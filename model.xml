@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<extendedFeatureModel>
+	<properties>
+		<graphics key="showhiddenfeatures" value="true"/>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="MLWF">
+			<graphics key="collapsed" value="false"/>
+			<and name="variants">
+				<graphics key="collapsed" value="false"/>
+				<alt name="Criteria">
+					<graphics key="collapsed" value="false"/>
+					<and name="toTestCriteria">
+						<feature name="InteractionAllowedCriteria"/>
+						<feature abstract="true" name="ComputanionalResourcesCriteria_VALUED"/>
+						<and name="PredictionCriteria">
+							<feature name="InteractiveInterpretationRequired"/>
+							<feature name="weigh automated predictions "/>
+						</and>
+						<feature name="LackOfTrainingData"/>
+						<and name="AnnotateDataCriteria">
+							<graphics key="collapsed" value="true"/>
+							<feature name="LaboriousTaskToAnnotateDate_VALUED"/>
+							<feature name="ExpertiseRequired_VALUED"/>
+						</and>
+						<and name="ProcessCriteria">
+							<feature abstract="true" name="Transparency"/>
+						</and>
+					</and>
+					<feature name="testCriteriaFeature">
+						<description>only to test small part of the FM</description>
+					</feature>
+				</alt>
+				<alt abstract="true" name="Methods">
+					<graphics key="collapsed" value="false"/>
+					<feature name="TrainingMultipleModelsMethod"/>
+					<feature name="ActiveLearningMethod"/>
+				</alt>
+				<and name="MacroStep">
+					<graphics key="collapsed" value="false"/>
+					<and name="PreprocessingStep">
+						<graphics key="collapsed" value="true"/>
+						<feature name="removeMissingValues_MULT">
+							<description>Multiple ways to manage missing values can be involved in one WF; each one for a different attribute</description>
+						</feature>
+						<feature name="NewFeature1"/>
+						<feature name="generatingTrainingData"/>
+					</and>
+					<feature name="RefineModelStep"/>
+					<alt abstract="true" mandatory="true" name="TrainingStep">
+						<feature name="testTrainingStepFeature"/>
+						<feature name="ML_ALGO_TODEFINE"/>
+					</alt>
+					<and name="HumanLabelingStep">
+						<feature name="CrownLabellingStep"/>
+						<and abstract="true" name="HumanLabelingStepCriteria">
+							<feature name="differnetTypesAndLevelOfAnnotations_labelingStep_Criteria"/>
+						</and>
+					</and>
+					<and name="ImproveModelStep">
+						<feature name="Fine-tuneModelStep">
+							<description>fine-tune the model using a subset of annotations including the new ones.</description>
+						</feature>
+					</and>
+					<feature name="SelectDataToLabelStep"/>
+					<and name="EvaluateRepresentationBiasStep">
+						<graphics key="collapsed" value="false"/>
+						<feature abstract="true" name="EnsurePopulationRepresentation">
+							<description>
+								For example, datasets collected through smart- phone apps can under-represent lower-income or older groups, who are less likely to own smartphones. Similarly, medical data for a particular condition may be available
+								only for the population of patients who were considered
+								serious enough to bring in for further screening.
+								(extrait article A Framework for Understanding Unintended Consequences of Machine Learning)
+							</description>
+						</feature>
+						<feature abstract="true" name="Ensure historic">
+							<description>
+								The population of interest has changed or is distinct from the population used during model training.
+								Data that is representative of Boston, for example, may not be representative if used to analyze the population of Indi- anapolis.
+								Similarly, data representative of Boston 30 years ago will likely not reflect today’s population.
+								A Framework for Understanding Unintended Consequences of Machine Learning
+							</description>
+						</feature>
+					</and>
+				</and>
+			</and>
+		</and>
+	</struct>
+	<constraints>
+		<rule>
+			<imp>
+				<var>generatingTrainingData</var>
+				<var>LackOfTrainingData</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>TrainingMultipleModelsMethod</var>
+				<var>ComputanionalResourcesCriteria_VALUED</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>InteractiveInterpretationRequired</var>
+				<var>InteractionAllowedCriteria</var>
+			</imp>
+		</rule>
+		<rule>
+			<eq>
+				<var>ActiveLearningMethod</var>
+				<var>HumanLabelingStep</var>
+			</eq>
+		</rule>
+		<rule>
+			<imp>
+				<var>testCriteriaFeature</var>
+				<var>testTrainingStepFeature</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>testTrainingStepFeature</var>
+				<not>
+					<disj>
+						<var>RefineModelStep</var>
+						<disj>
+							<var>ImproveModelStep</var>
+							<disj>
+								<var>HumanLabelingStep</var>
+								<disj>
+									<var>SelectDataToLabelStep</var>
+									<disj>
+										<var>PreprocessingStep</var>
+										<disj>
+											<var>RefineModelStep</var>
+											<var>EvaluateRepresentationBiasStep</var>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</not>
+			</imp>
+		</rule>
+	</constraints>
+</extendedFeatureModel>

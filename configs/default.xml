@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<feature automatic="selected" name="MLWF"/>
+	<feature automatic="selected" name="variants"/>
+	<feature automatic="selected" name="Criteria"/>
+	<feature automatic="unselected" name="toTestCriteria"/>
+	<feature automatic="unselected" name="InteractionAllowedCriteria"/>
+	<feature automatic="unselected" name="ComputanionalResourcesCriteria_VALUED"/>
+	<feature automatic="unselected" name="PredictionCriteria"/>
+	<feature automatic="unselected" name="InteractiveInterpretationRequired"/>
+	<feature automatic="unselected" name="weigh automated predictions "/>
+	<feature automatic="unselected" name="LackOfTrainingData"/>
+	<feature automatic="unselected" name="AnnotateDataCriteria"/>
+	<feature automatic="unselected" name="LaboriousTaskToAnnotateDate_VALUED"/>
+	<feature automatic="unselected" name="ExpertiseRequired_VALUED"/>
+	<feature automatic="unselected" name="ProcessCriteria"/>
+	<feature automatic="unselected" name="Transparency"/>
+	<feature manual="selected" name="testCriteriaFeature"/>
+	<feature automatic="unselected" name="Methods"/>
+	<feature automatic="unselected" name="TrainingMultipleModelsMethod"/>
+	<feature automatic="unselected" name="ActiveLearningMethod"/>
+	<feature automatic="selected" name="MacroStep"/>
+	<feature automatic="unselected" name="PreprocessingStep"/>
+	<feature automatic="unselected" name="removeMissingValues_MULT"/>
+	<feature automatic="unselected" name="NewFeature1"/>
+	<feature automatic="unselected" name="generatingTrainingData"/>
+	<feature automatic="unselected" name="RefineModelStep"/>
+	<feature automatic="selected" name="TrainingStep"/>
+	<feature automatic="selected" name="testTrainingStepFeature"/>
+	<feature automatic="unselected" name="ML_ALGO_TODEFINE"/>
+	<feature automatic="unselected" name="HumanLabelingStep"/>
+	<feature automatic="unselected" name="CrownLabellingStep"/>
+	<feature automatic="unselected" name="HumanLabelingStepCriteria"/>
+	<feature automatic="unselected" name="differnetTypesAndLevelOfAnnotations_labelingStep_Criteria"/>
+	<feature automatic="unselected" name="ImproveModelStep"/>
+	<feature automatic="unselected" name="Fine-tuneModelStep"/>
+	<feature automatic="unselected" name="SelectDataToLabelStep"/>
+	<feature name="EvaluateRepresentationBiasStep"/>
+	<feature name="EnsurePopulationRepresentation"/>
+	<feature name="Ensure historic"/>
+</configuration>
