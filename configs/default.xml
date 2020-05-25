@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
 	<feature automatic="selected" name="MLWF"/>
-	<feature name="variants"/>
-	<feature name="Criteria"/>
+	<feature automatic="selected" name="variants"/>
+	<feature automatic="selected" manual="selected" name="Criteria"/>
 	<feature name="toTestCriteria"/>
 	<feature name="InteractionAllowedCriteria"/>
 	<feature name="ComputanionalResourcesCriteria_VALUED"/>
@@ -15,24 +15,24 @@
 	<feature name="ExpertiseRequired_VALUED"/>
 	<feature name="ProcessCriteria"/>
 	<feature name="Transparency"/>
-	<feature name="testCriteriaFeature"/>
-	<feature name="criteria4TS"/>
-	<feature name="criteria4OC_SVM"/>
+	<feature automatic="unselected" name="testCriteriaFeature"/>
+	<feature automatic="selected" manual="selected" name="criteria4TS"/>
+	<feature manual="selected" name="criteria4OC_SVM"/>
 	<feature name="Methods"/>
 	<feature name="TrainingMultipleModelsMethod"/>
 	<feature name="ActiveLearningMethod"/>
-	<feature name="MacroStep"/>
-	<feature name="PreprocessingStep"/>
+	<feature automatic="selected" manual="selected" name="MacroStep"/>
+	<feature automatic="selected" manual="selected" name="PreprocessingStep"/>
 	<feature name="removeMissingValues_MULT"/>
-	<feature name="TimeSeriesReSampling"/>
+	<feature automatic="selected" manual="selected" name="TimeSeriesReSampling"/>
 	<feature name="generatingTrainingData"/>
-	<feature name="compute descriptors"/>
-	<feature name="compute descriptors over 5 min time windows"/>
+	<feature automatic="selected" name="compute descriptors"/>
+	<feature automatic="selected" name="compute descriptors over 5 min time windows"/>
 	<feature name="RefineModelStep"/>
-	<feature name="TrainingStep"/>
-	<feature name="testTrainingStepFeature"/>
-	<feature name="ML_ALGO_TODEFINE"/>
-	<feature name="train OC_SVM"/>
+	<feature automatic="selected" name="TrainingStep"/>
+	<feature automatic="unselected" name="testTrainingStepFeature"/>
+	<feature automatic="unselected" name="ML_ALGO_TODEFINE"/>
+	<feature automatic="selected" name="train OC_SVM"/>
 	<feature name="HumanLabelingStep"/>
 	<feature name="CrownLabellingStep"/>
 	<feature name="HumanLabelingStepCriteria"/>
@@ -43,8 +43,8 @@
 	<feature name="EvaluateRepresentationBiasStep"/>
 	<feature name="EnsurePopulationRepresentation"/>
 	<feature name="Ensure historic"/>
-	<feature name="select data training"/>
-	<feature name="select training period"/>
-	<feature name="detect with ML_model Step"/>
+	<feature automatic="selected" name="select data training"/>
+	<feature automatic="selected" name="select training period"/>
+	<feature automatic="selected" name="detect with ML_model Step"/>
 	<feature name="detect with OC_SVM Model"/>
 </configuration>
