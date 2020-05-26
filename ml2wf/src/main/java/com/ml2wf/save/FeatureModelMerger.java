@@ -5,12 +5,19 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conventions.Notation;
+import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
@@ -57,10 +64,6 @@ public class FeatureModelMerger {
 	 * @see Document
 	 */
 	private Document fmDocument;
-	/**
-	 * Default parent from which every node descends.
-	 */
-	private static final String DEFAULT_PARENT = "variants";
 
 	/**
 	 * {@code FeatureModelMerger}'s default constructor.
@@ -93,6 +96,7 @@ public class FeatureModelMerger {
 	 * {@link #getSuitableParent(Node)} method,</li>
 	 * <li>inserts the task under this suitable parent using the
 	 * {@link #insertNewTask(Node, Node)} method.</li>
+	 * <li>saves the modifications using the {@link #save()} method.</li>
 	 * </uL>
 	 *
 	 * @param path  Path to the xml workflow file.
@@ -100,19 +104,22 @@ public class FeatureModelMerger {
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
+	 * @throws TransformerException
 	 *
 	 * @since 1.0
 	 * @see Node
 	 * @see InstanceFactory
 	 *
 	 */
-	public void mergeWithWF(String path, String fname) throws ParserConfigurationException, SAXException, IOException {
+	public void mergeWithWF(String path, String fname)
+			throws ParserConfigurationException, SAXException, IOException, TransformerException {
 		Document wfDocument = XMLTool.preprocess(new File(path + fname));
 		List<Node> tasks = XMLTool.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
 		for (Node task : tasks) {
 			Node parentNode = this.getSuitableParent(task);
 			this.insertNewTask(parentNode, task);
 		}
+		this.save();
 	}
 
 	/**
@@ -141,6 +148,8 @@ public class FeatureModelMerger {
 		Node nameAttribute;
 		for (Node candidate : candidates) {
 			nameAttribute = candidate.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
+			System.out.println(nameAttribute.getNodeValue());
+			System.out.println(docNode.getNodeValue());
 			if (nameAttribute.getNodeValue().equals(docNode.getNodeValue())) {
 				return candidate;
 			}
@@ -162,6 +171,37 @@ public class FeatureModelMerger {
 	 * @see Node
 	 */
 	private void insertNewTask(Node parentNode, Node task) {
-		// TODO: not implemented yet
+		// TODO: to test
+		// retrieving task name content
+		Node taskNameNode = task.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
+		String[] nameParts = taskNameNode.getNodeValue().split(Notation.getGeneratedPrefixVoc());
+		// converting task name to the new node name
+		String nodeName = nameParts[1] + nameParts[0];
+		// inserting the new node
+		Element newNode = this.fmDocument.createElement(FeatureModelNames.FEATURE.getName());
+		newNode.setAttribute(FeatureModelAttributes.NAME.getName(), nodeName);
+		parentNode.appendChild(newNode);
+	}
+
+	/**
+	 * Saves the instantiated workflow as a new bpmn2 file.
+	 *
+	 * <p>
+	 *
+	 * The result filename will be <b>FileBaseName</b> + <b>_instance</b> +
+	 * <b>.FileExtension</b>.
+	 *
+	 * @throws TransformerException
+	 *
+	 * @since 1.0
+	 */
+	private void save() throws TransformerException {
+		// TODO: factorize with InstanceFactoryImpl#save
+		DOMSource source = new DOMSource(this.fmDocument);
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
+		String resultFname = this.fname.split("\\.")[0] + "result." + this.fname.split("\\.")[1]; // TODO: to define
+		StreamResult result = new StreamResult(this.path + resultFname);
+		transformer.transform(source, result);
 	}
 }
