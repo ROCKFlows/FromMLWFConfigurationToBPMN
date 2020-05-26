@@ -174,19 +174,17 @@ public class TestInstanceFactoryImpl {
 		// retrieving generic tasks and instantiated references
 		List<String> references = resultNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> v.replaceFirst(Notation.getGeneratedPrefixVoc(), "")).collect(Collectors.toList());
+				.map((v) -> XMLTool.sanitizeName(v)).collect(Collectors.toList());
 		List<String> genericTasksNames = sourceNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> v.replaceFirst(Notation.getGenericVoc() + "$", "")).collect(Collectors.toList());
+				.map((v) -> XMLTool.sanitizeName(v)).collect(Collectors.toList());
 		// comparing
 		assertTrue(references.containsAll(genericTasksNames)); // #1
 		resultNodes.forEach((n) -> {
 			assertEquals(
-					n.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue()
-							.replaceFirst(Notation.getGeneratedPrefixVoc(), "")
-							.replace(Notation.getGeneratedPrefixVoc() + ".*$", ""),
-					n.getChildNodes().item(1).getTextContent().replaceFirst(Notation.getReferenceVoc(), "")
-							.replaceFirst(Notation.getGenericVoc() + "$", "")); // #2
+					XMLTool.sanitizeName(
+							n.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue()),
+					XMLTool.sanitizeName(n.getChildNodes().item(1).getTextContent())); // #2
 		});
 	}
 }

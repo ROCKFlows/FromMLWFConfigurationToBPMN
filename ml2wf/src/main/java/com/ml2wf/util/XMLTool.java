@@ -15,6 +15,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conventions.Notation;
+
 /**
  * This class contains useful static methods for XML treatment.
  *
@@ -92,5 +94,21 @@ public class XMLTool {
 			lNodes.add(nodes.item(i));
 		}
 		return lNodes;
+	}
+
+	/**
+	 * Sanitizes {@code name} removing genericity and instantiation caracteristics.
+	 *
+	 * @param name name to sanitize
+	 * @return sanitized {@code name}
+	 */
+	public static String sanitizeName(String name) {
+		// sanitization for instantiate WF's task
+		name = name.replaceFirst(Notation.getGeneratedPrefixVoc(), "");
+		name = name.replaceFirst(Notation.getGeneratedPrefixVoc() + "\\d*$", "");
+		name = name.replaceFirst(Notation.getDocumentationVoc(), "");
+		name = name.replaceFirst(Notation.getReferenceVoc(), "");
+		// sanitization for generic WF's task
+		return name.replaceFirst(Notation.getGenericVoc() + "$", "");
 	}
 }
