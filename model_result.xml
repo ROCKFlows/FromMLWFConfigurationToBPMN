@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><extendedFeatureModel>
+	<properties>
+		<graphics key="showhiddenfeatures" value="true"/>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="MLWF">
+			<graphics key="collapsed" value="false"/>
+			<and name="variants">
+				<graphics key="collapsed" value="false"/>
+				<and name="Criteria">
+					<graphics key="collapsed" value="false"/>
+					<and name="toTestCriteria">
+						<feature name="InteractionAllowedCriteria"/>
+						<feature abstract="true" name="ComputanionalResourcesCriteria_VALUED"/>
+						<and name="PredictionCriteria">
+							<feature name="InteractiveInterpretationRequired"/>
+							<feature name="weigh automated predictions "/>
+						</and>
+						<feature name="LackOfTrainingData"/>
+						<and name="AnnotateDataCriteria">
+							<graphics key="collapsed" value="true"/>
+							<feature name="LaboriousTaskToAnnotateDate_VALUED"/>
+							<feature name="ExpertiseRequired_VALUED"/>
+						</and>
+						<and name="ProcessCriteria">
+							<feature abstract="true" name="Transparency"/>
+						</and>
+					</and>
+					<feature name="testCriteriaFeature">
+						<description>only to test small part of the FM</description>
+					</feature>
+					<and abstract="true" name="criteria4TS">
+						<graphics key="collapsed" value="false"/>
+						<feature name="criteria4OC_SVM"/>
+					</and>
+				</and>
+				<alt abstract="true" name="Methods">
+					<graphics key="collapsed" value="false"/>
+					<feature name="TrainingMultipleModelsMethod"/>
+					<feature name="ActiveLearningMethod"/>
+				</alt>
+				<and name="MacroStep">
+					<graphics key="collapsed" value="false"/>
+					<and abstract="true" name="PreprocessingStep">
+						<graphics key="collapsed" value="false"/>
+						<feature name="removeMissingValues_MULT">
+							<description>Multiple ways to manage missing values can be involved in one WF; each one for a different attribute</description>
+						</feature>
+						<feature abstract="true" name="TimeSeriesReSampling"/>
+						<feature name="generatingTrainingData"/>
+						<and abstract="true" name="compute descriptors">
+							<graphics key="collapsed" value="false"/>
+							<feature name="compute descriptors over 5 min time windows">
+								<attribute configurable="true" name="DoubleAttribute0" type="double" unit="" value="5.0"/>
+							</feature>
+						</and>
+					</and>
+					<feature name="RefineModelStep"/>
+					<alt abstract="true" mandatory="true" name="TrainingStep">
+						<feature name="testTrainingStepFeature"/>
+						<feature name="ML_ALGO_TODEFINE"/>
+						<feature name="train OC_SVM"/>
+					</alt>
+					<and name="HumanLabelingStep">
+						<graphics key="collapsed" value="true"/>
+						<feature name="CrownLabellingStep"/>
+						<and abstract="true" name="HumanLabelingStepCriteria">
+							<feature name="differnetTypesAndLevelOfAnnotations_labelingStep_Criteria"/>
+						</and>
+					</and>
+					<and name="ImproveModelStep">
+						<feature name="Fine-tuneModelStep">
+							<description>fine-tune the model using a subset of annotations including the new ones.</description>
+						</feature>
+					</and>
+					<feature name="SelectDataToLabelStep"/>
+					<and name="EvaluateRepresentationBiasStep">
+						<graphics key="collapsed" value="false"/>
+						<feature abstract="true" name="EnsurePopulationRepresentation">
+							<description>
+								For example, datasets collected through smart- phone apps can under-represent lower-income or older groups, who are less likely to own smartphones. Similarly, medical data for a particular condition may be available
+								only for the population of patients who were considered
+								serious enough to bring in for further screening.
+								(extrait article A Framework for Understanding Unintended Consequences of Machine Learning)
+							</description>
+						</feature>
+						<feature abstract="true" name="Ensure historic">
+							<description>
+								The population of interest has changed or is distinct from the population used during model training.
+								Data that is representative of Boston, for example, may not be representative if used to analyze the population of Indi- anapolis.
+								Similarly, data representative of Boston 30 years ago will likely not reflect today’s population.
+								A Framework for Understanding Unintended Consequences of Machine Learning
+							</description>
+						</feature>
+					</and>
+					<and abstract="true" name="select data training">
+						<feature name="select training period"/>
+					</and>
+					<and abstract="true" name="detect with ML_model Step">
+						<feature name="detect with OC_SVM Model"/>
+					</and>
+				</and>
+			</and>
+		<feature name="1_select data for training"/><feature name="1_preprocess data"/><feature name="1_train ml_model"/><feature name="1_detect with ml_model"/><feature name="1_select observations to anotate"/><feature name="2_detect with ml_model"/><feature name="1_remove outliers from training data???"/><feature name="1_fine_tune ml_model hyper parameters"/><feature name="1_check if model stable"/><feature name="1_spread discarded events from previous anotations"/><feature name="1_compute similarities"/><feature name="1_compute descriptors"/></and>
+	</struct>
+	<constraints>
+		<rule>
+			<imp>
+				<var>generatingTrainingData</var>
+				<var>LackOfTrainingData</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>TrainingMultipleModelsMethod</var>
+				<var>ComputanionalResourcesCriteria_VALUED</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>InteractiveInterpretationRequired</var>
+				<var>InteractionAllowedCriteria</var>
+			</imp>
+		</rule>
+		<rule>
+			<eq>
+				<var>ActiveLearningMethod</var>
+				<var>HumanLabelingStep</var>
+			</eq>
+		</rule>
+		<rule>
+			<imp>
+				<var>testCriteriaFeature</var>
+				<var>testTrainingStepFeature</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>testTrainingStepFeature</var>
+				<not>
+					<disj>
+						<var>RefineModelStep</var>
+						<disj>
+							<var>ImproveModelStep</var>
+							<disj>
+								<var>HumanLabelingStep</var>
+								<disj>
+									<var>SelectDataToLabelStep</var>
+									<disj>
+										<var>PreprocessingStep</var>
+										<disj>
+											<var>RefineModelStep</var>
+											<var>EvaluateRepresentationBiasStep</var>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+				</not>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>criteria4OC_SVM</var>
+				<conj>
+					<var>TimeSeriesReSampling</var>
+					<conj>
+						<var>select training period</var>
+						<conj>
+							<var>compute descriptors over 5 min time windows</var>
+							<var>train OC_SVM</var>
+						</conj>
+					</conj>
+				</conj>
+			</imp>
+		</rule>
+		<rule>
+			<description>For example only : working on TS implies to aply a given metaLearning WF</description>
+			<imp>
+				<var>criteria4TS</var>
+				<conj>
+					<var>PreprocessingStep</var>
+					<conj>
+						<var>select data training</var>
+						<conj>
+							<var>TrainingStep</var>
+							<conj>
+								<var>select data training</var>
+								<var>detect with ML_model Step</var>
+							</conj>
+						</conj>
+					</conj>
+				</conj>
+			</imp>
+		</rule>
+	</constraints>
+</extendedFeatureModel>

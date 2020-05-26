@@ -3,6 +3,7 @@ package com.ml2wf.save;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -113,9 +114,32 @@ public class FeatureModelMerger {
 	 */
 	public void mergeWithWF(String path, String fname)
 			throws ParserConfigurationException, SAXException, IOException, TransformerException {
+		// TODO: to comment
+		// preprocessing the document
 		Document wfDocument = XMLTool.preprocess(new File(path + fname));
+		// retrieving workflow's tasks
 		List<Node> tasks = XMLTool.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
+		// retrieving all existing FM's tasks names
+		// TODO: to optimize
+		List<Node> existingTasks = XMLTool
+				.nodeListAsList(this.fmDocument.getElementsByTagName(FeatureModelNames.AND.getName()));
+		existingTasks
+				.addAll(XMLTool.nodeListAsList(this.fmDocument.getElementsByTagName(FeatureModelNames.ALT.getName())));
+		existingTasks.addAll(
+				XMLTool.nodeListAsList(this.fmDocument.getElementsByTagName(FeatureModelNames.FEATURE.getName())));
+		List<String> existingTasksNames = existingTasks.stream().map(Node::getAttributes)
+				.map((n) -> n.getNamedItem(FeatureModelAttributes.NAME.getName())).map(Node::getNodeValue)
+				.collect(Collectors.toList());
+		// iterating for each task
+		String currentTaskName;
 		for (Node task : tasks) {
+			currentTaskName = task.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName()).getNodeValue();
+			currentTaskName = currentTaskName.replaceFirst(Notation.getGeneratedPrefixVoc(), "");
+			// splitting
+			String[] tName = currentTaskName.split(Notation.getGeneratedPrefixVoc());
+			if (existingTasksNames.contains(tName[1] + "_" + tName[0])) {
+				continue;
+			}
 			Node parentNode = this.getSuitableParent(task);
 			this.insertNewTask(parentNode, task);
 		}
@@ -125,6 +149,10 @@ public class FeatureModelMerger {
 	/**
 	 * Returns a suitable parent for the {@code Node task} according to its
 	 * specified <b>reference</b>.
+	 *
+	 * <p>
+	 *
+	 * If there isn't any referenced parent, returns the first document node.
 	 *
 	 * <p>
 	 *
@@ -148,13 +176,11 @@ public class FeatureModelMerger {
 		Node nameAttribute;
 		for (Node candidate : candidates) {
 			nameAttribute = candidate.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
-			System.out.println(nameAttribute.getNodeValue());
-			System.out.println(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""));
 			if (nameAttribute.getNodeValue().equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
 				return candidate;
 			}
 		}
-		return null;
+		return this.fmDocument.getElementsByTagName(FeatureModelNames.AND.getName()).item(0);
 	}
 
 	/**
@@ -174,9 +200,10 @@ public class FeatureModelMerger {
 		// TODO: to test
 		// retrieving task name content
 		Node taskNameNode = task.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
-		String[] nameParts = taskNameNode.getNodeValue().split(Notation.getGeneratedPrefixVoc());
+		String[] nameParts = taskNameNode.getNodeValue().replaceFirst(Notation.getGeneratedPrefixVoc(), "")
+				.split(Notation.getGeneratedPrefixVoc());
 		// converting task name to the new node name
-		String nodeName = nameParts[1] + nameParts[0];
+		String nodeName = nameParts[1] + "_" + nameParts[0];
 		// inserting the new node
 		Element newNode = this.fmDocument.createElement(FeatureModelNames.FEATURE.getName());
 		newNode.setAttribute(FeatureModelAttributes.NAME.getName(), nodeName);
@@ -200,7 +227,7 @@ public class FeatureModelMerger {
 		DOMSource source = new DOMSource(this.fmDocument);
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
-		String resultFname = this.fname.split("\\.")[0] + "result." + this.fname.split("\\.")[1]; // TODO: to define
+		String resultFname = this.fname.split("\\.")[0] + "_result." + this.fname.split("\\.")[1]; // TODO: to define
 		StreamResult result = new StreamResult(this.path + resultFname);
 		transformer.transform(source, result);
 	}

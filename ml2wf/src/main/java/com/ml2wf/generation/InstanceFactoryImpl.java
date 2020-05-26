@@ -2,6 +2,8 @@ package com.ml2wf.generation;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -70,6 +72,11 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
 	 */
 	private int docCount;
+	/**
+	 * This {@code Map} counts for each generic tasks the number of instantiated
+	 * tasks.
+	 */
+	private Map<String, Integer> tasksMap;
 
 	/**
 	 * {@code InstanceFactory}'s default constructor.
@@ -83,6 +90,7 @@ public class InstanceFactoryImpl implements InstanceFactory {
 		// TODO: check path always ending with /
 		this.inputFile = new File(this.path + this.fname);
 		this.docCount = 0;
+		this.tasksMap = new HashMap<>();
 	}
 
 	/**
@@ -169,9 +177,18 @@ public class InstanceFactoryImpl implements InstanceFactory {
 		// extension part
 		this.addExtensionNode(node);
 		// node renaming part
-		Node nodeName = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
-		nodeName.setNodeValue(
-				Notation.getGeneratedPrefixVoc() + nodeName.getNodeValue().replace(Notation.getGenericVoc(), ""));
+		Node nodeAttrName = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
+
+		String nodeName = Notation.getGeneratedPrefixVoc()
+				+ nodeAttrName.getNodeValue().replace(Notation.getGenericVoc(), "");
+
+		if (this.tasksMap.containsKey(nodeName)) {
+			this.tasksMap.put(nodeName, this.tasksMap.get(nodeName) + 1);
+		} else {
+			this.tasksMap.put(nodeName, 1);
+		}
+		nodeName += Notation.getGeneratedPrefixVoc() + this.tasksMap.get(nodeName);
+		nodeAttrName.setNodeValue(nodeName);
 	}
 
 	/**
