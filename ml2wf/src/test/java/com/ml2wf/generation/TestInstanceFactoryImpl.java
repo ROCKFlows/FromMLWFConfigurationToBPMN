@@ -5,13 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -24,8 +21,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.enums.BPMNNodesAttributes;
-import com.ml2wf.enums.BPMNNodesNames;
+import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
+import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
+import com.ml2wf.util.XMLTool;
 
 /**
  * This class tests the {@link InstanceFactoryImpl} class.
@@ -73,45 +71,6 @@ public class TestInstanceFactoryImpl {
 	private static final String RESULT_FILE_NAME = FILE_NAME.split("\\.")[0] + Notation.getInstanceVoc() + "."
 			+ FILE_NAME.split("\\.")[1];
 
-	/**
-	 * Returns the {@code Document} according to the specified {@code url}.
-	 *
-	 * @param url url of the xml file
-	 * @return the {@code Document} according to the specified {@code url}.
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 *
-	 * @see Document
-	 * @see URL
-	 */
-	private static Document getDocumentFromURL(URL url) throws SAXException, IOException, ParserConfigurationException {
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document document = dBuilder.parse(url.openStream());
-		document.getDocumentElement().normalize();
-		return document;
-	}
-
-	/**
-	 * Returns a {@code List} version of the {@code NodeList} parameter.
-	 *
-	 * @param nodes {@code NodeList} source
-	 * @return a {@code List} version of the {@code NodeList} parameter
-	 *
-	 * @since 1.0
-	 *
-	 * @see List
-	 * @see NodeList
-	 */
-	private static List<Node> nodeListAsList(NodeList nodes) {
-		List<Node> lNodes = new ArrayList<>();
-		for (int i = 0; i < nodes.getLength(); i++) {
-			lNodes.add(nodes.item(i));
-		}
-		return lNodes;
-	}
-
 	@BeforeEach
 	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		// loading xml test file
@@ -123,9 +82,9 @@ public class TestInstanceFactoryImpl {
 		// instantializing generic WF
 		this.factory.getWFInstance();
 		// getting xml files as documents
-		this.sourceDocument = getDocumentFromURL(url);
+		this.sourceDocument = XMLTool.getDocumentFromURL(url);
 		url = classLoader.getResource(RESULT_FILE_NAME);
-		this.resultDocument = getDocumentFromURL(url);
+		this.resultDocument = XMLTool.getDocumentFromURL(url);
 	}
 
 	@AfterEach
@@ -208,10 +167,10 @@ public class TestInstanceFactoryImpl {
 		// TODO: test for usertask
 		// TODO: improve readability
 		// retrieving nodes as a List
-		List<Node> sourceNodes = nodeListAsList(
-				this.sourceDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
-		List<Node> resultNodes = nodeListAsList(
-				this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
+		List<Node> sourceNodes = XMLTool
+				.nodeListAsList(this.sourceDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
+		List<Node> resultNodes = XMLTool
+				.nodeListAsList(this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
 		// retrieving generic tasks and instantiated references
 		List<String> references = resultNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())).map(Node::getNodeValue)

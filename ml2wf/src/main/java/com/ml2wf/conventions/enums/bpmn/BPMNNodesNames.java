@@ -1,4 +1,4 @@
-package com.ml2wf.enums;
+package com.ml2wf.conventions.enums.bpmn;
 
 public enum BPMNNodesNames {
 

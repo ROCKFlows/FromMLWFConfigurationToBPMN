@@ -1,0 +1,149 @@
+package com.ml2wf.save;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
+import com.ml2wf.generation.InstanceFactory;
+import com.ml2wf.util.XMLTool;
+
+/**
+ * This class merges a FeatureModel xml file with a Workflow xml file.
+ *
+ * <p>
+ *
+ * It aims at the application of <b>metalearning</b> for workflow automation as
+ * part of the <b>ml2wf project</b>.
+ *
+ * <p>
+ *
+ * Please refer to the <a href="https://featureide.github.io/">FeatureIDE
+ * framework</a> for further information about a FeatureModel.
+ *
+ * @author Nicolas Lacroix
+ *
+ * @version 1.0
+ *
+ */
+public class FeatureModelMerger {
+
+	/**
+	 * Path to the XML FeatureModel file's directory.
+	 */
+	private String path;
+	/**
+	 * XML FeatureModel filename.
+	 */
+	private String fname;
+	/**
+	 * {@code File} instance of the XML FeatureModel file.
+	 *
+	 * @see File
+	 */
+	private File fmFile;
+	/**
+	 * {@code Document} instance of the XML FeatureModel file.
+	 *
+	 * @see Document
+	 */
+	private Document fmDocument;
+	/**
+	 * Default parent from which every node descends.
+	 */
+	private static final String DEFAULT_PARENT = "variants";
+
+	/**
+	 * {@code FeatureModelMerger}'s default constructor.
+	 *
+	 * @param path
+	 * @param fname
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	public FeatureModelMerger(String path, String fname)
+			throws ParserConfigurationException, SAXException, IOException {
+		this.path = path;
+		this.fname = fname;
+		// TODO: check path always ending with /
+		this.fmFile = new File(this.path + this.fname);
+		this.fmDocument = XMLTool.preprocess(this.fmFile);
+	}
+
+	/**
+	 * Merges the given <b>instantiated</b> Workflow with the {@link #fmDocument
+	 * FeatureModel};
+	 *
+	 * <p>
+	 *
+	 * More precisely,
+	 *
+	 * <ul>
+	 * <li>retrieves a suitable parent from the FeatureModel for each task using the
+	 * {@link #getSuitableParent(Node)} method,</li>
+	 * <li>inserts the task under this suitable parent using the
+	 * {@link #insertNewTask(Node, Node)} method.</li>
+	 * </uL>
+	 *
+	 * @param path  Path to the xml workflow file.
+	 * @param fname file name of the xml workflow file.
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 *
+	 * @since 1.0
+	 * @see Node
+	 * @see InstanceFactory
+	 *
+	 */
+	public void mergeWithWF(String path, String fname) throws ParserConfigurationException, SAXException, IOException {
+		Document wfDocument = XMLTool.preprocess(new File(path + fname));
+		List<Node> tasks = XMLTool.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
+		for (Node task : tasks) {
+			Node parentNode = this.getSuitableParent(task);
+			this.insertNewTask(parentNode, task);
+		}
+	}
+
+	/**
+	 * Returns a suitable parent for the {@code Node task} according to its
+	 * specified <b>reference</b>.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that each instantiated task <b>refers to a generic one presents
+	 * in the FeatureModel</B>.
+	 *
+	 * @param task task to get a suitable parent
+	 * @return a suitable parent for the {@code Node task} according to its
+	 *         specified reference
+	 */
+	private Node getSuitableParent(Node task) {
+		// TODO: not implemented yet
+		return task;
+	}
+
+	/**
+	 * Inserts the new task corresponding of the given {@code Node task} under the
+	 * given {@code Node parentNode}.
+	 *
+	 * <p>
+	 *
+	 * The new task is converted to match the FeatureModel format.
+	 *
+	 * @param parentNode Parent node of the new task
+	 * @param task       task to insert
+	 *
+	 * @see Node
+	 */
+	private void insertNewTask(Node parentNode, Node task) {
+		// TODO: not implemented yet
+	}
+}

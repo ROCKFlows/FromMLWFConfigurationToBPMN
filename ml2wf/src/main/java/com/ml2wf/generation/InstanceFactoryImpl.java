@@ -20,8 +20,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.enums.BPMNNodesAttributes;
-import com.ml2wf.enums.BPMNNodesNames;
+import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
+import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 
 /**
  * This class is a factory for the instantiation of abstract workflows.
