@@ -19,6 +19,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.enums.BPMNNodesAttributes;
 import com.ml2wf.enums.BPMNNodesNames;
 
@@ -39,7 +40,7 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	/**
 	 * Hexadecimal color code of instantiated elements.
 	 */
-	private static final String INSTANTIATE_COLOR = "#00f900";
+	public static final String INSTANTIATE_COLOR = "#00f900";
 	/**
 	 * Path to the XML file's directory.
 	 */
@@ -157,8 +158,9 @@ public class InstanceFactoryImpl implements InstanceFactory {
 		// extension part
 		this.addExtensionNode(node);
 		// node renaming part
-		Node nodeName = node.getAttributes().getNamedItem("name");
-		nodeName.setNodeValue("#" + nodeName.getNodeValue().replace("_Step", ""));
+		Node nodeName = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
+		nodeName.setNodeValue(
+				Notation.getGeneratedPrefixVoc() + nodeName.getNodeValue().replace(Notation.getGenericVoc(), ""));
 	}
 
 	/**
@@ -179,8 +181,8 @@ public class InstanceFactoryImpl implements InstanceFactory {
 		// TODO: define documentation numerotation
 		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), "Documentation NB_TO_DEFINE");
 		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
-		CDATASection refersTo = this.document
-				.createCDATASection("refersTo: " + node.getAttributes().getNamedItem("name").getNodeValue());
+		CDATASection refersTo = this.document.createCDATASection(Notation.getReferenceVoc()
+				+ node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue());
 		documentation.appendChild(refersTo);
 		node.insertBefore(documentation, node.getFirstChild());
 	}
@@ -221,7 +223,7 @@ public class InstanceFactoryImpl implements InstanceFactory {
 		DOMSource source = new DOMSource(this.document);
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
-		String resultFname = this.fname.split("\\.")[0] + "_instance." + this.fname.split("\\.")[1];
+		String resultFname = this.fname.split("\\.")[0] + Notation.getInstanceVoc() + "." + this.fname.split("\\.")[1];
 		StreamResult result = new StreamResult(this.path + resultFname);
 		transformer.transform(source, result);
 	}
