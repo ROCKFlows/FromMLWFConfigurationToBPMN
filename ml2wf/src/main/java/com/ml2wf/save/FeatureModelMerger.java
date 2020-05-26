@@ -7,10 +7,13 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
+import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
+import com.ml2wf.conventions.enums.fm.FeatureModelNames;
 import com.ml2wf.generation.InstanceFactory;
 import com.ml2wf.util.XMLTool;
 
@@ -126,8 +129,23 @@ public class FeatureModelMerger {
 	 *         specified reference
 	 */
 	private Node getSuitableParent(Node task) {
-		// TODO: not implemented yet
-		return task;
+		// TODO: to test
+		// retrieving the references parent
+		Node docNode = ((Element) task).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName()).item(0);
+		// retrieving all candidates
+		List<Node> candidates = XMLTool
+				.nodeListAsList(this.fmDocument.getElementsByTagName(FeatureModelNames.AND.getName()));
+		candidates
+				.addAll(XMLTool.nodeListAsList(this.fmDocument.getElementsByTagName(FeatureModelNames.ALT.getName())));
+		// electing the good candidate
+		Node nameAttribute;
+		for (Node candidate : candidates) {
+			nameAttribute = candidate.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
+			if (nameAttribute.getNodeValue().equals(docNode.getNodeValue())) {
+				return candidate;
+			}
+		}
+		return null;
 	}
 
 	/**
