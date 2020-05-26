@@ -61,6 +61,15 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	 * @see Document
 	 */
 	private Document document;
+	/**
+	 * Documentation's counter.
+	 *
+	 * <p>
+	 *
+	 * This counter is used to number each documentation which is required for the
+	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
+	 */
+	private int docCount;
 
 	/**
 	 * {@code InstanceFactory}'s default constructor.
@@ -73,6 +82,7 @@ public class InstanceFactoryImpl implements InstanceFactory {
 		this.fname = fname;
 		// TODO: check path always ending with /
 		this.inputFile = new File(this.path + this.fname);
+		this.docCount = 0;
 	}
 
 	/**
@@ -179,7 +189,7 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	private void addDocumentationNode(Node node) {
 		Element documentation = this.document.createElement(BPMNNodesNames.DOCUMENTATION.getName());
 		// TODO: define documentation numerotation
-		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), "Documentation NB_TO_DEFINE");
+		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), "Documentation_" + this.docCount++);
 		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
 		CDATASection refersTo = this.document.createCDATASection(Notation.getReferenceVoc()
 				+ node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue());
