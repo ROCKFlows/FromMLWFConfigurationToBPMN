@@ -33,6 +33,10 @@ public final class Notation {
 	 * <b>generic</b> notation.
 	 */
 	private static final String GENERIC_VOC = "_Step";
+	/**
+	 * <b>documentation</b> notation.
+	 */
+	private static final String DOCUMENTATION_VOC = "Documentation_";
 
 	/**
 	 * {@code Notation's} default constructor.
@@ -87,6 +91,17 @@ public final class Notation {
 	 */
 	public static String getGenericVoc() {
 		return GENERIC_VOC;
+	}
+
+	/**
+	 * Returns the <b>documentation</b> notation.
+	 *
+	 * @return the documentation notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getDocumentationVoc() {
+		return DOCUMENTATION_VOC;
 	}
 
 }

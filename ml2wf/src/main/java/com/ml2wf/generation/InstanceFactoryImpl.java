@@ -128,6 +128,7 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	 * @since 1.0
 	 * @see Node
 	 */
+	@Override
 	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		this.preprocess();
 		// TODO: improve this part
@@ -189,7 +190,7 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	private void addDocumentationNode(Node node) {
 		Element documentation = this.document.createElement(BPMNNodesNames.DOCUMENTATION.getName());
 		// TODO: define documentation numerotation
-		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), "Documentation_" + this.docCount++);
+		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
 		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
 		CDATASection refersTo = this.document.createCDATASection(Notation.getReferenceVoc()
 				+ node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue());
