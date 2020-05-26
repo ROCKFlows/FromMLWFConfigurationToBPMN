@@ -12,12 +12,12 @@ import com.ml2wf.save.FeatureModelMerger;
 
 public class App {
 
-	// WF part
+	// WF attributes
 	protected static final String WF_PATH = "../BPMN - Models/";
 	protected static final String WF_FILE_NAME = "MetaModel_AD.bpmn2";
 	protected static final String WF_RESULT_PATH = "../BPMN - Models/";
 	protected static final String WF_RESULT_FILE_NAME = "MetaModel_AD_instance.bpmn2";
-
+	// FM attributes
 	protected static final String FM_PATH = "../";
 	protected static final String FM_FILE_NAME = "model.xml";
 

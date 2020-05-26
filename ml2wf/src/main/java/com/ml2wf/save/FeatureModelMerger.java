@@ -149,8 +149,8 @@ public class FeatureModelMerger {
 		for (Node candidate : candidates) {
 			nameAttribute = candidate.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
 			System.out.println(nameAttribute.getNodeValue());
-			System.out.println(docNode.getNodeValue());
-			if (nameAttribute.getNodeValue().equals(docNode.getNodeValue())) {
+			System.out.println(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""));
+			if (nameAttribute.getNodeValue().equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
 				return candidate;
 			}
 		}
