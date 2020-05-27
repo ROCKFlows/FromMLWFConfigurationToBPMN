@@ -14,7 +14,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
@@ -98,23 +97,15 @@ public class FeatureModelMerger extends XMLManager {
 		// preprocessing the document
 		Document wfDocument = XMLManager.preprocess(new File(path + fname));
 		// retrieving workflow's tasks
-		List<Node> tasks = XMLManager.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
-		tasks.addAll(XMLManager.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.USERTASK.getName())));
+		List<Node> tasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
 		// retrieving all existing FM's tasks names
-		// TODO: to optimize
-		List<Node> existingTasks = XMLManager
-				.nodeListAsList(super.getDocument().getElementsByTagName(FeatureModelNames.AND.getName()));
-		existingTasks.addAll(
-				XMLManager.nodeListAsList(super.getDocument().getElementsByTagName(FeatureModelNames.ALT.getName())));
-		existingTasks.addAll(XMLManager
-				.nodeListAsList(super.getDocument().getElementsByTagName(FeatureModelNames.FEATURE.getName())));
-		List<String> existingTasksNames = existingTasks.stream().map(Node::getAttributes)
-				.map((n) -> n.getNamedItem(FeatureModelAttributes.NAME.getName())).map(Node::getNodeValue)
+		List<Node> existingTasks = XMLManager.getTasksList(super.getDocument(), FeatureModelNames.SELECTOR);
+		List<String> existingTasksNames = existingTasks.stream().map(XMLManager::getNodeName)
 				.collect(Collectors.toList());
 		// iterating for each task
 		String currentTaskName;
 		for (Node task : tasks) {
-			currentTaskName = task.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName()).getNodeValue();
+			currentTaskName = XMLManager.getNodeName(task);
 			currentTaskName = currentTaskName.replaceFirst(Notation.getGeneratedPrefixVoc(), "");
 			// splitting
 			String[] tName = currentTaskName.split(Notation.getGeneratedPrefixVoc());
@@ -150,17 +141,12 @@ public class FeatureModelMerger extends XMLManager {
 		// retrieving the references parent
 		Node docNode = ((Element) task).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName()).item(0);
 		// retrieving all candidates
-		List<Node> candidates = XMLManager
-				.nodeListAsList(super.getDocument().getElementsByTagName(FeatureModelNames.AND.getName()));
-		candidates.addAll(
-				XMLManager.nodeListAsList(super.getDocument().getElementsByTagName(FeatureModelNames.ALT.getName())));
-		candidates.addAll(XMLManager
-				.nodeListAsList(super.getDocument().getElementsByTagName(FeatureModelNames.FEATURE.getName())));
+		List<Node> candidates = XMLManager.getTasksList(super.getDocument(), FeatureModelNames.SELECTOR);
 		// electing the good candidate
-		Node nameAttribute;
+		String candidateName;
 		for (Node candidate : candidates) {
-			nameAttribute = candidate.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
-			if (nameAttribute.getNodeValue().equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
+			candidateName = XMLManager.getNodeName(candidate);
+			if (candidateName.equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
 				return candidate;
 			}
 		}
@@ -181,16 +167,14 @@ public class FeatureModelMerger extends XMLManager {
 	 * @see Node
 	 */
 	private void insertNewTask(Node parentNode, Node task) {
-		// TODO: to test
 		// retrieving task name content
-		Node taskNameNode = task.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
-		String[] nameParts = taskNameNode.getNodeValue().replaceFirst(Notation.getGeneratedPrefixVoc(), "")
+		String[] taskName = XMLManager.getNodeName(task).replaceFirst(Notation.getGeneratedPrefixVoc(), "")
 				.split(Notation.getGeneratedPrefixVoc());
 		// converting task name to the new node name
-		String nodeName = nameParts[1] + "_" + nameParts[0];
+		String newNodeName = taskName[1] + "_" + taskName[0];
 		// inserting the new node
 		Element newNode = super.getDocument().createElement(FeatureModelNames.FEATURE.getName());
-		newNode.setAttribute(FeatureModelAttributes.NAME.getName(), nodeName);
+		newNode.setAttribute(FeatureModelAttributes.NAME.getName(), newNodeName);
 		parentNode.appendChild(newNode);
 	}
 }

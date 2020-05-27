@@ -10,7 +10,6 @@ import javax.xml.transform.TransformerException;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.Notation;
@@ -100,14 +99,8 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	@Override
 	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		// TODO: improve this part
-		NodeList nodes = super.getDocument().getElementsByTagName(BPMNNodesNames.TASK.getName());
-		for (int i = 0; i < nodes.getLength(); i++) {
-			this.instantiateNode(nodes.item(i));
-		}
-		nodes = super.getDocument().getElementsByTagName(BPMNNodesNames.USERTASK.getName());
-		for (int i = 0; i < nodes.getLength(); i++) {
-			this.instantiateNode(nodes.item(i));
+		for (Node node : XMLManager.getTasksList(super.getDocument(), BPMNNodesNames.SELECTOR)) {
+			this.instantiateNode(node);
 		}
 		String resultFname = super.getFname().split("\\.")[0] + Notation.getInstanceVoc() + "."
 				+ super.getFname().split("\\.")[1];

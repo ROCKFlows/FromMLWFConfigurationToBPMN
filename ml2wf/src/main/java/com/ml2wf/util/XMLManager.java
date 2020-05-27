@@ -21,6 +21,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.Notation;
+import com.ml2wf.conventions.enums.TaskTagsSelector;
+import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 
 /**
  * This class is the base class for any XML managing class.
@@ -176,6 +178,45 @@ public class XMLManager {
 	// General static methods
 
 	/**
+	 * Returns the name tag's value of the given {@code node} if exists.
+	 *
+	 * Returns an empty string if not.
+	 *
+	 * @param node node containing the name attribute
+	 * @return Returns the name tag's value of the given {@code node} if exists
+	 *
+	 * @since 1.0
+	 *
+	 * @see Node
+	 */
+	public static String getNodeName(Node node) {
+		Node n;
+		if ((n = node.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName())) != null) {
+			return n.getNodeValue();
+		}
+		return "";
+	}
+
+	/**
+	 * Returns all task nodes of the given {@code document}.
+	 *
+	 * @param document source document of task nodes extraction
+	 * @return all task nodes of the given {@code document}
+	 *
+	 * @since 1.0
+	 *
+	 * @see Document
+	 * @see Node
+	 */
+	public static List<Node> getTasksList(Document document, TaskTagsSelector selector) {
+		List<Node> nodes = new ArrayList<>();
+		for (String taskTag : selector.getTaskTags()) {
+			nodes.addAll(XMLManager.nodeListAsList(document.getElementsByTagName(taskTag)));
+		}
+		return nodes;
+	}
+
+	/**
 	 * Preprocess the given XML file before any treatment.
 	 *
 	 * @throws SAXException
@@ -183,6 +224,8 @@ public class XMLManager {
 	 * @throws ParserConfigurationException
 	 *
 	 * @since 1.0
+	 *
+	 * @see Document
 	 */
 	public static Document preprocess(File file) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -200,6 +243,8 @@ public class XMLManager {
 	 * @throws SAXException
 	 * @throws IOException
 	 * @throws ParserConfigurationException
+	 *
+	 * @since 1.0
 	 *
 	 * @see Document
 	 * @see URL
@@ -236,6 +281,8 @@ public class XMLManager {
 	 *
 	 * @param name name to sanitize
 	 * @return sanitized {@code name}
+	 *
+	 * @since 1.0
 	 */
 	public static String sanitizeName(String name) {
 		// sanitization for instantiate WF's task
