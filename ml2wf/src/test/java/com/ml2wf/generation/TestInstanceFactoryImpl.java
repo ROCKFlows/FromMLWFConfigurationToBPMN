@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
-import com.ml2wf.util.XMLTool;
+import com.ml2wf.util.XMLManager;
 
 /**
  * This class tests the {@link InstanceFactoryImpl} class.
@@ -80,9 +80,9 @@ public class TestInstanceFactoryImpl {
 		// instantializing generic WF
 		this.factory.getWFInstance();
 		// getting xml files as documents
-		this.sourceDocument = XMLTool.getDocumentFromURL(url);
+		this.sourceDocument = XMLManager.getDocumentFromURL(url);
 		url = classLoader.getResource(RESULT_FILE_NAME);
-		this.resultDocument = XMLTool.getDocumentFromURL(url);
+		this.resultDocument = XMLManager.getDocumentFromURL(url);
 	}
 
 	@AfterEach
@@ -168,24 +168,24 @@ public class TestInstanceFactoryImpl {
 		// TODO: test for usertask
 		// TODO: improve readability
 		// retrieving nodes as a List
-		List<Node> sourceNodes = XMLTool
+		List<Node> sourceNodes = XMLManager
 				.nodeListAsList(this.sourceDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
-		List<Node> resultNodes = XMLTool
+		List<Node> resultNodes = XMLManager
 				.nodeListAsList(this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
 		// retrieving generic tasks and instantiated references
 		List<String> references = resultNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> XMLTool.sanitizeName(v)).collect(Collectors.toList());
+				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
 		List<String> genericTasksNames = sourceNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> XMLTool.sanitizeName(v)).collect(Collectors.toList());
+				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
 		// comparing
 		assertTrue(references.containsAll(genericTasksNames)); // #1
 		resultNodes.forEach((n) -> {
 			assertEquals(
-					XMLTool.sanitizeName(
+					XMLManager.sanitizeName(
 							n.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue()),
-					XMLTool.sanitizeName(n.getChildNodes().item(1).getTextContent())); // #2
+					XMLManager.sanitizeName(n.getChildNodes().item(1).getTextContent())); // #2
 		});
 	}
 }

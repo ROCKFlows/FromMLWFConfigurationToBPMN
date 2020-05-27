@@ -9,6 +9,11 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -18,27 +23,157 @@ import org.xml.sax.SAXException;
 import com.ml2wf.conventions.Notation;
 
 /**
- * This class contains useful static methods for XML treatment.
+ * This class is the base class for any XML managing class.
+ *
+ * <p>
+ *
+ * It also contains useful static methods for XML treatment.
  *
  * @author Nicolas Lacroix
  *
  * @version 1.0
  *
  */
-public class XMLTool {
+public class XMLManager {
 
-	// TODO: factorize other class using this one
+	/**
+	 * Path to the XML file's directory.
+	 */
+	private String path;
+	/**
+	 * XML filename.
+	 */
+	private String fname;
+	/**
+	 * {@code File} instance of the XML file.
+	 *
+	 * @see File
+	 */
+	private File sourceFile;
+	/**
+	 * {@code Document} instance of the XML file.
+	 *
+	 * @see Document
+	 */
+	private Document document;
 
 	/**
 	 * {@code XMLTool}'s default constructor.
 	 *
 	 * <p>
 	 *
-	 * <b>Note</b> that this constructor is <code>private</code>.
+	 * <b>Note</b> that the {@link #preprocess()} method is called to initialize
+	 * {@link #document}.
+	 *
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
 	 */
-	private XMLTool() {
-
+	public XMLManager(String path, String fname) throws ParserConfigurationException, SAXException, IOException {
+		this.path = path;
+		this.fname = fname;
+		// TODO: check path always ending with /
+		this.sourceFile = new File(this.path + this.fname);
+		this.document = XMLManager.preprocess(this.sourceFile);
 	}
+
+	/**
+	 * Returns the xml's path
+	 *
+	 * @return the xml's path
+	 */
+	public String getPath() {
+		return this.path;
+	}
+
+	/**
+	 * Sets the xml's path
+	 *
+	 * @param path the new path
+	 */
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	/**
+	 * Returns the xml's filename
+	 *
+	 * @return the xml's filename
+	 */
+	public String getFname() {
+		return this.fname;
+	}
+
+	/**
+	 * Sets the xml's filename
+	 *
+	 * @param fname the new xml's filename
+	 */
+	public void setFname(String fname) {
+		this.fname = fname;
+	}
+
+	/**
+	 * Returns the xml's {@code File} instance
+	 *
+	 * @return the xml's {@code File} instance
+	 *
+	 * @see File
+	 */
+	public File getSourceFile() {
+		return this.sourceFile;
+	}
+
+	/**
+	 * Sets the xml's {@code File} instance
+	 *
+	 * @param sourceFile the new xml's {@code File} instance
+	 *
+	 * @see File
+	 */
+	public void setSourceFile(File sourceFile) {
+		this.sourceFile = sourceFile;
+	}
+
+	/**
+	 * Returns the xml's {@code Document} instance
+	 *
+	 * @return the xml's {@code Document} instance
+	 *
+	 * @see Document
+	 */
+	public Document getDocument() {
+		return this.document;
+	}
+
+	/**
+	 * Returns the xml's {@code Document} instance
+	 *
+	 * @param document the new xml's {@code Document} instance
+	 *
+	 * @see Document
+	 */
+	public void setDocument(Document document) {
+		this.document = document;
+	}
+
+	/**
+	 * Saves the result file.
+	 *
+	 * @param resultFname filename of result file
+	 * @throws TransformerException
+	 *
+	 * @since 1.0
+	 */
+	public void save(String resultFname) throws TransformerException {
+		DOMSource source = new DOMSource(this.document);
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
+		StreamResult result = new StreamResult(this.path + resultFname);
+		transformer.transform(source, result);
+	}
+
+	// General static methods
 
 	/**
 	 * Preprocess the given XML file before any treatment.

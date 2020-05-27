@@ -22,7 +22,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
-import com.ml2wf.util.XMLTool;
+import com.ml2wf.util.XMLManager;
 
 /**
  * This class tests the {@link FeatureModelMerger} class.
@@ -80,7 +80,7 @@ public class TestFeatureModelMerger {
 		String fDirectory = url.getPath().replace("%20", " ").replace(WF_SOURCE_FILE_NAME, "");
 		// ---
 		this.merger = new FeatureModelMerger(fDirectory, FM_SOURCE_FILE_NAME);
-		this.sourceWFDocument = XMLTool.getDocumentFromURL(url);
+		this.sourceWFDocument = XMLManager.getDocumentFromURL(url);
 		// ---
 		// TODO: factorize with TestInstanceFactoryImpl#setUp
 		url = classLoader.getResource(WF_SOURCE_FILE_NAME);
@@ -88,7 +88,7 @@ public class TestFeatureModelMerger {
 		// ---
 		this.merger.mergeWithWF(fDirectory, WF_SOURCE_FILE_NAME);
 		url = classLoader.getResource(FM_RESULT_FILE_NAME);
-		this.resultFMDocument = XMLTool.getDocumentFromURL(url);
+		this.resultFMDocument = XMLManager.getDocumentFromURL(url);
 	}
 
 	@AfterEach
@@ -115,24 +115,24 @@ public class TestFeatureModelMerger {
 	public void testMergingStructure() {
 		// TODO: to complete/improve
 		// getting WF's source task nodes
-		List<Node> sourceNodes = XMLTool
+		List<Node> sourceNodes = XMLManager
 				.nodeListAsList(this.sourceWFDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
 		sourceNodes.addAll(
-				XMLTool.nodeListAsList(this.sourceWFDocument.getElementsByTagName(BPMNNodesNames.USERTASK.getName())));
+				XMLManager.nodeListAsList(this.sourceWFDocument.getElementsByTagName(BPMNNodesNames.USERTASK.getName())));
 		// getting FM tasks
-		List<Node> resultNodes = XMLTool
+		List<Node> resultNodes = XMLManager
 				.nodeListAsList(this.resultFMDocument.getElementsByTagName(FeatureModelNames.AND.getName()));
 		resultNodes.addAll(
-				XMLTool.nodeListAsList(this.resultFMDocument.getElementsByTagName(FeatureModelNames.ALT.getName())));
-		resultNodes.addAll(XMLTool
+				XMLManager.nodeListAsList(this.resultFMDocument.getElementsByTagName(FeatureModelNames.ALT.getName())));
+		resultNodes.addAll(XMLManager
 				.nodeListAsList(this.resultFMDocument.getElementsByTagName(FeatureModelNames.FEATURE.getName())));
 		// getting tasks' names
 		List<String> sourceNodesNames = sourceNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> XMLTool.sanitizeName(v)).collect(Collectors.toList());
+				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
 		List<String> resultNodesNames = resultNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(FeatureModelAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> XMLTool.sanitizeName(v)).collect(Collectors.toList());
+				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
 		// testing
 		assertTrue(resultNodesNames.containsAll(sourceNodesNames)); // #1
 	}

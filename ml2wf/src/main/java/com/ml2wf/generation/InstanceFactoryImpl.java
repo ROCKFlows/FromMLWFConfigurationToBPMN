@@ -1,21 +1,13 @@
 package com.ml2wf.generation;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.CDATASection;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -24,9 +16,14 @@ import org.xml.sax.SAXException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
+import com.ml2wf.util.XMLManager;
 
 /**
  * This class is a factory for the instantiation of abstract workflows.
+ *
+ * <p>
+ *
+ * It is an extension of the {@link XMLManager} base class.
  *
  * <p>
  *
@@ -37,32 +34,12 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
  * @version 1.0
  *
  */
-public class InstanceFactoryImpl implements InstanceFactory {
+public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 
 	/**
 	 * Hexadecimal color code of instantiated elements.
 	 */
 	public static final String INSTANTIATE_COLOR = "#00f900";
-	/**
-	 * Path to the XML file's directory.
-	 */
-	private String path;
-	/**
-	 * XML filename.
-	 */
-	private String fname;
-	/**
-	 * {@code File} instance of the XML file.
-	 *
-	 * @see File
-	 */
-	private File inputFile;
-	/**
-	 * {@code Document} instance of the XML file.
-	 *
-	 * @see Document
-	 */
-	private Document document;
 	/**
 	 * Documentation's counter.
 	 *
@@ -81,32 +58,17 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	/**
 	 * {@code InstanceFactory}'s default constructor.
 	 *
-	 * @param path  The XML filepath.
+	 * @param path  the XML filepath.
 	 * @param fname the XML filename.
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
 	 */
-	public InstanceFactoryImpl(String path, String fname) {
-		this.path = path;
-		this.fname = fname;
-		// TODO: check path always ending with /
-		this.inputFile = new File(this.path + this.fname);
+	public InstanceFactoryImpl(String path, String fname)
+			throws ParserConfigurationException, SAXException, IOException {
+		super(path, fname);
 		this.docCount = 0;
 		this.tasksMap = new HashMap<>();
-	}
-
-	/**
-	 * Preprocess the given XML file before any treatment.
-	 *
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 *
-	 * @since 1.0
-	 */
-	private void preprocess() throws SAXException, IOException, ParserConfigurationException {
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		this.document = dBuilder.parse(this.inputFile);
-		this.document.getDocumentElement().normalize();
 	}
 
 	/**
@@ -125,8 +87,8 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	 *
 	 * <p>
 	 *
-	 * <b>Note</b> that the {@link #preprocess()} method is called before any
-	 * treatment.
+	 * The result filename will be <b>FileBaseName</b> + <b>_instance</b> +
+	 * <b>.FileExtension</b>.
 	 *
 	 * @throws TransformerException
 	 * @throws ParserConfigurationException
@@ -138,17 +100,18 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	 */
 	@Override
 	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		this.preprocess();
 		// TODO: improve this part
-		NodeList nodes = this.document.getElementsByTagName(BPMNNodesNames.TASK.getName());
+		NodeList nodes = super.getDocument().getElementsByTagName(BPMNNodesNames.TASK.getName());
 		for (int i = 0; i < nodes.getLength(); i++) {
 			this.instantiateNode(nodes.item(i));
 		}
-		nodes = this.document.getElementsByTagName(BPMNNodesNames.USERTASK.getName());
+		nodes = super.getDocument().getElementsByTagName(BPMNNodesNames.USERTASK.getName());
 		for (int i = 0; i < nodes.getLength(); i++) {
 			this.instantiateNode(nodes.item(i));
 		}
-		this.save();
+		String resultFname = super.getFname().split("\\.")[0] + Notation.getInstanceVoc() + "."
+				+ super.getFname().split("\\.")[1];
+		super.save(resultFname);
 	}
 
 	/**
@@ -205,11 +168,11 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	 * @see Node
 	 */
 	private void addDocumentationNode(Node node) {
-		Element documentation = this.document.createElement(BPMNNodesNames.DOCUMENTATION.getName());
+		Element documentation = super.getDocument().createElement(BPMNNodesNames.DOCUMENTATION.getName());
 		// TODO: define documentation numerotation
 		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
 		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
-		CDATASection refersTo = this.document.createCDATASection(Notation.getReferenceVoc()
+		CDATASection refersTo = super.getDocument().createCDATASection(Notation.getReferenceVoc()
 				+ node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue());
 		documentation.appendChild(refersTo);
 		node.insertBefore(documentation, node.getFirstChild());
@@ -228,32 +191,11 @@ public class InstanceFactoryImpl implements InstanceFactory {
 	 * @see Node
 	 */
 	private void addExtensionNode(Node node) {
-		Node extension = this.document.createElement(BPMNNodesNames.EXTENSION.getName());
-		Element style = this.document.createElement(BPMNNodesNames.STYLE.getName());
+		Node extension = super.getDocument().createElement(BPMNNodesNames.EXTENSION.getName());
+		Element style = super.getDocument().createElement(BPMNNodesNames.STYLE.getName());
 		style.setAttribute(BPMNNodesAttributes.BACKGROUND.getName(), INSTANTIATE_COLOR);
 		extension.appendChild(style);
 		node.insertBefore(extension, node.getFirstChild());
-	}
-
-	/**
-	 * Saves the instantiated workflow as a new bpmn2 file.
-	 *
-	 * <p>
-	 *
-	 * The result filename will be <b>FileBaseName</b> + <b>_instance</b> +
-	 * <b>.FileExtension</b>.
-	 *
-	 * @throws TransformerException
-	 *
-	 * @since 1.0
-	 */
-	private void save() throws TransformerException {
-		DOMSource source = new DOMSource(this.document);
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		Transformer transformer = transformerFactory.newTransformer();
-		String resultFname = this.fname.split("\\.")[0] + Notation.getInstanceVoc() + "." + this.fname.split("\\.")[1];
-		StreamResult result = new StreamResult(this.path + resultFname);
-		transformer.transform(source, result);
 	}
 
 }
