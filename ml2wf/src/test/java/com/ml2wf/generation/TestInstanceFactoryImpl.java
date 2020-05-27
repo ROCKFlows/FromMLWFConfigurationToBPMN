@@ -108,6 +108,7 @@ public class TestInstanceFactoryImpl {
 	 *
 	 */
 	@Test
+	@DisplayName("Verification of the global structure")
 	public void testGlobalStructure() {
 		// TODO: to complete/improve considering the wished number of instantiated tasks
 		NodeList sourceNodes = this.sourceDocument.getElementsByTagName(BPMNNodesNames.TASK.getName());
@@ -132,7 +133,8 @@ public class TestInstanceFactoryImpl {
 	 * </ol>
 	 */
 	@Test
-	public void testNodesStructure() {
+	@DisplayName("Verification of the nodes' structures")
+	public void testNodesStructures() {
 		// TODO: tests for usertask
 		NodeList resultNodes = this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName());
 		for (int i = 0; i < resultNodes.getLength(); i++) {
@@ -161,6 +163,7 @@ public class TestInstanceFactoryImpl {
 	 * </ol>
 	 */
 	@Test
+	@DisplayName("Verification of references")
 	public void testReferences() {
 		// TODO: test for usertask
 		// TODO: improve readability

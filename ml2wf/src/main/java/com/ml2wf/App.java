@@ -8,7 +8,7 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.generation.InstanceFactoryImpl;
-import com.ml2wf.save.FeatureModelMerger;
+import com.ml2wf.merge.FeatureModelMerger;
 
 public class App {
 
