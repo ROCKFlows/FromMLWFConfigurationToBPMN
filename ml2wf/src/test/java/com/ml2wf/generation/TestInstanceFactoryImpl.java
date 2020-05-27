@@ -14,6 +14,7 @@ import javax.xml.transform.TransformerException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -38,6 +39,7 @@ import com.ml2wf.util.XMLTool;
  * @see InstanceFactoryImpl
  *
  */
+@DisplayName("Test of InstanceFactoryImpl")
 public class TestInstanceFactoryImpl {
 	/**
 	 * Instance of the class to be tested.
@@ -58,13 +60,9 @@ public class TestInstanceFactoryImpl {
 	 */
 	private Document resultDocument;
 	/**
-	 * Default path to the XML file's directory.
-	 */
-	private static final String PATH = "./";
-	/**
 	 * Default XML filename.
 	 */
-	private static final String FILE_NAME = "WF_to_test.bpmn2";
+	private static final String FILE_NAME = "generic_WF_A.bpmn2";
 	/**
 	 * Result filename according to {@code FILE_NAME}.
 	 */

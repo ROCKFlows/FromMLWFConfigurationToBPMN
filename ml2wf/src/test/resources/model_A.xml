@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<extendedFeatureModel>
+	<properties>
+		<graphics key="showhiddenfeatures" value="true"/>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="MLWF">
+			<graphics key="collapsed" value="false"/>
+			<and abstract="true" name="variants">
+				<graphics key="collapsed" value="false"/>
+				<and abstract="true" name="Preprocessing_Step">
+					<graphics key="collapsed" value="false"/>
+					<feature name="removeMissingValues_MULT">
+						<description>Multiple ways to manage missing values can be involved in one WF; each one for a different attribute</description>
+					</feature>
+					<feature abstract="true" name="TimeSeriesReSampling"/>
+					<feature name="generatingTrainingData"/>
+					<and abstract="true" name="compute descriptors">
+						<graphics key="collapsed" value="false"/>
+						<feature name="compute descriptors over 5 min time windows">
+							<attribute configurable="true" name="DoubleAttribute0" type="double" unit="" value="5.0"/>
+						</feature>
+					</and>
+				</and>
+				<and abstract="true" name="Macro_Step">
+					<graphics key="collapsed" value="false"/>
+					<alt abstract="true" mandatory="true" name="Training_Step">
+						<feature name="testTrainingStepFeature"/>
+						<feature name="ML_ALGO_TODEFINE"/>
+						<feature name="train OC_SVM"/>
+					</alt>
+					<feature abstract="true" name="Labelling_Step"/>
+					<and abstract="true" name="Model_improvement_Step">
+						<feature name="Fine-tuneModel">
+							<description>fine-tune the model using a subset of annotations including the new ones.</description>
+						</feature>
+					</and>
+					<and abstract="true" name="Selecting_Step">
+						<feature name="select training period"/>
+					</and>
+					<and abstract="true" name="Model_detection_Step">
+						<feature name="detect with OC_SVM Model"/>
+					</and>
+					<feature abstract="true" name="Computing_Step"/>
+					<feature abstract="true" name="Validation_Step"/>
+				</and>
+				<feature abstract="true" name="Correction_Step"/>
+				<feature abstract="true" name="Control_Step"/>
+			</and>
+		</and>
+	</struct>
+</extendedFeatureModel>

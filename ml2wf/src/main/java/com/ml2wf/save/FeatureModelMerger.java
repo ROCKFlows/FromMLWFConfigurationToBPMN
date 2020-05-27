@@ -119,6 +119,7 @@ public class FeatureModelMerger {
 		Document wfDocument = XMLTool.preprocess(new File(path + fname));
 		// retrieving workflow's tasks
 		List<Node> tasks = XMLTool.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
+		tasks.addAll(XMLTool.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.USERTASK.getName())));
 		// retrieving all existing FM's tasks names
 		// TODO: to optimize
 		List<Node> existingTasks = XMLTool
@@ -152,7 +153,7 @@ public class FeatureModelMerger {
 	 *
 	 * <p>
 	 *
-	 * If there isn't any referenced parent, returns the first document node.
+	 * If there isn't any valid referenced parent, returns the first document node.
 	 *
 	 * <p>
 	 *
@@ -172,10 +173,14 @@ public class FeatureModelMerger {
 				.nodeListAsList(this.fmDocument.getElementsByTagName(FeatureModelNames.AND.getName()));
 		candidates
 				.addAll(XMLTool.nodeListAsList(this.fmDocument.getElementsByTagName(FeatureModelNames.ALT.getName())));
+		candidates.addAll(
+				XMLTool.nodeListAsList(this.fmDocument.getElementsByTagName(FeatureModelNames.FEATURE.getName())));
 		// electing the good candidate
 		Node nameAttribute;
+		System.out.println("-".repeat(10));
 		for (Node candidate : candidates) {
 			nameAttribute = candidate.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
+			System.out.println("Testing " + nameAttribute.getNodeValue() + " for " + docNode.getTextContent());
 			if (nameAttribute.getNodeValue().equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
 				return candidate;
 			}
@@ -198,6 +203,8 @@ public class FeatureModelMerger {
 	 */
 	private void insertNewTask(Node parentNode, Node task) {
 		// TODO: to test
+		System.out.println("Inserting " + task.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName())
+				+ " under " + parentNode.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName()));
 		// retrieving task name content
 		Node taskNameNode = task.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
 		String[] nameParts = taskNameNode.getNodeValue().replaceFirst(Notation.getGeneratedPrefixVoc(), "")
