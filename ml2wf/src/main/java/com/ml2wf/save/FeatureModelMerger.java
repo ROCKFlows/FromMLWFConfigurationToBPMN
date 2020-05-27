@@ -177,10 +177,8 @@ public class FeatureModelMerger {
 				XMLTool.nodeListAsList(this.fmDocument.getElementsByTagName(FeatureModelNames.FEATURE.getName())));
 		// electing the good candidate
 		Node nameAttribute;
-		System.out.println("-".repeat(10));
 		for (Node candidate : candidates) {
 			nameAttribute = candidate.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
-			System.out.println("Testing " + nameAttribute.getNodeValue() + " for " + docNode.getTextContent());
 			if (nameAttribute.getNodeValue().equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
 				return candidate;
 			}
@@ -203,8 +201,6 @@ public class FeatureModelMerger {
 	 */
 	private void insertNewTask(Node parentNode, Node task) {
 		// TODO: to test
-		System.out.println("Inserting " + task.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName())
-				+ " under " + parentNode.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName()));
 		// retrieving task name content
 		Node taskNameNode = task.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
 		String[] nameParts = taskNameNode.getNodeValue().replaceFirst(Notation.getGeneratedPrefixVoc(), "")
