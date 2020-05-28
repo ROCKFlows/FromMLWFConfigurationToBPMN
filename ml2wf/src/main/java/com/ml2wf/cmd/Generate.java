@@ -5,8 +5,10 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.generation.InstanceFactoryImpl;
@@ -58,6 +60,11 @@ public class Generate implements Runnable {
 
 	@Override
 	public void run() {
+		if (this.verbose) {
+			Configurator.setLevel(InstanceFactoryImpl.class.getPackageName(), Level.DEBUG);
+		} else {
+			Configurator.setLevel(InstanceFactoryImpl.class.getPackageName(), Level.FATAL);
+		}
 		InstanceFactoryImpl factory;
 		try {
 			factory = new InstanceFactoryImpl(this.input);

@@ -5,8 +5,10 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.merge.FeatureModelMerger;
@@ -63,6 +65,11 @@ public class Merge implements Runnable {
 
 	@Override
 	public void run() {
+		if (this.verbose) {
+			Configurator.setLevel(FeatureModelMerger.class.getPackageName(), Level.DEBUG);
+		} else {
+			Configurator.setLevel(FeatureModelMerger.class.getPackageName(), Level.FATAL);
+		}
 		FeatureModelMerger merger;
 		try {
 			merger = new FeatureModelMerger(this.output);
