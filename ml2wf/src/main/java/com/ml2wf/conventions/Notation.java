@@ -8,6 +8,10 @@ import com.ml2wf.generation.InstanceFactory;
  *
  * <p>
  *
+ * It also contains methods for naming and
+ *
+ * <p>
+ *
  * <b>Note</b> that all field are static.
  *
  * @author Nicolas Lacroix
@@ -37,6 +41,10 @@ public final class Notation {
 	 * <b>documentation</b> notation.
 	 */
 	private static final String DOCUMENTATION_VOC = "Documentation_";
+	/**
+	 * <b>back up</b> notation.
+	 */
+	private static final String BACKUP_VOC = "_save";
 
 	/**
 	 * {@code Notation's} default constructor.
@@ -50,7 +58,7 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the <b>generated prefix</b> notation.
+	 * Returns the {@link #GENERATED_PREFIX_VOC} notation.
 	 *
 	 * @return the generated prefix notation
 	 *
@@ -61,7 +69,7 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the <b>instance</b> notation.
+	 * Returns the {@link #INSTANCE_VOC} notation.
 	 *
 	 * @return the instance notation
 	 *
@@ -72,7 +80,7 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the <b>reference</b> notation.
+	 * Returns the {@link #REFERENCE_VOC} notation.
 	 *
 	 * @return the reference notation
 	 *
@@ -83,7 +91,7 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the <b>generic</b> notation.
+	 * Returns the {@link #GENERIC_VOC} notation.
 	 *
 	 * @return the generic notation
 	 *
@@ -94,7 +102,7 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the <b>documentation</b> notation.
+	 * Returns the {@link #DOCUMENTATION_VOC} notation.
 	 *
 	 * @return the documentation notation
 	 *
@@ -102,6 +110,17 @@ public final class Notation {
 	 */
 	public static String getDocumentationVoc() {
 		return DOCUMENTATION_VOC;
+	}
+
+	/**
+	 * Returns the {@link #BACKUP_VOC} notation.
+	 *
+	 * @return the back up notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getBackupVoc() {
+		return BACKUP_VOC;
 	}
 
 }

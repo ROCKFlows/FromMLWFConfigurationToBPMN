@@ -16,9 +16,10 @@ public interface InstanceFactory {
 	/**
 	 * Instantiates a generic workflow.
 	 *
+	 * @param resultPath result path
 	 * @throws Exception
 	 *
 	 * @since 1.0
 	 */
-	public void getWFInstance() throws Exception;
+	public void getWFInstance(String resultPath) throws Exception; // TODO: check parameters
 }

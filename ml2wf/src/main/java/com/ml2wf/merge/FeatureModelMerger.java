@@ -47,20 +47,24 @@ public class FeatureModelMerger extends XMLManager {
 	/**
 	 * {@code FeatureModelMerger}'s default constructor.
 	 *
-	 * @param path  the XML filepath.
-	 * @param fname the XML filename.
+	 * @param filePath the XML filepath.
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public FeatureModelMerger(String path, String fname)
+	public FeatureModelMerger(String filePath)
 			throws ParserConfigurationException, SAXException, IOException {
-		super(path, fname);
+		super(filePath);
 	}
 
 	/**
 	 * Merges the given <b>instantiated</b> Workflow with the {@link #fmDocument
 	 * FeatureModel};
+	 *
+	 * <p>
+	 *
+	 * If {@code backUp} parameter is {@code true}, then the current source file
+	 * will be backed up by the {@link #backUp()} method.
 	 *
 	 * <p>
 	 *
@@ -74,13 +78,8 @@ public class FeatureModelMerger extends XMLManager {
 	 * <li>saves the modifications using the {@link #save()} method.</li>
 	 * </uL>
 	 *
-	 * <p>
-	 *
-	 * The result filename will be <b>FileBaseName</b> + <b>_instance</b> +
-	 * <b>.FileExtension</b>.
-	 *
-	 * @param path  Path to the xml workflow file.
-	 * @param fname file name of the xml workflow file.
+	 * @param filePath the WF filepath.
+	 * @param backUp   backs up the current {@link #getSourceFile()} or not
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
@@ -91,32 +90,53 @@ public class FeatureModelMerger extends XMLManager {
 	 * @see InstanceFactory
 	 *
 	 */
-	public void mergeWithWF(String path, String fname)
+	public void mergeWithWF(String filePath, boolean backUp)
 			throws ParserConfigurationException, SAXException, IOException, TransformerException {
-		// TODO: to comment
+		// backing up if required
+		if (backUp) {
+			super.backUp();
+		}
 		// preprocessing the document
-		Document wfDocument = XMLManager.preprocess(new File(path + fname));
+		Document wfDocument = XMLManager.preprocess(new File(filePath));
 		// retrieving workflow's tasks
 		List<Node> tasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
 		// retrieving all existing FM's tasks names
 		List<Node> existingTasks = XMLManager.getTasksList(super.getDocument(), FeatureModelNames.SELECTOR);
 		List<String> existingTasksNames = existingTasks.stream().map(XMLManager::getNodeName)
 				.collect(Collectors.toList());
-		// iterating for each task
 		String currentTaskName;
+		// iterating for each task
 		for (Node task : tasks) {
 			currentTaskName = XMLManager.getNodeName(task);
 			currentTaskName = currentTaskName.replaceFirst(Notation.getGeneratedPrefixVoc(), "");
-			// splitting
+			// splitting task's name
 			String[] tName = currentTaskName.split(Notation.getGeneratedPrefixVoc());
 			if (existingTasksNames.contains(tName[1] + "_" + tName[0])) {
+				// if already contained, continue
 				continue;
 			}
+			// retrieving a suitable parent
 			Node parentNode = this.getSuitableParent(task);
+			// inserting the new task
 			this.insertNewTask(parentNode, task);
 		}
-		String resultFname = super.getFname().split("\\.")[0] + "_result." + super.getFname().split("\\.")[1];
-		super.save(resultFname);
+		// saving result
+		super.save(super.getPath());
+	}
+
+	/**
+	 * Calls the {@link #mergeWithWF(String, boolean)} with {@code backUp} parameter
+	 * as {@code false}.
+	 *
+	 * @param filePath
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws TransformerException
+	 */
+	public void mergeWithWF(String filePath)
+			throws ParserConfigurationException, SAXException, IOException, TransformerException {
+		this.mergeWithWF(filePath, false);
 	}
 
 	/**
@@ -137,7 +157,6 @@ public class FeatureModelMerger extends XMLManager {
 	 *         specified reference
 	 */
 	private Node getSuitableParent(Node task) {
-		// TODO: to test
 		// retrieving the references parent
 		Node docNode = ((Element) task).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName()).item(0);
 		// retrieving all candidates

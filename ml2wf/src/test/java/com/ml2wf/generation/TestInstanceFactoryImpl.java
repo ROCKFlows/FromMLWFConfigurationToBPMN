@@ -41,6 +41,7 @@ import com.ml2wf.util.XMLManager;
  */
 @DisplayName("Test of InstanceFactoryImpl")
 public class TestInstanceFactoryImpl {
+
 	/**
 	 * Instance of the class to be tested.
 	 *
@@ -62,21 +63,21 @@ public class TestInstanceFactoryImpl {
 	/**
 	 * Default XML filename.
 	 */
-	private static final String FILE_NAME = "generic_WF_A.bpmn2";
+	private static final String FILE_PATH = "generic_WF_A.bpmn2";
 	/**
 	 * Result filename according to {@code FILE_NAME}.
 	 */
-	private static final String RESULT_FILE_NAME = FILE_NAME.split("\\.")[0] + Notation.getInstanceVoc() + "."
-			+ FILE_NAME.split("\\.")[1];
+	private static final String RESULT_FILE_NAME = FILE_PATH.split("\\.")[0] + Notation.getInstanceVoc() + "."
+			+ FILE_PATH.split("\\.")[1];
 
 	@BeforeEach
 	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		// loading xml test file
 		ClassLoader classLoader = this.getClass().getClassLoader();
-		URL url = classLoader.getResource(FILE_NAME);
-		String fDirectory = url.getPath().replace("%20", " ").replace(FILE_NAME, ""); // TODO: improve sanitization
+		URL url = classLoader.getResource(FILE_PATH);
+		String fDirectory = url.getPath().replace("%20", " "); // TODO: improve sanitization
 		// initializing factory
-		this.factory = new InstanceFactoryImpl(fDirectory, FILE_NAME);
+		this.factory = new InstanceFactoryImpl(fDirectory);
 		// instantializing generic WF
 		this.factory.getWFInstance();
 		// getting xml files as documents

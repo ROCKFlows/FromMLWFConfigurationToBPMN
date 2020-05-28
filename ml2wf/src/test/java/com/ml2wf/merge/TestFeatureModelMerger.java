@@ -3,7 +3,14 @@ package com.ml2wf.merge;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
@@ -61,41 +69,84 @@ public class TestFeatureModelMerger {
 	/**
 	 * Default XML FM filename.
 	 */
-	private static final String FM_SOURCE_FILE_NAME = "model_A.xml";
+	private static final String FM_SOURCE_FILE_PATH = "model_A.xml";
 	/**
-	 * Default result XML FM filename.
+	 * Default XML FM result filename.
 	 */
-	private static final String FM_RESULT_FILE_NAME = "model_A_result.xml";
+	private static final String FM_RESULT_FILE_PATH = "model_A_result.xml";
 	/**
 	 * Default XML WF filename.
 	 */
-	private static final String WF_SOURCE_FILE_NAME = "generic_WF_A_instance.bpmn2";
+	private static final String WF_SOURCE_FILE_PATH = "generic_WF_A_instance.bpmn2";
+	/**
+	 * Back up path.
+	 *
+	 * @see XMLManager
+	 */
+	private String backUpPath;
+
+	/**
+	 * Updates the {@link #backUpPath}.
+	 *
+	 * @return the back up path.
+	 */
+	private String updateBackUpPath() {
+		SimpleDateFormat dateFormater = null;
+		Date backUpDate = new Date();
+		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
+		String[] splittedPath = FM_SOURCE_FILE_PATH.split("\\.");
+		this.backUpPath = splittedPath[0] + Notation.getBackupVoc() + dateFormater.format(backUpDate) + "."
+				+ splittedPath[1];
+		return this.backUpPath;
+	}
 
 	@BeforeEach
 	public void setUp() throws ParserConfigurationException, SAXException, IOException, TransformerException {
-		// ---
 		// TODO: factorize with TestInstanceFactoryImpl#setUp
+		// --- retrieving FM resource
 		ClassLoader classLoader = this.getClass().getClassLoader();
-		URL url = classLoader.getResource(WF_SOURCE_FILE_NAME);
-		String fDirectory = url.getPath().replace("%20", " ").replace(WF_SOURCE_FILE_NAME, "");
-		// ---
-		this.merger = new FeatureModelMerger(fDirectory, FM_SOURCE_FILE_NAME);
+		URL url = classLoader.getResource(FM_SOURCE_FILE_PATH);
+		String fDirectory = url.getPath().replace("%20", " ");
+		this.merger = new FeatureModelMerger(fDirectory);
 		this.sourceWFDocument = XMLManager.getDocumentFromURL(url);
-		// ---
-		// TODO: factorize with TestInstanceFactoryImpl#setUp
-		url = classLoader.getResource(WF_SOURCE_FILE_NAME);
-		fDirectory = url.getPath().replace("%20", " ").replace(WF_SOURCE_FILE_NAME, "");
-		// ---
-		this.merger.mergeWithWF(fDirectory, WF_SOURCE_FILE_NAME);
-		url = classLoader.getResource(FM_RESULT_FILE_NAME);
+		// --- retrieving instatiated WF resource
+		url = classLoader.getResource(WF_SOURCE_FILE_PATH);
+		fDirectory = url.getPath().replace("%20", " ");
+		this.merger.mergeWithWF(fDirectory, true); // backing up
+		// --- retrieving FM result resource
+		url = classLoader.getResource(this.updateBackUpPath());
 		this.resultFMDocument = XMLManager.getDocumentFromURL(url);
 	}
 
 	@AfterEach
-	public void clean() {
+	public void clean() throws IOException, URISyntaxException {
 		this.merger = null;
 		this.sourceWFDocument = null;
 		this.resultFMDocument = null;
+		this.cleanTestDir();
+		this.backUpPath = null;
+	}
+
+	/**
+	 * Cleans the src/test/resources directory.
+	 *
+	 * <p>
+	 *
+	 * It allows other tests to be performed independently.
+	 *
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	private void cleanTestDir() throws IOException, URISyntaxException {
+		ClassLoader classLoader = this.getClass().getClassLoader();
+		// saving the modified FM file
+		URL url = classLoader.getResource(FM_SOURCE_FILE_PATH);
+		Path path = Paths.get(url.toURI());
+		Files.copy(path, path.resolveSibling(FM_RESULT_FILE_PATH), StandardCopyOption.REPLACE_EXISTING);
+		// replacing the FM source file by the backed up one
+		url = classLoader.getResource(this.backUpPath);
+		path = Paths.get(url.toURI());
+		Files.move(path, path.resolveSibling(FM_SOURCE_FILE_PATH), StandardCopyOption.REPLACE_EXISTING);
 	}
 
 	/**
@@ -118,7 +169,8 @@ public class TestFeatureModelMerger {
 		List<Node> sourceNodes = XMLManager
 				.nodeListAsList(this.sourceWFDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
 		sourceNodes.addAll(
-				XMLManager.nodeListAsList(this.sourceWFDocument.getElementsByTagName(BPMNNodesNames.USERTASK.getName())));
+				XMLManager
+						.nodeListAsList(this.sourceWFDocument.getElementsByTagName(BPMNNodesNames.USERTASK.getName())));
 		// getting FM tasks
 		List<Node> resultNodes = XMLManager
 				.nodeListAsList(this.resultFMDocument.getElementsByTagName(FeatureModelNames.AND.getName()));

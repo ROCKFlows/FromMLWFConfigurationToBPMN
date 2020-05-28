@@ -1,6 +1,8 @@
 package com.ml2wf.generation;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,15 +59,13 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	/**
 	 * {@code InstanceFactory}'s default constructor.
 	 *
-	 * @param path  the XML filepath.
-	 * @param fname the XML filename.
+	 * @param filePath the XML filepath.
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public InstanceFactoryImpl(String path, String fname)
-			throws ParserConfigurationException, SAXException, IOException {
-		super(path, fname);
+	public InstanceFactoryImpl(String filePath) throws ParserConfigurationException, SAXException, IOException {
+		super(filePath);
 		this.docCount = 0;
 		this.tasksMap = new HashMap<>();
 	}
@@ -86,8 +86,8 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 *
 	 * <p>
 	 *
-	 * The result filename will be <b>FileBaseName</b> + <b>_instance</b> +
-	 * <b>.FileExtension</b>.
+	 * The result filename will be <b>FileBaseName</b> +
+	 * <b>{@link Notation#getInstanceVoc()}</b> + <b>.FileExtension</b>.
 	 *
 	 * @throws TransformerException
 	 * @throws ParserConfigurationException
@@ -98,13 +98,30 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	@Override
-	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+	public void getWFInstance(String resultPath)
+			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		for (Node node : XMLManager.getTasksList(super.getDocument(), BPMNNodesNames.SELECTOR)) {
 			this.instantiateNode(node);
 		}
-		String resultFname = super.getFname().split("\\.")[0] + Notation.getInstanceVoc() + "."
-				+ super.getFname().split("\\.")[1];
-		super.save(resultFname);
+		String resultFname = XMLManager.insertInFileName(super.getSourceFile().getName(), Notation.getInstanceVoc());
+		super.save(Paths.get(resultPath, resultFname).toString());
+	}
+
+	/**
+	 * Calls the {@link #getWFInstance(String)} method with
+	 * {@link #getSourceFile()}'s directory as parameter.
+	 *
+	 * @throws TransformerException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 *
+	 * @since 1.0
+	 * @see {@link #getWFInstance(String)}
+	 */
+	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+		String absolutePath = super.getSourceFile().getAbsolutePath();
+		this.getWFInstance(absolutePath.substring(0, absolutePath.lastIndexOf(File.separator)));
 	}
 
 	/**
@@ -138,11 +155,8 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		String nodeName = Notation.getGeneratedPrefixVoc()
 				+ nodeAttrName.getNodeValue().replace(Notation.getGenericVoc(), "");
 
-		if (this.tasksMap.containsKey(nodeName)) {
-			this.tasksMap.put(nodeName, this.tasksMap.get(nodeName) + 1);
-		} else {
-			this.tasksMap.put(nodeName, 1);
-		}
+		this.tasksMap.put(nodeName, this.tasksMap.containsKey(nodeName) ? this.tasksMap.get(nodeName) + 1 : 1);
+
 		nodeName += Notation.getGeneratedPrefixVoc() + this.tasksMap.get(nodeName);
 		nodeAttrName.setNodeValue(nodeName);
 	}
@@ -162,7 +176,6 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	private void addDocumentationNode(Node node) {
 		Element documentation = super.getDocument().createElement(BPMNNodesNames.DOCUMENTATION.getName());
-		// TODO: define documentation numerotation
 		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
 		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
 		CDATASection refersTo = super.getDocument().createCDATASection(Notation.getReferenceVoc()

@@ -3,8 +3,11 @@ package com.ml2wf.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,10 +46,6 @@ public class XMLManager {
 	 */
 	private String path;
 	/**
-	 * XML filename.
-	 */
-	private String fname;
-	/**
 	 * {@code File} instance of the XML file.
 	 *
 	 * @see File
@@ -58,6 +57,10 @@ public class XMLManager {
 	 * @see Document
 	 */
 	private Document document;
+	/**
+	 * Extension separator for files.
+	 */
+	private static final String EXTENSION_SEPARATOR = ".";
 
 	/**
 	 * {@code XMLTool}'s default constructor.
@@ -67,15 +70,14 @@ public class XMLManager {
 	 * <b>Note</b> that the {@link #preprocess()} method is called to initialize
 	 * {@link #document}.
 	 *
-	 * @throws IOException
-	 * @throws SAXException
+	 * @param filePath the XML filePath.
 	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
 	 */
-	public XMLManager(String path, String fname) throws ParserConfigurationException, SAXException, IOException {
-		this.path = path;
-		this.fname = fname;
-		// TODO: check path always ending with /
-		this.sourceFile = new File(this.path + this.fname);
+	public XMLManager(String filePath) throws ParserConfigurationException, SAXException, IOException {
+		this.path = filePath;
+		this.sourceFile = new File(this.path);
 		this.document = XMLManager.preprocess(this.sourceFile);
 	}
 
@@ -95,24 +97,6 @@ public class XMLManager {
 	 */
 	public void setPath(String path) {
 		this.path = path;
-	}
-
-	/**
-	 * Returns the xml's filename
-	 *
-	 * @return the xml's filename
-	 */
-	public String getFname() {
-		return this.fname;
-	}
-
-	/**
-	 * Sets the xml's filename
-	 *
-	 * @param fname the new xml's filename
-	 */
-	public void setFname(String fname) {
-		this.fname = fname;
 	}
 
 	/**
@@ -159,6 +143,8 @@ public class XMLManager {
 		this.document = document;
 	}
 
+	// Saving methods
+
 	/**
 	 * Saves the result file.
 	 *
@@ -167,12 +153,36 @@ public class XMLManager {
 	 *
 	 * @since 1.0
 	 */
-	public void save(String resultFname) throws TransformerException {
+	protected void save(String resultPath) throws TransformerException {
 		DOMSource source = new DOMSource(this.document);
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
-		StreamResult result = new StreamResult(this.path + resultFname);
+		StreamResult result = new StreamResult(resultPath);
 		transformer.transform(source, result);
+	}
+
+	/**
+	 * Backs up the current {@link #sourceFile}.
+	 *
+	 * <p>
+	 *
+	 * The result filename will be : <b>FileBaseName</b> +
+	 * {@link Notation#getBackupVoc()} + <b>_dd_MM_yy_hh_mm.FileExtension</b>.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method hasn't any retroactive effect.
+	 *
+	 * @throws TransformerException
+	 *
+	 * @since 1.0
+	 */
+	protected void backUp() throws TransformerException {
+		SimpleDateFormat dateFormater = null;
+		Date backUpDate = new Date();
+		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
+		String backUpPath = insertInFileName(this.path, Notation.getBackupVoc() + dateFormater.format(backUpDate));
+		this.save(backUpPath);
 	}
 
 	// General static methods
@@ -292,5 +302,19 @@ public class XMLManager {
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
 		// sanitization for generic WF's task
 		return name.replaceFirst(Notation.getGenericVoc() + "$", "");
+	}
+
+	/**
+	 * Inserts given {@code content} between the FileBaseName and the FileExtension.
+	 *
+	 * @param fName   filename
+	 * @param content content to insert
+	 * @return the new {@code fName} with the inserted {@code content}
+	 *
+	 * @since 1.0
+	 */
+	public static String insertInFileName(String fName, String content) {
+		String[] splittedPath = fName.split(Pattern.quote(EXTENSION_SEPARATOR));
+		return splittedPath[0] + content + EXTENSION_SEPARATOR + splittedPath[1];
 	}
 }
