@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,6 +19,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -26,6 +29,7 @@ import org.xml.sax.SAXException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
+import com.ml2wf.generation.InstanceFactoryImpl;
 
 /**
  * This class is the base class for any XML managing class.
@@ -61,6 +65,13 @@ public class XMLManager {
 	 * Extension separator for files.
 	 */
 	private static final String EXTENSION_SEPARATOR = ".";
+	/**
+	 * Logger instance.
+	 *
+	 * @since 1.0
+	 * @see Logger
+	 */
+	private static final Logger logger = LogManager.getLogger(InstanceFactoryImpl.class);
 
 	/**
 	 * {@code XMLTool}'s default constructor.
@@ -154,11 +165,19 @@ public class XMLManager {
 	 * @since 1.0
 	 */
 	protected void save(String resultPath) throws TransformerException {
+		String logMsg = String.format("Saving file at location : %s...", resultPath);
+		logger.info(logMsg);
 		DOMSource source = new DOMSource(this.document);
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		// --- protection against XXE attacks
+		logger.debug("Protecting against XXE attacks");
+		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+		// ---
 		Transformer transformer = transformerFactory.newTransformer();
 		StreamResult result = new StreamResult(resultPath);
 		transformer.transform(source, result);
+		logger.info("File saved.");
 	}
 
 	/**
@@ -178,11 +197,13 @@ public class XMLManager {
 	 * @since 1.0
 	 */
 	protected void backUp() throws TransformerException {
+		logger.info("Backing up...");
 		SimpleDateFormat dateFormater = null;
 		Date backUpDate = new Date();
 		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
 		String backUpPath = insertInFileName(this.path, Notation.getBackupVoc() + dateFormater.format(backUpDate));
 		this.save(backUpPath);
+		logger.info("Back up finished.");
 	}
 
 	// General static methods
@@ -200,10 +221,16 @@ public class XMLManager {
 	 * @see Node
 	 */
 	public static String getNodeName(Node node) {
+		String logMsg = String.format("Retrieving name for node : %s...", node);
+		logger.debug(logMsg);
 		Node n;
 		if ((n = node.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName())) != null) {
+			logMsg = String.format("Node's name is : %s", n.getNodeValue());
+			logger.debug(logMsg);
 			return n.getNodeValue();
 		}
+		logMsg = String.format("No name was found for node %s.", node);
+		logger.warn(logMsg);
 		return "";
 	}
 
@@ -219,6 +246,7 @@ public class XMLManager {
 	 * @see Node
 	 */
 	public static List<Node> getTasksList(Document document, TaskTagsSelector selector) {
+		logger.debug("Retrieving tasks list...");
 		List<Node> nodes = new ArrayList<>();
 		for (String taskTag : selector.getTaskTags()) {
 			nodes.addAll(XMLManager.nodeListAsList(document.getElementsByTagName(taskTag)));
@@ -238,7 +266,14 @@ public class XMLManager {
 	 * @see Document
 	 */
 	public static Document preprocess(File file) throws ParserConfigurationException, SAXException, IOException {
+		String logMsg = String.format("Preprocessing file : %s...", file.getName());
+		logger.info(logMsg);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		// --- protection against XXE attacks
+		logger.debug("Protecting against XXE attacks");
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
+		// ---
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document document = dBuilder.parse(file);
 		document.getDocumentElement().normalize();
@@ -260,6 +295,8 @@ public class XMLManager {
 	 * @see URL
 	 */
 	public static Document getDocumentFromURL(URL url) throws SAXException, IOException, ParserConfigurationException {
+		String logMsg = String.format("Retrieving document for URL : %s...", url);
+		logger.debug(logMsg);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document document = dBuilder.parse(url.openStream());

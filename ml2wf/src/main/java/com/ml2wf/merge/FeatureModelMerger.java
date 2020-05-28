@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -43,6 +45,14 @@ import com.ml2wf.util.XMLManager;
  *
  */
 public class FeatureModelMerger extends XMLManager {
+
+	/**
+	 * Logger instance.
+	 *
+	 * @since 1.0
+	 * @see Logger
+	 */
+	private static final Logger logger = LogManager.getLogger(FeatureModelMerger.class);
 
 	/**
 	 * {@code FeatureModelMerger}'s default constructor.
@@ -96,6 +106,7 @@ public class FeatureModelMerger extends XMLManager {
 		if (backUp) {
 			super.backUp();
 		}
+		logger.info("Starting the importation...");
 		// preprocessing the document
 		Document wfDocument = XMLManager.preprocess(new File(filePath));
 		// retrieving workflow's tasks
@@ -105,14 +116,19 @@ public class FeatureModelMerger extends XMLManager {
 		List<String> existingTasksNames = existingTasks.stream().map(XMLManager::getNodeName)
 				.collect(Collectors.toList());
 		String currentTaskName;
+		String debugMsg;
 		// iterating for each task
 		for (Node task : tasks) {
+			debugMsg = String.format("Processing task : %s", task);
+			logger.debug(debugMsg);
 			currentTaskName = XMLManager.getNodeName(task);
 			currentTaskName = currentTaskName.replaceFirst(Notation.getGeneratedPrefixVoc(), "");
 			// splitting task's name
 			String[] tName = currentTaskName.split(Notation.getGeneratedPrefixVoc());
 			if (existingTasksNames.contains(tName[1] + "_" + tName[0])) {
 				// if already contained, continue
+				logger.debug("Task already in FeatureModel");
+				logger.debug("Skipping...");
 				continue;
 			}
 			// retrieving a suitable parent
@@ -157,6 +173,8 @@ public class FeatureModelMerger extends XMLManager {
 	 *         specified reference
 	 */
 	private Node getSuitableParent(Node task) {
+		String debugMsg = String.format("Getting location for task : %s", task);
+		logger.debug(debugMsg);
 		// retrieving the references parent
 		Node docNode = ((Element) task).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName()).item(0);
 		// retrieving all candidates
@@ -164,11 +182,16 @@ public class FeatureModelMerger extends XMLManager {
 		// electing the good candidate
 		String candidateName;
 		for (Node candidate : candidates) {
+			debugMsg = String.format("	Processing candidate %s...", candidate);
+			logger.debug(debugMsg);
 			candidateName = XMLManager.getNodeName(candidate);
 			if (candidateName.equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
 				return candidate;
 			}
 		}
+		debugMsg = String.format("No suitable parent was found for task %s.", task);
+		logger.warn(debugMsg);
+		logger.warn("Putting task at default location.");
 		return super.getDocument().getElementsByTagName(FeatureModelNames.AND.getName()).item(0);
 	}
 
@@ -186,6 +209,8 @@ public class FeatureModelMerger extends XMLManager {
 	 * @see Node
 	 */
 	private void insertNewTask(Node parentNode, Node task) {
+		String debugMsg = String.format("Inserting task : %s", task);
+		logger.debug(debugMsg);
 		// retrieving task name content
 		String[] taskName = XMLManager.getNodeName(task).replaceFirst(Notation.getGeneratedPrefixVoc(), "")
 				.split(Notation.getGeneratedPrefixVoc());
@@ -195,5 +220,6 @@ public class FeatureModelMerger extends XMLManager {
 		Element newNode = super.getDocument().createElement(FeatureModelNames.FEATURE.getName());
 		newNode.setAttribute(FeatureModelAttributes.NAME.getName(), newNodeName);
 		parentNode.appendChild(newNode);
+		logger.debug("Task inserted.");
 	}
 }

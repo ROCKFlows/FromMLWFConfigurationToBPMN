@@ -9,6 +9,8 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -55,6 +57,13 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * tasks.
 	 */
 	private Map<String, Integer> tasksMap;
+	/**
+	 * Logger instance.
+	 *
+	 * @since 1.0
+	 * @see Logger
+	 */
+	private static final Logger logger = LogManager.getLogger(InstanceFactoryImpl.class);
 
 	/**
 	 * {@code InstanceFactory}'s default constructor.
@@ -100,9 +109,14 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	@Override
 	public void getWFInstance(String resultPath)
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
+		logger.info("Starting the Workflow instatiation...");
+		String logMsg;
 		for (Node node : XMLManager.getTasksList(super.getDocument(), BPMNNodesNames.SELECTOR)) {
+			logMsg = String.format("Instantiating the node %s...", node);
+			logger.debug(logMsg);
 			this.instantiateNode(node);
 		}
+		logger.info("Instantiation finished.");
 		String resultFname = XMLManager.insertInFileName(super.getSourceFile().getName(), Notation.getInstanceVoc());
 		super.save(Paths.get(resultPath, resultFname).toString());
 	}
@@ -180,7 +194,11 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
 		CDATASection refersTo = super.getDocument().createCDATASection(Notation.getReferenceVoc()
 				+ node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue());
+		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
+		logger.debug(logMsg);
 		documentation.appendChild(refersTo);
+		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
+		logger.debug(logMsg);
 		node.insertBefore(documentation, node.getFirstChild());
 	}
 
@@ -199,8 +217,12 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	private void addExtensionNode(Node node) {
 		Node extension = super.getDocument().createElement(BPMNNodesNames.EXTENSION.getName());
 		Element style = super.getDocument().createElement(BPMNNodesNames.STYLE.getName());
+		String logMsg = String.format("	Adding style %s to node %s", INSTANTIATE_COLOR, node);
+		logger.debug(logMsg);
 		style.setAttribute(BPMNNodesAttributes.BACKGROUND.getName(), INSTANTIATE_COLOR);
 		extension.appendChild(style);
+		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
+		logger.debug(logMsg);
 		node.insertBefore(extension, node.getFirstChild());
 	}
 

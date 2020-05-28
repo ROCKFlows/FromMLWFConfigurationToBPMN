@@ -15,6 +15,7 @@
         <version.assembly.plugin>3.3.0</version.assembly.plugin>
         <version.surefire>3.0.0-M1</version.surefire>
         <version.picocli>4.3.2</version.picocli>
+        <version.log4j>2.13.3</version.log4j>
     </properties>
     <build>
         <pluginManagement>
@@ -100,5 +101,11 @@
             <artifactId>picocli</artifactId>
             <version>${version.picocli}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-core</artifactId>
+		    <version>${version.log4j}</version>
+		</dependency>
     </dependencies>
 </project>
