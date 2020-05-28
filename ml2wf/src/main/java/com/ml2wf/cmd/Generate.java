@@ -60,10 +60,12 @@ public class Generate implements Runnable {
 
 	@Override
 	public void run() {
+		String pckName = "com.ml2wf.cmd.Generate"; // InstanceFactoryImpl.class.getPackageName() not compiling with
+													// maven on github
 		if (this.verbose) {
-			Configurator.setLevel(InstanceFactoryImpl.class.getPackageName(), Level.DEBUG);
+			Configurator.setLevel(pckName, Level.DEBUG);
 		} else {
-			Configurator.setLevel(InstanceFactoryImpl.class.getPackageName(), Level.FATAL);
+			Configurator.setLevel(pckName, Level.FATAL);
 		}
 		InstanceFactoryImpl factory;
 		try {

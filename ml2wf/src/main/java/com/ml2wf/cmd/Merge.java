@@ -65,10 +65,12 @@ public class Merge implements Runnable {
 
 	@Override
 	public void run() {
+		String pckName = "com.ml2wf.cmd.Merge"; // InstanceFactoryImpl.class.getPackageName() not compiling with
+												// maven on github
 		if (this.verbose) {
-			Configurator.setLevel(FeatureModelMerger.class.getPackageName(), Level.DEBUG);
+			Configurator.setLevel(pckName, Level.DEBUG);
 		} else {
-			Configurator.setLevel(FeatureModelMerger.class.getPackageName(), Level.FATAL);
+			Configurator.setLevel(pckName, Level.FATAL);
 		}
 		FeatureModelMerger merger;
 		try {
