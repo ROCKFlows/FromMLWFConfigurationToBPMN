@@ -1,10 +1,14 @@
 package com.ml2wf.constraints.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.ml2wf.constraints.config.Config;
 
@@ -68,7 +72,7 @@ public class ConstraintParser implements Parser {
 	}
 
 	@Override
-	public List<List<String>> parse(String content) {
+	public List<List<String>> parseContent(String content) {
 		// TODO: search for a better return type
 		List<List<String>> result = new ArrayList<>();
 		List<String> constraintParts = this.getConstraintParts(content.replace(" ", ""));
@@ -81,6 +85,24 @@ public class ConstraintParser implements Parser {
 				partResult.add(tokenizer.nextToken());
 			}
 			result.add(new ArrayList<>(partResult));
+		}
+		return result;
+	}
+
+	@Override
+	public Map<String, List<String>> parseExpression(String expression) {
+		Map<String, List<String>> result = new LinkedHashMap<>();
+		List<String> operators = this.config.getOperatorsList();
+		operators = operators.stream().map(Pattern::quote).collect(Collectors.toList());
+		// regex part
+		String regex = String.format("(\\w*)(%s| +)(\\w*)", String.join("|", operators));
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(expression);
+		while (matcher.find()) {
+			// System.out.println("Full match: " + matcher.group(0));
+			if (matcher.groupCount() == 3) {
+				result.put(matcher.group(2), Arrays.asList(new String[] { matcher.group(1), matcher.group(3) }));
+			}
 		}
 		return result;
 	}

@@ -1,5 +1,7 @@
 package com.ml2wf.constraints.factory;
 
+import java.util.List;
+
 import org.w3c.dom.Node;
 
 /**
@@ -23,5 +25,5 @@ public interface ConstraintFactory {
 	 * @since 1.0
 	 * @see Node
 	 */
-	public Node generateRuleNode(String constraintText);
+	public List<Node> getRuleNodes(String constraintText);
 }

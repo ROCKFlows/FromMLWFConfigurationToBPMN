@@ -42,4 +42,8 @@ public class Config {
 	public List<String> getOperatorsList() {
 		return vocMapping.keySet().stream().collect(Collectors.toList());
 	}
+
+	private boolean isAnOperator(String character) {
+		return this.getOperatorsList().contains(character);
+	}
 }

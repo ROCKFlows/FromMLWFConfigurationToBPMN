@@ -40,6 +40,10 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		this.depth = new TreeMap<>();
 	}
 
+	public Map<Integer, Queue<String>> getDepth() {
+		return this.depth;
+	}
+
 	/**
 	 * Generates a rule {@code Node} containing all constraints nodes from the given
 	 * {@code constraintText}.
@@ -69,18 +73,18 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @see Node
 	 */
 	@Override
-	public Node generateRuleNode(String constraintText) {
-		Node rule = document.createElement(FeatureModelNames.RULE.getName());
-		Node child;
+	public List<Node> getRuleNodes(String constraintText) {
+		List<Node> rules = new ArrayList<>();
 		this.parse(constraintText);
-		this.processMap();
-		return rule;
+		Node ruleNode = document.createElement(FeatureModelNames.RULE.getName());
+		ruleNode = this.generateNodes(ruleNode);
+		return rules;
 	}
 
-	private void parse(String constraintText) {
+	public void parse(String constraintText) {
 		// TODO: move in ConstraintParser
 		int separatorCounter = 0;
-		for (List<String> constraints : this.parser.parse(constraintText)) {
+		for (List<String> constraints : this.parser.parseContent(constraintText)) {
 			for (String element : constraints) {
 				// TODO: check parser utility
 				if (element.equals("(")) {
@@ -97,26 +101,36 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		}
 	}
 
-	private void processMap() {
+	private Node generateNodes(Node root) {
 		Map<Integer, Queue<String>> reversedMap = ((TreeMap<Integer, Queue<String>>) this.depth).descendingMap();
 		List<Integer> keyList = new ArrayList<>();
 		keyList.addAll(reversedMap.keySet());
+		if (reversedMap.isEmpty()) {
+			return root;
+		}
+		if (reversedMap.size() == 1) {
+			root.appendChild(this.createNode(reversedMap.get(0).poll()));
+			reversedMap.clear();
+			return root;
+		}
 		int currentKey = keyList.get(0);
 		int nextKey = keyList.get(1);
-		Node result;
-		do {
-			Queue<String> queue = reversedMap.get(currentKey);
-			String childA = queue.poll();
-			String childB = queue.poll();
-			Queue<String> secondQueue = reversedMap.get(nextKey);
-			String parent = secondQueue.poll();
-			// TODO: consider a result and a method this.createNode(parent, node[, childB]);
+		while (!reversedMap.isEmpty()) {
+			Queue<String> childrenQueue = reversedMap.get(currentKey);
+			Queue<String> parentQueue = reversedMap.get(nextKey);
+			String parent = parentQueue.poll();
+			String childA = childrenQueue.poll();
 			if (this.isOneSide(parent)) {
-				result = this.createNode(parent, childA);
+				root = this.createNode(parent, childA);
 			} else {
-				result = this.createNode(parent, childA, childB);
+				String childB = childrenQueue.poll();
+				root = this.createNode(parent, childA, childB);
 			}
-		} while (!reversedMap.isEmpty());
+			if (childrenQueue.isEmpty()) {
+				reversedMap.remove(currentKey);
+			}
+		}
+		return root;
 	}
 
 	private boolean isUnary(String operator) {
@@ -128,26 +142,24 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		return this.isUnary(operator) || !this.config.getOperatorsList().contains(operator);
 	}
 
-	@SuppressWarnings("unused")
-	private Node createNode(String parent, Node childA, String childB) {
-		return null;
-	}
-
-	@SuppressWarnings("unused")
 	private Node createNode(String parent, String childA, String childB) {
 		return null;
 	}
 
-	@SuppressWarnings("unused")
 	private Node createNode(String parent, String child) {
+		return null;
+	}
+
+	private Node createNode(String child) {
 		return null;
 	}
 
 	public static void main(String[] args) throws ParserConfigurationException {
 		// String complexContent = "[[!(((A & B) | (B | C)) & !(C & D) => E) <=> F]] &
 		// [[A => B]] eza sq [[A => !(B | C) & C]] plus [[!(!(A & B) | C > D => E)]]";
-		String complexContent = "[[!(((A & B) | (B | C) | (D & E)) & !(C & D) => E) <=> F]]";
-		ConstraintFactory factory = new ConstraintFactoryImpl();
-		factory.generateRuleNode(complexContent);
+		String complexContent = "[[!(((A & B | E) | (B | C) | (D & E)) & !(C & D) => E) <=> F]] & [[testA | testB]]";
+		// ConstraintFactoryImpl factory = new ConstraintFactoryImpl();
+		// factory.parse(complexContent);
+		// factory.getRuleNode(complexContent);
 	}
 }
