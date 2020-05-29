@@ -7,8 +7,15 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
 
 public enum FeatureModelNames implements TaskTagsSelector {
 
-	FEATUREMODEL("extendedFeatureModel"), PROPERTIES("properties"), STRUCT("struct"), AND("and"), GRAPHICS("graphics"),
-	FEATURE("feature"), ALT("alt"), DESCRIPTION("description"), CONSTRAINTS("constraints"), RULE("rule"), SELECTOR("");
+	// general tags
+	FEATUREMODEL("extendedFeatureModel"), PROPERTIES("properties"), STRUCT("struct"), GRAPHICS("graphics"),
+	DESCRIPTION("description"),
+	// task tags
+	FEATURE("feature"), ALT("alt"), AND("and"),
+	// constraint tags
+	CONSTRAINTS("constraints"), RULE("rule"), IMPLIES("imp"), NOT("not"), EQUIVALENT("equ"), CONJ("conj"), DISJ("disj"),
+	// reserved tags
+	SELECTOR("");
 
 	private String name;
 
