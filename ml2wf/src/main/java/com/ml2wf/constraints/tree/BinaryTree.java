@@ -1,7 +1,6 @@
 package com.ml2wf.constraints.tree;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 /**
  * This class represents a binary tree structure.
@@ -27,34 +26,34 @@ import java.util.Iterator;
  *
  * @version 1.0
  */
-public class BinaryTree<T> implements Iterator<T> {
+public class BinaryTree<T> {
 
-	private T node;
+	private T root;
 	private BinaryTree<T> rightChild;
 	private BinaryTree<T> leftChild;
 	private boolean isBlocked;
 
-	public BinaryTree(T node, BinaryTree<T> rightChild, BinaryTree<T> leftChild) {
-		this.node = node;
+	public BinaryTree(T root, BinaryTree<T> rightChild, BinaryTree<T> leftChild) {
+		this.root = root;
 		this.rightChild = rightChild;
 		this.leftChild = leftChild;
 		this.isBlocked = false;
 	}
 
-	public BinaryTree(T node) {
-		this(node, null, null);
+	public BinaryTree(T root) {
+		this(root, null, null);
 	}
 
 	public BinaryTree() {
 		this(null);
 	}
 
-	public T getNode() {
-		return this.node;
+	public T getRoot() {
+		return this.root;
 	}
 
-	public void setNode(T node) {
-		this.node = node;
+	public void setRoot(T node) {
+		this.root = node;
 	}
 
 	public BinaryTree<T> getRightChild() {
@@ -91,9 +90,9 @@ public class BinaryTree<T> implements Iterator<T> {
 		if (this.isBlocked) {
 			return null; // TODO: raise exception
 		}
-		if (this.node == null) {
+		if (this.root == null) {
 			// TODO: improve this behavior
-			this.node = child.getNode();
+			this.root = child.getRoot();
 			this.leftChild = child.getLeftChild();
 			this.rightChild = child.getRightChild();
 			return this;
@@ -121,9 +120,9 @@ public class BinaryTree<T> implements Iterator<T> {
 		if (this.isBlocked) {
 			return null; // TODO: raise exception
 		}
-		if (this.node == null) {
+		if (this.root == null) {
 			// TODO: improve this behavior
-			this.node = child.getNode();
+			this.root = child.getRoot();
 			this.leftChild = child.getLeftChild();
 			this.rightChild = child.getRightChild();
 			return this;
@@ -148,8 +147,8 @@ public class BinaryTree<T> implements Iterator<T> {
 		if (this.isBlocked) {
 			return false;
 		}
-		if (this.node == null) {
-			this.node = tree.getNode();
+		if (this.root == null) {
+			this.root = tree.getRoot();
 			this.leftChild = tree.getLeftChild();
 			this.rightChild = tree.getRightChild();
 			return true;
@@ -189,29 +188,12 @@ public class BinaryTree<T> implements Iterator<T> {
 		this.rightChild.setBlocked(block);
 	}
 
-	@Override
-	public boolean hasNext() {
-		return (this.leftChild != null) && (this.rightChild != null);
-	}
-
-	@Override
-	public T next() {
-		if (this.hasNext()) {
-			if (this.leftChild != null) {
-				return this.leftChild.next();
-			} else {
-				return this.rightChild.next();
-			}
-		}
-		return this.node;
-	}
-
 	public StringBuilder toString(StringBuilder prefix, boolean isTail, StringBuilder sb) {
 		// https://stackoverflow.com/a/27153988
 		if (this.rightChild != null) {
 			this.rightChild.toString(new StringBuilder().append(prefix).append(isTail ? "│   " : "    "), false, sb);
 		}
-		sb.append(prefix).append(isTail ? "└── " : "┌── ").append(this.node).append("(").append(this.isBlocked)
+		sb.append(prefix).append(isTail ? "└── " : "┌── ").append(this.root).append("(").append(this.isBlocked)
 				.append(")\n");
 		if (this.leftChild != null) {
 			this.leftChild.toString(new StringBuilder().append(prefix).append(isTail ? "    " : "│   "), true, sb);

@@ -59,7 +59,7 @@ public class Config {
 		return this.getUnaryOperators().contains(operator); // TODO: change considering the config file
 	}
 
-	private boolean isAnOperator(String character) {
+	public boolean isAnOperator(String character) {
 		return this.getOperatorsList().contains(character);
 	}
 }
