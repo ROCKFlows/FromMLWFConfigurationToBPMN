@@ -14,6 +14,7 @@ public enum FeatureModelNames implements TaskTagsSelector {
 	FEATURE("feature"), ALT("alt"), AND("and"),
 	// constraint tags
 	CONSTRAINTS("constraints"), RULE("rule"), IMPLIES("imp"), NOT("not"), EQUIVALENT("equ"), CONJ("conj"), DISJ("disj"),
+	VAR("var"),
 	// reserved tags
 	SELECTOR("");
 

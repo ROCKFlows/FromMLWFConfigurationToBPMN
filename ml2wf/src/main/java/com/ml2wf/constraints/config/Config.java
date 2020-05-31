@@ -1,5 +1,7 @@
 package com.ml2wf.constraints.config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +43,20 @@ public class Config {
 
 	public List<String> getOperatorsList() {
 		return vocMapping.keySet().stream().collect(Collectors.toList());
+	}
+
+	public List<String> getBinaryOperators() {
+		List<String> binary = this.getOperatorsList();
+		binary.removeAll(this.getUnaryOperators());
+		return binary;
+	}
+
+	public List<String> getUnaryOperators() {
+		return new ArrayList<>(Arrays.asList("!")); // TODO: replace with config file
+	}
+
+	public boolean isUnaryOperator(String operator) {
+		return this.getUnaryOperators().contains(operator); // TODO: change considering the config file
 	}
 
 	private boolean isAnOperator(String character) {

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.constraints.InvalidConstraintException;
+
 /**
  * This interface provides a method for the <b>generation of constraint
  * nodes</b>.
@@ -21,9 +23,10 @@ public interface ConstraintFactory {
 	 *
 	 * @param constraintText text containing constraints
 	 * @return a {@code List} of generated constraint nodes
+	 * @throws InvalidConstraintException
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	public List<Node> getRuleNodes(String constraintText);
+	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException;
 }

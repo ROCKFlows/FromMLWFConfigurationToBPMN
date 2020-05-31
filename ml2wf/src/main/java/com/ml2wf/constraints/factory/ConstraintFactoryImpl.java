@@ -1,23 +1,27 @@
 package com.ml2wf.constraints.factory;
 
-import java.util.ArrayDeque;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.config.Config;
 import com.ml2wf.constraints.parser.ConstraintParser;
 import com.ml2wf.constraints.parser.Parser;
-import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.constraints.tree.BinaryTree;
 
 // TODO: create a configuration file to define constraint syntax
 // TODO: add singleton dp
@@ -27,7 +31,6 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	private Config config;
 	private Parser parser;
 	private static Document document;
-	private Map<Integer, Queue<String>> depth;
 
 	public ConstraintFactoryImpl() throws ParserConfigurationException {
 		// Document instantiation
@@ -35,31 +38,18 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		document = docBuilder.newDocument();
 		// Parser instantiation
-		this.parser = new ConstraintParser(null);
 		this.config = new Config(""); // TODO
-		this.depth = new TreeMap<>();
-	}
-
-	public Map<Integer, Queue<String>> getDepth() {
-		return this.depth;
+		this.parser = new ConstraintParser(this.config);
 	}
 
 	/**
-	 * Generates a rule {@code Node} containing all constraints nodes from the given
+	 * Generates a {@code List} of rule {@code Node} containing all constraints
+	 * nodes from the given
 	 * {@code constraintText}.
 	 *
 	 * <p>
 	 *
-	 * Here is the <b>algorithm</b> (pseudocode) :
-	 *
-	 * <p>
-	 *
-	 * <code>
-	 * for each keyword in parse(constraintText):
-	 * <pre>get involved tasks</pre>
-	 * <pre>generate corresponding node</pre>
-	 * return generated_nodes
-	 * </code>
+	 * TODO: explain algorithm
 	 *
 	 * <p>
 	 *
@@ -68,98 +58,60 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 *
 	 * @param constraintText text containing constraints
 	 * @return a generated {@code Node} containing all constraints nodes
+	 * @throws InvalidConstraintException
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
 	@Override
-	public List<Node> getRuleNodes(String constraintText) {
+	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException {
 		List<Node> rules = new ArrayList<>();
-		this.parse(constraintText);
-		Node ruleNode = document.createElement(FeatureModelNames.RULE.getName());
-		ruleNode = this.generateNodes(ruleNode);
+		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
+		for (BinaryTree<String> tree : trees) {
+			rules.add(this.generateNode(tree));
+		}
 		return rules;
 	}
 
-	public void parse(String constraintText) {
-		// TODO: move in ConstraintParser
-		int separatorCounter = 0;
-		for (List<String> constraints : this.parser.parseContent(constraintText)) {
-			for (String element : constraints) {
-				// TODO: check parser utility
-				if (element.equals("(")) {
-					separatorCounter++;
-				} else if (element.equals(")")) {
-					separatorCounter--;
-				} else {
-					if (!this.depth.containsKey(separatorCounter)) {
-						this.depth.put(separatorCounter, new ArrayDeque<String>());
-					}
-					this.depth.get(separatorCounter).add(element);
-				}
-			}
-		}
-	}
-
-	private Node generateNodes(Node root) {
-		Map<Integer, Queue<String>> reversedMap = ((TreeMap<Integer, Queue<String>>) this.depth).descendingMap();
-		List<Integer> keyList = new ArrayList<>();
-		keyList.addAll(reversedMap.keySet());
-		if (reversedMap.isEmpty()) {
-			return root;
-		}
-		if (reversedMap.size() == 1) {
-			root.appendChild(this.createNode(reversedMap.get(0).poll()));
-			reversedMap.clear();
-			return root;
-		}
-		int currentKey = keyList.get(0);
-		int nextKey = keyList.get(1);
-		while (!reversedMap.isEmpty()) {
-			Queue<String> childrenQueue = reversedMap.get(currentKey);
-			Queue<String> parentQueue = reversedMap.get(nextKey);
-			String parent = parentQueue.poll();
-			String childA = childrenQueue.poll();
-			if (this.isOneSide(parent)) {
-				root = this.createNode(parent, childA);
-			} else {
-				String childB = childrenQueue.poll();
-				root = this.createNode(parent, childA, childB);
-			}
-			if (childrenQueue.isEmpty()) {
-				reversedMap.remove(currentKey);
-			}
-		}
-		return root;
-	}
-
-	private boolean isUnary(String operator) {
-		// TODO: move this method
-		return operator.equals("!");
-	}
-
-	private boolean isOneSide(String operator) {
-		return this.isUnary(operator) || !this.config.getOperatorsList().contains(operator);
-	}
-
-	private Node createNode(String parent, String childA, String childB) {
+	private Node generateNode(BinaryTree<String> tree) throws InvalidConstraintException {
+		// TODO: iterate over all tree's nodes and call createNode for each node
 		return null;
 	}
 
-	private Node createNode(String parent, String child) {
+	public Node createNode(String child) {
+		// TODO
 		return null;
 	}
 
-	private Node createNode(String child) {
-		return null;
+	/**
+	 * "Pretty prints" a DOM {@code Node}.
+	 *
+	 * TODO: to remove if not useful
+	 *
+	 * @param node node to print
+	 * @return a {@code String} containing a description of the given {@code node}
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	public static String nodeToString(Node node) {
+		// pretty print a DOM Node
+		StringWriter sw = new StringWriter();
+		try {
+			Transformer t = TransformerFactory.newInstance().newTransformer();
+			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.transform(new DOMSource(node), new StreamResult(sw));
+		} catch (TransformerException te) {
+			System.out.println("nodeToString Transformer Exception");
+		}
+		return sw.toString();
 	}
 
-	public static void main(String[] args) throws ParserConfigurationException {
-		// String complexContent = "[[!(((A & B) | (B | C)) & !(C & D) => E) <=> F]] &
-		// [[A => B]] eza sq [[A => !(B | C) & C]] plus [[!(!(A & B) | C > D => E)]]";
-		String complexContent = "[[!(((A & B | E) | (B | C) | (D & E)) & !(C & D) => E) <=> F]] & [[testA | testB]]";
-		// ConstraintFactoryImpl factory = new ConstraintFactoryImpl();
-		// factory.parse(complexContent);
-		// factory.getRuleNode(complexContent);
+	public static void main(String[] args) throws ParserConfigurationException, InvalidConstraintException {
+		String content = "qdfsdgfh [[!(!AB&!(B|C)=>D)]]fsdeghf";
+		ConstraintParser parser = new ConstraintParser(new Config(""));
+		List<BinaryTree<String>> treeResult = parser.parseContent(content);
+		System.out.println(treeResult);
 	}
 }
