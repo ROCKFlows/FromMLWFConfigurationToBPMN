@@ -25,6 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
@@ -101,7 +102,8 @@ public class TestFeatureModelMerger {
 	}
 
 	@BeforeEach
-	public void setUp() throws ParserConfigurationException, SAXException, IOException, TransformerException {
+	public void setUp() throws ParserConfigurationException, SAXException, IOException, TransformerException,
+			InvalidConstraintException {
 		// TODO: factorize with TestInstanceFactoryImpl#setUp
 		// --- retrieving FM resource
 		ClassLoader classLoader = this.getClass().getClassLoader();

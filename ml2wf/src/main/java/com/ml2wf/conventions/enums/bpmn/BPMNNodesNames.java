@@ -7,8 +7,14 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
 
 public enum BPMNNodesNames implements TaskTagsSelector {
 
-	TASK("bpmn2:task"), USERTASK("bpmn2:userTask"), INCOMING("bpmn2:incoming"), OUTGOING("bpmn2:outgoing"),
-	EXTENSION("bpmn2:extensionElements"), STYLE("ext:style"), DOCUMENTATION("bpmn2:documentation"), SELECTOR("");
+	// general tags
+	INCOMING("bpmn2:incoming"), OUTGOING("bpmn2:outgoing"),
+	EXTENSION("bpmn2:extensionElements"), STYLE("ext:style"), DOCUMENTATION("bpmn2:documentation"),
+	ANNOTATION("bpmn2:textAnnotation"),
+	// task tags
+	TASK("bpmn2:task"), USERTASK("bpmn2:userTask"),
+	// reserved tags
+	SELECTOR("");
 
 	private String name;
 

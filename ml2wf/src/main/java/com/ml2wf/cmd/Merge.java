@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.merge.FeatureModelMerger;
 
 import picocli.CommandLine.Command;
@@ -77,7 +78,8 @@ public class Merge implements Runnable {
 			merger = new FeatureModelMerger(this.output);
 			merger.mergeWithWF(this.input, this.backUp);
 			LogManager.shutdown();
-		} catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
+		} catch (ParserConfigurationException | SAXException | IOException | TransformerException
+				| InvalidConstraintException e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");
 			// CommandLine.usage(this.spec, );
 		}
