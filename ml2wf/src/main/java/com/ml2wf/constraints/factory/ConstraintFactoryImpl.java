@@ -20,14 +20,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.ml2wf.constraints.InvalidConstraintException;
-import com.ml2wf.constraints.config.Config;
+import com.ml2wf.constraints.config.ConfigImpl;
 import com.ml2wf.constraints.parser.ConstraintParser;
 import com.ml2wf.constraints.parser.Parser;
 import com.ml2wf.constraints.tree.BinaryTree;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
-
-// TODO: create a configuration file to define constraint syntax
-// TODO: add singleton dp
 
 /**
  * This class is a factory for {@code Node} from constraints.
@@ -48,7 +45,7 @@ import com.ml2wf.conventions.enums.fm.FeatureModelNames;
  *
  * @see ConstraintFactory
  * @see Node
- * @see Config
+ * @see ConfigImpl
  * @see ConstraintParser
  *
  */
@@ -57,9 +54,9 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	/**
 	 * {@code Config}'s instance that will be used for constraints parsing.
 	 *
-	 * @see Config
+	 * @see ConfigImpl
 	 */
-	private Config config;
+	private ConfigImpl config;
 	/**
 	 * {@code Parser}'s instance that will parse given constraints.
 	 *
@@ -93,7 +90,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @throws ParserConfigurationException
 	 *
 	 * @see Document
-	 * @see Config
+	 * @see ConfigImpl
 	 * @see ConstraintParser
 	 */
 	public ConstraintFactoryImpl() throws ParserConfigurationException {
@@ -102,7 +99,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		document = docBuilder.newDocument();
 		// Parser instantiation
-		this.config = Config.getInstance();
+		this.config = ConfigImpl.getInstance();
 		this.parser = new ConstraintParser(this.config);
 	}
 
@@ -179,13 +176,13 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 *
 	 * @since 1.0
 	 * @see Node
-	 * @see Config
+	 * @see ConfigImpl
 	 * @see FeatureModelNames
 	 */
 	public Node createNode(String element) {
 		Node node;
 		if (this.config.isAnOperator(element)) {
-			node = document.createElement(Config.getVocmapping().get(element).getName());
+			node = document.createElement(this.config.getVocmapping().get(element));
 		} else {
 			node = document.createElement(FeatureModelNames.VAR.getName());
 			node.appendChild(document.createTextNode(element)); // TODO: check if working

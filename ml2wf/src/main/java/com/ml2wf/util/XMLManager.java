@@ -298,6 +298,8 @@ public class XMLManager {
 		String logMsg = String.format("Retrieving document for URL : %s...", url);
 		logger.debug(logMsg);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document document = dBuilder.parse(url.openStream());
 		document.getDocumentElement().normalize();

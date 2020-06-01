@@ -29,10 +29,25 @@
             </plugins>
         </pluginManagement>
         <resources>
+         	<!-- for configuration file -->
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <includes>
+                    <include>**/*.cfg</include>
+                </includes>
+            </resource>
+       		<!-- for BPMN files -->
             <resource>
                 <directory>${basedir}/src/test/resources</directory>
                 <includes>
                     <include>**/*.bpmn2</include>
+                </includes>
+            </resource>
+            <!-- for FM files -->
+            <resource>
+                <directory>${basedir}/src/test/resources</directory>
+                <includes>
+                    <include>**/*.xml</include>
                 </includes>
             </resource>
         </resources>

@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.ml2wf.constraints.config.Config;
+import com.ml2wf.constraints.config.ConfigImpl;
 import com.ml2wf.constraints.tree.BinaryTree;
 import com.ml2wf.constraints.util.OperAssociation;
 
@@ -34,7 +34,7 @@ import com.ml2wf.constraints.util.OperAssociation;
  * @version 1.0
  *
  * @see Parser
- * @see Config
+ * @see ConfigImpl
  * @see BinaryTree
  */
 public class ConstraintParser implements Parser {
@@ -42,18 +42,18 @@ public class ConstraintParser implements Parser {
 	/**
 	 * {@code Config}'s instance used to define delimiters and regex patterns.
 	 *
-	 * @see Config
+	 * @see ConfigImpl
 	 */
-	private Config config;
+	private ConfigImpl config;
 
 	/**
 	 * {@code ConstraintParser}'s default instance.
 	 *
 	 * @param cfg the {@code Config} instance
 	 *
-	 * @see Config
+	 * @see ConfigImpl
 	 */
-	public ConstraintParser(Config cfg) {
+	public ConstraintParser(ConfigImpl cfg) {
 		this.setConfig(cfg);
 	}
 
@@ -62,18 +62,18 @@ public class ConstraintParser implements Parser {
 	 *
 	 * @return the {@code Config} instance
 	 *
-	 * @see Config
+	 * @see ConfigImpl
 	 */
-	public Config getConfig() {
+	public ConfigImpl getConfig() {
 		return this.config;
 	}
 
 	/**
 	 * Sets the {@code Config} instance.
 	 *
-	 * @see Config
+	 * @see ConfigImpl
 	 */
-	public void setConfig(Config cfg) {
+	public void setConfig(ConfigImpl cfg) {
 		this.config = cfg;
 	}
 
