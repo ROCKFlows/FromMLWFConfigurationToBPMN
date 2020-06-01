@@ -43,10 +43,10 @@ public class Merge implements Runnable {
 	@Spec
 	Model.CommandSpec spec;
 
-	@Option(names = { "-i", "--input" }, arity = "1", order = 1, description = "input file")
+	@Option(names = { "-i", "--input" }, required = true, arity = "1", order = 1, description = "input file")
 	String input;
 
-	@Option(names = { "-o", "--output" }, arity = "1", order = 1, description = "output file")
+	@Option(names = { "-o", "--output" }, required = true, arity = "1", order = 1, description = "output file")
 	String output;
 
 	@Option(names = { "-v", "--verbose" }, arity = "0", order = 1, description = "verbose mode")
