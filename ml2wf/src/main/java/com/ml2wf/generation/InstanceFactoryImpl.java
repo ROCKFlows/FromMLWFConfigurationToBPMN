@@ -16,6 +16,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
@@ -102,6 +103,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
+	 * @throws InvalidConstraintException
 	 *
 	 * @since 1.0
 	 * @see Node
@@ -129,6 +131,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @throws SAXException
 	 * @throws IOException
 	 * @throws ParserConfigurationException
+	 * @throws InvalidConstraintException
 	 *
 	 * @since 1.0
 	 * @see {@link #getWFInstance(String)}

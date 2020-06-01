@@ -21,6 +21,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
@@ -71,7 +72,8 @@ public class TestInstanceFactoryImpl {
 			+ FILE_PATH.split("\\.")[1];
 
 	@BeforeEach
-	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
+			InvalidConstraintException {
 		// loading xml test file
 		ClassLoader classLoader = this.getClass().getClassLoader();
 		URL url = classLoader.getResource(FILE_PATH);

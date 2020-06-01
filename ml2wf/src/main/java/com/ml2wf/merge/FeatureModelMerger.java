@@ -13,8 +13,12 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.constraints.InvalidConstraintException;
+import com.ml2wf.constraints.factory.ConstraintFactory;
+import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
@@ -47,6 +51,12 @@ import com.ml2wf.util.XMLManager;
 public class FeatureModelMerger extends XMLManager {
 
 	/**
+	 * {@code ConstraintFactory}'s instance that will generate constraint nodes.
+	 *
+	 * @see ConstraintFactory
+	 */
+	private ConstraintFactory constraintFactory;
+	/**
 	 * Logger instance.
 	 *
 	 * @since 1.0
@@ -65,6 +75,7 @@ public class FeatureModelMerger extends XMLManager {
 	public FeatureModelMerger(String filePath)
 			throws ParserConfigurationException, SAXException, IOException {
 		super(filePath);
+		this.constraintFactory = new ConstraintFactoryImpl();
 	}
 
 	/**
@@ -94,6 +105,7 @@ public class FeatureModelMerger extends XMLManager {
 	 * @throws SAXException
 	 * @throws IOException
 	 * @throws TransformerException
+	 * @throws InvalidConstraintException
 	 *
 	 * @since 1.0
 	 * @see Node
@@ -101,7 +113,8 @@ public class FeatureModelMerger extends XMLManager {
 	 *
 	 */
 	public void mergeWithWF(String filePath, boolean backUp)
-			throws ParserConfigurationException, SAXException, IOException, TransformerException {
+			throws ParserConfigurationException, SAXException, IOException, TransformerException,
+			InvalidConstraintException {
 		// backing up if required
 		if (backUp) {
 			super.backUp();
@@ -136,6 +149,7 @@ public class FeatureModelMerger extends XMLManager {
 			// inserting the new task
 			this.insertNewTask(parentNode, task);
 		}
+		this.processAnnotations(wfDocument);
 		// saving result
 		super.save(super.getPath());
 	}
@@ -149,10 +163,63 @@ public class FeatureModelMerger extends XMLManager {
 	 * @throws SAXException
 	 * @throws IOException
 	 * @throws TransformerException
+	 * @throws InvalidConstraintException
 	 */
 	public void mergeWithWF(String filePath)
-			throws ParserConfigurationException, SAXException, IOException, TransformerException {
+			throws ParserConfigurationException, SAXException, IOException, TransformerException,
+			InvalidConstraintException {
 		this.mergeWithWF(filePath, false);
+	}
+
+	/**
+	 * Creates the <b>constraints</b> {@code Node} if it doesn't exist.
+	 *
+	 * @return the constraints {@code Node}
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	private Node createConstraintTag() {
+		NodeList nodeList = this.getDocument().getElementsByTagName(FeatureModelNames.CONSTRAINTS.getName());
+		if (nodeList.getLength() > 0) {
+			// aldready exists
+			return nodeList.item(0);
+		} else {
+			Node consTag = this.getDocument().createElement(FeatureModelNames.CONSTRAINTS.getName());
+			Node rootNode = this.getDocument().getElementsByTagName(FeatureModelNames.FEATUREMODEL.getName()).item(0);
+			return rootNode.appendChild(consTag);
+		}
+	}
+
+	/**
+	 * Processes {@code document}'s annotations and adds constraints.
+	 *
+	 * @param wfDocument Workflow {@code Document}'s instance containing
+	 *                   annotations.
+	 * @throws InvalidConstraintException
+	 *
+	 * @since 1.0
+	 * @see ConstraintFactory
+	 */
+	private void processAnnotations(Document wfDocument) throws InvalidConstraintException {
+		logger.info("Processing annotations...");
+		System.out.println("Processing annotations...");
+		Node constraintsNode = this.createConstraintTag();
+		List<Node> annotations = XMLManager
+				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName()));
+		for (Node annotation : annotations) {
+			// TODO: improve performances (check annotation.getChildNodes().item(1)
+			// sufficient ?)
+			for (Node commentNode : XMLManager.nodeListAsList(annotation.getChildNodes())) {
+				String comment = commentNode.getTextContent();
+				List<Node> newRules = this.constraintFactory.getRuleNodes(comment);
+				for (Node rule : newRules) {
+					this.getDocument().adoptNode(rule);
+					constraintsNode.appendChild(rule);
+				}
+			}
+		}
+		logger.info("Annotations processing ended...");
 	}
 
 	/**
