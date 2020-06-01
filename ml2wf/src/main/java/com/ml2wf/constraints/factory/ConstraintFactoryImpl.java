@@ -102,7 +102,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		document = docBuilder.newDocument();
 		// Parser instantiation
-		this.config = new Config(""); // TODO
+		this.config = Config.getInstance();
 		this.parser = new ConstraintParser(this.config);
 	}
 
