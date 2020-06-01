@@ -1,10 +1,8 @@
 package com.ml2wf.constraints.config;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +45,7 @@ public class ConfigImpl implements Config {
 	/**
 	 * Default configuration file path.
 	 */
-	private static String DEFAULT_FILE_PATH = "configuration.cfg";
+	private static String DEFAULT_FILE_PATH = "./config/configuration.cfg";
 	/**
 	 * Configuration file path.
 	 */
@@ -154,26 +152,21 @@ public class ConfigImpl implements Config {
 		this.unaryOperators = new ArrayList<>();
 		this.binaryOperators = new ArrayList<>();
 		// get config file data
-		ClassLoader classLoader = this.getClass().getClassLoader();
-		URL url = classLoader.getResource(this.filePath); // TODO: check getResourceAsStream performances
-		URI uri;
-		try {
-			uri = url.toURI();
-		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
-			// TODO: log error while accessing file
-			// exit
-			uri = null; // TODO: to remove
+		// check if filePath is valid
+		Path path = Paths.get(this.filePath);
+		if (!Files.exists(path)) {
+			// TODO: log error
+			this.applyDefault();
+			return;
 		}
-		try (Stream<String> lines = Files.lines(Paths.get(uri))) {
+		try (Stream<String> lines = Files.lines(path)) {
 			// foreach line
-			System.out.println(lines);
 			lines.forEach(l -> {
-				System.out.println(l);
-				if (!l.startsWith("#") || l.isBlank()) {
+				l = l.replace(" ", "");
+				if (!l.startsWith("#") && !l.isBlank() && this.processEntry(l.split(":"))) {
 					// if it is not a comment or an empty line
-					this.processEntry(l.split(":"));
-					// TODO: stop if all operators are loaded
+					// and config is complete
+					return;
 				}
 			});
 		} catch (IOException e) {
@@ -189,6 +182,10 @@ public class ConfigImpl implements Config {
 	 *
 	 * <p>
 	 *
+	 * Returns whether the current config is complete or note.
+	 *
+	 * <p>
+	 *
 	 * Some examples of {@code entry} :
 	 *
 	 * <pre>
@@ -197,30 +194,24 @@ public class ConfigImpl implements Config {
 	 * </pre>
 	 *
 	 * @param entry array with <b>name : arity : symbol</b>
+	 * @return whether the current config is complete or note
 	 *
 	 * @since 1.0
 	 */
-	private void processEntry(String[] entry) {
+	private boolean processEntry(String[] entry) {
 		// TODO: improve verifications (create a dedicated method ?)
-		if (!DefaultConfig.isValidName(entry[0])) {
-			// TODO: log erro
-			this.applyDefault();
-			// TODO: improve (full replacement for every bad entry...)
-			return;
-		}
-		if ((entry.length < 3)) {
-			// TODO: log error
-			this.getDefault(entry);
-			return;
-		}
-		int arity;
 		try {
-			arity = Integer.parseInt(entry[1]);
-		} catch (NumberFormatException nfe) {
+			this.checkEntry(entry);
+		} catch (InvalidConfigEntryException e) {
+			// TODO: log error
+			this.applyDefault();
+			return true;
+		} catch (IncompleteConfigEntryException e) {
 			// TODO: log error
 			this.getDefault(entry);
-			return;
+			return DefaultConfig.isComplete(this.vocMapping);
 		}
+		int arity = Integer.parseInt(entry[1]);
 		this.vocMapping.put(entry[2], entry[0]);
 		if (arity == 1) {
 			this.unaryOperators.add(entry[2]);
@@ -230,6 +221,39 @@ public class ConfigImpl implements Config {
 			// TODO: log error
 			// return
 			this.getDefault(entry);
+		}
+		return DefaultConfig.isComplete(this.vocMapping);
+	}
+
+	/**
+	 * Checks if the given {@code entry} is valid or not.
+	 *
+	 * <p>
+	 *
+	 * It not, throws the appropriate {@code Exception}.
+	 *
+	 * @param entry entry to check
+	 * @throws InvalidConfigEntryException
+	 * @throws IncompleteConfigEntryException
+	 */
+	private void checkEntry(String[] entry) throws InvalidConfigEntryException, IncompleteConfigEntryException {
+		if (entry.length == 0) {
+			// TODO: log error
+			throw new InvalidConfigEntryException("Empty entry.");
+		}
+		if (!DefaultConfig.isValidName(entry[0])) {
+			// TODO: log error
+			throw new InvalidConfigEntryException(String.format("Invalid entry for : %s.", entry[0]));
+		}
+		if ((entry.length < 3)) {
+			// TODO: log error
+			throw new IncompleteConfigEntryException(String.format("Incomplete entry for : %s.", entry[0]));
+		}
+		try {
+			Integer.parseInt(entry[1]);
+		} catch (NumberFormatException nfe) {
+			// TODO: log error
+			throw new IncompleteConfigEntryException(String.format("Incomplete entry (arity) for : %s.", entry[0]));
 		}
 	}
 

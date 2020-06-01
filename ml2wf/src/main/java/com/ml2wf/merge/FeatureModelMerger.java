@@ -203,7 +203,6 @@ public class FeatureModelMerger extends XMLManager {
 	 */
 	private void processAnnotations(Document wfDocument) throws InvalidConstraintException {
 		logger.info("Processing annotations...");
-		System.out.println("Processing annotations...");
 		Node constraintsNode = this.createConstraintTag();
 		List<Node> annotations = XMLManager
 				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName()));

@@ -1,6 +1,7 @@
 package com.ml2wf.constraints.config;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -151,5 +152,15 @@ public enum DefaultConfig {
 	 */
 	public String[] getEntry() {
 		return new String[] { this.getName(), String.valueOf(this.getArity()), this.getSymbol() };
+	}
+
+	/**
+	 * Returns whether the config is complete or not.
+	 *
+	 * @param cfg config to test
+	 * @return whether the config is complete or not
+	 */
+	public static boolean isComplete(Map<String, String> cfg) {
+		return DefaultConfig.values().length == cfg.size();
 	}
 }
