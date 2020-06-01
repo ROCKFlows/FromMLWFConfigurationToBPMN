@@ -14,25 +14,67 @@
         <version.jar.plugin>3.2.0</version.jar.plugin>
         <version.assembly.plugin>3.3.0</version.assembly.plugin>
         <version.surefire>3.0.0-M1</version.surefire>
+        <version.shade.plugin>3.2.3</version.shade.plugin>
         <version.picocli>4.3.2</version.picocli>
         <version.log4j>2.13.3</version.log4j>
+        <dependency.directory>dependency/</dependency.directory>
     </properties>
     <build>
-        <pluginManagement>
-            <plugins>
-                <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${version.surefire}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <finalName>ml2wf</finalName>
+        <plugins>
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${version.surefire}</version>
+            </plugin>
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${version.shade.plugin}</version>
+                <executions>
+                    <!-- Run shade goal on package phase -->
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <!-- add Main-Class to manifest file -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.ml2wf.App</mainClass>
+                                    <manifestEntries>
+			                            <Multi-Release>true</Multi-Release>
+			                        </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <resources>
+            <!-- for configuration file -->
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <includes>
+                    <include>**/*.cfg</include>
+                </includes>
+            </resource>
+            <!-- for BPMN files -->
             <resource>
                 <directory>${basedir}/src/test/resources</directory>
                 <includes>
                     <include>**/*.bpmn2</include>
+                </includes>
+            </resource>
+            <!-- for FM files -->
+            <resource>
+                <directory>${basedir}/src/test/resources</directory>
+                <includes>
+                    <include>**/*.xml</include>
                 </includes>
             </resource>
         </resources>
@@ -59,10 +101,10 @@
             <version>${version.picocli}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
-		<dependency>
-		    <groupId>org.apache.logging.log4j</groupId>
-		    <artifactId>log4j-core</artifactId>
-		    <version>${version.log4j}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${version.log4j}</version>
+        </dependency>
     </dependencies>
 </project>
