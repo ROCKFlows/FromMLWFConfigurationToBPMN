@@ -43,13 +43,13 @@ ml2wf -m -i <ins>file</ins> -o <ins>file</ins> [-v]
 
 Lets consider this generic workflow :
 
-![generical_wf](F:\1 - Programmation\2 - Java\WF2BPMN\FromMLWFConfigurationToBPMN\img\generical_wf.png)
+![generical_wf](./img/generical_wf.png)
 
 #### Step 1 : Instantiation & Modification
 
 We instantiate our generic workflow using the **generate** (-g) command and we change the tasks names which give us :
 
-![instantiated_wf](F:\1 - Programmation\2 - Java\WF2BPMN\FromMLWFConfigurationToBPMN\img\instantiated_wf.png)
+![instantiated_wf](./img/instantiated_wf.png)
 
 *Note that we put some constraints on our tasks (in comments).*
 
@@ -59,10 +59,10 @@ We now merge our instantiated workflow in the FeatureModel using the **merge** (
 
 Here is the result :
 
-![feature_model](F:\1 - Programmation\2 - Java\WF2BPMN\FromMLWFConfigurationToBPMN\img\feature_model.png)
+![feature_model](./img/feature_model.png)
 
 #### Step 3  : Reusing your generated tasks for other workflows
 
 Using the FeatureModelIDE, you now can select the wished tasks and it will automatically select the needed ones.
 
-![tasks_selection](F:\1 - Programmation\2 - Java\WF2BPMN\FromMLWFConfigurationToBPMN\img\tasks_selection.png)
+![tasks_selection](./img/tasks_selection.png)
