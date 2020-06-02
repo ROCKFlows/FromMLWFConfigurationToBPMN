@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.generation.InstanceFactory;
 import com.ml2wf.generation.InstanceFactoryImpl;
 
 import picocli.CommandLine.Command;
@@ -30,7 +31,7 @@ import picocli.CommandLine.Spec;
  *
  * @version 1.0
  *
- * @see InstanceFactoryImpl
+ * @see InstanceFactory
  * @see Command
  * @see Logger
  *
@@ -60,13 +61,8 @@ public class Generate implements Runnable {
 
 	@Override
 	public void run() {
-		String pckName = "com.ml2wf.cmd.Generate"; // InstanceFactoryImpl.class.getPackageName() not compiling with
-													// maven on github
-		if (this.verbose) {
-			Configurator.setLevel(pckName, Level.DEBUG);
-		} else {
-			Configurator.setLevel(pckName, Level.FATAL);
-		}
+		String pckName = InstanceFactory.class.getPackageName(); // "com.ml2wf.cmd.Generate";
+		Configurator.setLevel(pckName, (this.verbose) ? Level.DEBUG : Level.FATAL);
 		InstanceFactoryImpl factory;
 		try {
 			factory = new InstanceFactoryImpl(this.input);

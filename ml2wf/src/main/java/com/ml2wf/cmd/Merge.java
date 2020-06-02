@@ -12,6 +12,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
+import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.merge.WFTasksMerger;
 
 import picocli.CommandLine.Command;
@@ -32,7 +33,7 @@ import picocli.CommandLine.Spec;
  *
  * @version 1.0
  *
- * @see WFTasksMerger
+ * @see AbstractMerger
  * @see Command
  * @see Logger
  *
@@ -66,13 +67,8 @@ public class Merge implements Runnable {
 
 	@Override
 	public void run() {
-		String pckName = "com.ml2wf.cmd.Merge"; // InstanceFactoryImpl.class.getPackageName() not compiling with
-												// maven on github
-		if (this.verbose) {
-			Configurator.setLevel(pckName, Level.DEBUG);
-		} else {
-			Configurator.setLevel(pckName, Level.FATAL);
-		}
+		String pckName = AbstractMerger.class.getPackageName(); // "com.ml2wf.cmd.Merge";
+		Configurator.setLevel(pckName, (this.verbose) ? Level.DEBUG : Level.FATAL);
 		WFTasksMerger merger;
 		try {
 			merger = new WFTasksMerger(this.output);

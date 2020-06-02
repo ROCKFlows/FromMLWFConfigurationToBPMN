@@ -66,12 +66,12 @@ public class TestInstanceFactoryImpl {
 	/**
 	 * Default XML filename.
 	 */
-	private static final String FILE_PATH = "generic_WF_A.bpmn2";
+	private static final String FILE_PATH = "./wf_generic_samples/generic_WF_A.bpmn2";
 	/**
 	 * Result filename according to {@code FILE_NAME}.
 	 */
-	private static final String RESULT_FILE_NAME = FILE_PATH.split("\\.")[0] + Notation.getInstanceVoc() + "."
-			+ FILE_PATH.split("\\.")[1];
+	private static final String RESULT_FILE_NAME = "." + FILE_PATH.split("\\.")[1] + Notation.getInstanceVoc() + "."
+			+ FILE_PATH.split("\\.")[2]; // TODO: change result directory by "./wf_instances/
 
 	@BeforeEach
 	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,

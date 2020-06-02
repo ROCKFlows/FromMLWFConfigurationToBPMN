@@ -41,6 +41,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+       						<createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
                                 <!-- add Main-Class to manifest file -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -56,25 +57,13 @@
             </plugin>
         </plugins>
         <resources>
-            <!-- for configuration file -->
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>**/*.cfg</include>
-                </includes>
-            </resource>
-            <!-- for BPMN files -->
-            <resource>
-                <directory>${basedir}/src/test/resources</directory>
-                <includes>
                     <include>**/*.bpmn2</include>
-                </includes>
-            </resource>
-            <!-- for FM files -->
-            <resource>
-                <directory>${basedir}/src/test/resources</directory>
-                <includes>
                     <include>**/*.xml</include>
+                    <include>log4j2.properties</include>
                 </includes>
             </resource>
         </resources>
@@ -100,6 +89,12 @@
             <artifactId>picocli</artifactId>
             <version>${version.picocli}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-api</artifactId>
+		    <version>2.13.3</version>
+		</dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

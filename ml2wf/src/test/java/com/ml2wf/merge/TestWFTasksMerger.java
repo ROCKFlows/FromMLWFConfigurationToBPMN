@@ -80,7 +80,7 @@ public class TestWFTasksMerger {
 	/**
 	 * Default XML WF filename.
 	 */
-	private static final String WF_SOURCE_FILE_PATH = "generic_WF_A_instance.bpmn2";
+	private static final String WF_SOURCE_FILE_PATH = "./wf_generic_samples/generic_WF_A_instance.bpmn2";
 	/**
 	 * Back up path.
 	 *
