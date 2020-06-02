@@ -34,7 +34,7 @@ import com.ml2wf.conventions.enums.fm.FeatureModelNames;
 import com.ml2wf.util.XMLManager;
 
 /**
- * This class tests the {@link FeatureModelMerger} class.
+ * This class tests the {@link WFTasksMerger} class.
  *
  * <p>
  *
@@ -43,18 +43,20 @@ import com.ml2wf.util.XMLManager;
  *
  * @author Nicolas Lacroix
  *
- * @see FeatureModelMerger
+ * @version 1.0
+ *
+ * @see WFTasksMerger
  *
  */
-@DisplayName("Test of FeatureModelMerger")
-public class TestFeatureModelMerger {
+@DisplayName("Test of WFTasksMerger")
+public class TestWFTasksMerger {
 
 	/**
 	 * Instance of the class to be tested.
 	 *
-	 * @see FeatureModelMerger
+	 * @see WFTasksMerger
 	 */
-	private FeatureModelMerger merger;
+	private WFTasksMerger merger;
 	/**
 	 * XML WF source document.
 	 *
@@ -109,7 +111,7 @@ public class TestFeatureModelMerger {
 		ClassLoader classLoader = this.getClass().getClassLoader();
 		URL url = classLoader.getResource(FM_SOURCE_FILE_PATH);
 		String fDirectory = url.getPath().replace("%20", " ");
-		this.merger = new FeatureModelMerger(fDirectory);
+		this.merger = new WFTasksMerger(fDirectory);
 		this.sourceWFDocument = XMLManager.getDocumentFromURL(url);
 		// --- retrieving instatiated WF resource
 		url = classLoader.getResource(WF_SOURCE_FILE_PATH);

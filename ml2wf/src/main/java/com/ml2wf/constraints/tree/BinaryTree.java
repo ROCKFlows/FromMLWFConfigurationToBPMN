@@ -33,10 +33,10 @@ public class BinaryTree<T> {
 	private BinaryTree<T> leftChild;
 	private boolean isBlocked;
 
-	public BinaryTree(T root, BinaryTree<T> rightChild, BinaryTree<T> leftChild) {
+	public BinaryTree(T root, BinaryTree<T> leftChild, BinaryTree<T> rightChild) {
 		this.root = root;
-		this.rightChild = rightChild;
 		this.leftChild = leftChild;
+		this.rightChild = rightChild;
 		this.isBlocked = false;
 	}
 
@@ -186,6 +186,54 @@ public class BinaryTree<T> {
 			this.rightChild = new BinaryTree<>(); // TODO: reuse creating methods
 		}
 		this.rightChild.setBlocked(block);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + (this.isBlocked ? 1231 : 1237);
+		result = (prime * result) + ((this.leftChild == null) ? 0 : this.leftChild.hashCode());
+		result = (prime * result) + ((this.rightChild == null) ? 0 : this.rightChild.hashCode());
+		result = (prime * result) + ((this.root == null) ? 0 : this.root.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// TODO: reduce
+		if (this == obj) {
+			return true;
+		}
+		if ((obj == null) || (this.getClass() != obj.getClass())) {
+			return false;
+		}
+		BinaryTree<?> other = (BinaryTree<?>) obj;
+		if (this.isBlocked != other.isBlocked) {
+			return false;
+		}
+		if (this.leftChild == null) {
+			if (other.leftChild != null) {
+				return false;
+			}
+		} else if (!this.leftChild.equals(other.leftChild)) {
+			return false;
+		}
+		if (this.rightChild == null) {
+			if (other.rightChild != null) {
+				return false;
+			}
+		} else if (!this.rightChild.equals(other.rightChild)) {
+			return false;
+		}
+		if (this.root == null) {
+			if (other.root != null) {
+				return false;
+			}
+		} else if (!this.root.equals(other.root)) {
+			return false;
+		}
+		return true;
 	}
 
 	public StringBuilder toString(StringBuilder prefix, boolean isTail, StringBuilder sb) {

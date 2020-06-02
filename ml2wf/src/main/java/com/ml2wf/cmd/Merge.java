@@ -12,7 +12,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
-import com.ml2wf.merge.FeatureModelMerger;
+import com.ml2wf.merge.WFTasksMerger;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model;
@@ -32,7 +32,7 @@ import picocli.CommandLine.Spec;
  *
  * @version 1.0
  *
- * @see FeatureModelMerger
+ * @see WFTasksMerger
  * @see Command
  * @see Logger
  *
@@ -73,9 +73,9 @@ public class Merge implements Runnable {
 		} else {
 			Configurator.setLevel(pckName, Level.FATAL);
 		}
-		FeatureModelMerger merger;
+		WFTasksMerger merger;
 		try {
-			merger = new FeatureModelMerger(this.output);
+			merger = new WFTasksMerger(this.output);
 			merger.mergeWithWF(this.input, this.backUp);
 			LogManager.shutdown();
 		} catch (ParserConfigurationException | SAXException | IOException | TransformerException

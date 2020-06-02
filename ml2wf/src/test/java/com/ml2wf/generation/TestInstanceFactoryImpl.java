@@ -37,6 +37,8 @@ import com.ml2wf.util.XMLManager;
  *
  * @author Nicolas Lacroix
  *
+ * @version 1.0
+ *
  * @see InstanceFactoryImpl
  *
  */
