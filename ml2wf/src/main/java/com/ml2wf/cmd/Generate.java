@@ -61,7 +61,7 @@ public class Generate implements Runnable {
 
 	@Override
 	public void run() {
-		String pckName = InstanceFactory.class.getPackageName(); // "com.ml2wf.cmd.Generate";
+		String pckName = InstanceFactory.class.getPackageName();
 		Configurator.setLevel(pckName, (this.verbose) ? Level.DEBUG : Level.FATAL);
 		InstanceFactoryImpl factory;
 		try {

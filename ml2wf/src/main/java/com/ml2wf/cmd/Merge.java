@@ -67,7 +67,7 @@ public class Merge implements Runnable {
 
 	@Override
 	public void run() {
-		String pckName = AbstractMerger.class.getPackageName(); // "com.ml2wf.cmd.Merge";
+		String pckName = AbstractMerger.class.getPackageName();
 		Configurator.setLevel(pckName, (this.verbose) ? Level.DEBUG : Level.FATAL);
 		WFTasksMerger merger;
 		try {

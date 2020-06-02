@@ -154,7 +154,6 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	private void generateNode(BinaryTree<String> tree, Node base) throws InvalidConstraintException {
 		// TODO: iterate over all tree's nodes and call createNode for each node
 		String rootValue = tree.getRoot();
-		System.out.println("generating for " + rootValue);
 		if (rootValue == null) {
 			// stop condition
 			return;
@@ -215,9 +214,18 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 
 	public static void main(String[] args) throws ParserConfigurationException, InvalidConstraintException,
 			TransformerFactoryConfigurationError, TransformerException {
-		String content = "qdfsdgfh [[!(!A&!(B|C)=>D)]]fsdeghf";
+		// String content = "qdfsdgfh [[!(!A&!(B|C)=>D)]]fsdeghf";
+		String content = "[[A => B & C]]";
 		ConstraintFactory factory = new ConstraintFactoryImpl();
 		List<Node> consNodes = factory.getRuleNodes(content);
+		System.out.println(nodeToString(consNodes.get(0)));
+		content = "[[A => (B & C)]]";
+		factory = new ConstraintFactoryImpl();
+		consNodes = factory.getRuleNodes(content);
+		System.out.println(nodeToString(consNodes.get(0)));
+		content = "[[A => B & C | D]]";
+		factory = new ConstraintFactoryImpl();
+		consNodes = factory.getRuleNodes(content);
 		System.out.println(nodeToString(consNodes.get(0)));
 	}
 }

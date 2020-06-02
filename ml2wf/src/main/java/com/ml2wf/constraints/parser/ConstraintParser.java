@@ -178,8 +178,8 @@ public class ConstraintParser implements Parser {
 					// if has a right operand
 					// save it in the buffer
 					if (!buffer.isBlank()) {
-						tree.setLeftChild(buffer);
-						tree.blockLeftChild(true); // block left child due to operand
+						created = tree.addLeftChild(buffer);
+						created.block(true); // block left child due to operand
 						lastInsertionLeft = true;
 					}
 					buffer = operAssociation.getRightOperand();
