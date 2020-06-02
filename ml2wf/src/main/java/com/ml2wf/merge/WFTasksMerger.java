@@ -27,28 +27,20 @@ import com.ml2wf.generation.InstanceFactory;
 import com.ml2wf.util.XMLManager;
 
 /**
- * This class merges a FeatureModel xml file with a Workflow xml file.
+ * This class merges all given Workflow's tasks into a FeatureModel xml file.
  *
  * <p>
  *
- * It is an extension of the {@link XMLManager} base class.
- *
- * <p>
- *
- * It aims at the application of <b>metalearning</b> for workflow automation as
- * part of the <b>ml2wf project</b>.
- *
- * <p>
- *
- * Please refer to the <a href="https://featureide.github.io/">FeatureIDE
- * framework</a> for further information about a FeatureModel.
+ * It is an extension of the {@link AbstractMerger} base class.
  *
  * @author Nicolas Lacroix
  *
  * @version 1.0
  *
+ * @see AbstractMerger
+ *
  */
-public class FeatureModelMerger extends XMLManager {
+public class WFTasksMerger extends AbstractMerger {
 
 	/**
 	 * {@code ConstraintFactory}'s instance that will generate constraint nodes.
@@ -62,7 +54,7 @@ public class FeatureModelMerger extends XMLManager {
 	 * @since 1.0
 	 * @see Logger
 	 */
-	private static final Logger logger = LogManager.getLogger(FeatureModelMerger.class);
+	private static final Logger logger = LogManager.getLogger(WFTasksMerger.class);
 
 	/**
 	 * {@code FeatureModelMerger}'s default constructor.
@@ -72,7 +64,7 @@ public class FeatureModelMerger extends XMLManager {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public FeatureModelMerger(String filePath)
+	public WFTasksMerger(String filePath)
 			throws ParserConfigurationException, SAXException, IOException {
 		super(filePath);
 		this.constraintFactory = new ConstraintFactoryImpl();
