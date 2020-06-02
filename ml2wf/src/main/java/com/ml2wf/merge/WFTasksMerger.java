@@ -104,6 +104,7 @@ public class WFTasksMerger extends AbstractMerger {
 	 * @see InstanceFactory
 	 *
 	 */
+	@Override
 	public void mergeWithWF(String filePath, boolean backUp)
 			throws ParserConfigurationException, SAXException, IOException, TransformerException,
 			InvalidConstraintException {
@@ -130,6 +131,7 @@ public class WFTasksMerger extends AbstractMerger {
 			currentTaskName = currentTaskName.replaceFirst(Notation.getGeneratedPrefixVoc(), "");
 			// splitting task's name
 			String[] tName = currentTaskName.split(Notation.getGeneratedPrefixVoc());
+			// TODO: check the tName size
 			if (existingTasksNames.contains(tName[1] + "_" + tName[0])) {
 				// if already contained, continue
 				logger.debug("Task already in FeatureModel");
@@ -178,7 +180,12 @@ public class WFTasksMerger extends AbstractMerger {
 			return nodeList.item(0);
 		} else {
 			Node consTag = this.getDocument().createElement(FeatureModelNames.CONSTRAINTS.getName());
-			Node rootNode = this.getDocument().getElementsByTagName(FeatureModelNames.FEATUREMODEL.getName()).item(0);
+			NodeList fmTagList = this.getDocument().getElementsByTagName(FeatureModelNames.FEATUREMODEL.getName());
+			if (fmTagList.getLength() == 0) {
+				// if it is an ExtendedFeatureModel
+				fmTagList = this.getDocument().getElementsByTagName(FeatureModelNames.EXTENDEDFEATUREMODEL.getName());
+			}
+			Node rootNode = fmTagList.item(0);
 			return rootNode.appendChild(consTag);
 		}
 	}
@@ -231,7 +238,7 @@ public class WFTasksMerger extends AbstractMerger {
 	 *         specified reference
 	 */
 	private Node getSuitableParent(Node task) {
-		String debugMsg = String.format("Getting location for task : %s", task);
+		String debugMsg = String.format("Getting location for task : %s", task.getNodeName());
 		logger.debug(debugMsg);
 		// retrieving the references parent
 		Node docNode = ((Element) task).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName()).item(0);
@@ -240,14 +247,14 @@ public class WFTasksMerger extends AbstractMerger {
 		// electing the good candidate
 		String candidateName;
 		for (Node candidate : candidates) {
-			debugMsg = String.format("	Processing candidate %s...", candidate);
+			debugMsg = String.format("	Processing candidate %s...", candidate.getTextContent());
 			logger.debug(debugMsg);
 			candidateName = XMLManager.getNodeName(candidate);
 			if (candidateName.equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
 				return candidate;
 			}
 		}
-		debugMsg = String.format("No suitable parent was found for task %s.", task);
+		debugMsg = String.format("No suitable parent was found for task %s.", task.getTextContent());
 		logger.warn(debugMsg);
 		logger.warn("Putting task at default location.");
 		return super.getDocument().getElementsByTagName(FeatureModelNames.AND.getName()).item(0);
@@ -267,13 +274,15 @@ public class WFTasksMerger extends AbstractMerger {
 	 * @see Node
 	 */
 	private void insertNewTask(Node parentNode, Node task) {
-		String debugMsg = String.format("Inserting task : %s", task);
+		String debugMsg = String.format("Inserting task : %s", task.getTextContent());
 		logger.debug(debugMsg);
 		// retrieving task name content
 		String[] taskName = XMLManager.getNodeName(task).replaceFirst(Notation.getGeneratedPrefixVoc(), "")
 				.split(Notation.getGeneratedPrefixVoc());
 		// converting task name to the new node name
-		String newNodeName = taskName[1] + "_" + taskName[0];
+		String newNodeName = taskName[1];
+		debugMsg = String.format("task's name : %s", newNodeName);
+		logger.debug(debugMsg);
 		// inserting the new node
 		Element newNode = super.getDocument().createElement(FeatureModelNames.FEATURE.getName());
 		newNode.setAttribute(FeatureModelAttributes.NAME.getName(), newNodeName);
