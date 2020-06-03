@@ -1,6 +1,7 @@
-#Principes généraux
+Principes généraux
 
-##Voici le FM initial 
+
+Voici le FM initial 
 
 
 Les contraintes sont issues pour l'instant soit de lecture soit de relevé de réunion.
