@@ -6,10 +6,12 @@ Les contraintes sont issues pour l'instant soit de lecture soit de relevé de r�
 
 ![Feature Model](/Knowledge%20on%20anomaly%20detection/img/AD.png)
 
+
 [ ] Faire valider l'ensemble des contraintes
 
 Dans le fichier ci-joint, une version textuelle du FM.
 ![description](/Knowledge%20on%20anomaly%20detection/FMs/ADDepencies.txt)
+
 
 
 ## Configurations
@@ -17,8 +19,9 @@ Dans le fichier ci-joint, une version textuelle du FM.
 Sur cette base de connaissance, assemblée à cette étape sous la forme d'un feature model, nous pouvons commencer à élaguer les possibilités relativement à un problème donné.
 
 1) Par exemple, la présence d'un nombre important d'anomalies interdit d'utiliser la fonction de cout MAE
-![MAE](/Knowledge%20on%20anomaly%20detection/img/configuration_MAE.png)
+![MAE](/Knowledge%20on%20anomaly%20detection/img/configuration_MAE.png ){:height="36px"}.
 
+<img src="/Knowledge%20on%20anomaly%20detection/img/configuration_MAE.png" alt="configuration_MAE" width="500"/>
 2) L'exigence de stabilité implique de mettre en place une méthode assurant la stabilité des modèles d'apprentissage contruits
 ![stability](/Knowledge%20on%20anomaly%20detection/img/configuration_stability.png)
 
@@ -31,7 +34,7 @@ Sur cette base de connaissance, assemblée à cette étape sous la forme d'un fe
 
 ### Voici un exemple de méta-worflow
 ![references](/Knowledge%20on%20anomaly%20detection/img/MetaModel_AD.png)
-
+<img src="/Knowledge%20on%20anomaly%20detection/img/MetaModel_AD.png" alt="drawing" width="50"/>
 
 ### Construire une instance du workflows
 Voici un exemple d'une instance de workflow :
