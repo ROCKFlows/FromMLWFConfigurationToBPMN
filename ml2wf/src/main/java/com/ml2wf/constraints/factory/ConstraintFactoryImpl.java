@@ -21,6 +21,7 @@ import org.w3c.dom.Node;
 
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.config.ConfigImpl;
+import com.ml2wf.constraints.config.DefaultConfig;
 import com.ml2wf.constraints.parser.ConstraintParser;
 import com.ml2wf.constraints.parser.Parser;
 import com.ml2wf.constraints.tree.BinaryTree;
@@ -139,6 +140,26 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	}
 
 	/**
+	 * Returns an <b>implication</b> association of the {@code globalTask} with the
+	 * {@code tasksNames}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method returns this association using the
+	 * {@code DefaultConfig}'s symbols.
+	 *
+	 * @param globalTask global task
+	 * @param tasksNames tasks implied by the {@code global task}
+	 * @return an implication association of the {@code globalTask} with the
+	 *         {@code tasksNames}
+	 */
+	public String getAssociationConstraint(String globalTask, List<String> tasksNames) {
+		// TODO: factorize [[ ]] into variables (see config)
+		return "[[" + globalTask + DefaultConfig.IMP.getSymbol()
+				+ String.join(DefaultConfig.CONJ.getSymbol(), tasksNames) + "]]";
+	}
+
+	/**
 	 * Generates a {@code Node} according to {@code tree}'s root value and call
 	 * recursively for each {@code tree}'s child.
 	 *
@@ -210,22 +231,5 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		t.setOutputProperty(OutputKeys.INDENT, "yes");
 		t.transform(new DOMSource(node), new StreamResult(sw));
 		return sw.toString();
-	}
-
-	public static void main(String[] args) throws ParserConfigurationException, InvalidConstraintException,
-			TransformerFactoryConfigurationError, TransformerException {
-		// String content = "qdfsdgfh [[!(!A&!(B|C)=>D)]]fsdeghf";
-		String content = "[[A => B & C]]";
-		ConstraintFactory factory = new ConstraintFactoryImpl();
-		List<Node> consNodes = factory.getRuleNodes(content);
-		System.out.println(nodeToString(consNodes.get(0)));
-		content = "[[A => (B & C)]]";
-		factory = new ConstraintFactoryImpl();
-		consNodes = factory.getRuleNodes(content);
-		System.out.println(nodeToString(consNodes.get(0)));
-		content = "[[A => B & C | D]]";
-		factory = new ConstraintFactoryImpl();
-		consNodes = factory.getRuleNodes(content);
-		System.out.println(nodeToString(consNodes.get(0)));
 	}
 }

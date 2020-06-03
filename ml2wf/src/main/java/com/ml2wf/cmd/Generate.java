@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.App;
 import com.ml2wf.generation.InstanceFactory;
 import com.ml2wf.generation.InstanceFactoryImpl;
 
@@ -61,7 +62,7 @@ public class Generate implements Runnable {
 
 	@Override
 	public void run() {
-		String pckName = InstanceFactory.class.getPackageName();
+		String pckName = App.class.getPackageName();
 		Configurator.setLevel(pckName, (this.verbose) ? Level.DEBUG : Level.FATAL);
 		InstanceFactoryImpl factory;
 		try {

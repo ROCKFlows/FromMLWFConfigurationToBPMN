@@ -2,6 +2,7 @@ package com.ml2wf;
 
 import com.ml2wf.cmd.Generate;
 import com.ml2wf.cmd.Merge;
+import com.ml2wf.cmd.Save;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -22,7 +23,8 @@ public class App {// implements Runnable {
 	public static void main(String[] args) {
 		CommandLine commandLine = new CommandLine(new App())
 				.addSubcommand("-g", new Generate())
-				.addSubcommand("-m", new Merge());
+				.addSubcommand("-m", new Merge())
+				.addSubcommand("-s", new Save());
 		commandLine.execute(args);
 		if (commandLine.isUsageHelpRequested()) {
 			commandLine.usage(System.out); // TODO: replace System.out by logger

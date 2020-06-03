@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -29,7 +30,6 @@ import org.xml.sax.SAXException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
-import com.ml2wf.generation.InstanceFactoryImpl;
 
 /**
  * This class is the base class for any XML managing class.
@@ -71,7 +71,7 @@ public class XMLManager {
 	 * @since 1.0
 	 * @see Logger
 	 */
-	private static final Logger logger = LogManager.getLogger(InstanceFactoryImpl.class);
+	private static final Logger logger = LogManager.getLogger(XMLManager.class);
 
 	/**
 	 * {@code XMLTool}'s default constructor.
@@ -152,6 +152,15 @@ public class XMLManager {
 	 */
 	public void setDocument(Document document) {
 		this.document = document;
+	}
+
+	/**
+	 * Returns the file extension separator.
+	 *
+	 * @return the file extension separator
+	 */
+	public static String getExtensionSeparator() {
+		return EXTENSION_SEPARATOR;
 	}
 
 	// Saving methods
@@ -326,6 +335,21 @@ public class XMLManager {
 	}
 
 	/**
+	 * Returns a {@code List} containing all {@code nodes}' tasks names.
+	 *
+	 * @param nodes nodes to get the names
+	 * @return a {@code List} containing all {@code nodes}' tasks names
+	 *
+	 * @since 1.0
+	 *
+	 * @see NodeList
+	 */
+	public static List<String> getTasksNames(List<Node> nodes) {
+		return nodes.stream().map(XMLManager::getNodeName)
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Sanitizes {@code name} removing genericity and instantiation caracteristics.
 	 *
 	 * @param name name to sanitize
@@ -353,7 +377,17 @@ public class XMLManager {
 	 * @since 1.0
 	 */
 	public static String insertInFileName(String fName, String content) {
+		// TODO: fix ..\ issue when splitting with .
 		String[] splittedPath = fName.split(Pattern.quote(EXTENSION_SEPARATOR));
-		return splittedPath[0] + content + EXTENSION_SEPARATOR + splittedPath[1];
+		int length = splittedPath.length;
+		if (length > 1) {
+			return splittedPath[length - 2] + content + EXTENSION_SEPARATOR + splittedPath[length - 1];
+		}
+		String logMsg = String.format("Error while renaming file : %s", fName);
+		logger.warn(logMsg);
+		String errorfName = "BACKUP_ERROR.xml";
+		logMsg = String.format("Saving backup file as : %s", errorfName);
+		logger.warn(logMsg);
+		return errorfName;
 	}
 }

@@ -13,8 +13,8 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.App;
 import com.ml2wf.constraints.InvalidConstraintException;
-import com.ml2wf.merge.AbstractMerger;
-import com.ml2wf.merge.WFTasksMerger;
+import com.ml2wf.merge.WFInstanceMerger;
+import com.ml2wf.merge.WFMerger;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model;
@@ -22,26 +22,26 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 /**
- * Class managing the <b>merge</b> command.
+ * Class managing the <b>save</b> command.
  *
  * <p>
  *
- * It calls required methods for the importation of a instantiated workflow's
- * tasks to a
- * FeatureModel.
+ * It calls required methods for saving the current workflow instance as a
+ * global task
+ * into the FeatureModel.
  *
  *
  * @author Nicolas Lacroix
  *
  * @version 1.0
  *
- * @see AbstractMerger
+ * @see WFMerger
  * @see Command
  * @see Logger
  *
  */
-@Command(name = "-m", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "import a worklow in a FeatureModel")
-public class Merge implements Runnable {
+@Command(name = "-s", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "saves a worklow as a task in a FeatureModel")
+public class Save implements Runnable {
 
 	@Spec
 	Model.CommandSpec spec;
@@ -65,16 +65,17 @@ public class Merge implements Runnable {
 	 * @since 1.0
 	 * @see Logger
 	 */
-	private static final Logger logger = LogManager.getLogger(Merge.class);
+	private static final Logger logger = LogManager.getLogger(Save.class);
 
 	@Override
 	public void run() {
+		// TODO: process Merge verifications
 		String pckName = App.class.getPackageName();
 		Configurator.setLevel(pckName, (this.verbose) ? Level.DEBUG : Level.FATAL);
-		WFTasksMerger merger;
+		WFMerger merger;
 		try {
-			merger = new WFTasksMerger(this.output);
-			merger.mergeWithWF(this.input, this.backUp);
+			merger = new WFInstanceMerger(this.output);
+			((WFInstanceMerger) merger).mergeWithWF(this.input, this.backUp);
 			LogManager.shutdown();
 		} catch (ParserConfigurationException | SAXException | IOException | TransformerException
 				| InvalidConstraintException e) {
