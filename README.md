@@ -13,7 +13,7 @@ Once created and modified, the data scientist can merge the workflow into the Fe
 
 - [Overview](#Overview)
 - [Usage](#Usage)
-  - [Command line](#Command line)
+  - [Command line](#command-line)
   - [Configuration](#Configuration)
 - [Installation](#Installation)
   - [Prerequisites](#Prerequisites)
