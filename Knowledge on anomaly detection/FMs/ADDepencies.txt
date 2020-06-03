@@ -1,0 +1,130 @@
+X ALWAYS Y := If X is selected then Y is selected in every valid configuration.
+X MAYBE  Y := If X is selected then Y is selected in at least one but not all valid configurations. 
+X NEVER  Y := If X is selected then Y cannot be selected in any valid configuration.
+
+multipleAnomalyClasses ALWAYS TraingDatasetCriteria
+multipleAnomalyClasses ALWAYS CititeriaOnOutliers
+multipleAnomalyClasses ALWAYS AnomalieClassesCriteria
+TimeSeries ALWAYS DataStructuration
+train OC_SVM ALWAYS  basedOnSimilarity
+train OC_SVM ALWAYS Training_step
+train OC_SVM ALWAYS Steps
+train OC_SVM ALWAYS tools
+train OC_SVM ALWAYS MLAlgorithm
+train OC_SVM ALWAYS OC_SVM
+OptimizerByTensorFlow ALWAYS testStability
+OptimizerByTensorFlow ALWAYS Steps
+OptimizerByTensorFlow ALWAYS Optimizer
+OptimizerByTensorFlow ALWAYS Adam Optimizer
+OptimizerByTensorFlow ALWAYS tools
+DataScientist ALWAYS References
+NumberOfOutliers ALWAYS TraingDatasetCriteria
+NumberOfOutliers ALWAYS CititeriaOnOutliers
+NumberOfOutliers MAYBE anomaliesInTrainingSet
+NumberOfOutliers MAYBE OnlyNormalTimeSeriesInTrainingSet_Criteria
+NumberOfOutliers MAYBE fewAnomaliesInTrainsingSet_Criteria
+testStability ALWAYS Steps
+testStability ALWAYS tools
+Mean Square Error ALWAYS Steps
+Mean Square Error ALWAYS tools
+Mean Square Error ALWAYS loss function
+Mean Square Error NEVER OnlyNormalTimeSeriesInTrainingSet_Criteria
+Mean Square Error NEVER fewAnomaliesInTrainsingSet_Criteria
+Benkabou2018 ALWAYS PHD
+Benkabou2018 ALWAYS References
+Benkabou2018 MAYBE OnlyNormalTimeSeriesInTrainingSet_Criteria
+Stability ALWAYS testStability
+Stability ALWAYS Requirement
+Stability ALWAYS Methods
+Stability ALWAYS Steps
+Stability ALWAYS tools
+Stability ALWAYS ensureStability
+compute descriptors_Step ALWAYS TimeSeries
+compute descriptors_Step ALWAYS Steps
+compute descriptors_Step ALWAYS Preprocessing_Step
+compute descriptors_Step ALWAYS DataStructuration
+RefineModel_step ALWAYS Steps
+ basedOnSimilarity ALWAYS Steps
+ basedOnSimilarity ALWAYS tools
+ basedOnSimilarity ALWAYS MLAlgorithm
+Training_step ALWAYS Steps
+Training_step ALWAYS tools
+Training_step ALWAYS MLAlgorithm
+preprocess data_Step ALWAYS Steps
+preprocess data_Step ALWAYS Preprocessing_Step
+TimeComplexity ALWAYS Requirement
+prioritize anomalies ALWAYS multipleAnomalyClasses
+prioritize anomalies ALWAYS TraingDatasetCriteria
+prioritize anomalies ALWAYS Methods
+prioritize anomalies ALWAYS CititeriaOnOutliers
+prioritize anomalies ALWAYS AnomalieClassesCriteria
+Yassine ALWAYS DataScientist
+Yassine ALWAYS References
+Yassine MAYBE fewAnomaliesInTrainsingSet_Criteria
+anomaliesInTrainingSet ALWAYS NumberOfOutliers
+anomaliesInTrainingSet ALWAYS TraingDatasetCriteria
+anomaliesInTrainingSet NEVER Mean Absolute Error
+anomaliesInTrainingSet ALWAYS CititeriaOnOutliers
+anomaliesInTrainingSet NEVER OnlyNormalTimeSeriesInTrainingSet_Criteria
+anomaliesInTrainingSet NEVER fewAnomaliesInTrainsingSet_Criteria
+Preprocessing_Step ALWAYS Steps
+Optimizer ALWAYS Steps
+Optimizer ALWAYS tools
+Adam Optimizer ALWAYS testStability
+Adam Optimizer ALWAYS Steps
+Adam Optimizer ALWAYS Optimizer
+Adam Optimizer ALWAYS tools
+Mean Absolute Error ALWAYS Steps
+Mean Absolute Error NEVER anomaliesInTrainingSet
+Mean Absolute Error ALWAYS tools
+Mean Absolute Error ALWAYS loss function
+PHD ALWAYS References
+tools ALWAYS Steps
+loss function ALWAYS Steps
+loss function ALWAYS tools
+PeriodicData ALWAYS TimeSeries
+PeriodicData ALWAYS DataStructuration
+FewAnomaiyClasses ALWAYS TraingDatasetCriteria
+FewAnomaiyClasses ALWAYS CititeriaOnOutliers
+FewAnomaiyClasses ALWAYS AnomalieClassesCriteria
+CititeriaOnOutliers ALWAYS TraingDatasetCriteria
+OptimizerbyKeras ALWAYS testStability
+OptimizerbyKeras ALWAYS Steps
+OptimizerbyKeras ALWAYS Optimizer
+OptimizerbyKeras ALWAYS Adam Optimizer
+OptimizerbyKeras ALWAYS tools
+LSTM ALWAYS Steps
+LSTM ALWAYS Optimizer
+LSTM ALWAYS tools
+LSTM ALWAYS loss function
+LSTM ALWAYS MLAlgorithm
+OnlyNormalTimeSeriesInTrainingSet_Criteria ALWAYS NumberOfOutliers
+OnlyNormalTimeSeriesInTrainingSet_Criteria NEVER Mean Square Error
+OnlyNormalTimeSeriesInTrainingSet_Criteria ALWAYS TraingDatasetCriteria
+OnlyNormalTimeSeriesInTrainingSet_Criteria NEVER anomaliesInTrainingSet
+OnlyNormalTimeSeriesInTrainingSet_Criteria ALWAYS CititeriaOnOutliers
+OnlyNormalTimeSeriesInTrainingSet_Criteria NEVER fewAnomaliesInTrainsingSet_Criteria
+AnomalieClassesCriteria ALWAYS TraingDatasetCriteria
+AnomalieClassesCriteria ALWAYS CititeriaOnOutliers
+MLAlgorithm ALWAYS Steps
+MLAlgorithm ALWAYS tools
+ensureStability ALWAYS testStability
+ensureStability ALWAYS Methods
+ensureStability ALWAYS Steps
+ensureStability ALWAYS tools
+SelectObservationToLabel_Step ALWAYS Steps
+OC_SVM ALWAYS  basedOnSimilarity
+OC_SVM ALWAYS Steps
+OC_SVM ALWAYS tools
+OC_SVM ALWAYS MLAlgorithm
+OC_SVM MAYBE fewAnomaliesInTrainsingSet_Criteria
+OC_SVM MAYBE OnlyNormalTimeSeriesInTrainingSet_Criteria
+HumanLabelling_Step ALWAYS Steps
+HumanLabelling_Step ALWAYS Labeling_Step
+Labeling_Step ALWAYS Steps
+fewAnomaliesInTrainsingSet_Criteria ALWAYS NumberOfOutliers
+fewAnomaliesInTrainsingSet_Criteria NEVER Mean Square Error
+fewAnomaliesInTrainsingSet_Criteria ALWAYS TraingDatasetCriteria
+fewAnomaliesInTrainsingSet_Criteria NEVER anomaliesInTrainingSet
+fewAnomaliesInTrainsingSet_Criteria ALWAYS CititeriaOnOutliers
+fewAnomaliesInTrainsingSet_Criteria NEVER OnlyNormalTimeSeriesInTrainingSet_Criteria
