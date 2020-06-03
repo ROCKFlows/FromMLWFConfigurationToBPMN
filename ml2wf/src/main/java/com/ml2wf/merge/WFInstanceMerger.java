@@ -92,8 +92,8 @@ public class WFInstanceMerger extends AbstractMerger {
 		logger.debug("Getting instances node...");
 		Element instanceNode = wfDocument.createElement(FeatureModelNames.FEATURE.getName());
 		instanceNode.setAttribute(FeatureModelAttributes.NAME.getName(), wfTaskName);
-		this.insertNewTask(this.getInstancesTask(), instanceNode);
-		// TODO: add result to WF document
+		Node generalInstancesNode = this.getInstancesTask();
+		this.insertNewTask(generalInstancesNode, instanceNode);
 		// ---
 		logger.debug("Retrieving all FM document tasks...");
 		List<Node> tasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
@@ -106,7 +106,6 @@ public class WFInstanceMerger extends AbstractMerger {
 		// add the new constraint
 		logger.info("Adding association constraint...");
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
-		// TODO: add rules to instanceNode
 	}
 
 	/**
@@ -144,11 +143,9 @@ public class WFInstanceMerger extends AbstractMerger {
 		instancesNode.setAttribute(FeatureModelAttributes.NAME.getName(), INSTANCES_TASK);
 		logMsg = String.format("Instances node created : %s", instancesNode.getNodeName());
 		logger.debug(logMsg);
-		logger.debug("Getting suitable parent...");
-		Node parent = this.getSuitableParent(instancesNode);
-		logMsg = String.format("Suitable parent found : %s", parent.getNodeName());
-		logger.debug(logMsg);
-		return parent.appendChild(instancesNode);
+		logger.debug("Inserting at default position...");
+		return super.getDocument().getElementsByTagName(FeatureModelNames.AND.getName()).item(1)
+				.appendChild(instancesNode);
 	}
 
 }

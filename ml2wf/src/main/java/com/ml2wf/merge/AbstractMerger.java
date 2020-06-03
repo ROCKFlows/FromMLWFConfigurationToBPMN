@@ -217,10 +217,14 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	 */
 	protected boolean isDuplicated(String instTaskName) {
 		// split the instTaskName
-		String[] s = instTaskName.split(Notation.getGeneratedPrefixVoc());
+		String[] splittedName = instTaskName.split(Notation.getGeneratedPrefixVoc());
 		// get all tasks
 		List<Node> tasks = XMLManager.getTasksList(this.getDocument(), FeatureModelNames.SELECTOR);
-		return XMLManager.getTasksNames(tasks).contains(s[2]);
+		// TODO: explain following code lines
+		if (splittedName.length == 3) {
+			return XMLManager.getTasksNames(tasks).contains(splittedName[2]);
+		}
+		return XMLManager.getTasksNames(tasks).contains(instTaskName);
 	}
 
 	/**
