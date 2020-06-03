@@ -18,7 +18,7 @@ Once created and modified, the data scientist can merge the workflow into the Fe
 - [Installation](#Installation)
   - [Prerequisites](#Prerequisites)
   - [Build](#Build)
-  - [Run](Run)
+  - [Run](#Run)
 - [Example](#Example)
 
 ## Usage
