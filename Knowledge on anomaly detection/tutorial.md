@@ -36,12 +36,12 @@ Sur cette base de connaissance, assemblée à cette étape sous la forme d'un fe
 
 ### Voici un exemple de méta-worflow
 
-<img src="/Knowledge%20on%20anomaly%20detection/img/MetaModel_AD.png" alt="drawing" width="50"/>
+<img src="/Knowledge%20on%20anomaly%20detection/img/MetaModel_AD.png" alt="drawing" width="500"/>
 
 ### Construire une instance du workflows
 Voici un exemple d'une instance de workflow :
 
-<img src="/Knowledge%20on%20anomaly%20detection/img/instance_model_AD.png" alt="drawing" width="50"/>
+<img src="/Knowledge%20on%20anomaly%20detection/img/instance_model_AD.png" alt="drawing" width="500"/>
 
 Voici une instance de workflow généré : 
 [ ] TO DO ligne de commande + image
