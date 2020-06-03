@@ -17,7 +17,7 @@ Dans le fichier ci-joint, une version textuelle du FM.
 Sur cette base de connaissance, assemblée à cette étape sous la forme d'un feature model, nous pouvons commencer à élaguer les possibilités relativement à un problème donné.
 
 1) Par exemple, la présence d'un nombre important d'anomalies interdit d'utiliser la fonction de cout MAE
-![MAE](/Knowledge%20on%20anomaly%20detection/img/configuration_MAE.png )
+![MAE](/Knowledge%20on%20anomaly%20detection/img/configuration_MAE.png =250x250)
 
 2) L'exigence de stabilité implique de mettre en place une méthode assurant la stabilité des modèles d'apprentissage contruits
 
