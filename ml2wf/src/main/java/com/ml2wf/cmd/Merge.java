@@ -1,18 +1,11 @@
 package com.ml2wf.cmd;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.xml.sax.SAXException;
 
 import com.ml2wf.App;
-import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.merge.WFTasksMerger;
 
@@ -74,10 +67,9 @@ public class Merge implements Runnable {
 		WFTasksMerger merger;
 		try {
 			merger = new WFTasksMerger(this.output);
-			merger.mergeWithWF(this.input, this.backUp);
+			merger.mergeWithWF(this.backUp, this.input);
 			LogManager.shutdown();
-		} catch (ParserConfigurationException | SAXException | IOException | TransformerException
-				| InvalidConstraintException e) {
+		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");
 			// CommandLine.usage(this.spec, );
 		}

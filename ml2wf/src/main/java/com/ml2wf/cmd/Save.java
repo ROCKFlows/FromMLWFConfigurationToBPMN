@@ -1,18 +1,11 @@
 package com.ml2wf.cmd;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.xml.sax.SAXException;
 
 import com.ml2wf.App;
-import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.merge.WFInstanceMerger;
 import com.ml2wf.merge.WFMerger;
 
@@ -46,8 +39,9 @@ public class Save implements Runnable {
 	@Spec
 	Model.CommandSpec spec;
 
-	@Option(names = { "-i", "--input" }, required = true, arity = "1", order = 1, description = "input file")
-	String input;
+	@Option(names = { "-i",
+			"--input" }, required = true, arity = "2", order = 1, description = "input files (meta workflow and instance workflow)")
+	String[] input;
 
 	@Option(names = { "-o", "--output" }, required = true, arity = "1", order = 1, description = "output file")
 	String output;
@@ -75,10 +69,9 @@ public class Save implements Runnable {
 		WFMerger merger;
 		try {
 			merger = new WFInstanceMerger(this.output);
-			((WFInstanceMerger) merger).mergeWithWF(this.input, this.backUp);
+			((WFInstanceMerger) merger).mergeWithWF(this.backUp, this.input);
 			LogManager.shutdown();
-		} catch (ParserConfigurationException | SAXException | IOException | TransformerException
-				| InvalidConstraintException e) {
+		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");
 			// CommandLine.usage(this.spec, );
 		}

@@ -335,16 +335,16 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns a {@code List} containing all {@code nodes}' tasks names.
+	 * Returns a {@code List} containing all {@code nodes}' names.
 	 *
 	 * @param nodes nodes to get the names
-	 * @return a {@code List} containing all {@code nodes}' tasks names
+	 * @return a {@code List} containing all {@code nodes}' names
 	 *
 	 * @since 1.0
 	 *
 	 * @see NodeList
 	 */
-	public static List<String> getTasksNames(List<Node> nodes) {
+	public static List<String> getNodesNames(List<Node> nodes) {
 		return nodes.stream().map(XMLManager::getNodeName)
 				.collect(Collectors.toList());
 	}
@@ -365,6 +365,16 @@ public class XMLManager {
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
 		// sanitization for generic WF's task
 		return name.replaceFirst(Notation.getGenericVoc() + "$", "");
+	}
+
+	/**
+	 * Returns the referred meta task from the given {@code reference} text.
+	 *
+	 * @param reference reference containing the referred meta task
+	 * @return the referred meta task from the given {@code reference} text
+	 */
+	public static String getReferredTask(String reference) {
+		return reference.replace(Notation.getReferenceVoc(), "").replace(Notation.getGenericVoc(), "");
 	}
 
 	/**

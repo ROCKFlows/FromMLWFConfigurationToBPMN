@@ -65,7 +65,7 @@ public class WFInstanceMerger extends AbstractMerger {
 	}
 
 	@Override
-	public void mergeWithWF(String filePath, boolean backUp)
+	public void mergeWithWF(boolean backUp, String filePath)
 			throws TransformerException, ParserConfigurationException, SAXException, IOException,
 			InvalidConstraintException {
 		if (backUp) {
@@ -90,14 +90,14 @@ public class WFInstanceMerger extends AbstractMerger {
 		Document wfDocument = XMLManager.preprocess(file);
 		// create instances node
 		logger.debug("Getting instances node...");
-		Element instanceNode = wfDocument.createElement(FeatureModelNames.FEATURE.getName());
-		instanceNode.setAttribute(FeatureModelAttributes.NAME.getName(), wfTaskName);
+		Element instanceNode = this.createFeatureWithName(wfTaskName);
+		// TODO: specify considering meta or instance WF importation
 		Node generalInstancesNode = this.getInstancesTask();
 		this.insertNewTask(generalInstancesNode, instanceNode);
 		// ---
 		logger.debug("Retrieving all FM document tasks...");
 		List<Node> tasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
-		List<String> tasksNames = XMLManager.getTasksNames(tasks);
+		List<String> tasksNames = this.getTasksNames(tasks);
 		logger.debug("Getting the constraint association...");
 		String associationConstraint = ((ConstraintFactoryImpl) super.getConstraintFactory())
 				.getAssociationConstraint(wfTaskName, tasksNames);
@@ -106,6 +106,7 @@ public class WFInstanceMerger extends AbstractMerger {
 		// add the new constraint
 		logger.info("Adding association constraint...");
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
+		super.save(super.getPath());
 	}
 
 	/**

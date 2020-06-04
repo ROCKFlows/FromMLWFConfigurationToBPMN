@@ -2,9 +2,9 @@ package com.ml2wf.merge;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,7 +13,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactory;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
@@ -92,8 +91,11 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	}
 
 	@Override
-	public abstract void mergeWithWF(String filePath, boolean backUp) throws ParserConfigurationException, SAXException,
-			IOException, TransformerException, InvalidConstraintException;
+	public void mergeWithWF(boolean backUp, String... filesPath) throws Exception {
+		for (String path : filesPath) {
+			this.mergeWithWF(backUp, path);
+		}
+	}
 
 	/**
 	 * Creates the <b>constraints</b> {@code Node} if it doesn't exist.
@@ -178,6 +180,7 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	 * @see Node
 	 */
 	protected void insertNewTask(Node parentNode, Node task) {
+		// TODO: recurse for nested tasks
 		String debugMsg = String.format("Inserting task : %s", task.getTextContent());
 		logger.debug(debugMsg);
 		// retrieving task name content
@@ -222,9 +225,9 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 		List<Node> tasks = XMLManager.getTasksList(this.getDocument(), FeatureModelNames.SELECTOR);
 		// TODO: explain following code lines
 		if (splittedName.length == 3) {
-			return XMLManager.getTasksNames(tasks).contains(splittedName[2]);
+			return XMLManager.getNodesNames(tasks).contains(splittedName[2]);
 		}
-		return XMLManager.getTasksNames(tasks).contains(instTaskName);
+		return XMLManager.getNodesNames(tasks).contains(instTaskName);
 	}
 
 	/**
@@ -242,6 +245,68 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 			this.getDocument().adoptNode(rule);
 			constraintsNode.appendChild(rule);
 		}
+	}
+
+	/**
+	 * Creates and returns a new feature with the given {@code name}.
+	 *
+	 * @param name name of the feature
+	 * @return a new feature with the given {@code name}
+	 */
+	protected Element createFeatureWithName(String name) {
+		Element feature = this.getDocument().createElement(FeatureModelNames.FEATURE.getName());
+		feature.setAttribute(FeatureModelAttributes.NAME.getName(), name);
+		return feature;
+	}
+
+	/**
+	 * Returns the given {@code task}'s name.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method is different from the
+	 * {@link XMLManager#getNodeName(Node)} because it removes the referred meta
+	 * task if present
+	 *
+	 * @param task task to get name
+	 * @return the given {@code task}'s name
+	 */
+	protected String getTaskName(Node task) {
+		String logMsg = String.format("Retrieving name for task : %s...", task);
+		logger.debug(logMsg);
+		String taskName = XMLManager.getNodeName(task);
+		if (task.hasChildNodes()) {
+			List<Node> children = XMLManager.nodeListAsList(task.getChildNodes());
+			// get all taks's children (e.g. extensionElements, documentation...)
+			for (Node child : children) {
+				// for each task's child
+				if (child.getNodeName().equals(BPMNNodesNames.DOCUMENTATION.getName())) {
+					// if has a documenting attribute
+					// remove the referred metatask to the current task's name
+					taskName = taskName.replaceFirst(XMLManager.getReferredTask(child.getTextContent()), "");
+					// Reminder : a documentation tag contains a "refersTo : meta task"
+				}
+			}
+		}
+		taskName = taskName.replace(Notation.getGeneratedPrefixVoc(), "");
+		logMsg = String.format("Task's name is : %s", taskName);
+		logger.debug(logMsg);
+		return taskName;
+	}
+
+	/**
+	 * Returns a {@code List} containing all {@code nodes}' tasks names.
+	 *
+	 * @param nodes nodes to get the names
+	 * @return a {@code List} containing all {@code nodes}' tasks names
+	 *
+	 * @since 1.0
+	 *
+	 * @see NodeList
+	 */
+	protected List<String> getTasksNames(List<Node> tasks) {
+		return tasks.stream().map(this::getTaskName)
+				.collect(Collectors.toList());
 	}
 
 }

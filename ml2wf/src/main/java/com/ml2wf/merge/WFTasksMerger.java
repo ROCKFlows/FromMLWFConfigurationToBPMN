@@ -79,7 +79,7 @@ public class WFTasksMerger extends AbstractMerger {
 	 * <li>saves the modifications using the {@link #save()} method.</li>
 	 * </uL>
 	 *
-	 * @param filePath the WF filepath.
+	 * @param filePath the WF file path.
 	 * @param backUp   backs up the current {@link #getSourceFile()} or not
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
@@ -93,7 +93,7 @@ public class WFTasksMerger extends AbstractMerger {
 	 *
 	 */
 	@Override
-	public void mergeWithWF(String filePath, boolean backUp)
+	public void mergeWithWF(boolean backUp, String filePath)
 			throws ParserConfigurationException, SAXException, IOException, TransformerException,
 			InvalidConstraintException {
 		// TODO: improve method readability
@@ -108,7 +108,7 @@ public class WFTasksMerger extends AbstractMerger {
 		List<Node> wfTasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
 		// retrieving all existing FM's tasks names
 		List<Node> existingTasks = XMLManager.getTasksList(super.getDocument(), FeatureModelNames.SELECTOR);
-		List<String> existingTasksNames = XMLManager.getTasksNames(existingTasks);
+		List<String> existingTasksNames = XMLManager.getNodesNames(existingTasks);
 		String currentTaskName;
 		String debugMsg;
 		// iterating for each task
@@ -156,7 +156,7 @@ public class WFTasksMerger extends AbstractMerger {
 	public void mergeWithWF(String filePath)
 			throws ParserConfigurationException, SAXException, IOException, TransformerException,
 			InvalidConstraintException {
-		this.mergeWithWF(filePath, false);
+		this.mergeWithWF(false, filePath);
 	}
 
 	/**

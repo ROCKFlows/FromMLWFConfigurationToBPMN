@@ -14,17 +14,32 @@ package com.ml2wf.merge;
 public interface WFMerger {
 
 	/**
-	 * Merges the workflow at {@code filePath} into the WF document.
+	 * Merges the workflow file at {@code filesPath} into the WF document.
 	 *
 	 * <p>
 	 *
 	 * Saves the current FeatureModel if {@code backup} is {@code true}.
 	 *
-	 * @param filePath path of the workflow's path.
+	 * @param filePath path of the workflow file.
 	 * @param backUp   indicates if a backup is needed
 	 * @throws Exception
 	 *
 	 * @since 1.0
 	 */
-	public void mergeWithWF(String filePath, boolean backUp) throws Exception;
+	public void mergeWithWF(boolean backUp, String filePath) throws Exception;
+
+	/**
+	 * Merges the workflow files at {@code filesPath} into the WF document.
+	 *
+	 * <p>
+	 *
+	 * Saves the current FeatureModel if {@code backup} is {@code true}.
+	 *
+	 * @param filesPath paths of the workflow files.
+	 * @param backUp    indicates if a backup is needed
+	 * @throws Exception
+	 *
+	 * @since 1.0
+	 */
+	public void mergeWithWF(boolean backUp, String... filesPath) throws Exception;
 }

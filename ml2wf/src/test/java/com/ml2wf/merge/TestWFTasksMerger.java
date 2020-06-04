@@ -106,7 +106,6 @@ public class TestWFTasksMerger {
 				+ splittedPath[1];
 		return this.backUpPath;
 	}
-	
 
 	@BeforeEach
 	public void setUp() throws ParserConfigurationException, SAXException, IOException, TransformerException,
@@ -121,7 +120,7 @@ public class TestWFTasksMerger {
 		// --- retrieving instatiated WF resource
 		url = classLoader.getResource(WF_SOURCE_FILE_PATH);
 		fDirectory = url.getPath().replace("%20", " ");
-		this.merger.mergeWithWF(fDirectory, true); // backing up
+		this.merger.mergeWithWF(true, fDirectory); // backing up
 		// --- retrieving FM result resource
 		url = classLoader.getResource(this.updateBackUpPath(FM_SOURCE_FILE_PATH));
 		this.resultFMDocument = XMLManager.getDocumentFromURL(url);
