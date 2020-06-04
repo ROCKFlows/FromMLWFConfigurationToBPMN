@@ -73,14 +73,17 @@ public class TestWFTasksMerger {
 	 * Default XML FM filename.
 	 */
 	private static final String FM_SOURCE_FILE_PATH = "model_A.xml";
+	private static final String FM_SOURCE_FILE_PATH2 = "model_example.xml";
 	/**
 	 * Default XML FM result filename.
 	 */
 	private static final String FM_RESULT_FILE_PATH = "model_A_result.xml";
+	private static final String FM_RESULT_FILE_PATH2 = "model_example_result.xml";
 	/**
 	 * Default XML WF filename.
 	 */
 	private static final String WF_SOURCE_FILE_PATH = "./wf_generic_samples/generic_WF_A_instance.bpmn2";
+	private static final String WF_SOURCE_FILE_PATH2 = "./wf_generic_samples/simple_wf2_instance.bpmn2";
 	/**
 	 * Back up path.
 	 *
@@ -93,15 +96,17 @@ public class TestWFTasksMerger {
 	 *
 	 * @return the back up path.
 	 */
-	private String updateBackUpPath() {
+
+	private String updateBackUpPath(String fm_source_file_path) {
 		SimpleDateFormat dateFormater = null;
 		Date backUpDate = new Date();
 		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
-		String[] splittedPath = FM_SOURCE_FILE_PATH.split("\\.");
+		String[] splittedPath = fm_source_file_path.split("\\.");
 		this.backUpPath = splittedPath[0] + Notation.getBackupVoc() + dateFormater.format(backUpDate) + "."
 				+ splittedPath[1];
 		return this.backUpPath;
 	}
+	
 
 	@BeforeEach
 	public void setUp() throws ParserConfigurationException, SAXException, IOException, TransformerException,
@@ -118,7 +123,7 @@ public class TestWFTasksMerger {
 		fDirectory = url.getPath().replace("%20", " ");
 		this.merger.mergeWithWF(fDirectory, true); // backing up
 		// --- retrieving FM result resource
-		url = classLoader.getResource(this.updateBackUpPath());
+		url = classLoader.getResource(this.updateBackUpPath(FM_SOURCE_FILE_PATH));
 		this.resultFMDocument = XMLManager.getDocumentFromURL(url);
 	}
 

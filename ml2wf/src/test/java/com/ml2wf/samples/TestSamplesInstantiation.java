@@ -22,6 +22,9 @@ public class TestSamplesInstantiation {
 	 * Basic WF XML file path.
 	 */
 	private static final String SIMPLE_WF_PATH = "./wf_generic_samples/simple_wf.bpmn";
+	
+	private static final String SIMPLE_WF_PATH2 = "./wf_generic_samples/simple_wf2.bpmn";
+	
 	/**
 	 * Basic WF XML file path.
 	 */
@@ -59,6 +62,10 @@ public class TestSamplesInstantiation {
 		this.classLoader = this.getClass().getClassLoader();
 		this.url = this.classLoader.getResource(SIMPLE_WF_PATH);
 		String fDirectory = this.url.getPath().replace("%20", " "); // TODO: improve sanitization
+		this.factory = new InstanceFactoryImpl(fDirectory);
+		
+		this.url = this.classLoader.getResource(SIMPLE_WF_PATH2);
+		fDirectory = this.url.getPath().replace("%20", " "); // TODO: improve sanitization
 		this.factory = new InstanceFactoryImpl(fDirectory);
 	}
 

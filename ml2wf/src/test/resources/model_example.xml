@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+	<properties>
+		<graphics key="showhiddenfeatures" value="true"/>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="Root">
+			<and name="AD">
+				<and abstract="true" name="Criteria">
+					<and abstract="true" name="CriteriaOnDataSet">
+						<graphics key="collapsed" value="true"/>
+						<alt abstract="true" name="NumberOfANomalies">
+							<graphics key="collapsed" value="true"/>
+							<feature name="Few"/>
+							<feature name="aLot"/>
+						</alt>
+					</and>
+				</and>
+				<and abstract="true" name="Steps">
+					<feature abstract="true" name="Evaluating_Step"/>
+					<feature abstract="true" name="Trainig_Step"/>
+					<feature abstract="true" name="Preprocessing_Step"/>
+				</and>
+			</and>
+		</and>
+	</struct>
+</featureModel>
