@@ -2,8 +2,8 @@ package com.ml2wf.merge;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
@@ -75,8 +76,11 @@ public class WFInstanceMerger extends AbstractMerger {
 		File file = new File(filePath);
 		String wfTaskName;
 		String logMsg;
+		Document wfDocument;
 		if (file.exists()) {
-			wfTaskName = file.getName().split(Pattern.quote(XMLManager.getExtensionSeparator()))[0];
+			wfDocument = XMLManager.preprocess(file);
+			wfTaskName = getWorkflowName(wfDocument).replace(" ", "_");
+			// file.getName().split(Pattern.quote(XMLManager.getExtensionSeparator()))[0];
 			if (this.isDuplicated(wfTaskName)) {
 				logger.warn("This workflow is already in the FeatureModel");
 				logger.warn("Skipping...");
@@ -87,7 +91,6 @@ public class WFInstanceMerger extends AbstractMerger {
 			logger.fatal(logMsg);
 			return;
 		}
-		Document wfDocument = XMLManager.preprocess(file);
 		// create instances node
 		logger.debug("Getting instances node...");
 		Element instanceNode = this.createFeatureWithName(wfTaskName);
@@ -106,7 +109,37 @@ public class WFInstanceMerger extends AbstractMerger {
 		// add the new constraint
 		logger.info("Adding association constraint...");
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
+		if (this.isInstanceWF(wfDocument)) {
+			// TODO: factorize method with previous lines
+			String metaReferrence = this.getMetaReferrenced(wfDocument);
+			associationConstraint = ((ConstraintFactoryImpl) super.getConstraintFactory())
+					.getAssociationConstraint(wfTaskName, Arrays.asList(metaReferrence));
+			this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
+		}
 		super.save(super.getPath());
+	}
+
+	private boolean isInstanceWF(Document wfDocument) {
+		// TODO: move this method
+		NodeList processNodes = wfDocument.getElementsByTagName(BPMNNodesNames.PROCESS.getName());
+		if (processNodes.getLength() > 0) {
+			Node processNode = processNodes.item(0);
+			// TODO: improve verification
+			return processNode.getFirstChild().getNodeValue().equals(BPMNNodesNames.DOCUMENTATION.getName());
+		}
+		return false;
+	}
+
+	private String getMetaReferrenced(Document wfDocument) {
+		// TODO: factorize and improve this method
+		NodeList processNodes = wfDocument.getElementsByTagName(BPMNNodesNames.PROCESS.getName());
+		if (processNodes.getLength() > 0) {
+			Node processNode = processNodes.item(0);
+			// TODO: improve verification
+			return XMLManager.getReferredTask(processNode.getFirstChild().getTextContent());
+		}
+		// TODO: log error
+		return null;
 	}
 
 	/**

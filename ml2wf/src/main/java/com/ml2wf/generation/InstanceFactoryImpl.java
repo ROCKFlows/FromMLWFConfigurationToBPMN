@@ -229,7 +229,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	private void addMetaWFReferences() {
 		// TODO: add logs
 		logger.debug("Adding the meta reference...");
-		String referred = XMLManager.getWorkflowName(this.getDocument());
+		String referred = XMLManager.getWorkflowName(this.getDocument()).replace(" ", "_");
 		String logMsg = String.format("Referred meta model is : %s.", referred);
 		logger.debug(logMsg);
 		this.addMetaWFRefDoc(referred);
