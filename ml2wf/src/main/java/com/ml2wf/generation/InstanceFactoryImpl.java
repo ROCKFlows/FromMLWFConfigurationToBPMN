@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
@@ -112,6 +113,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	public void getWFInstance(String resultPath)
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		logger.info("Starting the Workflow instatiation...");
+		this.addMetaWFReferences();
 		String logMsg;
 		for (Node node : XMLManager.getTasksList(super.getDocument(), BPMNNodesNames.SELECTOR)) {
 			logMsg = String.format("Instantiating the node %s...", node);
@@ -163,7 +165,9 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	private void instantiateNode(Node node) {
 		// documentation part
-		this.addDocumentationNode(node);
+		// TODO: factorize in method ?
+		String content = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue();
+		this.addDocumentationNode(node, content);
 		// extension part
 		this.addExtensionNode(node);
 		// node renaming part
@@ -191,18 +195,93 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @since 1.0
 	 * @see Node
 	 */
-	private void addDocumentationNode(Node node) {
-		Element documentation = super.getDocument().createElement(BPMNNodesNames.DOCUMENTATION.getName());
+	private void addDocumentationNode(Node node, String content) {
+		Element documentation = this.getDocument().createElement(BPMNNodesNames.DOCUMENTATION.getName());
 		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
 		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
-		CDATASection refersTo = super.getDocument().createCDATASection(Notation.getReferenceVoc()
-				+ node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue());
+		CDATASection refersTo = this.getDocument().createCDATASection(Notation.getReferenceVoc() + content);
 		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
 		logger.debug(logMsg);
 		documentation.appendChild(refersTo);
 		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
 		logger.debug(logMsg);
 		node.insertBefore(documentation, node.getFirstChild());
+	}
+
+	/**
+	 * Adds the metaworkflow references in the document.
+	 *
+	 * <p>
+	 *
+	 * More precisely,
+	 *
+	 * <p>
+	 *
+	 * <ul>
+	 * <li>add the reference in a documentation tag with the
+	 * {@link #addMetaWFRefDoc(String)} method,</li>
+	 * <li>add the reference in an annotation with the
+	 * {@link #addMetaWFRefAnnot(String)} method,</li>
+	 * </ul>
+	 *
+	 * @since 1.0
+	 */
+	private void addMetaWFReferences() {
+		// TODO: add logs
+		logger.debug("Adding the meta reference...");
+		String referred = XMLManager.getWorkflowName(this.getDocument());
+		String logMsg = String.format("Referred meta model is : %s.", referred);
+		logger.debug(logMsg);
+		this.addMetaWFRefDoc(referred);
+		this.addMetaWFRefAnnot(referred);
+	}
+
+	/**
+	 * Adds the metaworkflow reference in a documentation tag under the process one.
+	 *
+	 * @param reffered referred meta task
+	 *
+	 * @since 1.0
+	 */
+	private void addMetaWFRefDoc(String referred) {
+		logger.debug("Adding meta referrence in the documentation...");
+		NodeList processNodeList = this.getDocument().getElementsByTagName(BPMNNodesNames.PROCESS.getName());
+		if (processNodeList.getLength() == 0) {
+			logger.error("Error while getting the reffered metaworkflow's name.");
+			logger.warn("Skipping this step...");
+			return;
+		}
+		Node processNode = processNodeList.item(0);
+		this.addDocumentationNode(processNode, referred);
+	}
+
+	/**
+	 * Adds the metaworkflow reference in an annotation tag visible to the user.
+	 *
+	 * @param reffered referred meta task
+	 *
+	 * @since 1.0
+	 */
+	private void addMetaWFRefAnnot(String referred) {
+		NodeList processNodeList = this.getDocument().getElementsByTagName(BPMNNodesNames.PROCESS.getName());
+		if (processNodeList.getLength() == 0) {
+			logger.error("Error while getting the reffered metaworkflow's name.");
+			logger.warn("Skipping this step...");
+			return;
+		}
+		Node globalAnnotation = XMLManager.getGlobalAnnotationNode(this.getDocument());
+		if ((globalAnnotation != null) && (globalAnnotation.getChildNodes().getLength() > 0)) {
+			String content = "Workflow's name " + Notation.getWfNameDelimiterLeft() + Notation.getWfNameDelimiterRight()
+					+ "\nThis workflow makes reference to the " + referred + " workflow.";
+			Node newTextNode = this.getDocument().createElement(BPMNNodesNames.TEXT.getName());
+			newTextNode.setTextContent(content);
+			globalAnnotation.appendChild(newTextNode);
+			logger.fatal(globalAnnotation.getTextContent());
+		} else {
+			logger.error("The global annotation is missing.");
+			logger.error("Maybe you removed it during the workflow modification ?");
+			logger.warn("Skipping...");
+		}
 	}
 
 	/**

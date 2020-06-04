@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,7 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.TaskTagsSelector;
+import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 
 /**
@@ -216,6 +218,58 @@ public class XMLManager {
 	}
 
 	// General static methods
+
+	/**
+	 * Returns the global annotation node.
+	 *
+	 * @param wfDocument document to get the global annotation node
+	 * @return the global annotation node
+	 */
+	public static Node getGlobalAnnotationNode(Document wfDocument) {
+		logger.debug("Getting global annotation node...");
+		NodeList nodeList = wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName());
+		List<Node> annotationNodes = XMLManager.nodeListAsList(nodeList);
+		// TODO: factorize delimiter with the getWorkflowName one
+		String delimiter = String.format("%s(.*)%s", Notation.getQuotedNotation(Notation.getWfNameDelimiterLeft()),
+				Notation.getQuotedNotation(Notation.getWfNameDelimiterRight()));
+		Pattern pattern = Pattern.compile(delimiter);
+		for (Node annotation : annotationNodes) {
+			if (pattern.matcher(annotation.getTextContent()).find()) {
+				logger.debug("Global annotation node found.");
+				return annotation;
+			}
+		}
+		logger.warn("Global annotation node not found.");
+		logger.warn("Skipping...");
+		return null;
+	}
+
+	/**
+	 * Parses the document's annotations and returns the workflow's name.
+	 *
+	 * <p>
+	 *
+	 * If it is not found, returns the document's name.
+	 *
+	 * @param wfDocument document containing the workflow's name
+	 * @return the workflow's name
+	 */
+	public static String getWorkflowName(Document wfDocument) {
+		// TODO: add logs
+		logger.debug("Getting workflow's name...");
+		Node annotation = XMLManager.getGlobalAnnotationNode(wfDocument);
+		String regex = String.format("%s(.+)%s", Notation.getQuotedNotation(Notation.getWfNameDelimiterLeft()),
+				Notation.getQuotedNotation(Notation.getWfNameDelimiterRight()));
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = (annotation != null) ? pattern.matcher(annotation.getTextContent()) : null;
+		if ((matcher == null)) {
+			return new File(wfDocument.getDocumentURI()).getName().split("\\.")[0];
+		}
+		if (matcher.find() && (matcher.groupCount() > 0) && !matcher.group(1).isBlank()) {
+			return matcher.group(1);
+		}
+		return new File(wfDocument.getDocumentURI()).getName().split("\\.")[0];
+	}
 
 	/**
 	 * Returns the name tag's value of the given {@code node} if exists.
