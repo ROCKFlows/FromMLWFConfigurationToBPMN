@@ -11,7 +11,7 @@
 	</properties>
 	<struct>
 		<and abstract="true" mandatory="true" name="AnomalyDetectionExploration">
-			<and mandatory="true" name="AD">
+			<and mandatory="true" name="AnomallyDetection">
 				<graphics key="collapsed" value="false"/>
 				<and name="References">
 					<graphics key="collapsed" value="false"/>
@@ -78,13 +78,8 @@
 				</and>
 				<and abstract="true" name="Steps">
 					<graphics key="collapsed" value="false"/>
-					<feature abstract="true" name="RefineModel_step"/>
-					<and abstract="true" name="Training_step">
-						<graphics key="collapsed" value="false"/>
-						<feature name="train OC_SVM"/>
-					</and>
 					<and abstract="true" name="tools">
-						<graphics key="collapsed" value="false"/>
+						<graphics key="collapsed" value="true"/>
 						<and abstract="true" name="Optimizer">
 							<and abstract="true" name="Adam Optimizer">
 								<feature name="OptimizerbyKeras"/>
@@ -119,7 +114,13 @@
 							</feature>
 						</and>
 					</and>
-					<feature abstract="true" name="SelectObservationToLabel_Step"/>
+					<and abstract="true" name="Training_step">
+						<graphics key="collapsed" value="false"/>
+						<feature name="train OC_SVM"/>
+					</and>
+					<and abstract="true" name="SelectObservationToLabel_Step">
+						<feature abstract="true" name="RefineModel_step"/>
+					</and>
 					<and abstract="true" name="Labeling_Step">
 						<graphics key="collapsed" value="false"/>
 						<feature abstract="true" name="HumanLabelling_Step"/>
@@ -130,9 +131,14 @@
 					</and>
 				</and>
 				<and abstract="true" name="Methods">
-					<graphics key="collapsed" value="false"/>
+					<graphics key="collapsed" value="true"/>
 					<feature name="prioritize anomalies"/>
 					<feature name="ensureStability"/>
+				</and>
+				<and abstract="true" name="ReferenceToWorkflows">
+					<graphics key="collapsed" value="false"/>
+					<feature abstract="true" name="ReferenceToInstanceWorkflows"/>
+					<feature abstract="true" name="ReferenceToMetaWorkflow"/>
 				</and>
 			</and>
 		</and>
