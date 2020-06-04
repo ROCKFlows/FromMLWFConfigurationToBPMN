@@ -31,10 +31,12 @@ Sur cette base de connaissance, assemblée à cette étape sous la forme d'un fe
 <img src="/Knowledge%20on%20anomaly%20detection/img/configuration_and_reference.png" alt="configuration_and_reference" width="500"/>
 
 **Construire le Feature model est ennuyeux et ne capture pas pour l'instant les grands workflows (meta-workflows).**
+[ ] mettre une reference dans le FM aux metaworkflow (non seulement sous la forme de contraintes... mais aussi au BPMN)
+
 
 ## Des Metaworkflows aux workflows instanciés
 
-### Voici un exemple de méta-worflow
+### Voici un exemple de méta-workflow
 
 <img src="/Knowledge%20on%20anomaly%20detection/img/MetaModel_AD.png" alt="drawing" width="500"/>
 
@@ -45,6 +47,7 @@ Voici un exemple d'une instance de workflow :
 
 Voici une instance de workflow généré : 
 [ ] TO DO ligne de commande + image
+[ ] TO DO remonter la contrainte instance => meta
 
 ### Valider la cohérence du workflows instance et en faire de la connaissance
 
