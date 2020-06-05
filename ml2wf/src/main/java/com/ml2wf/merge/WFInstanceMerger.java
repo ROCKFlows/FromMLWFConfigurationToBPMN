@@ -70,6 +70,7 @@ public class WFInstanceMerger extends AbstractMerger {
 
 	@Override
 	protected void processSpecificNeeds(Document wfDocument, String wfName) throws InvalidConstraintException {
+		logger.debug(wfName);
 		logger.debug("Specific need : meta reference.");
 		String metaReferrence = this.getMetaReferenced(wfDocument);
 		logger.debug(metaReferrence);
@@ -83,18 +84,17 @@ public class WFInstanceMerger extends AbstractMerger {
 	 * Returns the referenced metaworkflow's name.
 	 *
 	 * @param wfDocument document containing the reference.
-	 * @return
+	 * @return the referenced metaworkflow's name
 	 */
 	private String getMetaReferenced(Document wfDocument) {
 		// TODO: factorize and improve this method
-		NodeList processNodes = wfDocument.getElementsByTagName(BPMNNodesNames.PROCESS.getName());
-		if (processNodes.getLength() > 0) {
-			Node processNode = processNodes.item(0);
+		NodeList docNodes = wfDocument.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
+		if (docNodes.getLength() > 0) {
+			Node docNode = docNodes.item(0);
 			// TODO: improve verification
-			logger.debug(processNode.getFirstChild());
-			logger.debug(processNode.getFirstChild().getNodeName());
-			logger.debug(processNode.getFirstChild().getTextContent());
-			return XMLManager.getReferredTask(processNode.getFirstChild().getTextContent());
+			logger.debug(docNode.getFirstChild());
+			logger.debug(docNode.getTextContent());
+			return XMLManager.getReferredTask(docNode.getTextContent());
 		}
 		// TODO: log error
 		return null;
