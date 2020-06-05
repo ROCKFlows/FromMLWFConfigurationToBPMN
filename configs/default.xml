@@ -1,50 +1,60 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
-	<feature automatic="selected" name="MLWF"/>
-	<feature automatic="selected" name="variants"/>
+	<feature automatic="selected" name="AnomalyDetectionExploration"/>
+	<feature automatic="selected" name="AnomallyDetection"/>
+	<feature automatic="selected" name="References"/>
+	<feature name="PHD"/>
+	<feature name="Benkabou2018"/>
+	<feature automatic="selected" manual="selected" name="DataScientist"/>
+	<feature manual="selected" name="Yassine"/>
 	<feature automatic="selected" manual="selected" name="Criteria"/>
-	<feature name="toTestCriteria"/>
-	<feature name="InteractionAllowedCriteria"/>
-	<feature name="ComputanionalResourcesCriteria_VALUED"/>
-	<feature name="PredictionCriteria"/>
-	<feature name="InteractiveInterpretationRequired"/>
-	<feature name="weigh automated predictions "/>
-	<feature name="LackOfTrainingData"/>
-	<feature name="AnnotateDataCriteria"/>
-	<feature name="LaboriousTaskToAnnotateDate_VALUED"/>
-	<feature name="ExpertiseRequired_VALUED"/>
-	<feature name="ProcessCriteria"/>
-	<feature name="Transparency"/>
-	<feature automatic="unselected" name="testCriteriaFeature"/>
-	<feature automatic="selected" manual="selected" name="criteria4TS"/>
-	<feature manual="selected" name="criteria4OC_SVM"/>
+	<feature name="HumanInteractionCriteria"/>
+	<feature automatic="selected" name="DatasetCriteria"/>
+	<feature automatic="selected" name="TraingDatasetCriteria"/>
+	<feature automatic="selected" name="CititeriaOnOutliers"/>
+	<feature name="AnomalieClassesCriteria"/>
+	<feature name="FewAnomaiyClasses"/>
+	<feature name="multipleAnomalyClasses"/>
+	<feature automatic="selected" name="NumberOfOutliers"/>
+	<feature automatic="unselected" name="fewAnomaliesInTrainsingSet_Criteria"/>
+	<feature manual="selected" name="anomaliesInTrainingSet"/>
+	<feature automatic="unselected" name="OnlyNormalTimeSeriesInTrainingSet_Criteria"/>
+	<feature name="WayOfExtraction"/>
+	<feature name="DataSize"/>
+	<feature name="DataStructuration"/>
+	<feature name="TimeSeries"/>
+	<feature name="PeriodicData"/>
+	<feature name="ValidationDataSetCriteria"/>
+	<feature name="Requirement"/>
+	<feature name="TimeComplexity"/>
+	<feature name="Stability"/>
+	<feature name="Steps"/>
+	<feature name="tools"/>
+	<feature name="Optimizer"/>
+	<feature name="Adam Optimizer"/>
+	<feature name="OptimizerbyKeras"/>
+	<feature name="OptimizerByTensorFlow"/>
+	<feature name="MLAlgorithm"/>
+	<feature name=" basedOnSimilarity"/>
+	<feature automatic="unselected" name="OC_SVM"/>
+	<feature name="LSTM"/>
+	<feature name="testStability"/>
+	<feature name="loss function"/>
+	<feature automatic="unselected" name="Mean Absolute Error"/>
+	<feature name="Mean Square Error"/>
+	<feature name="Training_step"/>
+	<feature automatic="unselected" name="train OC_SVM"/>
+	<feature name="SelectObservationToLabel_Step"/>
+	<feature name="RefineModel_step"/>
+	<feature name="Labeling_Step"/>
+	<feature name="HumanLabelling_Step"/>
+	<feature name="Preprocessing_Step"/>
+	<feature name="preprocess data_Step"/>
+	<feature name="compute descriptors_Step"/>
 	<feature name="Methods"/>
-	<feature name="TrainingMultipleModelsMethod"/>
-	<feature name="ActiveLearningMethod"/>
-	<feature automatic="selected" manual="selected" name="MacroStep"/>
-	<feature automatic="selected" manual="selected" name="PreprocessingStep"/>
-	<feature name="removeMissingValues_MULT"/>
-	<feature automatic="selected" manual="selected" name="TimeSeriesReSampling"/>
-	<feature name="generatingTrainingData"/>
-	<feature automatic="selected" name="compute descriptors"/>
-	<feature automatic="selected" name="compute descriptors over 5 min time windows"/>
-	<feature name="RefineModelStep"/>
-	<feature automatic="selected" name="TrainingStep"/>
-	<feature automatic="unselected" name="testTrainingStepFeature"/>
-	<feature automatic="unselected" name="ML_ALGO_TODEFINE"/>
-	<feature automatic="selected" name="train OC_SVM"/>
-	<feature name="HumanLabelingStep"/>
-	<feature name="CrownLabellingStep"/>
-	<feature name="HumanLabelingStepCriteria"/>
-	<feature name="differnetTypesAndLevelOfAnnotations_labelingStep_Criteria"/>
-	<feature name="ImproveModelStep"/>
-	<feature name="Fine-tuneModelStep"/>
-	<feature name="SelectDataToLabelStep"/>
-	<feature name="EvaluateRepresentationBiasStep"/>
-	<feature name="EnsurePopulationRepresentation"/>
-	<feature name="Ensure historic"/>
-	<feature automatic="selected" name="select data training"/>
-	<feature automatic="selected" name="select training period"/>
-	<feature automatic="selected" name="detect with ML_model Step"/>
-	<feature name="detect with OC_SVM Model"/>
+	<feature name="prioritize anomalies"/>
+	<feature name="ensureStability"/>
+	<feature name="ReferenceToWorkflows"/>
+	<feature name="ReferenceToInstanceWorkflows"/>
+	<feature name="ReferenceToMetaWorkflow"/>
 </configuration>

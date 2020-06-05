@@ -72,8 +72,10 @@ public class WFInstanceMerger extends AbstractMerger {
 	protected void processSpecificNeeds(Document wfDocument, String wfName) throws InvalidConstraintException {
 		logger.debug("Specific need : meta reference.");
 		String metaReferrence = this.getMetaReferenced(wfDocument);
+		logger.debug(metaReferrence);
 		String associationConstraint = ((ConstraintFactoryImpl) super.getConstraintFactory())
 				.getAssociationConstraint(wfName, Arrays.asList(metaReferrence));
+		logger.debug(associationConstraint);
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
 	}
 
@@ -89,6 +91,9 @@ public class WFInstanceMerger extends AbstractMerger {
 		if (processNodes.getLength() > 0) {
 			Node processNode = processNodes.item(0);
 			// TODO: improve verification
+			logger.debug(processNode.getFirstChild());
+			logger.debug(processNode.getFirstChild().getNodeName());
+			logger.debug(processNode.getFirstChild().getTextContent());
 			return XMLManager.getReferredTask(processNode.getFirstChild().getTextContent());
 		}
 		// TODO: log error
