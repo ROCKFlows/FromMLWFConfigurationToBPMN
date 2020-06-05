@@ -1,5 +1,6 @@
 package com.ml2wf.merge;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,17 +9,20 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactory;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -91,11 +95,141 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	}
 
 	@Override
+	public void mergeWithWF(boolean backUp, String filePath) throws Exception {
+		// this method is a template for the Template Method design pattern
+		String logMsg;
+		logger.info("Processing backUp argument...");
+		if (backUp) {
+			super.backUp();
+		}
+		Pair<String, Document> wfInfo = this.getWFDocInfoFromPath(filePath);
+		if (wfInfo.isEmpty()) {
+			logger.fatal("The given file path is invalid or the workflow is already contained in the FeatureModel...");
+			logger.warn("Skipping...");
+			// TODO: add logs
+			return;
+		}
+		String wfName = wfInfo.getKey();
+		logMsg = String.format("Current workflow's name : %s", wfName);
+		logger.debug(logMsg);
+		Document wfDocument = wfInfo.getValue();
+		logger.debug("Creating associated task...");
+		Element newNode = this.createFeatureWithName(wfName);
+		logger.debug("Getting parent...");
+		Node parent = this.getRootParentNode();
+		logMsg = String.format("Parent is %s.", parent.getNodeValue());
+		logger.debug(logMsg);
+		logger.debug("Inserting task...");
+		this.insertNewTask(parent, newNode);
+		logger.debug("Processing annotations constraints...");
+		this.processAssocConstraints(wfDocument, wfName);
+		logger.debug("Processing specific needs...");
+		this.processSpecificNeeds(wfDocument, wfName);
+		logger.debug("Saving file...");
+		super.save(super.getPath());
+	}
+
+	@Override
 	public void mergeWithWF(boolean backUp, String... filesPath) throws Exception {
 		for (String path : filesPath) {
 			this.mergeWithWF(backUp, path);
 		}
 	}
+
+	/**
+	 * Returns the workflow's document and name with the given {@code filePath}
+	 * using the {@link Pair} class. If the
+	 * {@code filePath} is not a valid path or the workflow's name is already in the
+	 * feature model, return null.
+	 *
+	 * @param filePath file path of the workflow
+	 * @return a {@code Pair} association between the workflow's name and its
+	 *         {@code Document} instance or an empty {@code Pair} if something is
+	 *         wrong.
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 *
+	 * @see Pair
+	 * @see Document
+	 */
+	protected Pair<String, Document> getWFDocInfoFromPath(String filePath)
+			throws ParserConfigurationException, SAXException, IOException {
+		File file = new File(filePath);
+		String wfTaskName;
+		String logMsg;
+		Document wfDocument;
+		if (file.exists()) {
+			logger.debug("File exists");
+			wfDocument = XMLManager.preprocess(file);
+			wfTaskName = getWorkflowName(wfDocument).replace(" ", "_");
+			logMsg = String.format("WF's name is %s.", wfTaskName);
+			logger.debug(logMsg);
+			// file.getName().split(Pattern.quote(XMLManager.getExtensionSeparator()))[0];
+			if (this.isDuplicated(wfTaskName)) {
+				logger.warn("This workflow is already in the FeatureModel");
+				logger.warn("Skipping...");
+				return new Pair<>();
+			}
+		} else {
+			logMsg = String.format("Invalid filepath : %s", filePath);
+			logger.fatal(logMsg);
+			return new Pair<>();
+		}
+		logger.warn(wfTaskName == null);
+		logger.warn(wfDocument == null);
+		logger.warn(new Pair<>(wfTaskName, wfDocument).isEmpty());
+		return new Pair<>(wfTaskName, wfDocument);
+	}
+
+	/**
+	 * Processes the association constraints.
+	 *
+	 * <p>
+	 *
+	 * An association constraint is an implication between the {@code wfName} and
+	 * the {@code wfDocument}'s tasks.
+	 *
+	 * @param wfDocument workflow's document
+	 * @param wfName     workflow's name
+	 * @throws InvalidConstraintException
+	 */
+	protected void processAssocConstraints(Document wfDocument, String wfName) throws InvalidConstraintException {
+		String logMsg;
+		logger.debug("Retrieving all FM document tasks...");
+		List<Node> tasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
+		List<String> tasksNames = this.getTasksNames(tasks);
+		logger.debug("Getting the constraint association...");
+		String associationConstraint = ((ConstraintFactoryImpl) this.getConstraintFactory())
+				.getAssociationConstraint(wfName, tasksNames);
+		logMsg = String.format("Generated constraint association : %s", associationConstraint);
+		logger.info(logMsg);
+		// add the new constraint
+		logger.info("Adding association constraint...");
+		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
+	}
+
+	/**
+	 * Returns the root parent {@code Node} according to the workflow's
+	 * specifications.
+	 *
+	 * <p>
+	 *
+	 * e.g. : meta workflow, instance workflow...
+	 *
+	 * @return the root parent {@code Node} according to the workflow's
+	 *         specifications
+	 */
+	protected abstract Node getRootParentNode();
+
+	/**
+	 * Processes other specific needs to complete the merge operation.
+	 *
+	 * @param wfDocument workflow's document
+	 * @param wfName     workflow's name
+	 * @throws Exception
+	 */
+	protected abstract void processSpecificNeeds(Document wfDocument, String wfName) throws Exception;
 
 	/**
 	 * Creates the <b>constraints</b> {@code Node} if it doesn't exist.

@@ -10,195 +10,236 @@
 		<graphics key="layoutalgorithm" value="1"/>
 	</properties>
 	<struct>
-		<and abstract="true" mandatory="true" name="MLWF">
-			<graphics key="collapsed" value="false"/>
-			<and name="variants">
+		<and abstract="true" mandatory="true" name="AnomalyDetectionExploration">
+			<and mandatory="true" name="AnomallyDetection">
 				<graphics key="collapsed" value="false"/>
-				<and name="Criteria">
+				<and name="References">
 					<graphics key="collapsed" value="false"/>
-					<and name="toTestCriteria">
-						<feature name="InteractionAllowedCriteria"/>
-						<feature abstract="true" name="ComputanionalResourcesCriteria_VALUED"/>
-						<and name="PredictionCriteria">
-							<feature name="InteractiveInterpretationRequired"/>
-							<feature name="weigh automated predictions "/>
-						</and>
-						<feature name="LackOfTrainingData"/>
-						<and name="AnnotateDataCriteria">
-							<graphics key="collapsed" value="true"/>
-							<feature name="LaboriousTaskToAnnotateDate_VALUED"/>
-							<feature name="ExpertiseRequired_VALUED"/>
-						</and>
-						<and name="ProcessCriteria">
-							<feature abstract="true" name="Transparency"/>
-						</and>
-					</and>
-					<feature name="testCriteriaFeature">
-						<description>only to test small part of the FM</description>
-					</feature>
-					<and abstract="true" name="criteria4TS">
+					<and abstract="true" name="PHD">
 						<graphics key="collapsed" value="false"/>
-						<feature name="criteria4OC_SVM"/>
+						<feature name="Benkabou2018">
+							<description>
+								@techreport{Benkabou2018,
+								abstract = {La d{\'{e}}tection d'anomalies est une t{\^{a}}che cruciale qui a suscit{\'{e}} l'int{\'{e}}r{\^{e}}t de plusieurs travaux de recherche dans les communaut{\'{e}}s d'apprentissage automatique et fouille de donn{\'{e}}es. La complexit{\'{e}} de cette t{\^{a}}che d{\'{e}}pend de la nature des donn{\'{e}}es, de la disponibilit{\'{e}} de leur {\'{e}}tiquetage et du cadre applicatif dont elles s'inscrivent. Dans le cadre de cette th{\`{e}}se, nous nous int{\'{e}}ressons {\`{a}} cette probl{\'{e}}matique pour les donn{\'{e}}es complexes et particuli{\`{e}}rement pour les s{\'{e}}ries temporelles uni et multi-vari{\'{e}}es. Le terme "anomalie" peut d{\'{e}}signer une observation qui s'{\'{e}}carte des autres observations au point d'{\'{e}}veiller des soup{\c{c}}ons. De fa{\c{c}}on plus g{\'{e}}n{\'{e}}rale, la probl{\'{e}}matique sous-jacente (aussi appel{\'{e}}e d{\'{e}}tection de nouveaut{\'{e}}s ou d{\'{e}}tection des valeurs aberrantes) vise {\`{a}} identifier, dans un ensemble de donn{\'{e}}es, celles qui diff{\'{e}}rent significativement des autres, qui ne se conforment pas {\`{a}} un "comportement attendu" ({\`{a}} d{\'{e}}finir ou {\`{a}} apprendre automatiquement), et qui indiquent un processus de g{\'{e}}n{\'{e}}ration diff{\'{e}}rent. Les motifs "anormaux" ainsi d{\'{e}}tect{\'{e}}s se traduisent souvent par de l'information critique. Nous nous focalisons plus pr{\'{e}}cis{\'{e}}ment sur deux aspects particuliers de la d{\'{e}}tection d'anomalies {\`{a}} partir de s{\'{e}}ries temporelles dans un mode non-supervis{\'{e}}. Le premier est global et consiste {\`{a}} ressortir des s{\'{e}}ries relativement anormales par rapport une base enti{\`{e}}re. Le second est dit contextuel et vise {\`{a}} d{\'{e}}tecter localement, les points anormaux par rapport {\`{a}} la structure de la s{\'{e}}rie {\'{e}}tudi{\'{e}}e. Pour ce faire, nous proposons des approches d'optimisation {\`{a}} base de clustering pond{\'{e}}r{\'{e}} et de d{\'{e}}formation temporelle pour la d{\'{e}}tection globale ; et des m{\'{e}}canismes {\`{a}} base de mod{\'{e}}lisation matricielle pour la d{\'{e}}tection contextuelle. Enfin, nous pr{\'{e}}sentons une s{\'{e}}rie d'{\'{e}}tudes empiriques sur des donn{\'{e}}es publiques pour valider les approches propos{\'{e}}es et les comparer avec d'autres approches connues dans la litt{\'{e}}rature. De plus, une validation exp{\'{e}}rimentale est fournie sur un probl{\`{e}}me r{\'{e}}el, concernant la d{\'{e}}tection de s{\'{e}}ries de prix aberrants sur les pneumatiques, pour r{\'{e}}pondre aux besoins exprim{\'{e}}s par le partenaire industriel de cette th{\`{e}}se},
+								author = {Benkabou, Seif-Eddine},
+								keywords = {Apprentissage automatique,Math{\'{e}}matiques appliqu{\'{e}}es},
+								month = {mar},
+								publisher = {Universit{\'{e}} de Lyon},
+								title = {{D{\'{e}}tection d'anomalies dans les s{\'{e}}ries temporelles : application aux masses de donn{\'{e}}es sur les pneumatiques}},
+								url = {https://tel.archives-ouvertes.fr/tel-01839074},
+								year = {2018}
+								}
+							</description>
+						</feature>
+					</and>
+					<and name="DataScientist">
+						<graphics key="collapsed" value="false"/>
+						<feature name="Yassine"/>
 					</and>
 				</and>
-				<alt abstract="true" name="Methods">
+				<and mandatory="true" name="Criteria">
 					<graphics key="collapsed" value="false"/>
-					<feature name="TrainingMultipleModelsMethod"/>
-					<feature name="ActiveLearningMethod"/>
-				</alt>
-				<and name="MacroStep">
-					<graphics key="collapsed" value="false"/>
-					<and abstract="true" name="PreprocessingStep">
+					<feature abstract="true" name="HumanInteractionCriteria"/>
+					<and abstract="true" mandatory="true" name="DatasetCriteria">
 						<graphics key="collapsed" value="false"/>
-						<feature name="removeMissingValues_MULT">
-							<description>Multiple ways to manage missing values can be involved in one WF; each one for a different attribute</description>
-						</feature>
-						<feature abstract="true" name="TimeSeriesReSampling"/>
-						<feature name="generatingTrainingData"/>
-						<and abstract="true" name="compute descriptors">
+						<and abstract="true" name="TraingDatasetCriteria">
 							<graphics key="collapsed" value="false"/>
-							<feature name="compute descriptors over 5 min time windows">
-								<attribute configurable="true" name="DoubleAttribute0" type="double" unit="" value="5.0"/>
+							<and abstract="true" name="CititeriaOnOutliers">
+								<graphics key="collapsed" value="false"/>
+								<and abstract="true" name="AnomalieClassesCriteria">
+									<feature name="FewAnomaiyClasses"/>
+									<feature name="multipleAnomalyClasses"/>
+								</and>
+								<alt abstract="true" name="NumberOfOutliers">
+									<feature name="fewAnomaliesInTrainsingSet_Criteria">
+										<description>We assume that there are few anomalies in the time series, that the models will learn correctly.</description>
+									</feature>
+									<feature name="anomaliesInTrainingSet"/>
+									<feature name="OnlyNormalTimeSeriesInTrainingSet_Criteria">
+										<description>Requires a learning base containing only normal time series.</description>
+									</feature>
+								</alt>
+							</and>
+						</and>
+						<feature abstract="true" name="WayOfExtraction"/>
+						<feature abstract="true" name="DataSize"/>
+						<and abstract="true" name="DataStructuration">
+							<and name="TimeSeries">
+								<feature name="PeriodicData"/>
+							</and>
+						</and>
+						<feature abstract="true" name="ValidationDataSetCriteria"/>
+					</and>
+					<and abstract="true" name="Requirement">
+						<graphics key="collapsed" value="false"/>
+						<feature abstract="true" name="TimeComplexity"/>
+						<feature name="Stability"/>
+					</and>
+				</and>
+				<and abstract="true" name="Steps">
+					<graphics key="collapsed" value="false"/>
+					<and abstract="true" name="tools">
+						<graphics key="collapsed" value="true"/>
+						<and abstract="true" name="Optimizer">
+							<and abstract="true" name="Adam Optimizer">
+								<feature name="OptimizerbyKeras"/>
+								<feature name="OptimizerByTensorFlow"/>
+							</and>
+						</and>
+						<and abstract="true" name="MLAlgorithm">
+							<graphics key="collapsed" value="false"/>
+							<and abstract="true" name=" basedOnSimilarity">
+								<graphics key="collapsed" value="false"/>
+								<feature name="OC_SVM"/>
+							</and>
+							<feature name="LSTM"/>
+						</and>
+						<feature abstract="true" name="testStability"/>
+						<and abstract="true" name="loss function">
+							<feature name="Mean Absolute Error">
+								<description>
+									Mean Absolute Error (MAE)
+									Measures average/mean squared error of our predictions.
+									MAE = \Sigma_{i=1}^{n}\frac{|\hat{y}_i - y_i|}{n}
+									Gives less weight to the outliers, when you are sure that they are outliers prefer MAE to MSE.
+								</description>
+							</feature>
+							<feature name="Mean Square Error">
+								<description>
+									Mean Squared Error (MSE)
+									Incorporates both the variance and the bias of the predictor.
+									MSE = \Sigma_{i=1}^{n}{\frac{(\hat{y_i} - y_i)^2}{n}}
+									When you have unexpected values that you should take into account use MSE instead of MAE.
+								</description>
 							</feature>
 						</and>
 					</and>
-					<feature name="RefineModelStep"/>
-					<alt abstract="true" mandatory="true" name="TrainingStep">
-						<feature name="testTrainingStepFeature"/>
-						<feature name="ML_ALGO_TODEFINE"/>
-						<feature name="train OC_SVM"/>
-					</alt>
-					<and name="HumanLabelingStep">
-						<graphics key="collapsed" value="true"/>
-						<feature name="CrownLabellingStep"/>
-						<and abstract="true" name="HumanLabelingStepCriteria">
-							<feature name="differnetTypesAndLevelOfAnnotations_labelingStep_Criteria"/>
-						</and>
-					</and>
-					<and name="ImproveModelStep">
-						<feature name="Fine-tuneModelStep">
-							<description>fine-tune the model using a subset of annotations including the new ones.</description>
-						</feature>
-					</and>
-					<feature name="SelectDataToLabelStep"/>
-					<and name="EvaluateRepresentationBiasStep">
+					<and abstract="true" name="Training_step">
 						<graphics key="collapsed" value="false"/>
-						<feature abstract="true" name="EnsurePopulationRepresentation">
-							<description>
-								For example, datasets collected through smart- phone apps can under-represent lower-income or older groups, who are less likely to own smartphones. Similarly, medical data for a particular condition may be available
-								only for the population of patients who were considered
-								serious enough to bring in for further screening.
-								(extrait article A Framework for Understanding Unintended Consequences of Machine Learning)
-							</description>
-						</feature>
-						<feature abstract="true" name="Ensure historic">
-							<description>
-								The population of interest has changed or is distinct from the population used during model training.
-								Data that is representative of Boston, for example, may not be representative if used to analyze the population of Indi- anapolis.
-								Similarly, data representative of Boston 30 years ago will likely not reflect today’s population.
-								A Framework for Understanding Unintended Consequences of Machine Learning
-							</description>
-						</feature>
+						<feature name="train OC_SVM"/>
 					</and>
-					<and abstract="true" name="select data training">
-						<feature name="select training period"/>
+					<and abstract="true" name="SelectObservationToLabel_Step">
+						<feature abstract="true" name="RefineModel_step"/>
 					</and>
-					<and abstract="true" name="detect with ML_model Step">
-						<feature name="detect with OC_SVM Model"/>
+					<and abstract="true" name="Labeling_Step">
+						<graphics key="collapsed" value="false"/>
+						<feature abstract="true" name="HumanLabelling_Step"/>
 					</and>
+					<and abstract="true" name="Preprocessing_Step">
+						<feature abstract="true" name="preprocess data_Step"/>
+						<feature name="compute descriptors_Step"/>
+					</and>
+				</and>
+				<and abstract="true" name="Methods">
+					<graphics key="collapsed" value="true"/>
+					<feature name="prioritize anomalies"/>
+					<feature name="ensureStability"/>
+				</and>
+				<and abstract="true" name="ReferenceToWorkflows">
+					<graphics key="collapsed" value="false"/>
+					<feature abstract="true" name="ReferenceToInstanceWorkflows"/>
+					<feature abstract="true" name="ReferenceToMetaWorkflow"/>
 				</and>
 			</and>
 		</and>
 	</struct>
 	<constraints>
 		<rule>
+			<description>To be review</description>
 			<imp>
-				<var>generatingTrainingData</var>
-				<var>LackOfTrainingData</var>
+				<conj>
+					<var>OC_SVM</var>
+					<var>Benkabou2018</var>
+				</conj>
+				<var>OnlyNormalTimeSeriesInTrainingSet_Criteria</var>
 			</imp>
 		</rule>
 		<rule>
 			<imp>
-				<var>TrainingMultipleModelsMethod</var>
-				<var>ComputanionalResourcesCriteria_VALUED</var>
+				<conj>
+					<var>Yassine</var>
+					<var>OC_SVM</var>
+				</conj>
+				<var>fewAnomaliesInTrainsingSet_Criteria</var>
 			</imp>
 		</rule>
 		<rule>
 			<imp>
-				<var>InteractiveInterpretationRequired</var>
-				<var>InteractionAllowedCriteria</var>
-			</imp>
-		</rule>
-		<rule>
-			<eq>
-				<var>ActiveLearningMethod</var>
-				<var>HumanLabelingStep</var>
-			</eq>
-		</rule>
-		<rule>
-			<imp>
-				<var>testCriteriaFeature</var>
-				<var>testTrainingStepFeature</var>
+				<var>Adam Optimizer</var>
+				<var>testStability</var>
 			</imp>
 		</rule>
 		<rule>
 			<imp>
-				<var>testTrainingStepFeature</var>
+				<var>LSTM</var>
+				<var>Optimizer</var>
+			</imp>
+		</rule>
+		<rule>
+			<description>Not at the good level...</description>
+			<imp>
+				<var>LSTM</var>
+				<var>loss function</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>anomaliesInTrainingSet</var>
 				<not>
-					<disj>
-						<var>RefineModelStep</var>
-						<disj>
-							<var>ImproveModelStep</var>
-							<disj>
-								<var>HumanLabelingStep</var>
-								<disj>
-									<var>SelectDataToLabelStep</var>
-									<disj>
-										<var>PreprocessingStep</var>
-										<disj>
-											<var>RefineModelStep</var>
-											<var>EvaluateRepresentationBiasStep</var>
-										</disj>
-									</disj>
-								</disj>
-							</disj>
-						</disj>
-					</disj>
+					<var>Mean Absolute Error</var>
 				</not>
 			</imp>
 		</rule>
 		<rule>
 			<imp>
-				<var>criteria4OC_SVM</var>
-				<conj>
-					<var>TimeSeriesReSampling</var>
-					<conj>
-						<var>select training period</var>
-						<conj>
-							<var>compute descriptors over 5 min time windows</var>
-							<var>train OC_SVM</var>
-						</conj>
-					</conj>
-				</conj>
+				<var>OnlyNormalTimeSeriesInTrainingSet_Criteria</var>
+				<not>
+					<var>Mean Square Error</var>
+				</not>
 			</imp>
 		</rule>
 		<rule>
-			<description>For example only : working on TS implies to aply a given metaLearning WF</description>
 			<imp>
-				<var>criteria4TS</var>
-				<conj>
-					<var>PreprocessingStep</var>
-					<conj>
-						<var>select data training</var>
-						<conj>
-							<var>TrainingStep</var>
-							<conj>
-								<var>select data training</var>
-								<var>detect with ML_model Step</var>
-							</conj>
-						</conj>
-					</conj>
-				</conj>
+				<var>fewAnomaliesInTrainsingSet_Criteria</var>
+				<not>
+					<var>Mean Square Error</var>
+				</not>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>prioritize anomalies</var>
+				<var>multipleAnomalyClasses</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>Stability</var>
+				<var>ensureStability</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>Training_step</var>
+				<var>MLAlgorithm</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>train OC_SVM</var>
+				<var>OC_SVM</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>compute descriptors_Step</var>
+				<var>TimeSeries</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>ensureStability</var>
+				<var>testStability</var>
 			</imp>
 		</rule>
 	</constraints>

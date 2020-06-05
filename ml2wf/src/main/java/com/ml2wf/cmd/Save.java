@@ -8,6 +8,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import com.ml2wf.App;
 import com.ml2wf.merge.WFInstanceMerger;
 import com.ml2wf.merge.WFMerger;
+import com.ml2wf.merge.WFMetaMerger;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model;
@@ -68,11 +69,18 @@ public class Save implements Runnable {
 		Configurator.setLevel(pckName, (this.verbose) ? Level.DEBUG : Level.FATAL);
 		WFMerger merger;
 		try {
+			logger.warn("WFMetaMerger");
+			merger = new WFMetaMerger(this.output);
+			logger.warn("WFMetaMerger#mergeWithWF");
+			((WFMetaMerger) merger).mergeWithWF(this.backUp, this.input[0]);
+			logger.warn("WFInstanceMerger");
 			merger = new WFInstanceMerger(this.output);
-			((WFInstanceMerger) merger).mergeWithWF(this.backUp, this.input);
+			logger.warn("WFInstanceMerger#mergeWithWF");
+			((WFInstanceMerger) merger).mergeWithWF(this.backUp, this.input[1]);
 			LogManager.shutdown();
 		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");
+			logger.fatal(e.getMessage());
 			// CommandLine.usage(this.spec, );
 		}
 	}

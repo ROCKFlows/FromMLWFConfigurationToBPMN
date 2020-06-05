@@ -14,9 +14,9 @@
 			<and name="AD">
 				<and abstract="true" name="Criteria">
 					<and abstract="true" name="CriteriaOnDataSet">
-						<graphics key="collapsed" value="true"/>
+						<graphics key="collapsed" value="false"/>
 						<alt abstract="true" name="NumberOfANomalies">
-							<graphics key="collapsed" value="true"/>
+							<graphics key="collapsed" value="false"/>
 							<feature name="Few"/>
 							<feature name="aLot"/>
 						</alt>
