@@ -186,4 +186,17 @@ public class WFTasksMerger extends AbstractMerger {
 		logger.info("Annotations processing ended...");
 	}
 
+	// TODO: manage these methods
+	@Override
+	protected Node getRootParentNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void processSpecificNeeds(Document wfDocument, String wfName) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
 }

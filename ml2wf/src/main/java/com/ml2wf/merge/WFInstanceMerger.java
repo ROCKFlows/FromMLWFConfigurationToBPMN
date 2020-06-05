@@ -1,12 +1,10 @@
 package com.ml2wf.merge;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,16 +40,16 @@ public class WFInstanceMerger extends AbstractMerger {
 	// TODO: make logMsg static
 
 	/**
+	 * Instances default task tag name.
+	 */
+	private static final String INSTANCES_TASK = "Instances";
+	/**
 	 * Logger instance.
 	 *
 	 * @since 1.0
 	 * @see Logger
 	 */
 	private static final Logger logger = LogManager.getLogger(WFInstanceMerger.class);
-	/**
-	 * Instances default task tag name.
-	 */
-	private static final String INSTANCES_TASK = "Instances";
 
 	/**
 	 * {@code WFInstanceMerger}'s default constructor.
@@ -66,71 +64,26 @@ public class WFInstanceMerger extends AbstractMerger {
 	}
 
 	@Override
-	public void mergeWithWF(boolean backUp, String filePath)
-			throws TransformerException, ParserConfigurationException, SAXException, IOException,
-			InvalidConstraintException {
-		if (backUp) {
-			super.backUp();
-		}
-		logger.info("Starting the save action...");
-		File file = new File(filePath);
-		String wfTaskName;
-		String logMsg;
-		Document wfDocument;
-		if (file.exists()) {
-			wfDocument = XMLManager.preprocess(file);
-			wfTaskName = getWorkflowName(wfDocument).replace(" ", "_");
-			// file.getName().split(Pattern.quote(XMLManager.getExtensionSeparator()))[0];
-			if (this.isDuplicated(wfTaskName)) {
-				logger.warn("This workflow is already in the FeatureModel");
-				logger.warn("Skipping...");
-				return;
-			}
-		} else {
-			logMsg = String.format("Invalid filepath : %s", filePath);
-			logger.fatal(logMsg);
-			return;
-		}
-		// create instances node
-		logger.debug("Getting instances node...");
-		Element instanceNode = this.createFeatureWithName(wfTaskName);
-		// TODO: specify considering meta or instance WF importation
-		Node generalInstancesNode = this.getInstancesTask();
-		this.insertNewTask(generalInstancesNode, instanceNode);
-		// ---
-		logger.debug("Retrieving all FM document tasks...");
-		List<Node> tasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
-		List<String> tasksNames = this.getTasksNames(tasks);
-		logger.debug("Getting the constraint association...");
+	protected Node getRootParentNode() {
+		return this.getInstancesTask();
+	}
+
+	@Override
+	protected void processSpecificNeeds(Document wfDocument, String wfName) throws InvalidConstraintException {
+		logger.debug("Specific need : meta reference.");
+		String metaReferrence = this.getMetaReferenced(wfDocument);
 		String associationConstraint = ((ConstraintFactoryImpl) super.getConstraintFactory())
-				.getAssociationConstraint(wfTaskName, tasksNames);
-		logMsg = String.format("Generated constraint association : %s", associationConstraint);
-		logger.info(logMsg);
-		// add the new constraint
-		logger.info("Adding association constraint...");
+				.getAssociationConstraint(wfName, Arrays.asList(metaReferrence));
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
-		if (this.isInstanceWF(wfDocument)) {
-			// TODO: factorize method with previous lines
-			String metaReferrence = this.getMetaReferrenced(wfDocument);
-			associationConstraint = ((ConstraintFactoryImpl) super.getConstraintFactory())
-					.getAssociationConstraint(wfTaskName, Arrays.asList(metaReferrence));
-			this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
-		}
-		super.save(super.getPath());
 	}
 
-	private boolean isInstanceWF(Document wfDocument) {
-		// TODO: move this method
-		NodeList processNodes = wfDocument.getElementsByTagName(BPMNNodesNames.PROCESS.getName());
-		if (processNodes.getLength() > 0) {
-			Node processNode = processNodes.item(0);
-			// TODO: improve verification
-			return processNode.getFirstChild().getNodeValue().equals(BPMNNodesNames.DOCUMENTATION.getName());
-		}
-		return false;
-	}
-
-	private String getMetaReferrenced(Document wfDocument) {
+	/**
+	 * Returns the referenced metaworkflow's name.
+	 *
+	 * @param wfDocument document containing the reference.
+	 * @return
+	 */
+	private String getMetaReferenced(Document wfDocument) {
 		// TODO: factorize and improve this method
 		NodeList processNodes = wfDocument.getElementsByTagName(BPMNNodesNames.PROCESS.getName());
 		if (processNodes.getLength() > 0) {
