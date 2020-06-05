@@ -60,6 +60,11 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	private Map<String, Integer> tasksMap;
 	/**
+	 * This {@code taskCounter} is incremented for each task. This allows other
+	 * methods to give an unique name to a given task.
+	 */
+	private static int taskCounter = 0;
+	/**
 	 * Logger instance.
 	 *
 	 * @since 1.0
@@ -167,6 +172,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		// documentation part
 		// TODO: factorize in method ?
 		String content = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue();
+		content = XMLManager.sanitizeName(content);
 		this.addDocumentationNode(node, content);
 		// extension part
 		this.addExtensionNode(node);
@@ -175,10 +181,8 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 
 		String nodeName = Notation.getGeneratedPrefixVoc()
 				+ nodeAttrName.getNodeValue().replace(Notation.getGenericVoc(), "");
-
-		this.tasksMap.put(nodeName, this.tasksMap.containsKey(nodeName) ? this.tasksMap.get(nodeName) + 1 : 1);
-
-		nodeName += Notation.getGeneratedPrefixVoc() + this.tasksMap.get(nodeName);
+		nodeName = XMLManager.sanitizeName(nodeName);
+		nodeName += Notation.getGeneratedPrefixVoc() + content + taskCounter++;
 		nodeAttrName.setNodeValue(nodeName);
 	}
 

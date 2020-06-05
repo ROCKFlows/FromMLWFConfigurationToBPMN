@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -413,10 +414,14 @@ public class XMLManager {
 	 */
 	public static String sanitizeName(String name) {
 		// sanitization for instantiate WF's task
-		name = name.replaceFirst(Notation.getGeneratedPrefixVoc(), "");
-		name = name.replaceFirst(Notation.getGeneratedPrefixVoc() + "\\d*$", "");
+		List<String> splitted = new ArrayList<>(Arrays.asList(name.split(Notation.getGeneratedPrefixVoc())));
+		splitted.removeIf(String::isBlank);
+		if (!splitted.isEmpty()) {
+			name = splitted.get(0);
+		}
 		name = name.replaceFirst(Notation.getDocumentationVoc(), "");
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
+		name = name.replace(" ", "_");
 		// sanitization for generic WF's task
 		return name.replaceFirst(Notation.getGenericVoc() + "$", "");
 	}
