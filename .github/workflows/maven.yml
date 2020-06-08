@@ -21,6 +21,4 @@ jobs:
       with:
         java-version: 1.11
     - name: Build with Maven
-      run: mvn -B package --file ml2wf/pom.xml
-    - name: Test with Maven  
-      run: mvn test
+      run: mvn -B -X package --file ml2wf/pom.xml
