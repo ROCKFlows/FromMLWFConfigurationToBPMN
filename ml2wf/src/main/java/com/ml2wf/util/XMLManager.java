@@ -24,13 +24,16 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.TaskTagsSelector;
+import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 
@@ -69,6 +72,15 @@ public class XMLManager {
 	 */
 	private static final String EXTENSION_SEPARATOR = ".";
 	/**
+	 * Documentation's counter.
+	 *
+	 * <p>
+	 *
+	 * This counter is used to number each documentation which is required for the
+	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
+	 */
+	private int docCount;
+	/**
 	 * Logger instance.
 	 *
 	 * @since 1.0
@@ -90,6 +102,7 @@ public class XMLManager {
 	 * @throws IOException
 	 */
 	public XMLManager(String filePath) throws ParserConfigurationException, SAXException, IOException {
+		this.docCount = 0;
 		this.path = filePath;
 		this.sourceFile = new File(this.path);
 		this.document = XMLManager.preprocess(this.sourceFile);
@@ -424,6 +437,32 @@ public class XMLManager {
 		name = name.replace(" ", "_");
 		// sanitization for generic WF's task
 		return name.replaceFirst(Notation.getGenericVoc() + "$", "");
+	}
+
+	/**
+	 * Adds the documentation part to the given {@code node}.
+	 *
+	 * <p>
+	 *
+	 * The documentation contains informations about the task's ID and the referred
+	 * generic task.
+	 *
+	 * @param node Node to add the documentation
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	public void addDocumentationNode(Node node, String content) {
+		Element documentation = this.document.createElement(BPMNNodesNames.DOCUMENTATION.getName());
+		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
+		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
+		CDATASection refersTo = this.document.createCDATASection(Notation.getReferenceVoc() + content);
+		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
+		logger.debug(logMsg);
+		documentation.appendChild(refersTo);
+		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
+		logger.debug(logMsg);
+		node.insertBefore(documentation, node.getFirstChild());
 	}
 
 	/**

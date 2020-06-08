@@ -95,7 +95,7 @@ public class ConstraintParser implements Parser {
 		// regex part
 		String regex = String.format("(\\w*)(%s| +)(\\w*)", String.join("|", operators));
 		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(expression.replace(" ", "_"));
+		Matcher matcher = pattern.matcher(expression.trim().replace(" ", "_"));
 		while (matcher.find()) {
 			if (matcher.groupCount() == 3) {
 				String operator = matcher.group(2);
@@ -282,7 +282,8 @@ public class ConstraintParser implements Parser {
 				if (!depth.containsKey(separatorCounter)) {
 					depth.put(separatorCounter, new ArrayDeque<>());
 				}
-				depth.get(separatorCounter).add(element.replace(" ", "_")); // TODO: factorize in method
+				// TODO: trim in sup methods
+				depth.get(separatorCounter).add(element.trim().replace(" ", "_")); // TODO: factorize in method
 			}
 		}
 		return depth;
