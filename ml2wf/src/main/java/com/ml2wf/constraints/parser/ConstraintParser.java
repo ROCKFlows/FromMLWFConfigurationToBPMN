@@ -283,7 +283,6 @@ public class ConstraintParser implements Parser {
 				if (!depth.containsKey(separatorCounter)) {
 					depth.put(separatorCounter, new ArrayDeque<>());
 				}
-				// TODO: trim in sup methods
 				depth.get(separatorCounter).add(element);
 			}
 		}
