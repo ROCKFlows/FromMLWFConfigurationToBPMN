@@ -159,7 +159,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		this.addExtensionNode(node);
 		// node renaming part
 		Node nodeAttrName = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
-
+		// TODO: update instance syntax
 		String nodeName = Notation.getGeneratedPrefixVoc()
 				+ nodeAttrName.getNodeValue().replace(Notation.getGenericVoc(), "");
 		nodeName = XMLManager.sanitizeName(nodeName);

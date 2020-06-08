@@ -385,8 +385,8 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	 * <p>
 	 *
 	 * <b>Note</b> that this method is different from the
-	 * {@link XMLManager#getNodeName(Node)} because it removes the referred meta
-	 * task if present
+	 * {@link XMLManager#getNodeName(Node)} because it only returns the deepest
+	 * subtask's name.
 	 *
 	 * @param task task to get name
 	 * @return the given {@code task}'s name
@@ -397,20 +397,8 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 		String logMsg = String.format("Retrieving name for task : %s...", task);
 		logger.debug(logMsg);
 		String taskName = XMLManager.getNodeName(task);
-		if (task.hasChildNodes()) {
-			List<Node> children = XMLManager.nodeListAsList(task.getChildNodes());
-			// get all taks's children (e.g. extensionElements, documentation...)
-			for (Node child : children) {
-				// for each task's child
-				if (child.getNodeName().equals(BPMNNodesNames.DOCUMENTATION.getName())) {
-					// if has a documenting attribute
-					// remove the referred metatask to the current task's name
-					taskName = taskName.replaceFirst(XMLManager.getReferredTask(child.getTextContent()), "");
-					// Reminder : a documentation tag contains a "refersTo : meta task"
-				}
-			}
-		}
-		taskName = taskName.replace(Notation.getGeneratedPrefixVoc(), "");
+		String[] splitted = taskName.split(Notation.getGeneratedPrefixVoc());
+		taskName = (splitted.length > 0) ? splitted[splitted.length - 1] : taskName;
 		logMsg = String.format("Task's name is : %s", taskName);
 		logger.debug(logMsg);
 		return taskName;
