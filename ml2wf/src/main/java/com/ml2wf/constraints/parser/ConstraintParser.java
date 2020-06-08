@@ -93,13 +93,14 @@ public class ConstraintParser implements Parser {
 		List<String> operators = this.config.getOperatorsList();
 		operators = operators.stream().map(Pattern::quote).collect(Collectors.toList());
 		// regex part
-		String regex = String.format("(\\w*)(%s| +)(\\w*)", String.join("|", operators));
+		String regex = String.format("([\\w\\s]*)(%s+)([\\w\\s]*)", String.join("|", operators));
 		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(expression.trim().replace(" ", "_"));
+		Matcher matcher = pattern.matcher(expression);
 		while (matcher.find()) {
 			if (matcher.groupCount() == 3) {
 				String operator = matcher.group(2);
-				List<String> operands = Arrays.asList(matcher.group(1), matcher.group(3));
+				List<String> operands = Arrays.asList(matcher.group(1).trim().replace(" ", "_"),
+						matcher.group(3).trim().replace(" ", "_"));
 				result.add(new OperAssociation(operator, operands));
 			}
 		}
@@ -283,7 +284,7 @@ public class ConstraintParser implements Parser {
 					depth.put(separatorCounter, new ArrayDeque<>());
 				}
 				// TODO: trim in sup methods
-				depth.get(separatorCounter).add(element.trim().replace(" ", "_")); // TODO: factorize in method
+				depth.get(separatorCounter).add(element);
 			}
 		}
 		return depth;

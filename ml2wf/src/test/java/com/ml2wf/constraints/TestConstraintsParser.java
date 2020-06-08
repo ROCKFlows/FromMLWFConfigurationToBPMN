@@ -35,11 +35,6 @@ public class TestConstraintsParser {
 		assertTrue(this.parser.parseExpression(emptyExpression).isEmpty());
 		assertTrue(this.parser.parseExpression(blankExpression).isEmpty());
 		assertEquals(1, this.parser.parseExpression(simpleExpression).size());
-		this.parser.parseExpression(complexExpression).forEach(a -> {
-			System.out.println(a.getLeftOperand());
-			System.out.println(a.getOperator());
-			System.out.println(a.getRightOperand());
-		});
 		assertEquals(9, this.parser.parseExpression(complexExpression).size());
 	}
 

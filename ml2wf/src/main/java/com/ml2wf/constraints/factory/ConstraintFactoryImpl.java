@@ -25,7 +25,6 @@ import com.ml2wf.constraints.config.DefaultConfig;
 import com.ml2wf.constraints.parser.ConstraintParser;
 import com.ml2wf.constraints.parser.Parser;
 import com.ml2wf.constraints.tree.BinaryTree;
-import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
 
 /**
@@ -155,14 +154,6 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 */
 	public String getAssociationConstraint(String globalTask, List<String> tasksNames) {
 		// TODO: factorize [[ ]] into variables (see config)
-		tasksNames.forEach(System.out::println);
-		for (int i = 0; i < tasksNames.size(); i++) {
-			// getting deeper task for nested tasks
-			String[] splitted = tasksNames.get(i).split(Notation.getGeneratedPrefixVoc());
-			if (splitted.length > 0) {
-				tasksNames.set(i, splitted[splitted.length - 1]);
-			}
-		}
 		return "[[" + globalTask + DefaultConfig.IMP.getSymbol()
 				+ String.join(DefaultConfig.CONJ.getSymbol(), tasksNames) + "]]";
 
