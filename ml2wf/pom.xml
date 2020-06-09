@@ -61,6 +61,7 @@
                 <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>**/*.cfg</include>
+                    <include>**/*.bpmn</include>
                     <include>**/*.bpmn2</include>
                     <include>**/*.xml</include>
                     <include>log4j2.properties</include>
@@ -83,6 +84,13 @@
             <version>${version.junit}</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
+		<dependency>
+		    <groupId>org.junit.jupiter</groupId>
+		    <artifactId>junit-jupiter-params</artifactId>
+		    <version>${version.junit}</version>
+		    <scope>test</scope>
+		</dependency>
         <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
         <dependency>
             <groupId>info.picocli</groupId>
