@@ -119,6 +119,7 @@ public class TestWFTasksMerger {
 		this.sourceWFDocument = XMLManager.getDocumentFromURL(url);
 		// --- retrieving instatiated WF resource
 		url = classLoader.getResource(WF_SOURCE_FILE_PATH);
+		System.out.println(url);
 		fDirectory = url.getPath().replace("%20", " ");
 		this.merger.mergeWithWF(true, fDirectory); // backing up
 		// --- retrieving FM result resource

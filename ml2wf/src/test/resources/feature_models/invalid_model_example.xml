@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>
+	<properties>
+		<graphics key="showhiddenfeatures" value="true"/>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="Root">
+			<and name="AD">
+				<and abstract="true" name="Criteria">
+					<and abstract="true" name="CriteriaOnDataSet">
+						<graphics key="collapsed" value="false"/>
+						<alt abstract="true" name="NumberOfANomalies">
+							<graphics key="collapsed" value="false"/>
+							<feature name="Few"/>
+							<feature name="aLot"/>
+						</alt>
+					</and>
+				</and>
+				<and abstract="true" name="Steps">
+					<feature abstract="true" name="Evaluating_Step"/>
+					<feature abstract="true" name="Training_Step"><feature name="LSD"/></feature>
+					<feature abstract="true" name="Preprocessing_Step"><feature name="ts_resampling"/><feature name="construct_rolling_windows"/><feature name="drop_invalid_windows"/></feature>
+				</and>
+			<and name="Meta"><feature name="simple_wf"/></and><and name="Instances"><feature name="simple_wf_instance"/><feature name="medium_wf_instance"/><feature name="invalid_wf_instance"/></and></and>
+		</and>
+	</struct>
+<constraints><rule><imp><var>simple_wf</var><conj><var>Preprocessing_Step</var><var>Training_Step</var></conj></imp></rule><rule><imp><var>simple_wf_instance</var><conj><var>ts_resampling</var><var>LSD</var></conj></imp></rule><rule><imp><var>simple_wf_instance</var><var>simple_wf</var></imp></rule><rule><imp><var>LSD</var><var>drop_invalid_windows</var></imp></rule><rule><imp><var>LSD</var><var>aLot</var></imp></rule><rule><imp><var>medium_wf_instance</var><conj><var>ts_resampling</var><conj><var>LSD</var><conj><var>construct_rolling_windows</var><var>drop_invalid_windows</var></conj></conj></conj></imp></rule><rule><imp><var>medium_wf_instance</var><var>simple_wf</var></imp></rule><rule><imp><var>LSD</var><not><var>drop_invalid_windows</var></not></imp></rule><rule><imp><var>invalid_wf_instance</var><conj><var>ts_resampling</var><conj><var>LSD</var><var>construct_rolling_windows</var></conj></conj></imp></rule><rule><imp><var>invalid_wf_instance</var><var>simple_wf</var></imp></rule></constraints></featureModel>

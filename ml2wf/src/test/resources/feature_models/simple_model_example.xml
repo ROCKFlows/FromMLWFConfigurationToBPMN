@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<featureModel>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>
 	<properties>
 		<graphics key="showhiddenfeatures" value="true"/>
 		<graphics key="legendautolayout" value="true"/>
@@ -24,10 +23,10 @@
 				</and>
 				<and abstract="true" name="Steps">
 					<feature abstract="true" name="Evaluating_Step"/>
-					<feature abstract="true" name="Trainig_Step"/>
-					<feature abstract="true" name="Preprocessing_Step"/>
+					<feature abstract="true" name="Training_Step"><feature name="LSD"/></feature>
+					<feature abstract="true" name="Preprocessing_Step"><feature name="ts_resampling"/></feature>
 				</and>
-			</and>
+			<and name="Meta"><feature name="simple_wf"/></and><and name="Instances"><feature name="simple_wf_instance"/></and></and>
 		</and>
 	</struct>
-</featureModel>
+<constraints><rule><imp><var>simple_wf</var><conj><var>Preprocessing_Step</var><var>Training_Step</var></conj></imp></rule><rule><imp><var>simple_wf_instance</var><conj><var>ts_resampling</var><var>LSD</var></conj></imp></rule><rule><imp><var>simple_wf_instance</var><var>simple_wf</var></imp></rule></constraints></featureModel>
