@@ -129,7 +129,6 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException {
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
-		System.out.println(trees);
 		for (BinaryTree<String> tree : trees) {
 			Node rule = document.createElement(FeatureModelNames.RULE.getName());
 			// rules.add(this.generateNode(tree, rule));
@@ -157,6 +156,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		// TODO: factorize [[ ]] into variables (see config)
 		return "[[" + globalTask + DefaultConfig.IMP.getSymbol()
 				+ String.join(DefaultConfig.CONJ.getSymbol(), tasksNames) + "]]";
+
 	}
 
 	/**

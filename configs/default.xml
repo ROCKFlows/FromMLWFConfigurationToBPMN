@@ -3,22 +3,22 @@
 	<feature automatic="selected" name="AnomalyDetectionExploration"/>
 	<feature automatic="selected" name="AnomallyDetection"/>
 	<feature automatic="selected" name="References"/>
-	<feature name="PHD"/>
-	<feature name="Benkabou2018"/>
-	<feature automatic="selected" manual="selected" name="DataScientist"/>
-	<feature manual="selected" name="Yassine"/>
+	<feature automatic="selected" name="PHD"/>
+	<feature manual="selected" name="Benkabou2018"/>
+	<feature manual="selected" name="DataScientist"/>
+	<feature name="Yassine"/>
 	<feature automatic="selected" manual="selected" name="Criteria"/>
 	<feature name="HumanInteractionCriteria"/>
 	<feature automatic="selected" name="DatasetCriteria"/>
-	<feature automatic="selected" name="TraingDatasetCriteria"/>
-	<feature automatic="selected" name="CititeriaOnOutliers"/>
+	<feature name="TraingDatasetCriteria"/>
+	<feature name="CititeriaOnOutliers"/>
 	<feature name="AnomalieClassesCriteria"/>
 	<feature name="FewAnomaiyClasses"/>
 	<feature name="multipleAnomalyClasses"/>
-	<feature automatic="selected" name="NumberOfOutliers"/>
-	<feature automatic="unselected" name="fewAnomaliesInTrainsingSet_Criteria"/>
-	<feature manual="selected" name="anomaliesInTrainingSet"/>
-	<feature automatic="unselected" name="OnlyNormalTimeSeriesInTrainingSet_Criteria"/>
+	<feature name="NumberOfOutliers"/>
+	<feature manual="unselected" name="fewAnomaliesInTrainsingSet_Criteria"/>
+	<feature name="anomaliesInTrainingSet"/>
+	<feature name="OnlyNormalTimeSeriesInTrainingSet_Criteria"/>
 	<feature name="WayOfExtraction"/>
 	<feature name="DataSize"/>
 	<feature name="DataStructuration"/>
@@ -36,14 +36,14 @@
 	<feature name="OptimizerByTensorFlow"/>
 	<feature name="MLAlgorithm"/>
 	<feature name=" basedOnSimilarity"/>
-	<feature automatic="unselected" name="OC_SVM"/>
+	<feature name="OC_SVM"/>
 	<feature name="LSTM"/>
 	<feature name="testStability"/>
 	<feature name="loss function"/>
-	<feature automatic="unselected" name="Mean Absolute Error"/>
+	<feature name="Mean Absolute Error"/>
 	<feature name="Mean Square Error"/>
 	<feature name="Training_step"/>
-	<feature automatic="unselected" name="train OC_SVM"/>
+	<feature name="train OC_SVM"/>
 	<feature name="SelectObservationToLabel_Step"/>
 	<feature name="RefineModel_step"/>
 	<feature name="Labeling_Step"/>

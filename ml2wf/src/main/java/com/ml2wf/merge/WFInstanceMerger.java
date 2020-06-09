@@ -26,16 +26,16 @@ import com.ml2wf.util.XMLManager;
  *
  * <p>
  *
- * It is an extension of the {@link AbstractMerger} base class.
+ * It is an extension of the {@link WFCompleteMerger} base class.
  *
  * @author Nicolas Lacroix
  *
  * @version 1.0
  *
- * @see AbstractMerger
+ * @see WFCompleteMerger
  *
  */
-public class WFInstanceMerger extends AbstractMerger {
+public class WFInstanceMerger extends WFCompleteMerger {
 
 	// TODO: make logMsg static
 
