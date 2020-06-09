@@ -1,6 +1,5 @@
 package com.ml2wf.generation;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -27,6 +26,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -91,7 +91,7 @@ public class TestInstanceFactoryImpl {
 	/**
 	 * Result filename according to {@code FILE_NAME}.
 	 */
-	private static final String RESULT_DIRECTORY = "./wf_instances/";
+	private static final String INSTANCES_DIRECTORY = "./wf_instances/";
 
 	@BeforeAll
 	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
@@ -113,10 +113,10 @@ public class TestInstanceFactoryImpl {
 	}
 
 	/**
-	 * Returns all {@code File}'s instances in the {@code RESULT_DIRECTORY}
+	 * Returns all {@code File}'s instances in the {@code INSTANCES_DIRECTORY}
 	 * directory.
 	 *
-	 * @return all {@code File}'s instances in the {@code RESULT_DIRECTORY}
+	 * @return all {@code File}'s instances in the {@code INSTANCES_DIRECTORY}
 	 *         directory
 	 * @throws IOException
 	 * @throws URISyntaxException
@@ -124,7 +124,7 @@ public class TestInstanceFactoryImpl {
 	 * @since 1.0
 	 */
 	static Stream<File> instanceFiles() throws IOException, URISyntaxException {
-		URI uri = classLoader.getResource(RESULT_DIRECTORY).toURI();
+		URI uri = classLoader.getResource(INSTANCES_DIRECTORY).toURI();
 		Path myPath = Paths.get(uri);
 		return Files.walk(myPath, 1).filter(p -> p.toString().endsWith(BPMN_EXTENSION)).map(Path::toFile);
 	}
@@ -199,15 +199,14 @@ public class TestInstanceFactoryImpl {
 		// TODO: tests for usertask
 		NodeList resultNodes = this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName());
 		for (int i = 0; i < resultNodes.getLength(); i++) {
-			Node node = resultNodes.item(i);
-			NodeList children = node.getChildNodes();
-			Node expectedExtensionNode = children.item(0);
-			assertEquals(BPMNNodesNames.EXTENSION.getName(), expectedExtensionNode.getNodeName()); // #1
-			// TODO: tests task color ?
-			Node expectedDocNode = children.item(1);
-			assertEquals(BPMNNodesNames.DOCUMENTATION.getName(), expectedDocNode.getNodeName()); // #2
+			Element node = (Element) resultNodes.item(i);
+			NodeList extensionChildren = node.getElementsByTagName(BPMNNodesNames.EXTENSION.getName());
+			assertTrue(extensionChildren.getLength() > 0);
+			NodeList docChildren = node.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
+			assertTrue(docChildren.getLength() > 0);
+			Node docNode = docChildren.item(0);
 			assertTrue(Pattern.matches(Notation.getDocumentationVoc() + "\\d+",
-					expectedDocNode.getAttributes().getNamedItem(BPMNNodesAttributes.ID.getName()).getNodeValue())); // #3
+					docNode.getAttributes().getNamedItem(BPMNNodesAttributes.ID.getName()).getNodeValue()));
 		}
 	}
 
@@ -219,8 +218,7 @@ public class TestInstanceFactoryImpl {
 	 * More precisely, this method tests if :
 	 *
 	 * <ol>
-	 * <li>reference nodes are referencing <b>all generic tasks</b>,</li>
-	 * <li>each reference is referencing the <b>right generic task</b>.</li>
+	 * <li>reference nodes are referencing <b>all generic tasks</b>.</li>
 	 * </ol>
 	 *
 	 * <p>
@@ -237,28 +235,20 @@ public class TestInstanceFactoryImpl {
 	@MethodSource("instanceFiles")
 	@DisplayName("Verification of references")
 	public void testReferences(File file) throws ParserConfigurationException, SAXException, IOException {
-		// TODO: test for usertask
 		// TODO: improve readability
 		this.resultDocument = XMLManager.preprocess(file);
-		// retrieving nodes as a List
-		List<Node> sourceNodes = XMLManager
-				.nodeListAsList(this.sourceDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
-		List<Node> resultNodes = XMLManager
-				.nodeListAsList(this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName()));
-		// retrieving generic tasks and instantiated references
-		List<String> references = resultNodes.stream().map(Node::getAttributes)
+		// retrieving task nodes
+		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNodesNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNodesNames.SELECTOR);
+		// retrieving meta tasks and instantiated references
+		List<String> references = resultNodes.stream().map(Element.class::cast)
+				.map(e -> e.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName())) // getting doc nodes
+				.map(n -> n.item(0).getTextContent()) // getting first doc node's content
+				.map(XMLManager::getReferredTask).collect(Collectors.toList()); // get referred task
+		List<String> metaTasksNames = sourceNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
-		List<String> genericTasksNames = sourceNodes.stream().map(Node::getAttributes)
-				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
+				.map(XMLManager::getReferredTask).collect(Collectors.toList());
 		// comparing
-		assertTrue(references.containsAll(genericTasksNames)); // #1
-		resultNodes.forEach((n) -> {
-			assertEquals(
-					XMLManager.sanitizeName(
-							n.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue()),
-					XMLManager.sanitizeName(n.getChildNodes().item(1).getTextContent())); // #2
-		});
+		assertTrue(references.containsAll(metaTasksNames)); // #1
 	}
 }
