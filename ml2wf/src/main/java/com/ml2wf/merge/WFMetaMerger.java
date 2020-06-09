@@ -21,16 +21,16 @@ import com.ml2wf.util.XMLManager;
  *
  * <p>
  *
- * It is an extension of the {@link AbstractMerger} base class.
+ * It is an extension of the {@link WFCompleteMerger} base class.
  *
  * @author Nicolas Lacroix
  *
  * @version 1.0
  *
- * @see AbstractMerger
+ * @see WFCompleteMerger
  *
  */
-public class WFMetaMerger extends AbstractMerger {
+public class WFMetaMerger extends WFCompleteMerger {
 
 	/**
 	 * Meta default task tag name.
@@ -55,7 +55,9 @@ public class WFMetaMerger extends AbstractMerger {
 
 	@Override
 	protected void processSpecificNeeds(Document wfDocument, String wfName) throws Exception {
-		// TODO: complete this method
+		// adds new metatasks
+		/*-List<Node> wfTasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
+		this.processTasks(wfTasks);*/
 	}
 
 	/**

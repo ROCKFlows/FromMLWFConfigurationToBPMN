@@ -3,15 +3,12 @@ package com.ml2wf.generation;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -46,19 +43,10 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	public static final String INSTANTIATE_COLOR = "#00f900";
 	/**
-	 * Documentation's counter.
-	 *
-	 * <p>
-	 *
-	 * This counter is used to number each documentation which is required for the
-	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
+	 * This {@code taskCounter} is incremented for each task. This allows other
+	 * methods to give an unique name to a given task.
 	 */
-	private int docCount;
-	/**
-	 * This {@code Map} counts for each generic tasks the number of instantiated
-	 * tasks.
-	 */
-	private Map<String, Integer> tasksMap;
+	private int taskCounter = 0;
 	/**
 	 * Logger instance.
 	 *
@@ -77,8 +65,6 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	public InstanceFactoryImpl(String filePath) throws ParserConfigurationException, SAXException, IOException {
 		super(filePath);
-		this.docCount = 0;
-		this.tasksMap = new HashMap<>();
 	}
 
 	/**
@@ -167,45 +153,18 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		// documentation part
 		// TODO: factorize in method ?
 		String content = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue();
+		content = XMLManager.sanitizeName(content);
 		this.addDocumentationNode(node, content);
 		// extension part
 		this.addExtensionNode(node);
 		// node renaming part
 		Node nodeAttrName = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
-
+		// TODO: update instance syntax
 		String nodeName = Notation.getGeneratedPrefixVoc()
 				+ nodeAttrName.getNodeValue().replace(Notation.getGenericVoc(), "");
-
-		this.tasksMap.put(nodeName, this.tasksMap.containsKey(nodeName) ? this.tasksMap.get(nodeName) + 1 : 1);
-
-		nodeName += Notation.getGeneratedPrefixVoc() + this.tasksMap.get(nodeName);
+		nodeName = XMLManager.sanitizeName(nodeName);
+		nodeName += Notation.getGeneratedPrefixVoc() + content + this.taskCounter++;
 		nodeAttrName.setNodeValue(nodeName);
-	}
-
-	/**
-	 * Adds the documentation part to the given {@code node}.
-	 *
-	 * <p>
-	 *
-	 * The documentation contains informations about the task's ID and the referred
-	 * generic task.
-	 *
-	 * @param node Node to add the documentation
-	 *
-	 * @since 1.0
-	 * @see Node
-	 */
-	private void addDocumentationNode(Node node, String content) {
-		Element documentation = this.getDocument().createElement(BPMNNodesNames.DOCUMENTATION.getName());
-		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
-		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
-		CDATASection refersTo = this.getDocument().createCDATASection(Notation.getReferenceVoc() + content);
-		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
-		logger.debug(logMsg);
-		documentation.appendChild(refersTo);
-		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
-		logger.debug(logMsg);
-		node.insertBefore(documentation, node.getFirstChild());
 	}
 
 	/**

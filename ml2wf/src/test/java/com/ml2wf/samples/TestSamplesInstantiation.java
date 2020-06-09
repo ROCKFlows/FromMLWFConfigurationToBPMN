@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -18,17 +19,6 @@ import com.ml2wf.generation.InstanceFactoryImpl;
 
 public class TestSamplesInstantiation {
 
-	/**
-	 * Basic WF XML file path.
-	 */
-	private static final String SIMPLE_WF_PATH = "./wf_generic_samples/simple_wf.bpmn";
-	
-	private static final String SIMPLE_WF_PATH2 = "./wf_generic_samples/simple_wf2.bpmn";
-	
-	/**
-	 * Basic WF XML file path.
-	 */
-	private static final String RESULT_DIRECTORY = "src/test/resources/results/";
 	/**
 	 * {@code InstanceFactoryImpl}'s instance.
 	 */
@@ -53,7 +43,18 @@ public class TestSamplesInstantiation {
 	 * @see URL
 	 */
 	private URL url;
+	/**
+	 * Basic WF XML file path.
+	 */
+	private static final String SIMPLE_WF_PATH = "./wf_meta/simple_wf.bpmn";
 
+	/**
+	 * Basic WF XML file path.
+	 */
+	private static final String RESULT_DIRECTORY = ".src/test/resources/results/";
+	/**
+	 * {@code Logger}'s instance.
+	 */
 	private static final Logger logger = LogManager.getLogger(TestSamplesInstantiation.class);
 
 	@BeforeEach
@@ -62,10 +63,6 @@ public class TestSamplesInstantiation {
 		this.classLoader = this.getClass().getClassLoader();
 		this.url = this.classLoader.getResource(SIMPLE_WF_PATH);
 		String fDirectory = this.url.getPath().replace("%20", " "); // TODO: improve sanitization
-		this.factory = new InstanceFactoryImpl(fDirectory);
-		
-		this.url = this.classLoader.getResource(SIMPLE_WF_PATH2);
-		fDirectory = this.url.getPath().replace("%20", " "); // TODO: improve sanitization
 		this.factory = new InstanceFactoryImpl(fDirectory);
 	}
 
@@ -77,8 +74,9 @@ public class TestSamplesInstantiation {
 	}
 
 	@Test
+	@Disabled
 	@DisplayName("Test with a basic workflow")
 	public void testSamples() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		this.factory.getWFInstance(RESULT_DIRECTORY);
+		// TODO: this.factory.getWFInstance(RESULT_DIRECTORY);
 	}
 }

@@ -15,9 +15,7 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactory;
-import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
-import com.ml2wf.conventions.enums.fm.FeatureModelNames;
 import com.ml2wf.generation.InstanceFactory;
 import com.ml2wf.util.XMLManager;
 
@@ -106,37 +104,7 @@ public class WFTasksMerger extends AbstractMerger {
 		Document wfDocument = XMLManager.preprocess(new File(filePath));
 		// retrieving workflow's tasks
 		List<Node> wfTasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
-		// retrieving all existing FM's tasks names
-		List<Node> existingTasks = XMLManager.getTasksList(super.getDocument(), FeatureModelNames.SELECTOR);
-		List<String> existingTasksNames = XMLManager.getNodesNames(existingTasks);
-		String currentTaskName;
-		String debugMsg;
-		// iterating for each task
-		for (Node task : wfTasks) {
-			currentTaskName = XMLManager.getNodeName(task);
-			debugMsg = String.format("Processing task : %s", currentTaskName);
-			logger.debug(debugMsg);
-			// splitting task's name
-			String[] tName = currentTaskName.split(Notation.getGeneratedPrefixVoc());
-			if (tName.length < 3) {
-				// TODO: factorize in a method isValidInstTaskName
-				debugMsg = String.format("Bad task name for task : %s.", currentTaskName);
-				logger.warn(debugMsg);
-				logger.warn("Skipping...");
-				continue;
-			}
-			if (existingTasksNames.contains(tName[2])) {
-				// TODO: check factorization with method
-				// AbstractMerger#isDuplicated(instTaskName)
-				logger.debug("Task already in FeatureModel");
-				logger.debug("Skipping...");
-				continue;
-			}
-			// retrieving a suitable parent
-			Node parentNode = this.getSuitableParent(task);
-			// inserting the new task
-			this.insertNewTask(parentNode, task);
-		}
+		this.processTasks(wfTasks);
 		this.processAnnotations(wfDocument);
 		// saving result
 		super.save(super.getPath());
@@ -184,19 +152,6 @@ public class WFTasksMerger extends AbstractMerger {
 			}
 		}
 		logger.info("Annotations processing ended...");
-	}
-
-	// TODO: manage these methods
-	@Override
-	protected Node getRootParentNode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected void processSpecificNeeds(Document wfDocument, String wfName) throws Exception {
-		// TODO Auto-generated method stub
-
 	}
 
 }
