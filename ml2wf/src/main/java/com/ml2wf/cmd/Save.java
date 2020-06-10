@@ -4,9 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import com.ml2wf.merge.WFInstanceMerger;
 import com.ml2wf.merge.WFMerger;
-import com.ml2wf.merge.WFMetaMerger;
+import com.ml2wf.merge.complete.WFInstanceMerger;
+import com.ml2wf.merge.complete.WFMetaMerger;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;

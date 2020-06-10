@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import com.ml2wf.merge.AbstractMerger;
-import com.ml2wf.merge.WFTasksMerger;
+import com.ml2wf.merge.tasks.WFTasksMerger;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
