@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<featureModel>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>
 	<properties>
 		<graphics key="showhiddenfeatures" value="true"/>
 		<graphics key="legendautolayout" value="true"/>
@@ -61,5 +60,5 @@
 				<var>aLot</var>
 			</imp>
 		</rule>
-	</constraints>
+	<rule><imp><var>LSD</var><not><var>drop_invalid_windows</var></not></imp></rule><rule><imp><var>LSD</var><var>drop_invalid_windows</var></imp></rule><rule><imp><var>LSD</var><var>aLot</var></imp></rule></constraints>
 </featureModel>

@@ -39,7 +39,6 @@ public abstract class WFCompleteMerger extends AbstractMerger {
 		if (wfInfo.isEmpty()) {
 			logger.fatal("The given file path is invalid or the workflow is already contained in the FeatureModel...");
 			logger.warn("Skipping...");
-			// TODO: add logs
 			return;
 		}
 		String wfName = wfInfo.getKey();

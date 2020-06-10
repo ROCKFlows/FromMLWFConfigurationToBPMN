@@ -69,13 +69,9 @@ public class Save implements Runnable {
 		Configurator.setLevel(pckName, (this.verbose) ? Level.DEBUG : Level.FATAL);
 		WFMerger merger;
 		try {
-			logger.warn("WFMetaMerger");
 			merger = new WFMetaMerger(this.output);
-			logger.warn("WFMetaMerger#mergeWithWF");
 			((WFMetaMerger) merger).mergeWithWF(this.backUp, this.input[0]);
-			logger.warn("WFInstanceMerger");
 			merger = new WFInstanceMerger(this.output);
-			logger.warn("WFInstanceMerger#mergeWithWF");
 			((WFInstanceMerger) merger).mergeWithWF(this.backUp, this.input[1]);
 			LogManager.shutdown();
 		} catch (Exception e) {

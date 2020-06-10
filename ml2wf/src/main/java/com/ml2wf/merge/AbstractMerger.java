@@ -140,7 +140,6 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 			wfTaskName = getWorkflowName(wfDocument).replace(" ", "_");
 			logMsg = String.format("WF's name is %s.", wfTaskName);
 			logger.debug(logMsg);
-			// file.getName().split(Pattern.quote(XMLManager.getExtensionSeparator()))[0];
 			if (this.isDuplicated(wfTaskName)) {
 				logger.warn("This workflow is already in the FeatureModel");
 				logger.warn("Skipping...");
