@@ -354,7 +354,7 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 		// getting constraints
 		List<Node> constraints = new ArrayList<>(
 				XMLManager.nodeListAsList(this.getDocument().getElementsByTagName(FeatureModelNames.RULE.getName())));
-		logger.fatal("-".repeat(100));
+		logger.fatal(() -> "-".repeat(100));
 		rules.forEach(rule -> logger.fatal(constraints.stream().noneMatch(rule::equals)));
 		for (Node rule : rules) {
 			if (constraints.stream().noneMatch(rule::equals)) {

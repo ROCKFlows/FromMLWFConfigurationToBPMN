@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -69,7 +70,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 *
 	 * @see Document
 	 */
-	private static Document document;
+	private Document document;
 
 	/**
 	 * {@code ConstraintFactoryImpl}'s default constructor.
@@ -97,6 +98,8 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	public ConstraintFactoryImpl() throws ParserConfigurationException {
 		// Document instantiation
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
+		docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		document = docBuilder.newDocument();
 		// Parser instantiation
@@ -226,7 +229,11 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 			throws TransformerFactoryConfigurationError, TransformerException {
 		// pretty print a DOM Node
 		StringWriter sw = new StringWriter();
-		Transformer t = TransformerFactory.newInstance().newTransformer();
+		//To protect Java XML Parsers from XXE attacks 
+		TransformerFactory df = TransformerFactory.newInstance();
+		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
+		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
+		Transformer t = df.newTransformer();
 		t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		t.setOutputProperty(OutputKeys.INDENT, "yes");
 		t.transform(new DOMSource(node), new StreamResult(sw));
