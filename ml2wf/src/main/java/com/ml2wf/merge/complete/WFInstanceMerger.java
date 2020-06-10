@@ -1,4 +1,4 @@
-package com.ml2wf.merge;
+package com.ml2wf.merge.complete;
 
 import java.io.IOException;
 import java.util.Arrays;

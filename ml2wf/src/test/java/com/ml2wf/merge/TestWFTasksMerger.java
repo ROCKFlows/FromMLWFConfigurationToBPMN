@@ -32,6 +32,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.merge.tasks.WFTasksMerger;
 import com.ml2wf.util.XMLManager;
 
 /**
