@@ -1,10 +1,20 @@
 package com.ml2wf.conventions.enums.bpmn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.ml2wf.conventions.enums.TaskTagsSelector;
 
+/**
+ * This {@code enum} contains handled tags' names according to the
+ * <a href="https://www.bpmn.org/">BPMN standard</a>.
+ *
+ * @author Nicolas Lacroix
+ *
+ * @version 1.0
+ *
+ */
 public enum BPMNNodesNames implements TaskTagsSelector {
 
 	// general tags
@@ -16,21 +26,31 @@ public enum BPMNNodesNames implements TaskTagsSelector {
 	// reserved tags
 	SELECTOR("");
 
+	/**
+	 * Tag name.
+	 */
 	private String name;
 
+	/**
+	 * {@code BPMNNodesNames}'s constructor.
+	 *
+	 * @param name name of the tag
+	 */
 	private BPMNNodesNames(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Returns the current tag's {@code name}.
+	 *
+	 * @return the current tag's {@code name}
+	 */
 	public String getName() {
 		return this.name;
 	}
 
 	@Override
 	public List<String> getTaskTags() {
-		List<String> tags = new ArrayList<>();
-		tags.add(TASK.getName());
-		tags.add(USERTASK.getName());
-		return tags;
+		return new ArrayList<>(Arrays.asList(USERTASK.getName(), TASK.getName()));
 	}
 }
