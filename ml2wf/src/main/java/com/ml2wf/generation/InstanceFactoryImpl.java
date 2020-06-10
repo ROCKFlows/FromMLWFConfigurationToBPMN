@@ -235,7 +235,6 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			Node newTextNode = this.getDocument().createElement(BPMNNodesNames.TEXT.getName());
 			newTextNode.setTextContent(content);
 			globalAnnotation.appendChild(newTextNode);
-			logger.fatal(globalAnnotation.getTextContent());
 		} else {
 			logger.error("The global annotation is missing.");
 			logger.error("Maybe you removed it during the workflow modification ?");

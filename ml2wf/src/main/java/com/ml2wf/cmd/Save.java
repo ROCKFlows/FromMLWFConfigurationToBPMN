@@ -1,19 +1,15 @@
 package com.ml2wf.cmd;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import com.ml2wf.App;
 import com.ml2wf.merge.WFInstanceMerger;
 import com.ml2wf.merge.WFMerger;
 import com.ml2wf.merge.WFMetaMerger;
 
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Model;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Spec;
 
 /**
  * Class managing the <b>save</b> command.
@@ -24,21 +20,22 @@ import picocli.CommandLine.Spec;
  * global task
  * into the FeatureModel.
  *
+ * <p>
+ *
+ * It is an extension of the {@link AbstractCommand} base class.
  *
  * @author Nicolas Lacroix
  *
  * @version 1.0
  *
+ * @see AbstractCommand
  * @see WFMerger
  * @see Command
  * @see Logger
  *
  */
 @Command(name = "-s", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "saves a worklow as a task in a FeatureModel")
-public class Save implements Runnable {
-
-	@Spec
-	Model.CommandSpec spec;
+public class Save extends AbstractCommand {
 
 	@Option(names = { "-i",
 			"--input" }, required = true, arity = "2", order = 1, description = "input files (meta workflow and instance workflow)")
@@ -46,9 +43,6 @@ public class Save implements Runnable {
 
 	@Option(names = { "-o", "--output" }, required = true, arity = "1", order = 1, description = "output file")
 	String output;
-
-	@Option(names = { "-v", "--verbose" }, arity = "0", order = 1, description = "verbose mode")
-	boolean verbose;
 
 	@Option(names = { "-b",
 			"--backup" }, arity = "0", order = 1, description = "backup the original FeatureModel file before any modification")
@@ -65,17 +59,12 @@ public class Save implements Runnable {
 	@Override
 	public void run() {
 		// TODO: process Merge verifications
-		String pckName = App.class.getPackageName();
-		Configurator.setLevel(pckName, (this.verbose) ? Level.DEBUG : Level.FATAL);
+		Configurator.setLevel(getPackageName(), getVerbLevel(this.verbose));
 		WFMerger merger;
 		try {
-			logger.warn("WFMetaMerger");
 			merger = new WFMetaMerger(this.output);
-			logger.warn("WFMetaMerger#mergeWithWF");
 			((WFMetaMerger) merger).mergeWithWF(this.backUp, this.input[0]);
-			logger.warn("WFInstanceMerger");
 			merger = new WFInstanceMerger(this.output);
-			logger.warn("WFInstanceMerger#mergeWithWF");
 			((WFInstanceMerger) merger).mergeWithWF(this.backUp, this.input[1]);
 			LogManager.shutdown();
 		} catch (Exception e) {

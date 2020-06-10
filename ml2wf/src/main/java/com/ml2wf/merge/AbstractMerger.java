@@ -140,7 +140,6 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 			wfTaskName = getWorkflowName(wfDocument).replace(" ", "_");
 			logMsg = String.format("WF's name is %s.", wfTaskName);
 			logger.debug(logMsg);
-			// file.getName().split(Pattern.quote(XMLManager.getExtensionSeparator()))[0];
 			if (this.isDuplicated(wfTaskName)) {
 				logger.warn("This workflow is already in the FeatureModel");
 				logger.warn("Skipping...");
@@ -354,10 +353,8 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 		// getting constraints
 		List<Node> constraints = new ArrayList<>(
 				XMLManager.nodeListAsList(this.getDocument().getElementsByTagName(FeatureModelNames.RULE.getName())));
-		logger.fatal("-".repeat(100));
-		rules.forEach(rule -> logger.fatal(constraints.stream().noneMatch(rule::equals)));
 		for (Node rule : rules) {
-			if (constraints.stream().noneMatch(rule::equals)) {
+			if (constraints.stream().noneMatch(rule::isEqualNode)) {
 				// if it is not duplicated constraint
 				this.getDocument().adoptNode(rule);
 				constraintsNode.appendChild(rule);
