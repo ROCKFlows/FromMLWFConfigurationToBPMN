@@ -2,18 +2,12 @@ package com.ml2wf.generation;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -25,12 +19,12 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.AbstractXMLTest;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
@@ -42,6 +36,10 @@ import com.ml2wf.util.XMLManager;
  *
  * <p>
  *
+ * It is an extension of the {@code AbstractXMLTest} base class.
+ *
+ * <p>
+ *
  * Tests are executed with the <a href="https://junit.org/junit5/">JUnit
  * framework</a>.
  *
@@ -49,31 +47,14 @@ import com.ml2wf.util.XMLManager;
  *
  * @version 1.0
  *
+ * @see AbstractXMLTest
  * @see InstanceFactoryImpl
  *
  */
 @TestInstance(Lifecycle.PER_CLASS)
 @DisplayName("Test of InstanceFactoryImpl")
-public class TestInstanceFactoryImpl {
+public class TestInstanceFactoryImpl extends AbstractXMLTest {
 
-	/**
-	 * Instance of the class to be tested.
-	 *
-	 * @see InstanceFactoryImpl
-	 */
-	private InstanceFactoryImpl factory;
-	/**
-	 * XML source document.
-	 *
-	 * @see Document
-	 */
-	private Document sourceDocument;
-	/**
-	 * XML result document.
-	 *
-	 * @see Document
-	 */
-	private Document resultDocument;
 	/**
 	 * {@code ClassLoader}'s instance used to get resources.
 	 *
@@ -81,17 +62,9 @@ public class TestInstanceFactoryImpl {
 	 */
 	private static ClassLoader classLoader = TestInstanceFactoryImpl.class.getClassLoader();
 	/**
-	 * The BPMN extension used to filter files.
-	 */
-	private static final String BPMN_EXTENSION = ".bpmn";
-	/**
 	 * Default XML filename.
 	 */
 	private static final String SOURCE_FILE_PATH = "./wf_meta/simple_wf.bpmn";
-	/**
-	 * Result filename according to {@code FILE_NAME}.
-	 */
-	private static final String INSTANCES_DIRECTORY = "./wf_instances/";
 
 	@BeforeAll
 	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
@@ -102,31 +75,14 @@ public class TestInstanceFactoryImpl {
 		// getting source document
 		this.sourceDocument = XMLManager.getDocumentFromURL(url);
 		// initializing factory
-		this.factory = new InstanceFactoryImpl(fDirectory);
+		this.testedClass = new InstanceFactoryImpl(fDirectory);
 		// instantializing generic WF
-		this.factory.getWFInstance();
+		((InstanceFactoryImpl) this.testedClass).getWFInstance();
 	}
 
 	@AfterEach
 	public void clean() {
 		this.resultDocument = null;
-	}
-
-	/**
-	 * Returns all {@code File}'s instances in the {@code INSTANCES_DIRECTORY}
-	 * directory.
-	 *
-	 * @return all {@code File}'s instances in the {@code INSTANCES_DIRECTORY}
-	 *         directory
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 *
-	 * @since 1.0
-	 */
-	static Stream<File> instanceFiles() throws IOException, URISyntaxException {
-		URI uri = classLoader.getResource(INSTANCES_DIRECTORY).toURI();
-		Path myPath = Paths.get(uri);
-		return Files.walk(myPath, 1).filter(p -> p.toString().endsWith(BPMN_EXTENSION)).map(Path::toFile);
 	}
 
 	/**
@@ -157,8 +113,8 @@ public class TestInstanceFactoryImpl {
 	@ParameterizedTest
 	@MethodSource("instanceFiles")
 	@DisplayName("Verification of the global structure")
-	public void testGlobalStructure(File file) throws ParserConfigurationException, SAXException, IOException {
-		this.resultDocument = XMLManager.preprocess(file);
+	public void testGlobalStructure(Path path) throws ParserConfigurationException, SAXException, IOException {
+		this.resultDocument = XMLManager.preprocess(path.toFile());
 		// TODO: to complete/improve considering the wished number of instantiated tasks
 		NodeList sourceNodes = this.sourceDocument.getElementsByTagName(BPMNNodesNames.TASK.getName());
 		NodeList resultNodes = this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName());
@@ -194,8 +150,8 @@ public class TestInstanceFactoryImpl {
 	@ParameterizedTest
 	@MethodSource("instanceFiles")
 	@DisplayName("Verification of the nodes' structures")
-	public void testNodesStructures(File file) throws ParserConfigurationException, SAXException, IOException {
-		this.resultDocument = XMLManager.preprocess(file);
+	public void testNodesStructures(Path path) throws ParserConfigurationException, SAXException, IOException {
+		this.resultDocument = XMLManager.preprocess(path.toFile());
 		// TODO: tests for usertask
 		NodeList resultNodes = this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName());
 		for (int i = 0; i < resultNodes.getLength(); i++) {
@@ -234,9 +190,9 @@ public class TestInstanceFactoryImpl {
 	@ParameterizedTest
 	@MethodSource("instanceFiles")
 	@DisplayName("Verification of references")
-	public void testReferences(File file) throws ParserConfigurationException, SAXException, IOException {
+	public void testReferences(Path path) throws ParserConfigurationException, SAXException, IOException {
 		// TODO: improve readability
-		this.resultDocument = XMLManager.preprocess(file);
+		this.resultDocument = XMLManager.preprocess(path.toFile());
 		// retrieving task nodes
 		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNodesNames.SELECTOR);
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNodesNames.SELECTOR);
