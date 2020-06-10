@@ -33,9 +33,11 @@ ml2wf  Machine Learning problem to Workflow
 ##### SYNOPSIS
 
 <pre>
-ml2wf -g -i <ins>file</ins> -o <ins>directory</ins> [-v]
-ml2wf -m -i <ins>file</ins> -o <ins>file</ins> [-v]
+ml2wf -g -i <ins>file</ins> -o <ins>directory</ins> [-v level]
+ml2wf -m -i <ins>file</ins> -o <ins>file</ins> [-v level]
+ml2wf -s -i <ins>file</ins> -o <ins>file</ins> [-b] [-v level]
 </pre>
+
 ##### DESCRIPTION
 
 <pre> 
@@ -44,8 +46,9 @@ ml2wf -m -i <ins>file</ins> -o <ins>file</ins> [-v]
 -i, --input       input file location
 -o, --output      output file or directory location
 -b, --backup      backup the original FeatureModel file before any modification
--v, --verbose     verbose mode
+-v, --verbose     verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL)
 </pre>
+
 #### Configuration
 
 The default configuration is the following :
@@ -98,6 +101,10 @@ Lets consider this generic workflow :
 
 ![generical_wf](./img/generical_wf.png)
 
+and this initial feature model :
+
+![](F:\1 - Programmation\2 - Java\WF2BPMN\FromMLWFConfigurationToBPMN\img\initial_fm.png)
+
 #### Step 1 : Instantiation & Modification
 
 We instantiate our generic workflow using the **generate** (-g) command and we change the tasks names which give us :
@@ -112,9 +119,21 @@ We now merge our instantiated workflow in the FeatureModel using the **merge** (
 
 Here is the result :
 
-![feature_model](./img/feature_model.png)
+![feature_model](./img/feature_model_merge.png)
 
-#### Step 3  : Reusing your generated tasks for other workflows
+
+
+#### Step 3 : Saving the meta and instance relationship
+
+We now save the meta and instance relationship in the FeatureModel using the save (-s) command.
+
+We now see the constraints between the meta-workflow and the instantiated one :
+
+![](F:\1 - Programmation\2 - Java\WF2BPMN\FromMLWFConfigurationToBPMN\img\feature_model_save.png)
+
+
+
+#### Step 4  : Reusing your generated tasks for other workflows
 
 Using the FeatureModelIDE, you now can select the wished tasks and it will automatically select the needed ones.
 
