@@ -1,10 +1,21 @@
 package com.ml2wf.conventions.enums.fm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.ml2wf.conventions.enums.TaskTagsSelector;
 
+/**
+ * This {@code enum} contains handled tags' names according to the
+ * <a href="https://featureide.github.io/">FeatureIDE
+ * framework</a>.
+ *
+ * @author Nicolas Lacroix
+ *
+ * @version 1.0
+ *
+ */
 public enum FeatureModelNames implements TaskTagsSelector {
 
 	// general tags
@@ -19,22 +30,32 @@ public enum FeatureModelNames implements TaskTagsSelector {
 	// reserved tags
 	SELECTOR("");
 
+	/**
+	 * Tag name.
+	 */
 	private String name;
 
+	/**
+	 * {@code FeatureModelNames}'s constructor.
+	 *
+	 * @param name name of the tag
+	 */
 	private FeatureModelNames(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Returns the current tag's {@code name}.
+	 *
+	 * @return the current tag's {@code name}
+	 */
 	public String getName() {
 		return this.name;
 	}
 
 	@Override
 	public List<String> getTaskTags() {
-		List<String> tags = new ArrayList<>();
-		tags.add(FEATURE.getName());
-		tags.add(AND.getName());
-		tags.add(ALT.getName());
-		return tags;
+		return new ArrayList<>(Arrays.asList(FEATURE.getName(), AND.getName(), ALT.getName()));
 	}
+
 }

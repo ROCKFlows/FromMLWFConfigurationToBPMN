@@ -8,8 +8,8 @@ import java.util.List;
  *
  * <p>
  *
- * {@code Node} task tags can change considering the type of xml file
- * (<b>FeatureModel</b> or <b>BPMN</b> for instance)
+ * {@code Node} task tags can change considering the type of xml standard
+ * (<b>FeatureModel</b> or <b>BPMN</b> for instance).
  *
  * @author Nicolas Lacroix
  *
@@ -20,6 +20,7 @@ import java.util.List;
  *
  */
 public interface TaskTagsSelector {
+
 	/**
 	 * Returns a {@code List<String>} containing all task tags considering the type
 	 * of xml file.

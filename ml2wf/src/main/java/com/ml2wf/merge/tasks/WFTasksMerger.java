@@ -1,4 +1,4 @@
-package com.ml2wf.merge;
+package com.ml2wf.merge.tasks;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +17,7 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactory;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.generation.InstanceFactory;
+import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.util.XMLManager;
 
 /**

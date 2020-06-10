@@ -1,4 +1,4 @@
-package com.ml2wf.merge;
+package com.ml2wf.merge.complete;
 
 import java.io.IOException;
 
@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.util.Pair;
 
 public abstract class WFCompleteMerger extends AbstractMerger {

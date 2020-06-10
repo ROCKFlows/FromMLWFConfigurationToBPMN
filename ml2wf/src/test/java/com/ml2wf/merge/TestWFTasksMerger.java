@@ -3,7 +3,6 @@ package com.ml2wf.merge;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -14,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -24,20 +22,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.AbstractXMLTest;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.merge.tasks.WFTasksMerger;
 import com.ml2wf.util.XMLManager;
 
 /**
  * This class tests the {@link WFTasksMerger} class.
+ *
+ * <p>
+ *
+ * It is an extension of the {@code AbstractXMLTest} base class.
  *
  * <p>
  *
@@ -48,65 +51,34 @@ import com.ml2wf.util.XMLManager;
  *
  * @version 1.0
  *
+ * @see AbstractXMLTest
  * @see WFTasksMerger
  *
  */
 @DisplayName("Test of WFTasksMerger")
-public class TestWFTasksMerger {
+public class TestWFTasksMerger extends AbstractXMLTest {
 
 	/**
-	 * Instance of the class to be tested.
-	 *
-	 * @see WFTasksMerger
-	 */
-	private WFTasksMerger merger;
-	/**
-	 * XML WF source document.
-	 *
-	 * @see Document
-	 */
-	private Document sourceWFDocument;
-	/**
-	 * XML FM result document.
-	 *
-	 * @see Document
-	 */
-	private Document resultFMDocument;
-	/**
-	 * {@code ClassLoader}'s instance used to get resources.
-	 *
-	 * @see ClassLoader
-	 */
-	private static ClassLoader classLoader = TestWFTasksMerger.class.getClassLoader();
-	/**
-	 * Bask up path.
+	 * Back up path.
 	 */
 	private String backUpPath;
-	/**
-	 * The BPMN extension used to filter files.
-	 */
-	private static final String BPMN_EXTENSION = ".bpmn";
 	/**
 	 * Default XML filename.
 	 */
 	private static final String FM_FILE_PATH = "./src/test/resources/feature_models/model.xml";
-	/**
-	 * Instance workflows' directory.
-	 */
-	private static final String INSTANCES_DIRECTORY = "./wf_instances/";
 
 	@BeforeEach
 	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
 			InvalidConstraintException {
 		// loading xml test file
-		this.merger = new WFTasksMerger(FM_FILE_PATH);
+		this.testedClass = new WFTasksMerger(FM_FILE_PATH);
 	}
 
 	@AfterEach
 	public void clean() throws IOException, URISyntaxException {
-		this.merger = null;
-		this.sourceWFDocument = null;
-		this.resultFMDocument = null;
+		this.testedClass = null;
+		this.sourceDocument = null;
+		this.resultDocument = null;
 		// TODO; clean the test directory
 		// this.cleanTestDir();
 		// this.backUpPath = null;
@@ -125,23 +97,6 @@ public class TestWFTasksMerger {
 		this.backUpPath = splittedPath[0] + Notation.getBackupVoc() + dateFormater.format(backUpDate) + "."
 				+ splittedPath[1];
 		return this.backUpPath;
-	}
-
-	/**
-	 * Returns all {@code Path}'s instances in the {@code INSTANCES_DIRECTORY}
-	 * directory.
-	 *
-	 * @return all {@code Path}'s instances in the {@code INSTANCES_DIRECTORY}
-	 *         directory
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 *
-	 * @since 1.0
-	 */
-	static Stream<Path> instanceFiles() throws IOException, URISyntaxException {
-		URI uri = classLoader.getResource(INSTANCES_DIRECTORY).toURI();
-		Path myPath = Paths.get(uri);
-		return Files.walk(myPath, 1).filter(p -> p.toString().endsWith(BPMN_EXTENSION));
 	}
 
 	/**
@@ -193,20 +148,21 @@ public class TestWFTasksMerger {
 	@ParameterizedTest
 	@MethodSource("instanceFiles")
 	@DisplayName("Test of merging feature")
-	public void testMergingStructure(Path instanceFile)
+	public void testMergingStructure(Path path)
 			throws ParserConfigurationException, SAXException, IOException, TransformerException,
 			InvalidConstraintException {
-		this.merger.mergeWithWF(instanceFile.toString()); // TODO: save before modifications (true parameter)
-		this.sourceWFDocument = XMLManager.preprocess(instanceFile.toFile());
-		this.resultFMDocument = this.merger.getDocument();
+		((WFTasksMerger) this.testedClass).mergeWithWF(path.toString()); // TODO: save before modifications
+																			// (true parameter)
+		this.sourceDocument = XMLManager.preprocess(path.toFile());
+		this.resultDocument = this.testedClass.getDocument();
 		// getting WF's source task nodes
-		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceWFDocument, BPMNNodesNames.SELECTOR);
+		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNodesNames.SELECTOR);
 		// List<Node> sourceNestedNodes = ;
 		// getting FM tasks
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultFMDocument, FeatureModelNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FeatureModelNames.SELECTOR);
 		// getting tasks' names
 		List<String> sourceNodesNames = sourceNodes.stream()
-				.flatMap(n -> this.merger.getNestedNodes(n).stream()) // flattening
+				.flatMap(n -> ((AbstractMerger) this.testedClass).getNestedNodes(n).stream()) // flattening
 				.map(Node::getAttributes) // getting attributes
 				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())) // getting Name attribute
 				.map(Node::getNodeValue) // getting name value
