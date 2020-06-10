@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
 	<properties>
 		<graphics key="showhiddenfeatures" value="true"/>
 		<graphics key="legendautolayout" value="true"/>
@@ -23,10 +24,42 @@
 				</and>
 				<and abstract="true" name="Steps">
 					<feature abstract="true" name="Evaluating_Step"/>
-					<feature abstract="true" name="Training_Step"><feature name="LSD"/></feature>
-					<feature abstract="true" name="Preprocessing_Step"><feature name="ts_resampling"><feature name="sub_resampling"><feature name="deeper_resampling"/></feature></feature><feature name="construct_rolling_windows"/><feature name="drop_invalid_windows"/></feature>
+					<and abstract="true" name="Training_Step">
+						<feature name="LSD"/>
+					</and>
+					<and abstract="true" name="Preprocessing_Step">
+						<and name="ts_resampling">
+							<and name="sub_resampling">
+								<feature name="deeper_resampling"/>
+							</and>
+						</and>
+						<feature name="construct_rolling_windows"/>
+						<feature name="drop_invalid_windows"/>
+					</and>
 				</and>
 			</and>
 		</and>
 	</struct>
-<constraints><rule><imp><var>LSD</var><not><var>drop_invalid_windows</var></not></imp></rule><rule><imp><var>LSD</var><var>drop_invalid_windows</var></imp></rule><rule><imp><var>LSD</var><var>aLot</var></imp></rule><rule><imp><var>LSD</var><not><var>drop_invalid_windows</var></not></imp></rule><rule><imp><var>LSD</var><var>drop_invalid_windows</var></imp></rule><rule><imp><var>LSD</var><var>aLot</var></imp></rule><rule><imp><var>LSD</var><not><var>drop_invalid_windows</var></not></imp></rule><rule><imp><var>LSD</var><var>drop_invalid_windows</var></imp></rule><rule><imp><var>LSD</var><var>aLot</var></imp></rule><rule><imp><var>LSD</var><not><var>drop_invalid_windows</var></not></imp></rule><rule><imp><var>LSD</var><var>drop_invalid_windows</var></imp></rule><rule><imp><var>LSD</var><var>aLot</var></imp></rule><rule><imp><var>LSD</var><not><var>drop_invalid_windows</var></not></imp></rule><rule><imp><var>LSD</var><var>drop_invalid_windows</var></imp></rule><rule><imp><var>LSD</var><var>aLot</var></imp></rule></constraints></featureModel>
+	<constraints>
+		<rule>
+			<imp>
+				<var>LSD</var>
+				<not>
+					<var>drop_invalid_windows</var>
+				</not>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>LSD</var>
+				<var>drop_invalid_windows</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>LSD</var>
+				<var>aLot</var>
+			</imp>
+		</rule>
+	</constraints>
+</featureModel>
