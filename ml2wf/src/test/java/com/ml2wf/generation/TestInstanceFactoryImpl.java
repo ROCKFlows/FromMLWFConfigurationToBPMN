@@ -94,8 +94,6 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	 *
 	 * <ol>
 	 * <li>all generic <b>tasks</b> have been instantiated <b>at least one
-	 * time</b>,</li>
-	 * <li>all generic <b>usertasks</b> have been instantiated <b>at least one
 	 * time</b></li>
 	 * </ol>
 	 *
@@ -116,12 +114,9 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	public void testGlobalStructure(Path path) throws ParserConfigurationException, SAXException, IOException {
 		this.resultDocument = XMLManager.preprocess(path.toFile());
 		// TODO: to complete/improve considering the wished number of instantiated tasks
-		NodeList sourceNodes = this.sourceDocument.getElementsByTagName(BPMNNodesNames.TASK.getName());
-		NodeList resultNodes = this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName());
-		assertTrue(sourceNodes.getLength() <= resultNodes.getLength()); // #1
-		sourceNodes = this.sourceDocument.getElementsByTagName(BPMNNodesNames.USERTASK.getName());
-		resultNodes = this.resultDocument.getElementsByTagName(BPMNNodesNames.USERTASK.getName());
-		assertTrue(sourceNodes.getLength() <= resultNodes.getLength()); // #2
+		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNodesNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNodesNames.SELECTOR);
+		assertTrue(sourceNodes.size() <= resultNodes.size()); // #1
 	}
 
 	/**
@@ -152,13 +147,12 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	@DisplayName("Verification of the nodes' structures")
 	public void testNodesStructures(Path path) throws ParserConfigurationException, SAXException, IOException {
 		this.resultDocument = XMLManager.preprocess(path.toFile());
-		// TODO: tests for usertask
-		NodeList resultNodes = this.resultDocument.getElementsByTagName(BPMNNodesNames.TASK.getName());
-		for (int i = 0; i < resultNodes.getLength(); i++) {
-			Element node = (Element) resultNodes.item(i);
-			NodeList extensionChildren = node.getElementsByTagName(BPMNNodesNames.EXTENSION.getName());
+		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNodesNames.SELECTOR);
+		for (Node resultNode : resultNodes) {
+			NodeList extensionChildren = ((Element) resultNode)
+					.getElementsByTagName(BPMNNodesNames.EXTENSION.getName());
 			assertTrue(extensionChildren.getLength() > 0);
-			NodeList docChildren = node.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
+			NodeList docChildren = ((Element) resultNode).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
 			assertTrue(docChildren.getLength() > 0);
 			Node docNode = docChildren.item(0);
 			assertTrue(Pattern.matches(Notation.getDocumentationVoc() + "\\d+",
