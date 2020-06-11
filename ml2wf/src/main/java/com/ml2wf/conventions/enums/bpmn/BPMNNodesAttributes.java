@@ -11,7 +11,9 @@ package com.ml2wf.conventions.enums.bpmn;
  */
 public enum BPMNNodesAttributes {
 
-	BACKGROUND("ext:shapeBackground"), ID("id"), NAME("name");
+	BACKGROUND("ext:shapeBackground"), ID("id"), NAME("name"),
+	// positional attributes
+	ELEMENT("bpmnElement"), HEIGHT("height"), WIDTH("width"), X("x"), Y("y");
 
 	/**
 	 * Tag name.

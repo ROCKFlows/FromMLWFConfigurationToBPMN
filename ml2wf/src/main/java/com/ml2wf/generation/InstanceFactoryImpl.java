@@ -222,24 +222,13 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @since 1.0
 	 */
 	private void addMetaWFRefAnnot(String referred) {
-		NodeList processNodeList = this.getDocument().getElementsByTagName(BPMNNodesNames.PROCESS.getName());
-		if (processNodeList.getLength() == 0) {
-			logger.error("Error while getting the reffered metaworkflow's name.");
-			logger.warn("Skipping this step...");
-			return;
-		}
 		Node globalAnnotation = XMLManager.getGlobalAnnotationNode(this.getDocument());
-		if ((globalAnnotation != null) && (globalAnnotation.getChildNodes().getLength() > 0)) {
-			String content = "Workflow's name " + Notation.getWfNameDelimiterLeft() + Notation.getWfNameDelimiterRight()
-					+ "\nThis workflow makes reference to the " + referred + " workflow.";
-			Node newTextNode = this.getDocument().createElement(BPMNNodesNames.TEXT.getName());
-			newTextNode.setTextContent(content);
-			globalAnnotation.appendChild(newTextNode);
-		} else {
-			logger.error("The global annotation is missing.");
-			logger.error("Maybe you removed it during the workflow modification ?");
-			logger.warn("Skipping...");
-		}
+		String content = "Workflow's name %s%s\nThis workflow makes reference to the %s workflow.";
+		content = String.format(content, Notation.getWfNameDelimiterLeft(), Notation.getWfNameDelimiterRight(),
+				referred);
+		Node newTextNode = this.getDocument().createElement(BPMNNodesNames.TEXT.getName());
+		newTextNode.setTextContent(content);
+		globalAnnotation.appendChild(newTextNode);
 	}
 
 	/**

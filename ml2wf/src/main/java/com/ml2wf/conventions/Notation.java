@@ -44,6 +44,14 @@ public final class Notation {
 	 */
 	private static final String DOCUMENTATION_VOC = "Documentation_";
 	/**
+	 * <b>Text annotation</b> notation.
+	 */
+	private static final String TEXT_ANNOTATION_VOC = "TextAnnotation_";
+	/**
+	 * <b>BPMN shape</b> notation.
+	 */
+	private static final String BPMN_SHAPE_VOC = "BPMNShape_";
+	/**
 	 * <b>back up</b> notation.
 	 */
 	private static final String BACKUP_VOC = "_save";
@@ -120,6 +128,28 @@ public final class Notation {
 	 */
 	public static String getDocumentationVoc() {
 		return DOCUMENTATION_VOC;
+	}
+
+	/**
+	 * Returns the {@link #TEXT_ANNOTATION_VOC} notation.
+	 *
+	 * @return the text annotation notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getTextAnnotationVoc() {
+		return TEXT_ANNOTATION_VOC;
+	}
+
+	/**
+	 * Returns the {@link #BPMN_SHAPE_VOC} notation.
+	 *
+	 * @return the BPMN shape notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getBpmnShapeVoc() {
+		return BPMN_SHAPE_VOC;
 	}
 
 	/**

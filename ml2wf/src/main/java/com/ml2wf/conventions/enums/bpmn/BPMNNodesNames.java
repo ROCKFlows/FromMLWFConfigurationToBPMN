@@ -20,9 +20,11 @@ public enum BPMNNodesNames implements TaskTagsSelector {
 	// general tags
 	PROCESS("bpmn2:process"), INCOMING("bpmn2:incoming"), OUTGOING("bpmn2:outgoing"),
 	EXTENSION("bpmn2:extensionElements"), STYLE("ext:style"), DOCUMENTATION("bpmn2:documentation"),
-	ANNOTATION("bpmn2:textAnnotation"), TEXT("bpmn2:text"),
+	ANNOTATION("bpmn2:textAnnotation"), TEXT("bpmn2:text"), DIAGRAM("bpmndi:BPMNDiagram"), PLANE("bpmndi:BPMNPlane"),
 	// task tags
 	TASK("bpmn2:task"), USERTASK("bpmn2:userTask"),
+	// positional tags
+	SHAPE("bpmndi:BPMNShape"), BOUNDS("dc:Bounds"), LABEL("bpmndi:BPMNLabel"),
 	// reserved tags
 	SELECTOR("");
 

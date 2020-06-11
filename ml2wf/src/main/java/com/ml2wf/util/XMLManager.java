@@ -24,6 +24,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -79,7 +80,16 @@ public class XMLManager {
 	 * This counter is used to number each documentation which is required for the
 	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
 	 */
-	private int docCount;
+	private int docCount = 0;
+	/**
+	 * Text annotation's counter.
+	 *
+	 * <p>
+	 *
+	 * This counter is used to number each text annotation which is required for the
+	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
+	 */
+	private static int textAnnotCount = 0;
 	/**
 	 * Logger instance.
 	 *
@@ -102,7 +112,6 @@ public class XMLManager {
 	 * @throws IOException
 	 */
 	public XMLManager(String filePath) throws ParserConfigurationException, SAXException, IOException {
-		this.docCount = 0;
 		this.path = filePath;
 		this.sourceFile = new File(this.path);
 		this.document = XMLManager.preprocess(this.sourceFile);
@@ -234,10 +243,105 @@ public class XMLManager {
 	// General static methods
 
 	/**
-	 * Returns the global annotation node.
+	 * Creates and returns a positional {@code Node}.
+	 *
+	 * <p>
+	 *
+	 * A "positional {@code Node}" is used to locate a BPMN element.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that all positional tags are considered as style tags contained
+	 * in the {@code BPMNNodesStyle enum}.
+	 *
+	 * @param wfDocument      document to add the position node
+	 * @param referredElement the referred element's name
+	 * @param x               abscissa
+	 * @param y               ordinate
+	 * @return the positional {@code Node}
+	 */
+	public static Node createPositionalNode(Document wfDocument, String referredElement, double x, double y) {
+		// TODO: improve this method (refactoring required)
+		// TODO: refactor creating methods in enums
+		logger.debug("Creating positional Node...");
+		Element shapeNode = wfDocument.createElement(BPMNNodesNames.SHAPE.getName());
+		// creating shape node's id attribute
+		String idAttrName = Notation.getBpmnShapeVoc() + referredElement;
+		Attr idAttr = wfDocument.createAttribute(BPMNNodesAttributes.ID.getName());
+		idAttr.setNodeValue(idAttrName);
+		shapeNode.setAttributeNode(idAttr);
+		// adding referred element attribute
+		shapeNode.setAttribute(BPMNNodesAttributes.ELEMENT.getName(), referredElement);
+		// creating bounds child
+		Element boundsNode = wfDocument.createElement(BPMNNodesNames.BOUNDS.getName());
+		// adding location attributes
+		boundsNode.setAttribute(BPMNNodesAttributes.HEIGHT.getName(), "150"); // TODO: store in constants
+		boundsNode.setAttribute(BPMNNodesAttributes.WIDTH.getName(), "170");
+		boundsNode.setAttribute(BPMNNodesAttributes.X.getName(), String.valueOf(x));
+		boundsNode.setAttribute(BPMNNodesAttributes.Y.getName(), String.valueOf(y));
+		shapeNode.appendChild(boundsNode);
+		// creating label child
+		Element labelNode = wfDocument.createElement(BPMNNodesNames.LABEL.getName());
+		shapeNode.appendChild(labelNode);
+		// TODO: create label id
+		// creating bounds child
+		boundsNode = wfDocument.createElement(BPMNNodesNames.BOUNDS.getName());
+		// adding location attributes
+		boundsNode.setAttribute(BPMNNodesAttributes.HEIGHT.getName(), "145");
+		boundsNode.setAttribute(BPMNNodesAttributes.WIDTH.getName(), "160");
+		boundsNode.setAttribute(BPMNNodesAttributes.X.getName(), String.valueOf(x + 5));
+		boundsNode.setAttribute(BPMNNodesAttributes.Y.getName(), String.valueOf(y));
+		labelNode.appendChild(boundsNode);
+		// selecting main diagram node
+		NodeList planeNodeList = wfDocument.getElementsByTagName(BPMNNodesNames.PLANE.getName());
+		Node planeNode = planeNodeList.item(0);
+		// appending new positional node
+		planeNode.appendChild(shapeNode);
+		return shapeNode;
+	}
+
+	/**
+	 * Creates the global annotation {@code Node}.
 	 *
 	 * @param wfDocument document to get the global annotation node
-	 * @return the global annotation node
+	 * @return the global annotation {@code Node}
+	 *
+	 * @since 1.0
+	 *
+	 * @see Node
+	 */
+	public static Node createGlobalAnnotationNode(Document wfDocument) {
+		// getting process node
+		NodeList processNodeList = wfDocument.getElementsByTagName(BPMNNodesNames.PROCESS.getName());
+		Node processNode = processNodeList.item(0);
+		// updating the text annotation counter
+		textAnnotCount += wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName()).getLength();
+		// creating the annotation node
+		Element annotationNode = wfDocument.createElement(BPMNNodesNames.ANNOTATION.getName());
+		String annotName = Notation.getTextAnnotationVoc() + ++textAnnotCount;
+		// creating the id attribute
+		annotationNode.setAttribute(BPMNNodesAttributes.ID.getName(), annotName);
+		// TODO: check setIdAttributeNode benefits
+		// locating the annotation node
+		createPositionalNode(wfDocument, annotName, 0., 0.);
+		// adding to parent node
+		return processNode.appendChild(annotationNode);
+	}
+
+	/**
+	 * Returns the global annotation {@code Node}.
+	 *
+	 * <p>
+	 *
+	 * Creates the global annotation {@code Node} using the
+	 * {@link #createGlobalAnnotationNode(Document)} method if needed.
+	 *
+	 * @param wfDocument document to get the global annotation node
+	 * @return the global annotation {@code Node}
+	 *
+	 * @since 1.0
+	 *
+	 * @see Node
 	 */
 	public static Node getGlobalAnnotationNode(Document wfDocument) {
 		logger.debug("Getting global annotation node...");
@@ -254,8 +358,7 @@ public class XMLManager {
 			}
 		}
 		logger.warn("Global annotation node not found.");
-		logger.warn("Skipping...");
-		return null;
+		return createGlobalAnnotationNode(wfDocument);
 	}
 
 	/**
