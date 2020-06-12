@@ -140,7 +140,6 @@ public class WFTasksMerger extends AbstractMerger {
 	 */
 	private void processAnnotations(Document wfDocument) throws InvalidConstraintException {
 		logger.info("Processing annotations...");
-
 		List<Node> annotations = XMLManager
 				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName()));
 		for (Node annotation : annotations) {
@@ -150,6 +149,8 @@ public class WFTasksMerger extends AbstractMerger {
 				String comment = commentNode.getTextContent();
 				List<Node> newRules = this.getConstraintFactory().getRuleNodes(comment);
 				this.adoptRules(newRules);
+				/*- List<Node> docConsNodes = this.getConstraintFactory().getOrderConstraints(comment)*/
+				// this.addOrderConstraints(docConsNodes)
 			}
 		}
 		logger.info("Annotations processing ended...");
