@@ -154,6 +154,34 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	}
 
 	/**
+	 * Processes {@code document}'s annotations and adds constraints.
+	 *
+	 * @param wfDocument Workflow {@code Document}'s instance containing
+	 *                   annotations.
+	 * @throws InvalidConstraintException
+	 *
+	 * @since 1.0
+	 * @see ConstraintFactory
+	 */
+	protected void processAnnotations(Document wfDocument) throws InvalidConstraintException {
+		logger.info("Processing annotations...");
+		List<Node> annotations = XMLManager
+				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName()));
+		for (Node annotation : annotations) {
+			// TODO: improve performances (check annotation.getChildNodes().item(1)
+			// sufficient ?)
+			for (Node commentNode : XMLManager.nodeListAsList(annotation.getChildNodes())) {
+				String comment = commentNode.getTextContent();
+				List<Node> newRules = this.getConstraintFactory().getRuleNodes(comment);
+				this.adoptRules(newRules);
+				/*- List<Node> docConsNodes = this.getConstraintFactory().getOrderConstraints(comment)*/
+				// this.addOrderConstraints(docConsNodes)
+			}
+		}
+		logger.info("Annotations processing ended...");
+	}
+
+	/**
 	 * Processes the association constraints.
 	 *
 	 * <p>
