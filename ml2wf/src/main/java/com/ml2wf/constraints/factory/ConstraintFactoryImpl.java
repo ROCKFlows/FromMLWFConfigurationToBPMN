@@ -3,6 +3,7 @@ package com.ml2wf.constraints.factory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,6 +20,8 @@ import com.ml2wf.constraints.parser.Parser;
 import com.ml2wf.constraints.tree.BinaryTree;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.util.Pair;
+import com.ml2wf.util.XMLManager;
 
 /**
  * This class is a factory for {@code Node} from constraints.
@@ -141,10 +144,35 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		for (BinaryTree<String> tree : trees) {
 			Node rule = document.createElement(FeatureModelNames.RULE.getName());
 			// rules.add(this.generateNode(tree, rule));
-			this.generateNode(tree, rule);
+			this.generateRuleNode(tree, rule);
 			rules.add(rule);
 		}
 		return rules;
+	}
+
+	@Override
+	public List<Pair<Node, Node>> getOrderNodes(Document document, String constraintText) {
+		// TODO : to test
+		List<Pair<Node, Node>> pairs = new ArrayList<>();
+		Node description;
+		if (this.parser.isOrderConstraint(constraintText)) {
+			List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
+			for (BinaryTree<String> tree : trees) {
+				description = document.createElement(FeatureModelNames.DESCRIPTION.getName());
+				// get involved nodes
+				List<String> taskNames = tree.getAllNodes().stream().filter(n -> !this.config.isAnOperator(n))
+						.collect(Collectors.toList());
+				List<Node> nodes = taskNames.stream().map(n -> XMLManager.getNodeWithName(document, n))
+						.collect(Collectors.toList());
+				// get and add LCA
+				Node lca = XMLManager.getLowestCommonAncestor(nodes);
+				// set description node
+				description.setTextContent(tree.toString());
+				// add new pair to list
+				pairs.add(new Pair<>(lca, description));
+			}
+		}
+		return pairs;
 	}
 
 	/**
@@ -162,6 +190,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 *         {@code tasksNames}
 	 */
 	public String getAssociationConstraint(String globalTask, List<String> tasksNames) {
+		// TODO: add in interface
 		return Notation.getConstraintDelimiterLeft() + globalTask + DefaultConfig.IMP.getSymbol()
 				+ String.join(DefaultConfig.CONJ.getSymbol(), tasksNames) + Notation.getConstraintDelimiterRight();
 
@@ -205,7 +234,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @see BinaryTree
 	 * @see Node
 	 */
-	private void generateNode(BinaryTree<String> tree, Node base) throws InvalidConstraintException {
+	private void generateRuleNode(BinaryTree<String> tree, Node base) throws InvalidConstraintException {
 		String rootValue = tree.getRoot();
 		if (rootValue == null) {
 			// stop condition
@@ -214,7 +243,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		base = base.appendChild(this.createNode(rootValue));
 		for (BinaryTree<String> child : Arrays.asList(tree.getLeftChild(), tree.getRightChild())) {
 			if (child != null) {
-				this.generateNode(child, base);
+				this.generateRuleNode(child, base);
 			}
 		}
 	}

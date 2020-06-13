@@ -167,15 +167,30 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 		logger.info("Processing annotations...");
 		List<Node> annotations = XMLManager
 				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName()));
+		List<Pair<Node, Node>> orderPairs; // pair that will contain order constraint data
 		for (Node annotation : annotations) {
 			// TODO: improve performances (check annotation.getChildNodes().item(1)
 			// sufficient ?)
 			for (Node commentNode : XMLManager.nodeListAsList(annotation.getChildNodes())) {
 				String comment = commentNode.getTextContent();
-				List<Node> newRules = this.getConstraintFactory().getRuleNodes(comment);
-				this.adoptRules(newRules);
-				/*- List<Node> docConsNodes = this.getConstraintFactory().getOrderConstraints(comment)*/
-				// this.addOrderConstraints(docConsNodes)
+				orderPairs = this.getConstraintFactory().getOrderNodes(this.getDocument(), comment);
+				if (!orderPairs.isEmpty()) {
+					// this is an order constraint
+					// TODO: manage in another method
+					for (Pair<Node, Node> pair : orderPairs) {
+						NodeList docNodes = ((Element) pair.getKey())
+								.getElementsByTagName(FeatureModelNames.DESCRIPTION.getName());
+						if (docNodes.getLength() > 0) {
+							Node docNode = docNodes.item(0);
+							XMLManager.mergeNodesTextContent(docNode, pair.getValue());
+						} else {
+							// TODO: log error
+						}
+					}
+				} else {
+					List<Node> newRules = this.getConstraintFactory().getRuleNodes(comment);
+					this.adoptRules(newRules);
+				}
 			}
 		}
 		logger.info("Annotations processing ended...");

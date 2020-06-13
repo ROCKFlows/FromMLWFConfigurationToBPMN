@@ -1,6 +1,8 @@
 package com.ml2wf.constraints.tree;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class represents a binary tree structure.
@@ -188,6 +190,58 @@ public class BinaryTree<T> {
 		this.rightChild.setBlocked(block);
 	}
 
+	/**
+	 * Returns whether the current tree has children or not.
+	 *
+	 * @return whether the current tree has children or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean hasChildren() {
+		return this.hasLeftChild() || this.hasRightChild();
+	}
+
+	/**
+	 * Returns whether the current tree has a left child or not.
+	 *
+	 * @return whether the current tree has a left child or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean hasLeftChild() {
+		return this.leftChild != null;
+	}
+
+	/**
+	 * Returns whether the current tree has a right child or not.
+	 *
+	 * @return whether the current tree has a right child or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean hasRightChild() {
+		return this.rightChild != null;
+	}
+
+	/**
+	 * Returns all nodes of the current tree.
+	 *
+	 * @return all nodes of the current tree
+	 *
+	 * @since 1.0
+	 */
+	public List<T> getAllNodes() {
+		List<T> list = new ArrayList<>();
+		list.add(this.root); // TODO: check root == null ?
+		for (BinaryTree<T> child : Arrays.asList(this.leftChild, this.rightChild)) {
+			// TODO: check performances issues with Arrays.asList
+			if (child != null) {
+				list.addAll(child.getAllNodes());
+			}
+		}
+		return list;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -236,21 +290,18 @@ public class BinaryTree<T> {
 		return true;
 	}
 
-	public StringBuilder toString(StringBuilder prefix, boolean isTail, StringBuilder sb) {
-		// https://stackoverflow.com/a/27153988
-		if (this.rightChild != null) {
-			this.rightChild.toString(new StringBuilder().append(prefix).append(isTail ? "│   " : "    "), false, sb);
-		}
-		sb.append(prefix).append(isTail ? "└── " : "┌── ").append(this.root).append("(").append(this.isBlocked)
-				.append(")\n");
-		if (this.leftChild != null) {
-			this.leftChild.toString(new StringBuilder().append(prefix).append(isTail ? "    " : "│   "), true, sb);
-		}
-		return sb;
-	}
-
 	@Override
 	public String toString() {
-		return this.toString(new StringBuilder(), true, new StringBuilder()).toString();
+		// TODO: to check
+		StringBuilder builder = new StringBuilder();
+		builder.append(" ");
+		builder.append(this.leftChild.getRoot().toString());
+		builder.append(" ");
+		builder.append(this.root.toString());
+		builder.append(" ");
+		if (this.hasRightChild()) {
+			builder.append(this.rightChild.toString());
+		}
+		return builder.toString();
 	}
 }

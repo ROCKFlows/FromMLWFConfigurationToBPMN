@@ -107,6 +107,11 @@ public class ConstraintParser implements Parser {
 		return result;
 	}
 
+	@Override
+	public boolean isOrderConstraint(String constraintText) {
+		return this.config.getOrderOperator().stream().anyMatch(constraintText::contains);
+	}
+
 	/**
 	 * Converts a {@code Map} containing the depth representation of a constraint
 	 * obtained with the {@link #computeDepth(List)} method to a {@code BinaryTree}.
