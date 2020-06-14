@@ -63,6 +63,14 @@ public final class Notation {
 	 * <b>Right delimiter</b> for the workflow's name section.
 	 */
 	private static final String WF_NAME_DELIMITER_RIGHT = "}}";
+	/**
+	 * <b>Left delimiter</b> for the constraint section.
+	 */
+	private static final String CONSTRAINT_DELIMITER_LEFT = "[[";
+	/**
+	 * <b>Right delimiter</b> for the constraint section.
+	 */
+	private static final String CONSTRAINT_DELIMITER_RIGHT = "]]";
 
 	/**
 	 * {@code Notation's} default constructor.
@@ -166,7 +174,7 @@ public final class Notation {
 	/**
 	 * Returns the {@link #WF_NAME_DELIMITER_LEFT} notation.
 	 *
-	 * @return the back up notation
+	 * @return the workflow's name left delimiter notation
 	 *
 	 * @since 1.0
 	 */
@@ -177,12 +185,34 @@ public final class Notation {
 	/**
 	 * Returns the {@link #WF_NAME_DELIMITER_RIGHT} notation.
 	 *
-	 * @return the back up notation
+	 * @return the workflow's name right delimiter notation
 	 *
 	 * @since 1.0
 	 */
 	public static String getWfNameDelimiterRight() {
 		return WF_NAME_DELIMITER_RIGHT;
+	}
+
+	/**
+	 * Returns the {@link #CONSTRAINT_DELIMITER_LEFT} notation.
+	 *
+	 * @return the constraint left delimiter notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getConstraintDelimiterLeft() {
+		return CONSTRAINT_DELIMITER_LEFT;
+	}
+
+	/**
+	 * Returns the {@link #CONSTRAINT_DELIMITER_RIGHT} notation.
+	 *
+	 * @return the constraint right delimiter notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getConstraintDelimiterRight() {
+		return CONSTRAINT_DELIMITER_RIGHT;
 	}
 
 	/**

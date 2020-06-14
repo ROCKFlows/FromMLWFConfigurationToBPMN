@@ -26,7 +26,7 @@ public abstract class AbstractCommand implements Runnable {
 
 	@Option(names = { "-v",
 			"--verbose" }, arity = "1", order = 1, defaultValue = "0", description = "verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL")
-	String verbose;
+	int verbose;
 	/**
 	 * Package name to change the logger level.
 	 */
@@ -55,10 +55,10 @@ public abstract class AbstractCommand implements Runnable {
 	 * @since 1.0
 	 * @see Level
 	 */
-	protected static Level getVerbLevel(String level) {
+	protected static Level getVerbLevel(int level) {
 		try {
 			Optional<Level> verboseLevel = Arrays.asList(Level.values()).stream()
-					.filter(l -> l.intLevel() == Integer.parseInt(level))
+					.filter(l -> l.intLevel() == (level * 100))
 					.findAny();
 			if (verboseLevel.isPresent()) {
 				return verboseLevel.get();
