@@ -1,5 +1,7 @@
 package com.ml2wf.conventions;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import com.ml2wf.generation.InstanceFactory;
@@ -71,6 +73,22 @@ public final class Notation {
 	 * <b>Right delimiter</b> for the constraint section.
 	 */
 	private static final String CONSTRAINT_DELIMITER_RIGHT = "]]";
+	/**
+	 * Sentence for workflow's name.
+	 */
+	private static final String WF_NAME_SENTENCE = "Workflow's name %s%s.";
+	/**
+	 * Sentence for referred meta-workflow.
+	 */
+	private static final String META_REFERENCE_SENTENCE = "Meta-Workflow : %s%s%s.";
+	/**
+	 * Sentence for referred data.
+	 */
+	private static final String DATA_REFERENCE_SENTENCE = "Data : %s%s.";
+	/**
+	 * Sentence for referred author/article.
+	 */
+	private static final String AUTHOR_REFERENCE_SENTENCE = "Author/Article : %s%s.";
 
 	/**
 	 * {@code Notation's} default constructor.
@@ -216,6 +234,50 @@ public final class Notation {
 	}
 
 	/**
+	 * Returns the {@link WF_NAME_SENTENCE} notation.
+	 *
+	 * @return the worflow's name notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getWfNameSentence() {
+		return WF_NAME_SENTENCE;
+	}
+
+	/**
+	 * Returns the {@link META_REFERENCE_SENTENCE} notation.
+	 *
+	 * @return the referred meta-workflow notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getMetaReferenceSentence() {
+		return META_REFERENCE_SENTENCE;
+	}
+
+	/**
+	 * Returns the {@link DATA_REFERENCE_SENTENCE} notation.
+	 *
+	 * @return the referred data notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getDataReferenceSentence() {
+		return DATA_REFERENCE_SENTENCE;
+	}
+
+	/**
+	 * Returns the {@link AUTHOR_REFERENCE_SENTENCE} notation.
+	 *
+	 * @return the referred author/article notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getAuthorReferenceSentence() {
+		return AUTHOR_REFERENCE_SENTENCE;
+	}
+
+	/**
 	 * Returns the quoted notation using the {@link Pattern#quote(String)} method.
 	 *
 	 * @return the quoted notation using the {@link Pattern#quote(String)} method
@@ -226,6 +288,11 @@ public final class Notation {
 	public static String getQuotedNotation(String notation) {
 		String[] splitted = notation.split("");
 		return Pattern.quote(splitted[0]).repeat(splitted.length);
+	}
+
+	public static List<String> getGlobalAnnotationDefaultContent() {
+		return Arrays.asList(WF_NAME_SENTENCE, META_REFERENCE_SENTENCE, DATA_REFERENCE_SENTENCE,
+				AUTHOR_REFERENCE_SENTENCE);
 	}
 
 }

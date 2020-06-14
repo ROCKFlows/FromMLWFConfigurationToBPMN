@@ -403,6 +403,7 @@ public class XMLManager {
 		// TODO: add logs
 		logger.debug("Getting workflow's name...");
 		Node annotation = XMLManager.getGlobalAnnotationNode(wfDocument);
+		// TODO: foreach line
 		String regex = String.format("%s(.+)%s", Notation.getQuotedNotation(Notation.getWfNameDelimiterLeft()),
 				Notation.getQuotedNotation(Notation.getWfNameDelimiterRight()));
 		Pattern pattern = Pattern.compile(regex);

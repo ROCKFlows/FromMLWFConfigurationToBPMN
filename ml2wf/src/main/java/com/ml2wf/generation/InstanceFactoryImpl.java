@@ -3,6 +3,9 @@ package com.ml2wf.generation;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -177,7 +180,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * <li>add the reference in a documentation tag with the
 	 * {@link #addMetaWFRefDoc(String)} method,</li>
 	 * <li>add the reference in an annotation with the
-	 * {@link #addMetaWFRefAnnot(String)} method,</li>
+	 * {@link #addMetaWFRefAnnot(String...)} method,</li>
 	 * </ul>
 	 *
 	 * @since 1.0
@@ -185,11 +188,9 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	private void addMetaWFReferences() {
 		// TODO: add logs
 		logger.debug("Adding the meta reference...");
-		String referred = XMLManager.getWorkflowName(this.getDocument()).replace(" ", "_");
-		String logMsg = String.format("Referred meta model is : %s.", referred);
-		logger.debug(logMsg);
-		this.addMetaWFRefDoc(referred);
-		this.addMetaWFRefAnnot(referred);
+		String metaReference = XMLManager.getWorkflowName(this.getDocument()).replace(" ", "_");
+		this.addMetaWFRefDoc(metaReference);
+		this.addWFRefAnnot(metaReference);
 	}
 
 	/**
@@ -208,23 +209,29 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			return;
 		}
 		Node processNode = processNodeList.item(0);
-		this.addDocumentationNode(processNode, referred);
+		String content = String.format("Referred meta model is : %s.", referred);
+		this.addDocumentationNode(processNode, content);
 	}
 
 	/**
-	 * Adds the metaworkflow reference in an annotation tag visible to the user.
+	 * Adds the workflow's reference in an annotation tag visible to the user.
 	 *
-	 * @param reffered referred meta task
+	 * @param reference the referred meta-workflow
 	 *
 	 * @since 1.0
 	 */
-	private void addMetaWFRefAnnot(String referred) {
+	private void addWFRefAnnot(String reference) {
 		Node globalAnnotation = XMLManager.getGlobalAnnotationNode(this.getDocument());
-		String content = "Workflow's name %s%s\nThis workflow makes reference to the %s workflow.";
-		content = String.format(content, Notation.getWfNameDelimiterLeft(), Notation.getWfNameDelimiterRight(),
-				referred);
+		List<String> lines = new ArrayList<>(Notation.getGlobalAnnotationDefaultContent());
+		String metaRef = lines.remove(1);
+		metaRef = String.format(metaRef, Notation.getWfNameDelimiterLeft(), reference,
+				Notation.getWfNameDelimiterRight());
+		lines = lines.stream()
+				.map(l -> String.format(l, Notation.getWfNameDelimiterLeft(), Notation.getWfNameDelimiterRight()))
+				.collect(Collectors.toList());
+		lines.add(1, metaRef);
 		Node newTextNode = this.getDocument().createElement(BPMNNodesNames.TEXT.getName());
-		newTextNode.setTextContent(content);
+		newTextNode.setTextContent(String.join("\n", lines));
 		globalAnnotation.appendChild(newTextNode);
 	}
 
