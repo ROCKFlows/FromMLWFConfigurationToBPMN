@@ -1,6 +1,8 @@
 package com.ml2wf.constraints.tree;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class represents a binary tree structure.
@@ -28,11 +30,30 @@ import java.util.Arrays;
  */
 public class BinaryTree<T> {
 
+	/**
+	 * Root of the tree.
+	 */
 	private T root;
-	private BinaryTree<T> rightChild;
+	/**
+	 * Left child of the tree.
+	 */
 	private BinaryTree<T> leftChild;
+	/**
+	 * Right child of the tree.
+	 */
+	private BinaryTree<T> rightChild;
+	/**
+	 * Blocking state of the tree.
+	 */
 	private boolean isBlocked;
 
+	/**
+	 * {@code BinaryTree}'s full constructor.
+	 *
+	 * @param root       root of the tree
+	 * @param leftChild  left child of the tree
+	 * @param rightChild right child og the tree
+	 */
 	public BinaryTree(T root, BinaryTree<T> leftChild, BinaryTree<T> rightChild) {
 		this.root = root;
 		this.leftChild = leftChild;
@@ -40,37 +61,63 @@ public class BinaryTree<T> {
 		this.isBlocked = false;
 	}
 
+	/**
+	 * {@code BinaryTree}'s partial constructor.
+	 *
+	 * <p>
+	 *
+	 * Initializes a new {@code BinaryTree} with {@code null} children.
+	 *
+	 * @param root root of the tree
+	 */
 	public BinaryTree(T root) {
 		this(root, null, null);
 	}
 
+	/**
+	 * {@code BinaryTree}'s empty constructor.
+	 *
+	 * <p>
+	 *
+	 * Initializes a new {@code BinaryTree} with {@code null} root and {@code null}
+	 * children.
+	 */
 	public BinaryTree() {
 		this(null);
 	}
 
+	/**
+	 * Returns the tree's root.
+	 *
+	 * @return the tree's root
+	 */
 	public T getRoot() {
 		return this.root;
 	}
 
-	public void setRoot(T node) {
-		this.root = node;
+	/**
+	 * Sets the tree's root.
+	 *
+	 * @param root the new root
+	 */
+	public void setRoot(T root) {
+		this.root = root;
 	}
 
-	public BinaryTree<T> getRightChild() {
-		return this.rightChild;
-	}
-
-	public void setRightChild(T rightChild) {
-		if (this.isBlocked) {
-			return; // TODO: raise exception
-		}
-		this.rightChild = new BinaryTree<>(rightChild);
-	}
-
+	/**
+	 * Returns the tree's left child.
+	 *
+	 * @return the tree's left child
+	 */
 	public BinaryTree<T> getLeftChild() {
 		return this.leftChild;
 	}
 
+	/**
+	 * Sets the tree's left child.
+	 *
+	 * @param leftChild the new tree's left child
+	 */
 	public void setLeftChild(T leftChild) {
 		if (this.isBlocked) {
 			return; // TODO: raise exception
@@ -78,12 +125,144 @@ public class BinaryTree<T> {
 		this.leftChild = new BinaryTree<>(leftChild);
 	}
 
+	/**
+	 * Returns the tree's right child.
+	 *
+	 * @return the tree's right child
+	 */
+	public BinaryTree<T> getRightChild() {
+		return this.rightChild;
+	}
+
+	/**
+	 * Sets the tree's right child.
+	 *
+	 * @param rightChild the new tree's right child
+	 */
+	public void setRightChild(T rightChild) {
+		if (this.isBlocked) {
+			return; // TODO: raise exception
+		}
+		this.rightChild = new BinaryTree<>(rightChild);
+	}
+
+	/**
+	 * Returns whether the current tree is blocked or not.
+	 *
+	 * @return whether the current tree is blocked or not
+	 */
 	public boolean isBlocked() {
 		return this.isBlocked;
 	}
 
+	/**
+	 * Blocks or unblocks the current tree depending on the {@code block} value.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method only block the current tree and not its
+	 * children.
+	 *
+	 * @param block the new blocking state
+	 */
 	public void setBlocked(boolean block) {
+		// TODO: check logic (compare to block)
+		// blocking node but not his children ?
 		this.isBlocked = block;
+	}
+
+	/**
+	 * Blocks of unblocks the current tree.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that blocking the current tree recursively block its children.
+	 *
+	 * @param block the new blocking state
+	 *
+	 * @since 1.0
+	 */
+	public void block(boolean block) {
+		this.isBlocked = block;
+		this.blockLeftChild(block);
+		this.blockRightChild(block);
+	}
+
+	/**
+	 * Blocks of unblocks the tree's left child.
+	 *
+	 * <p>
+	 *
+	 * If left child is {@code null} and {@code block} is true, then an empty
+	 * {@code BinaryTree} left child is instantiated and blocked.
+	 *
+	 * @param block the new blocking state
+	 *
+	 * @since 1.0
+	 */
+	public void blockLeftChild(boolean block) {
+		if (this.leftChild == null) {
+			if (!block) {
+				return;
+			} else {
+				this.leftChild = new BinaryTree<>(); // TODO: reuse creating methods
+			}
+		}
+		this.leftChild.setBlocked(block);
+	}
+
+	/**
+	 * Blocks of unblocks the tree's right child.
+	 *
+	 * <p>
+	 *
+	 * If left child is {@code null} and {@code block} is true, then an empty
+	 * {@code BinaryTree} right child is instantiated and blocked.
+	 *
+	 * @param block the new blocking state
+	 *
+	 * @since 1.0
+	 */
+	public void blockRightChild(boolean block) {
+		if (this.rightChild == null) {
+			if (!block) {
+				return;
+			} else {
+				this.rightChild = new BinaryTree<>(); // TODO: reuse creating methods
+			}
+		}
+		this.rightChild.setBlocked(block);
+	}
+
+	/**
+	 * TODO: behave differently than {@link #addRightChild(BinaryTree)}.
+	 * TODO: improve this behavior
+	 */
+	public BinaryTree<T> addLeftChild(BinaryTree<T> child) {
+		if (this.isBlocked) {
+			return null; // TODO: raise exception
+		}
+		if (this.root == null) {
+			// TODO: improve this behavior
+			this.root = child.getRoot();
+			this.leftChild = child.getLeftChild();
+			this.rightChild = child.getRightChild();
+			return this;
+		} else {
+			if (this.leftChild != null) {
+				return this.rightChild.addLeftChild(child);
+			} else {
+				this.leftChild = child;
+				return this.leftChild;
+			}
+		}
+	}
+
+	public BinaryTree<T> addLeftChild(T child) {
+		if (this.isBlocked) {
+			return null; // TODO: raise exception
+		}
+		return this.addLeftChild(new BinaryTree<>(child));
 	}
 
 	public BinaryTree<T> addRightChild(BinaryTree<T> child) {
@@ -114,35 +293,31 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * TODO: behave differently than {@link #addRightChild(BinaryTree)}.
+	 * Inserts the given {@code tree} when it is possible.
+	 *
+	 * <p>
+	 *
+	 * Four different behaviors can be observed,
+	 *
+	 * <p>
+	 *
+	 * <ul>
+	 * <li>if the tree is empty, then the current tree is replaced by the given
+	 * {@code tree}</li>
+	 * <li>else if the left child is empty, then the current left child becomes the
+	 * given {@code tree}</li>
+	 * <li>else if the right child is empty, then the current right child becomes
+	 * the given {@code tree}</li>
+	 * <li>else recursively inserts</li>
+	 * </ul>
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that an insertion can fail if the tree is blocked.
+	 *
+	 * @param tree tree to insert
+	 * @return whether the insertion succeed or not
 	 */
-	public BinaryTree<T> addLeftChild(BinaryTree<T> child) {
-		if (this.isBlocked) {
-			return null; // TODO: raise exception
-		}
-		if (this.root == null) {
-			// TODO: improve this behavior
-			this.root = child.getRoot();
-			this.leftChild = child.getLeftChild();
-			this.rightChild = child.getRightChild();
-			return this;
-		} else {
-			if (this.leftChild != null) {
-				return this.rightChild.addLeftChild(child);
-			} else {
-				this.leftChild = child;
-				return this.leftChild;
-			}
-		}
-	}
-
-	public BinaryTree<T> addLeftChild(T child) {
-		if (this.isBlocked) {
-			return null; // TODO: raise exception
-		}
-		return this.addLeftChild(new BinaryTree<>(child));
-	}
-
 	public boolean insertWhenPossible(BinaryTree<T> tree) {
 		if (this.isBlocked) {
 			return false;
@@ -168,24 +343,56 @@ public class BinaryTree<T> {
 		}
 	}
 
-	public void block(boolean block) {
-		this.isBlocked = block;
-		this.blockLeftChild(block);
-		this.blockRightChild(block);
+	/**
+	 * Returns whether the current tree has children or not.
+	 *
+	 * @return whether the current tree has children or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean hasChildren() {
+		return this.hasLeftChild() || this.hasRightChild();
 	}
 
-	public void blockLeftChild(boolean block) {
-		if (this.leftChild == null) {
-			this.leftChild = new BinaryTree<>(); // TODO: reuse creating methods
-		}
-		this.leftChild.setBlocked(block);
+	/**
+	 * Returns whether the current tree has a left child or not.
+	 *
+	 * @return whether the current tree has a left child or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean hasLeftChild() {
+		return this.leftChild != null;
 	}
 
-	public void blockRightChild(boolean block) {
-		if (this.rightChild == null) {
-			this.rightChild = new BinaryTree<>(); // TODO: reuse creating methods
+	/**
+	 * Returns whether the current tree has a right child or not.
+	 *
+	 * @return whether the current tree has a right child or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean hasRightChild() {
+		return this.rightChild != null;
+	}
+
+	/**
+	 * Returns all nodes of the current tree.
+	 *
+	 * @return all nodes of the current tree
+	 *
+	 * @since 1.0
+	 */
+	public List<T> getAllNodes() {
+		List<T> list = new ArrayList<>();
+		list.add(this.root); // TODO: check root == null ?
+		for (BinaryTree<T> child : Arrays.asList(this.leftChild, this.rightChild)) {
+			// TODO: check performances issues with Arrays.asList
+			if (child != null) {
+				list.addAll(child.getAllNodes());
+			}
 		}
-		this.rightChild.setBlocked(block);
+		return list;
 	}
 
 	@Override
@@ -201,7 +408,7 @@ public class BinaryTree<T> {
 
 	@Override
 	public boolean equals(Object obj) {
-		// TODO: reduce
+		// TODO: replace by a simpler method
 		if (this == obj) {
 			return true;
 		}
@@ -236,21 +443,21 @@ public class BinaryTree<T> {
 		return true;
 	}
 
-	public StringBuilder toString(StringBuilder prefix, boolean isTail, StringBuilder sb) {
-		// https://stackoverflow.com/a/27153988
-		if (this.rightChild != null) {
-			this.rightChild.toString(new StringBuilder().append(prefix).append(isTail ? "│   " : "    "), false, sb);
-		}
-		sb.append(prefix).append(isTail ? "└── " : "┌── ").append(this.root).append("(").append(this.isBlocked)
-				.append(")\n");
-		if (this.leftChild != null) {
-			this.leftChild.toString(new StringBuilder().append(prefix).append(isTail ? "    " : "│   "), true, sb);
-		}
-		return sb;
-	}
-
 	@Override
 	public String toString() {
-		return this.toString(new StringBuilder(), true, new StringBuilder()).toString();
+		StringBuilder builder = new StringBuilder();
+		builder.append(" ");
+		if (this.hasLeftChild()) {
+			builder.append(this.leftChild.getRoot().toString());
+			builder.append(" ");
+		}
+		if (this.root != null) {
+			builder.append(this.root.toString());
+			builder.append(" ");
+		}
+		if (this.hasRightChild()) {
+			builder.append(this.rightChild.toString());
+		}
+		return builder.toString();
 	}
 }
