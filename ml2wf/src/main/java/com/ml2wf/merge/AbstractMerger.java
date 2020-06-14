@@ -90,7 +90,7 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	 */
 	public AbstractMerger(String filePath) throws ParserConfigurationException, SAXException, IOException {
 		super(filePath);
-		this.constraintFactory = new ConstraintFactoryImpl();
+		this.constraintFactory = new ConstraintFactoryImpl(this.getDocument());
 	}
 
 	/**
@@ -173,27 +173,52 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 			// sufficient ?)
 			for (Node commentNode : XMLManager.nodeListAsList(annotation.getChildNodes())) {
 				String comment = commentNode.getTextContent();
-				orderPairs = this.getConstraintFactory().getOrderNodes(this.getDocument(), comment);
+				orderPairs = this.getConstraintFactory().getOrderNodes(comment);
 				if (!orderPairs.isEmpty()) {
 					// this is an order constraint
-					// TODO: manage in another method
-					for (Pair<Node, Node> pair : orderPairs) {
-						NodeList docNodes = ((Element) pair.getKey())
-								.getElementsByTagName(FeatureModelNames.DESCRIPTION.getName());
-						if (docNodes.getLength() > 0) {
-							Node docNode = docNodes.item(0);
-							XMLManager.mergeNodesTextContent(docNode, pair.getValue());
-						} else {
-							// TODO: log error
-						}
-					}
+					this.processOrderConstraint(orderPairs);
 				} else {
+					// this is a "classic" constraint
 					List<Node> newRules = this.getConstraintFactory().getRuleNodes(comment);
 					this.adoptRules(newRules);
 				}
 			}
 		}
 		logger.info("Annotations processing ended...");
+	}
+
+	/**
+	 * Processes the order constraints.
+	 *
+	 * *
+	 * <p>
+	 *
+	 * An association constraint is an order implication between two features.
+	 *
+	 * <p>
+	 *
+	 * e.g. A before B, C after D
+	 *
+	 * @param orderPairs {@code List} of {@code Pair} containing the LCA
+	 *                   {@code Node} as key and the descriptive {@code Node} as
+	 *                   value
+	 *
+	 * @since 1.0
+	 *
+	 * @see Node
+	 * @see Pair
+	 */
+	protected void processOrderConstraint(List<Pair<Node, Node>> orderPairs) {
+		Node lca;
+		for (Pair<Node, Node> pair : orderPairs) {
+			lca = pair.getKey();
+			NodeList docNodes = ((Element) lca).getElementsByTagName(FeatureModelNames.DESCRIPTION.getName());
+			Node docNode = (docNodes.getLength() > 0) ? docNodes.item(0)
+					: this.createTag(lca, FeatureModelNames.DESCRIPTION);
+			if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue())) {
+				logger.error("The merge operation for description nodes failed.");
+			}
+		}
 	}
 
 	/**
@@ -223,6 +248,27 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 		// add the new constraint
 		logger.info("Adding association constraint...");
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
+	}
+
+	/**
+	 * Creates the <b>tagName</b> {@code Node} and append it to the given
+	 * {@code parent} if it doesn't exist.
+	 *
+	 * @param parent  {@code parent} of {@code tagName Node}
+	 * @param tagName name of tag to be created
+	 * @return the created tag
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	protected Node createTag(Node parent, FeatureModelNames tagName) {
+		NodeList nodeList = this.getDocument().getElementsByTagName(tagName.getName());
+		if (nodeList.getLength() > 0) {
+			// aldready exists
+			return nodeList.item(0);
+		}
+		Node newTag = this.getDocument().createElement(tagName.getName());
+		return parent.appendChild(newTag);
 	}
 
 	/**

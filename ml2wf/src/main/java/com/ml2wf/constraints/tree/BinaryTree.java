@@ -295,10 +295,14 @@ public class BinaryTree<T> {
 		// TODO: to check
 		StringBuilder builder = new StringBuilder();
 		builder.append(" ");
-		builder.append(this.leftChild.getRoot().toString());
-		builder.append(" ");
-		builder.append(this.root.toString());
-		builder.append(" ");
+		if (this.hasLeftChild()) {
+			builder.append(this.leftChild.getRoot().toString());
+			builder.append(" ");
+		}
+		if (this.root != null) {
+			builder.append(this.root.toString());
+			builder.append(" ");
+		}
 		if (this.hasRightChild()) {
 			builder.append(this.rightChild.toString());
 		}

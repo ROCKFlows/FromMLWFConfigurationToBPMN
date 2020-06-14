@@ -2,7 +2,6 @@ package com.ml2wf.constraints.factory;
 
 import java.util.List;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.ml2wf.constraints.InvalidConstraintException;
@@ -36,12 +35,12 @@ public interface ConstraintFactory {
 	 * Returns a {@code List} of {@code Pair} containing the LCA {@code Node} as key
 	 * and the descriptive {@code Node} as value.
 	 *
-	 * @param document document that contains referred nodes
+	 * @param constraintText text containing constraints
 	 * @return a {@code List} of {@code Pair} containing the LCA {@code Node} as
 	 *         left element and the descriptive {@code Node} as right element
 	 *
 	 * @since 1.0
 	 * @see Pair
 	 */
-	public List<Pair<Node, Node>> getOrderNodes(Document document, String constraintText);
+	public List<Pair<Node, Node>> getOrderNodes(String constraintText);
 }

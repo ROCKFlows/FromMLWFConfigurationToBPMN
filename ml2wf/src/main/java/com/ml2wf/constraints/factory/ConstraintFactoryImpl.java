@@ -65,7 +65,37 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 *
 	 * @see Document
 	 */
-	private static Document document;
+	private Document document;
+
+	/**
+	 * {@code ConstraintFactoryImpl}'s complete constructor.
+	 *
+	 * <p>
+	 *
+	 * It initializes :
+	 *
+	 * <p>
+	 *
+	 * <ul>
+	 * <li>the {@code Config} instance,</li>
+	 * <li>{@code ConstraintParser} instance that will be used for parsing
+	 * constraints</li>
+	 * </ul>
+	 *
+	 * @param document document used to create nodes
+	 * @throws ParserConfigurationException
+	 *
+	 * @see Document
+	 * @see ConfigImpl
+	 * @see ConstraintParser
+	 */
+	public ConstraintFactoryImpl(Document document) throws ParserConfigurationException {
+		// Document instantiation
+		this.document = document;
+		// Parser instantiation
+		this.config = ConfigImpl.getInstance();
+		this.parser = new ConstraintParser(this.config);
+	}
 
 	/**
 	 * {@code ConstraintFactoryImpl}'s default constructor.
@@ -94,7 +124,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		// Document instantiation
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-		document = docBuilder.newDocument();
+		this.document = docBuilder.newDocument();
 		// Parser instantiation
 		this.config = ConfigImpl.getInstance();
 		this.parser = new ConstraintParser(this.config);
@@ -142,7 +172,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 		for (BinaryTree<String> tree : trees) {
-			Node rule = document.createElement(FeatureModelNames.RULE.getName());
+			Node rule = this.document.createElement(FeatureModelNames.RULE.getName());
 			// rules.add(this.generateNode(tree, rule));
 			this.generateRuleNode(tree, rule);
 			rules.add(rule);
@@ -151,18 +181,18 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	}
 
 	@Override
-	public List<Pair<Node, Node>> getOrderNodes(Document document, String constraintText) {
+	public List<Pair<Node, Node>> getOrderNodes(String constraintText) {
 		// TODO : to test
 		List<Pair<Node, Node>> pairs = new ArrayList<>();
 		Node description;
 		if (this.parser.isOrderConstraint(constraintText)) {
 			List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 			for (BinaryTree<String> tree : trees) {
-				description = document.createElement(FeatureModelNames.DESCRIPTION.getName());
+				description = this.document.createElement(FeatureModelNames.DESCRIPTION.getName());
 				// get involved nodes
 				List<String> taskNames = tree.getAllNodes().stream().filter(n -> !this.config.isAnOperator(n))
 						.collect(Collectors.toList());
-				List<Node> nodes = taskNames.stream().map(n -> XMLManager.getNodeWithName(document, n))
+				List<Node> nodes = taskNames.stream().map(n -> XMLManager.getNodeWithName(this.document, n))
 						.collect(Collectors.toList());
 				// get and add LCA
 				Node lca = XMLManager.getLowestCommonAncestor(nodes);
@@ -263,10 +293,10 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	public Node createNode(String element) {
 		Node node;
 		if (this.config.isAnOperator(element)) {
-			node = document.createElement(this.config.getVocmapping().get(element));
+			node = this.document.createElement(this.config.getVocmapping().get(element));
 		} else {
-			node = document.createElement(FeatureModelNames.VAR.getName());
-			node.appendChild(document.createTextNode(element));
+			node = this.document.createElement(FeatureModelNames.VAR.getName());
+			node.appendChild(this.document.createTextNode(element));
 		}
 		return node;
 	}

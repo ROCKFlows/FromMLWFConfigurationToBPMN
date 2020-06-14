@@ -28,7 +28,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -376,7 +375,8 @@ public class XMLManager {
 		List<Node> nodeParents = new ArrayList<>();
 		for (Node node : nodes) {
 			// for each node
-			while ((parent = node.getParentNode()) != null) {
+			parent = node;
+			while ((parent = parent.getParentNode()) != null) {
 				// get all parents
 				nodeParents.add(parent);
 			}
@@ -417,6 +417,33 @@ public class XMLManager {
 	}
 
 	/**
+	 * Returns the name tag's value of the given {@code node} if exists.
+	 *
+	 * Returns an empty string if not.
+	 *
+	 * @param node node containing the name attribute
+	 * @return Returns the name tag's value of the given {@code node} if exists
+	 *
+	 * @since 1.0
+	 *
+	 * @see Node
+	 */
+	public static String getNodeName(Node node) {
+		String logMsg = String.format("Retrieving name for node : %s...", node);
+		logger.debug(logMsg);
+		if (!node.hasAttributes()) {
+			return "";
+		}
+		Node n = node.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
+		if (n != null) {
+			logMsg = String.format("Node's name is : %s", n.getNodeValue());
+			logger.debug(logMsg);
+			return n.getNodeValue();
+		}
+		return "";
+	}
+
+	/**
 	 * Returns the {@code Node} with the given {@code name} in the document.
 	 *
 	 * <p>
@@ -436,48 +463,18 @@ public class XMLManager {
 		// TODO: to test
 		NodeList children = root.getChildNodes();
 		Node child;
-		NamedNodeMap attributes;
-		Node nameAttr;
 		Node recursiveResult; // result of recursive call
 		for (int i = 0; i < children.getLength(); i++) {
 			child = children.item(i);
-			attributes = child.getAttributes();
-			nameAttr = attributes.getNamedItem(FeatureModelAttributes.NAME.getName());
-			if ((nameAttr != null) && nameAttr.getNodeValue().equals(name)) {
+			String childName = XMLManager.getNodeName(child);
+			logger.debug("child name : " + childName);
+			if (childName.equals(name)) {
 				return child;
-			} else {
-				if ((recursiveResult = getNodeWithName(child, name)) != null) {
-					return recursiveResult;
-				}
+			} else if ((recursiveResult = getNodeWithName(child, name)) != null) {
+				return recursiveResult;
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Returns the name tag's value of the given {@code node} if exists.
-	 *
-	 * Returns an empty string if not.
-	 *
-	 * @param node node containing the name attribute
-	 * @return Returns the name tag's value of the given {@code node} if exists
-	 *
-	 * @since 1.0
-	 *
-	 * @see Node
-	 */
-	public static String getNodeName(Node node) {
-		String logMsg = String.format("Retrieving name for node : %s...", node);
-		logger.debug(logMsg);
-		Node n;
-		if ((n = node.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName())) != null) {
-			logMsg = String.format("Node's name is : %s", n.getNodeValue());
-			logger.debug(logMsg);
-			return n.getNodeValue();
-		}
-		logMsg = String.format("No name was found for node %s.", node);
-		logger.warn(logMsg);
-		return "";
 	}
 
 	/**
@@ -496,11 +493,14 @@ public class XMLManager {
 	 * @return true if the merge operation succeed, false if it failed.
 	 */
 	public static boolean mergeNodesTextContent(Node nodeA, Node nodeB) {
+		// TODO: improve this method
 		if (!nodeA.getNodeName().equals(nodeB.getNodeName())) {
 			return false;
 		}
-		String nodeAContent = nodeA.getTextContent();
-		nodeA.setTextContent(nodeAContent + nodeB.getTextContent());
+		String contentA = nodeA.getTextContent().trim().replace("\\s+", " ");
+		String contentB = nodeB.getTextContent().trim().replace("\\s+", " ");
+		contentA = contentA.replace(contentB, "");
+		nodeA.setTextContent(contentA + "\n" + contentB);
 		return true;
 	}
 
