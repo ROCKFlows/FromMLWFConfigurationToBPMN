@@ -55,6 +55,7 @@ public abstract class WFCompleteMerger extends AbstractMerger {
 		logger.debug("Inserting task...");
 		this.insertNewTask(parent, newNode);
 		logger.debug("Processing annotations constraints...");
+		this.processAnnotations(wfDocument);
 		this.processAssocConstraints(wfDocument, wfName);
 		logger.debug("Processing specific needs...");
 		this.processSpecificNeeds(wfDocument, wfName);

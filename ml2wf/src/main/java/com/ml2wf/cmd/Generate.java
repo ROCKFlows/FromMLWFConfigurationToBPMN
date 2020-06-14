@@ -64,6 +64,7 @@ public class Generate extends AbstractCommand {
 			LogManager.shutdown();
 		} catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
 			logger.fatal("Can't instantiate the WorkFlow.");
+			e.printStackTrace(); // TODO: to remove
 		}
 	}
 

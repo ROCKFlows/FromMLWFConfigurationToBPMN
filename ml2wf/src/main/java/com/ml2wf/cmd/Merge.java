@@ -64,6 +64,7 @@ public class Merge extends AbstractCommand {
 			LogManager.shutdown();
 		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");
+			e.printStackTrace(); // TODO: to remove
 			// CommandLine.usage(this.spec, );
 		}
 	}

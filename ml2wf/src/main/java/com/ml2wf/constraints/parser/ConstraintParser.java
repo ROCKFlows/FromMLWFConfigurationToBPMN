@@ -107,6 +107,11 @@ public class ConstraintParser implements Parser {
 		return result;
 	}
 
+	@Override
+	public boolean isOrderConstraint(String constraintText) {
+		return this.config.getOrderOperator().stream().anyMatch(constraintText::contains);
+	}
+
 	/**
 	 * Converts a {@code Map} containing the depth representation of a constraint
 	 * obtained with the {@link #computeDepth(List)} method to a {@code BinaryTree}.
@@ -139,7 +144,54 @@ public class ConstraintParser implements Parser {
 	 *
 	 * <p>
 	 *
-	 * TODO: explain algorithm
+	 * Pseudo-code :
+	 *
+	 * <p>
+	 *
+	 * <pre>
+	 * <code>
+	 * function getTreeFromParsedCons(parsedOper: List)
+	 *   lastInsertionLeft <- false
+	 *   buffer <- empty string
+	 *   tree <- empty tree
+	 *   foreach operAssociation in parsedOper do
+	 *     operator <- operAssociation.operator
+	 *     created <- tree.addRightChild(operator)
+	 *     if config.isUnaryOperator(operator) then
+	 *       created.blockLeftChild(true)
+	 *       if operAssociation.hasRightOperand() then
+	 *         tree.addRightChild(operAssocation.rightOperand)
+	 *         lastInsertionLeft <- false
+	 *       end
+	 *     else
+	 *       if operAssociation.hasLeftOperand() then
+	 *         tree.leftChild <- operAssociation.leftOperand
+	 *         tree.blockLeftChild(true)
+	 *         lastInsertionLeft <- true
+	 *       end
+	 *       if operAssociation.hasRightOperand() then
+	 *         if not buffer.isBlank() then
+	 *           created <- tree.addLeftChild(buffer)
+	 *           created.block(true)
+	 *           lastInsertionLeft <- true
+	 *         end
+	 *         buffer <- operAssociation.rightOperand
+	 *       end
+	 *     end
+	 *   end
+	 *   if not buffer.isEmpty() then
+	 *     if lastInsertionLeft is true then
+	 *       tree.addRightChild(buffer)
+	 *       tree.blockRightChild(false)
+	 *     else
+	 *       tree.addLeftChild(buffer)
+	 *       tree.blockLeftChild(true)
+	 *     end
+	 *   end
+	 *   return tree
+	 * end
+	 * </code>
+	 * </pre>
 	 *
 	 * @param parsedOper {@code List} of {@code OperAssociation}
 	 * @return a {@code BinaryTree} representing the {@code parsedOper}
@@ -195,7 +247,6 @@ public class ConstraintParser implements Parser {
 				tree.addLeftChild(buffer);
 				tree.blockLeftChild(true); // block left child due to operand
 			}
-
 		}
 		return tree;
 	}

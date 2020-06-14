@@ -55,11 +55,23 @@ public interface Parser {
 	 *
 	 * <b>Note</b> that operandLeft or operandRight can be blank.
 	 *
-	 * @param expression
-	 * @return
+	 * @param expression text to parse
+	 * @return a {@code List} of {@code OperAssociation}
 	 *
 	 * @since 1.0
 	 * @see OperAssociation
 	 */
 	public List<OperAssociation> parseExpression(String expression);
+
+	/**
+	 * Returns whether the given {@code constraintText} is an order constraint or
+	 * not.
+	 *
+	 * @param constraintText text to parse
+	 * @return whether the given {@code constraintText} is an order constraint or
+	 *         not
+	 * 
+	 * @since 1.0
+	 */
+	public boolean isOrderConstraint(String constraintText);
 }

@@ -364,4 +364,17 @@ public class ConfigImpl implements Config {
 	public boolean isAnOperator(String character) {
 		return this.getOperatorsList().contains(character);
 	}
+
+	/**
+	 * Returns all order operators.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that order operators are the two first elements.
+	 *
+	 * @return all order operators
+	 */
+	public List<String> getOrderOperator() {
+		return this.vocMapping.keySet().stream().limit(2).collect(Collectors.toList());
+	}
 }

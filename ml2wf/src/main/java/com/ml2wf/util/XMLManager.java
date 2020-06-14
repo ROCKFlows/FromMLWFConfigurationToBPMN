@@ -362,6 +362,34 @@ public class XMLManager {
 	}
 
 	/**
+	 * Returns the <b>lowest common ancestor</b> (LCA) for given {@code nodes}.
+	 *
+	 * @param nodes nodes to retrieve the LCA
+	 * @return the <b>lowest common ancestor</b> (LCA) for given {@code nodes}
+	 *
+	 * @since 1.0
+	 */
+	public static Node getLowestCommonAncestor(List<Node> nodes) {
+		Node parent;
+		List<Node> commonParents = new ArrayList<>();
+		List<Node> nodeParents = new ArrayList<>();
+		for (Node node : nodes) {
+			// for each node
+			parent = node;
+			while ((parent = parent.getParentNode()) != null) {
+				// get all parents
+				nodeParents.add(parent);
+			}
+			if (commonParents.isEmpty()) {
+				commonParents.addAll(nodeParents);
+			}
+			// retaining common parents
+			commonParents.retainAll(nodeParents);
+		}
+		return commonParents.get(0);
+	}
+
+	/**
 	 * Parses the document's annotations and returns the workflow's name.
 	 *
 	 * <p>
@@ -403,15 +431,77 @@ public class XMLManager {
 	public static String getNodeName(Node node) {
 		String logMsg = String.format("Retrieving name for node : %s...", node);
 		logger.debug(logMsg);
-		Node n;
-		if ((n = node.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName())) != null) {
+		if (!node.hasAttributes()) {
+			return "";
+		}
+		Node n = node.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
+		if (n != null) {
 			logMsg = String.format("Node's name is : %s", n.getNodeValue());
 			logger.debug(logMsg);
 			return n.getNodeValue();
 		}
-		logMsg = String.format("No name was found for node %s.", node);
-		logger.warn(logMsg);
 		return "";
+	}
+
+	/**
+	 * Returns the {@code Node} with the given {@code name} in the document.
+	 *
+	 * <p>
+	 *
+	 * Returns null if no node is found.
+	 *
+	 * @param root root containing source nodes
+	 * @param name name of wished node
+	 * @return the {@code Node} with the given {@code name} in the document or null
+	 *         if no node is found
+	 *
+	 * @since 1.0
+	 *
+	 * @see Node
+	 */
+	public static Node getNodeWithName(Node root, String name) {
+		// TODO: to test
+		NodeList children = root.getChildNodes();
+		Node child;
+		Node recursiveResult; // result of recursive call
+		for (int i = 0; i < children.getLength(); i++) {
+			child = children.item(i);
+			String childName = XMLManager.getNodeName(child);
+			logger.debug("child name : " + childName);
+			if (childName.equals(name)) {
+				return child;
+			} else if ((recursiveResult = getNodeWithName(child, name)) != null) {
+				return recursiveResult;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Merges {@code nodeA}'s text content with {@code nodeB}'s text content.
+	 *
+	 * <p>
+	 *
+	 * If the given nodes have different names (different tags), then the merge will
+	 * fail and false will be returned.
+	 *
+	 * <b>Note</b> that the only node content that change is the {@code nodeA}'s
+	 * one.
+	 *
+	 * @param nodeA first node
+	 * @param nodeB second node
+	 * @return true if the merge operation succeed, false if it failed.
+	 */
+	public static boolean mergeNodesTextContent(Node nodeA, Node nodeB) {
+		// TODO: improve this method
+		if (!nodeA.getNodeName().equals(nodeB.getNodeName())) {
+			return false;
+		}
+		String contentA = nodeA.getTextContent().trim().replace("\\s+", " ");
+		String contentB = nodeB.getTextContent().trim().replace("\\s+", " ");
+		contentA = contentA.replace(contentB, "");
+		nodeA.setTextContent(contentA + "\n" + contentB);
+		return true;
 	}
 
 	/**

@@ -1,20 +1,13 @@
 package com.ml2wf.constraints.factory;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -25,7 +18,10 @@ import com.ml2wf.constraints.config.DefaultConfig;
 import com.ml2wf.constraints.parser.ConstraintParser;
 import com.ml2wf.constraints.parser.Parser;
 import com.ml2wf.constraints.tree.BinaryTree;
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.util.Pair;
+import com.ml2wf.util.XMLManager;
 
 /**
  * This class is a factory for {@code Node} from constraints.
@@ -69,7 +65,37 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 *
 	 * @see Document
 	 */
-	private static Document document;
+	private Document document;
+
+	/**
+	 * {@code ConstraintFactoryImpl}'s complete constructor.
+	 *
+	 * <p>
+	 *
+	 * It initializes :
+	 *
+	 * <p>
+	 *
+	 * <ul>
+	 * <li>the {@code Config} instance,</li>
+	 * <li>{@code ConstraintParser} instance that will be used for parsing
+	 * constraints</li>
+	 * </ul>
+	 *
+	 * @param document document used to create nodes
+	 * @throws ParserConfigurationException
+	 *
+	 * @see Document
+	 * @see ConfigImpl
+	 * @see ConstraintParser
+	 */
+	public ConstraintFactoryImpl(Document document) throws ParserConfigurationException {
+		// Document instantiation
+		this.document = document;
+		// Parser instantiation
+		this.config = ConfigImpl.getInstance();
+		this.parser = new ConstraintParser(this.config);
+	}
 
 	/**
 	 * {@code ConstraintFactoryImpl}'s default constructor.
@@ -98,7 +124,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		// Document instantiation
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-		document = docBuilder.newDocument();
+		this.document = docBuilder.newDocument();
 		// Parser instantiation
 		this.config = ConfigImpl.getInstance();
 		this.parser = new ConstraintParser(this.config);
@@ -106,12 +132,28 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 
 	/**
 	 * Generates a {@code List} of rule {@code Node} containing all constraints
-	 * nodes from the given
-	 * {@code constraintText}.
+	 * nodes from the given {@code constraintText}.
 	 *
 	 * <p>
 	 *
-	 * TODO: explain algorithm
+	 * Pseudo-code :
+	 *
+	 * <p>
+	 *
+	 * <pre>
+	 * <code>
+	 * function getRuleNodes(constraintText: String)
+	 *   rules <- empty list
+	 *   trees <- parser.parseContent(constraintText)
+	 *   foreach tree in trees do
+	 *     rule <- document.createElement(RULE)
+	 *     generateNode(tree, rule)
+	 *     rules.Add(rule)
+	 *   end
+	 *   return rules
+	 * end
+	 * </code>
+	 * </pre>
 	 *
 	 * <p>
 	 *
@@ -130,12 +172,37 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 		for (BinaryTree<String> tree : trees) {
-			Node rule = document.createElement(FeatureModelNames.RULE.getName());
+			Node rule = this.document.createElement(FeatureModelNames.RULE.getName());
 			// rules.add(this.generateNode(tree, rule));
-			this.generateNode(tree, rule);
+			this.generateRuleNode(tree, rule);
 			rules.add(rule);
 		}
 		return rules;
+	}
+
+	@Override
+	public List<Pair<Node, Node>> getOrderNodes(String constraintText) {
+		// TODO : to test
+		List<Pair<Node, Node>> pairs = new ArrayList<>();
+		Node description;
+		if (this.parser.isOrderConstraint(constraintText)) {
+			List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
+			for (BinaryTree<String> tree : trees) {
+				description = this.document.createElement(FeatureModelNames.DESCRIPTION.getName());
+				// get involved nodes
+				List<String> taskNames = tree.getAllNodes().stream().filter(n -> !this.config.isAnOperator(n))
+						.collect(Collectors.toList());
+				List<Node> nodes = taskNames.stream().map(n -> XMLManager.getNodeWithName(this.document, n))
+						.collect(Collectors.toList());
+				// get and add LCA
+				Node lca = XMLManager.getLowestCommonAncestor(nodes);
+				// set description node
+				description.setTextContent(tree.toString());
+				// add new pair to list
+				pairs.add(new Pair<>(lca, description));
+			}
+		}
+		return pairs;
 	}
 
 	/**
@@ -153,15 +220,40 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 *         {@code tasksNames}
 	 */
 	public String getAssociationConstraint(String globalTask, List<String> tasksNames) {
-		// TODO: factorize [[ ]] into variables (see config)
-		return "[[" + globalTask + DefaultConfig.IMP.getSymbol()
-				+ String.join(DefaultConfig.CONJ.getSymbol(), tasksNames) + "]]";
+		// TODO: add in interface
+		return Notation.getConstraintDelimiterLeft() + globalTask + DefaultConfig.IMP.getSymbol()
+				+ String.join(DefaultConfig.CONJ.getSymbol(), tasksNames) + Notation.getConstraintDelimiterRight();
 
 	}
 
 	/**
 	 * Generates a {@code Node} according to {@code tree}'s root value and call
 	 * recursively for each {@code tree}'s child.
+	 *
+	 * <p>
+	 *
+	 * Pseudo-code :
+	 *
+	 * <p>
+	 *
+	 * <pre>
+	 * <code>
+	 * function generateNode(tree: BinaryTree, base: Node)
+	 *   rootValue <- tree.root
+	 *   if rootValue == null then
+	 *     return
+	 *   end
+	 *   base <- base.appendChild(createNode(rootValue))
+	 *   foreach child in (tree.leftChild, tree.rightChild) do
+	 *     if child != null then
+	 *       generateNode(child, base)
+	 *     end
+	 *   end
+	 * end
+	 * </code>
+	 * </pre>
+	 *
+	 * <p>
 	 *
 	 * @param tree tree to convert to {@code Node}
 	 * @param base base {@code Node} which will contains newly generated
@@ -172,8 +264,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @see BinaryTree
 	 * @see Node
 	 */
-	private void generateNode(BinaryTree<String> tree, Node base) throws InvalidConstraintException {
-		// TODO: iterate over all tree's nodes and call createNode for each node
+	private void generateRuleNode(BinaryTree<String> tree, Node base) throws InvalidConstraintException {
 		String rootValue = tree.getRoot();
 		if (rootValue == null) {
 			// stop condition
@@ -182,7 +273,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		base = base.appendChild(this.createNode(rootValue));
 		for (BinaryTree<String> child : Arrays.asList(tree.getLeftChild(), tree.getRightChild())) {
 			if (child != null) {
-				this.generateNode(child, base);
+				this.generateRuleNode(child, base);
 			}
 		}
 	}
@@ -202,34 +293,11 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	public Node createNode(String element) {
 		Node node;
 		if (this.config.isAnOperator(element)) {
-			node = document.createElement(this.config.getVocmapping().get(element));
+			node = this.document.createElement(this.config.getVocmapping().get(element));
 		} else {
-			node = document.createElement(FeatureModelNames.VAR.getName());
-			node.appendChild(document.createTextNode(element)); // TODO: check if working
+			node = this.document.createElement(FeatureModelNames.VAR.getName());
+			node.appendChild(this.document.createTextNode(element));
 		}
 		return node;
-	}
-
-	/**
-	 * "Pretty prints" a DOM {@code Node}.
-	 *
-	 * TODO: remove if not useful
-	 *
-	 * @param node node to print
-	 * @return a {@code String} containing a description of the given {@code node}
-	 * @throws TransformerFactoryConfigurationError
-	 * @throws TransformerException
-	 * @since 1.0
-	 * @see Node
-	 */
-	public static String nodeToString(Node node)
-			throws TransformerFactoryConfigurationError, TransformerException {
-		// pretty print a DOM Node
-		StringWriter sw = new StringWriter();
-		Transformer t = TransformerFactory.newInstance().newTransformer();
-		t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-		t.setOutputProperty(OutputKeys.INDENT, "yes");
-		t.transform(new DOMSource(node), new StreamResult(sw));
-		return sw.toString();
 	}
 }
