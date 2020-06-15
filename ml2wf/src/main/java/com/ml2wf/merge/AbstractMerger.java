@@ -215,7 +215,7 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 			NodeList docNodes = ((Element) lca).getElementsByTagName(FeatureModelNames.DESCRIPTION.getName());
 			Node docNode = (docNodes.getLength() > 0) ? docNodes.item(0)
 					: this.createTag(lca, FeatureModelNames.DESCRIPTION);
-			if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue())) {
+			if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
 				logger.error("The merge operation for description nodes failed.");
 			}
 		}

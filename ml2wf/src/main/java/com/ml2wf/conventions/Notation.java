@@ -58,13 +58,13 @@ public final class Notation {
 	 */
 	private static final String BACKUP_VOC = "_save";
 	/**
-	 * <b>Left delimiter</b> for the workflow's name section.
+	 * <b>Left delimiter</b> for the workflow's references section.
 	 */
-	private static final String WF_NAME_DELIMITER_LEFT = "{{";
+	private static final String REFERENCES_DELIMITER_LEFT = "{{";
 	/**
-	 * <b>Right delimiter</b> for the workflow's name section.
+	 * <b>Right delimiter</b> for the workflow's references section.
 	 */
-	private static final String WF_NAME_DELIMITER_RIGHT = "}}";
+	private static final String REFERENCES_DELIMITER_RIGHT = "}}";
 	/**
 	 * <b>Left delimiter</b> for the constraint section.
 	 */
@@ -73,6 +73,10 @@ public final class Notation {
 	 * <b>Right delimiter</b> for the constraint section.
 	 */
 	private static final String CONSTRAINT_DELIMITER_RIGHT = "]]";
+	/**
+	 * <b>ID</b> for the global annotation node.
+	 */
+	private static final String GLOBAL_ANNOTATION_ID = "Global_Annotation";
 	/**
 	 * Sentence for workflow's name.
 	 */
@@ -190,25 +194,25 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the {@link #WF_NAME_DELIMITER_LEFT} notation.
+	 * Returns the {@link #REFERENCES_DELIMITER_LEFT} notation.
 	 *
-	 * @return the workflow's name left delimiter notation
+	 * @return the workflow's references left delimiter notation
 	 *
 	 * @since 1.0
 	 */
-	public static String getWfNameDelimiterLeft() {
-		return WF_NAME_DELIMITER_LEFT;
+	public static String getReferencesDelimiterLeft() {
+		return REFERENCES_DELIMITER_LEFT;
 	}
 
 	/**
-	 * Returns the {@link #WF_NAME_DELIMITER_RIGHT} notation.
+	 * Returns the {@link #REFERENCES_DELIMITER_RIGHT} notation.
 	 *
-	 * @return the workflow's name right delimiter notation
+	 * @return the workflow's references right delimiter notation
 	 *
 	 * @since 1.0
 	 */
-	public static String getWfNameDelimiterRight() {
-		return WF_NAME_DELIMITER_RIGHT;
+	public static String getReferencesDelimiterRight() {
+		return REFERENCES_DELIMITER_RIGHT;
 	}
 
 	/**
@@ -231,6 +235,17 @@ public final class Notation {
 	 */
 	public static String getConstraintDelimiterRight() {
 		return CONSTRAINT_DELIMITER_RIGHT;
+	}
+
+	/**
+	 * Returns the {@link #GLOBAL_ANNOTATION_ID} notation.
+	 *
+	 * @return the global annotation ID notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getGlobalAnnotationId() {
+		return GLOBAL_ANNOTATION_ID;
 	}
 
 	/**

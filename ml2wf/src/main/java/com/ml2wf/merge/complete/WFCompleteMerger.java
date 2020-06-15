@@ -17,6 +17,13 @@ import com.ml2wf.util.Pair;
 public abstract class WFCompleteMerger extends AbstractMerger {
 
 	/**
+	 * The {@code Element} corresponding of the merged workflow's created
+	 * {@code Node}.
+	 *
+	 * @see Element
+	 */
+	protected Element createdWFNode;
+	/**
 	 * Logger instance.
 	 *
 	 * @since 1.0
@@ -47,13 +54,13 @@ public abstract class WFCompleteMerger extends AbstractMerger {
 		logger.debug(logMsg);
 		Document wfDocument = wfInfo.getValue();
 		logger.debug("Creating associated task...");
-		Element newNode = this.createFeatureWithName(wfName);
+		this.createdWFNode = this.createFeatureWithName(wfName);
 		logger.debug("Getting parent...");
 		Node parent = this.getRootParentNode();
 		logMsg = String.format("Parent is %s.", parent.getNodeValue());
 		logger.debug(logMsg);
 		logger.debug("Inserting task...");
-		this.insertNewTask(parent, newNode);
+		this.insertNewTask(parent, this.createdWFNode);
 		logger.debug("Processing annotations constraints...");
 		this.processAnnotations(wfDocument);
 		this.processAssocConstraints(wfDocument, wfName);

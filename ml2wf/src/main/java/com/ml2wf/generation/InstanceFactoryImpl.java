@@ -209,8 +209,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			return;
 		}
 		Node processNode = processNodeList.item(0);
-		String content = String.format("Referred meta model is : %s.", referred);
-		this.addDocumentationNode(processNode, content);
+		this.addDocumentationNode(processNode, referred);
 	}
 
 	/**
@@ -224,10 +223,11 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		Node globalAnnotation = XMLManager.getGlobalAnnotationNode(this.getDocument());
 		List<String> lines = new ArrayList<>(Notation.getGlobalAnnotationDefaultContent());
 		String metaRef = lines.remove(1);
-		metaRef = String.format(metaRef, Notation.getWfNameDelimiterLeft(), reference,
-				Notation.getWfNameDelimiterRight());
+		metaRef = String.format(metaRef, Notation.getReferencesDelimiterLeft(), reference,
+				Notation.getReferencesDelimiterRight());
 		lines = lines.stream()
-				.map(l -> String.format(l, Notation.getWfNameDelimiterLeft(), Notation.getWfNameDelimiterRight()))
+				.map(l -> String.format(l, Notation.getReferencesDelimiterLeft(),
+						Notation.getReferencesDelimiterRight()))
 				.collect(Collectors.toList());
 		lines.add(1, metaRef);
 		Node newTextNode = this.getDocument().createElement(BPMNNodesNames.TEXT.getName());

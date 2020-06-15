@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
@@ -75,6 +76,7 @@ public class WFInstanceMerger extends WFCompleteMerger {
 		String associationConstraint = ((ConstraintFactoryImpl) super.getConstraintFactory())
 				.getAssociationConstraint(wfName, Arrays.asList(metaReferrence));
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
+		this.addReferences(wfDocument);
 	}
 
 	/**
@@ -93,6 +95,22 @@ public class WFInstanceMerger extends WFCompleteMerger {
 		}
 		// TODO: log error
 		return null;
+	}
+
+	private void addReferences(Document wfDocument) {
+		logger.debug("Adding references...");
+		// getting global annotation content
+		Node globalAnnotation = getGlobalAnnotationNode(wfDocument);
+		String references = globalAnnotation.getTextContent();
+		// removing references delimiters
+		references = references.replace(Notation.getQuotedNotation(Notation.getReferencesDelimiterLeft()), "");
+		references = references.replace(Notation.getQuotedNotation(Notation.getReferencesDelimiterRight()), "");
+		// getting/creating the createdWFNode description
+		NodeList docNodes = this.createdWFNode.getElementsByTagName(FeatureModelNames.DESCRIPTION.getName());
+		Node docNode = (docNodes.getLength() > 0) ? docNodes.item(0)
+				: this.createTag(this.createdWFNode, FeatureModelNames.DESCRIPTION);
+		// merging content with description
+		mergeNodesTextContent(docNode, references);
 	}
 
 	/**
