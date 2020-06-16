@@ -83,15 +83,6 @@ public class XMLManager {
 	 */
 	private int docCount = 0;
 	/**
-	 * Text annotation's counter.
-	 *
-	 * <p>
-	 *
-	 * This counter is used to number each text annotation which is required for the
-	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
-	 */
-	private static int textAnnotCount = 0;
-	/**
 	 * Logger instance.
 	 *
 	 * @since 1.0
@@ -315,8 +306,6 @@ public class XMLManager {
 		// getting process node
 		NodeList processNodeList = wfDocument.getElementsByTagName(BPMNNodesNames.PROCESS.getName());
 		Node processNode = processNodeList.item(0);
-		// updating the text annotation counter
-		textAnnotCount += wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName()).getLength();
 		// creating the annotation node
 		Element annotationNode = wfDocument.createElement(BPMNNodesNames.ANNOTATION.getName());
 		String annotID = Notation.getGlobalAnnotationId();

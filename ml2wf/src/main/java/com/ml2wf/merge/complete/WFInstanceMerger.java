@@ -82,11 +82,12 @@ public class WFInstanceMerger extends WFCompleteMerger {
 	/**
 	 * Returns the referenced metaworkflow's name.
 	 *
-	 * @param wfDocument document containing the reference.
+	 * @param wfDocument document containing the reference
 	 * @return the referenced metaworkflow's name
+	 *
+	 * @since 1.0
 	 */
 	private String getMetaReferenced(Document wfDocument) {
-		// TODO: factorize and improve this method
 		NodeList docNodes = wfDocument.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
 		if (docNodes.getLength() > 0) {
 			Node docNode = docNodes.item(0);
@@ -97,20 +98,28 @@ public class WFInstanceMerger extends WFCompleteMerger {
 		return null;
 	}
 
+	/**
+	 * Adds a description {@code Node} to the current {@code createdWFNode}
+	 * containing all references (meta-workflow, dataset, author/articleà
+	 *
+	 * @param wfDocument document containing the references
+	 *
+	 * @since 1.0
+	 */
 	private void addReferences(Document wfDocument) {
 		logger.debug("Adding references...");
 		// getting global annotation content
 		Node globalAnnotation = getGlobalAnnotationNode(wfDocument);
 		String references = globalAnnotation.getTextContent();
-		// removing references delimiters
-		references = references.replace(Notation.getQuotedNotation(Notation.getReferencesDelimiterLeft()), "");
-		references = references.replace(Notation.getQuotedNotation(Notation.getReferencesDelimiterRight()), "");
+		// removing WF's name
+		// and references delimiters
+		// TODO: remove WF's name part
+		references = references.replace(Notation.getReferencesDelimiterLeft(), "");
+		references = references.replace(Notation.getReferencesDelimiterRight(), "");
 		// getting/creating the createdWFNode description
-		NodeList docNodes = this.createdWFNode.getElementsByTagName(FeatureModelNames.DESCRIPTION.getName());
-		Node docNode = (docNodes.getLength() > 0) ? docNodes.item(0)
-				: this.createTag(this.createdWFNode, FeatureModelNames.DESCRIPTION);
+		Node descNode = this.createTag(this.createdWFNode, FeatureModelNames.DESCRIPTION);
 		// merging content with description
-		mergeNodesTextContent(docNode, references);
+		mergeNodesTextContent(descNode, references);
 	}
 
 	/**
