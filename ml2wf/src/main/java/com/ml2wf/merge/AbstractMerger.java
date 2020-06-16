@@ -113,9 +113,9 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 
 	/**
 	 * Returns the workflow's document and name with the given {@code filePath}
-	 * using the {@link Pair} class. If the
-	 * {@code filePath} is not a valid path or the workflow's name is already in the
-	 * feature model, return null.
+	 * using the {@link Pair} class. If the {@code filePath} is not a valid path or
+	 * the workflow's name is already in the feature model, return an empty
+	 * {@code Pair}.
 	 *
 	 * @param filePath file path of the workflow
 	 * @return a {@code Pair} association between the workflow's name and its
@@ -209,13 +209,9 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	 * @see Pair
 	 */
 	protected void processOrderConstraint(List<Pair<Node, Node>> orderPairs) {
-		Node lca;
 		for (Pair<Node, Node> pair : orderPairs) {
-			lca = pair.getKey();
-			NodeList docNodes = ((Element) lca).getElementsByTagName(FeatureModelNames.DESCRIPTION.getName());
-			Node docNode = (docNodes.getLength() > 0) ? docNodes.item(0)
-					: this.createTag(lca, FeatureModelNames.DESCRIPTION);
-			if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue())) {
+			Node docNode = this.createTag(((Element) pair.getKey()), FeatureModelNames.DESCRIPTION);
+			if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
 				logger.error("The merge operation for description nodes failed.");
 			}
 		}
@@ -261,8 +257,8 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	 * @since 1.0
 	 * @see Node
 	 */
-	protected Node createTag(Node parent, FeatureModelNames tagName) {
-		NodeList nodeList = this.getDocument().getElementsByTagName(tagName.getName());
+	protected Node createTag(Element parent, FeatureModelNames tagName) {
+		NodeList nodeList = parent.getElementsByTagName(tagName.getName());
 		if (nodeList.getLength() > 0) {
 			// aldready exists
 			return nodeList.item(0);
@@ -368,7 +364,8 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	}
 
 	/**
-	 * Inserts the new task corresponding of the given {@code Node task} under the
+	 * Inserts and returns the new task corresponding of the given {@code Node task}
+	 * under the
 	 * given {@code Node parentNode}.
 	 *
 	 * <p>
@@ -377,11 +374,12 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 	 *
 	 * @param parentNode Parent node of the new task
 	 * @param task       task to insert
+	 * @return the added child
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	protected void insertNewTask(Node parentNode, Node task) {
+	protected Node insertNewTask(Node parentNode, Node task) {
 		// TODO: recurse for nested tasks
 		String debugMsg = String.format("Inserting task : %s", task.getTextContent());
 		logger.debug(debugMsg);
@@ -392,8 +390,7 @@ public abstract class AbstractMerger extends XMLManager implements WFMerger {
 		logger.debug(debugMsg);
 		// inserting the new node
 		Node newFeature = this.createFeatureWithName(taskName);
-		parentNode.appendChild(newFeature);
-		logger.debug("Task inserted.");
+		return parentNode.appendChild(newFeature);
 	}
 
 	/**

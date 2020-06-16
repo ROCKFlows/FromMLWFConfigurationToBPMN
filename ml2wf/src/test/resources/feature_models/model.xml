@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
 	<properties>
 		<graphics key="showhiddenfeatures" value="true"/>
 		<graphics key="legendautolayout" value="true"/>
@@ -6,6 +7,7 @@
 		<graphics key="layout" value="horizontal"/>
 		<graphics key="showcollapsedconstraints" value="true"/>
 		<graphics key="legendhidden" value="false"/>
+		<graphics key="" value="true"/>
 		<graphics key="layoutalgorithm" value="1"/>
 	</properties>
 	<struct>
@@ -13,7 +15,7 @@
 			<and name="AD">
 				<and abstract="true" name="Criteria">
 					<and abstract="true" name="CriteriaOnDataSet">
-						<graphics key="collapsed" value="false"/>
+						<graphics key="" value="false"/>
 						<alt abstract="true" name="NumberOfANomalies">
 							<graphics key="collapsed" value="false"/>
 							<feature name="Few"/>
@@ -23,7 +25,7 @@
 				</and>
 				<and abstract="true" name="Steps">
 					<feature abstract="true" name="Evaluating_Step"/>
-					<and abstract="true" name="Training_Step">
+					<and name="Training_Step">
 						<feature name="LSD"/>
 					</and>
 					<and abstract="true" name="Preprocessing_Step">
@@ -60,5 +62,5 @@
 				<var>aLot</var>
 			</imp>
 		</rule>
-	<rule><imp><var>LSD</var><not><var>drop_invalid_windows</var></not></imp></rule><rule><imp><var>LSD</var><var>drop_invalid_windows</var></imp></rule><rule><imp><var>LSD</var><var>aLot</var></imp></rule></constraints>
+	</constraints>
 </featureModel>

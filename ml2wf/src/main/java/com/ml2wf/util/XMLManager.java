@@ -28,6 +28,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -81,15 +82,6 @@ public class XMLManager {
 	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
 	 */
 	private int docCount = 0;
-	/**
-	 * Text annotation's counter.
-	 *
-	 * <p>
-	 *
-	 * This counter is used to number each text annotation which is required for the
-	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
-	 */
-	private static int textAnnotCount = 0;
 	/**
 	 * Logger instance.
 	 *
@@ -275,8 +267,8 @@ public class XMLManager {
 		// creating bounds child
 		Element boundsNode = wfDocument.createElement(BPMNNodesNames.BOUNDS.getName());
 		// adding location attributes
-		boundsNode.setAttribute(BPMNNodesAttributes.HEIGHT.getName(), "150"); // TODO: store in constants
-		boundsNode.setAttribute(BPMNNodesAttributes.WIDTH.getName(), "170");
+		boundsNode.setAttribute(BPMNNodesAttributes.HEIGHT.getName(), "90"); // TODO: store in constants
+		boundsNode.setAttribute(BPMNNodesAttributes.WIDTH.getName(), "180");
 		boundsNode.setAttribute(BPMNNodesAttributes.X.getName(), String.valueOf(x));
 		boundsNode.setAttribute(BPMNNodesAttributes.Y.getName(), String.valueOf(y));
 		shapeNode.appendChild(boundsNode);
@@ -314,16 +306,14 @@ public class XMLManager {
 		// getting process node
 		NodeList processNodeList = wfDocument.getElementsByTagName(BPMNNodesNames.PROCESS.getName());
 		Node processNode = processNodeList.item(0);
-		// updating the text annotation counter
-		textAnnotCount += wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName()).getLength();
 		// creating the annotation node
 		Element annotationNode = wfDocument.createElement(BPMNNodesNames.ANNOTATION.getName());
-		String annotName = Notation.getTextAnnotationVoc() + ++textAnnotCount;
+		String annotID = Notation.getGlobalAnnotationId();
 		// creating the id attribute
-		annotationNode.setAttribute(BPMNNodesAttributes.ID.getName(), annotName);
+		annotationNode.setAttribute(BPMNNodesAttributes.ID.getName(), annotID);
 		// TODO: check setIdAttributeNode benefits
 		// locating the annotation node
-		createPositionalNode(wfDocument, annotName, 0., 0.);
+		createPositionalNode(wfDocument, annotID, 0., 0.);
 		// adding to parent node
 		return processNode.appendChild(annotationNode);
 	}
@@ -347,14 +337,15 @@ public class XMLManager {
 		logger.debug("Getting global annotation node...");
 		NodeList nodeList = wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName());
 		List<Node> annotationNodes = XMLManager.nodeListAsList(nodeList);
+		String annotID = Notation.getGlobalAnnotationId();
 		// TODO: factorize delimiter with the getWorkflowName one
-		String delimiter = String.format("%s(.*)%s", Notation.getQuotedNotation(Notation.getWfNameDelimiterLeft()),
-				Notation.getQuotedNotation(Notation.getWfNameDelimiterRight()));
-		Pattern pattern = Pattern.compile(delimiter);
 		for (Node annotation : annotationNodes) {
-			if (pattern.matcher(annotation.getTextContent()).find()) {
-				logger.debug("Global annotation node found.");
-				return annotation;
+			NamedNodeMap attributes = annotation.getAttributes();
+			if (attributes.getLength() > 0) {
+				Node currentId = attributes.getNamedItem(BPMNNodesAttributes.ID.getName());
+				if ((currentId != null) && annotID.equals(currentId.getNodeValue())) {
+					return annotation;
+				}
 			}
 		}
 		logger.warn("Global annotation node not found.");
@@ -403,15 +394,17 @@ public class XMLManager {
 		// TODO: add logs
 		logger.debug("Getting workflow's name...");
 		Node annotation = XMLManager.getGlobalAnnotationNode(wfDocument);
-		String regex = String.format("%s(.+)%s", Notation.getQuotedNotation(Notation.getWfNameDelimiterLeft()),
-				Notation.getQuotedNotation(Notation.getWfNameDelimiterRight()));
+		// TODO: foreach line
+		String regex = String.format("%s(.+)%s", Notation.getQuotedNotation(Notation.getReferencesDelimiterLeft()),
+				Notation.getQuotedNotation(Notation.getReferencesDelimiterRight()));
 		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = (annotation != null) ? pattern.matcher(annotation.getTextContent()) : null;
-		if ((matcher == null)) {
-			return new File(wfDocument.getDocumentURI()).getName().split("\\.")[0];
-		}
-		if (matcher.find() && (matcher.groupCount() > 0) && !matcher.group(1).isBlank()) {
-			return matcher.group(1);
+		Matcher matcher = null;
+		if (annotation != null) {
+			String wfNameLine = annotation.getTextContent().split("\n")[0];
+			matcher = pattern.matcher(wfNameLine);
+			if (matcher.find() && (matcher.groupCount() > 0) && !matcher.group(1).isBlank()) {
+				return matcher.group(1);
+			}
 		}
 		return new File(wfDocument.getDocumentURI()).getName().split("\\.")[0];
 	}
@@ -478,27 +471,15 @@ public class XMLManager {
 	}
 
 	/**
-	 * Merges {@code nodeA}'s text content with {@code nodeB}'s text content.
+	 * Merges {@code nodeA}'s text content with the given {@code content}.
 	 *
-	 * <p>
-	 *
-	 * If the given nodes have different names (different tags), then the merge will
-	 * fail and false will be returned.
-	 *
-	 * <b>Note</b> that the only node content that change is the {@code nodeA}'s
-	 * one.
-	 *
-	 * @param nodeA first node
-	 * @param nodeB second node
+	 * @param nodeA   first node
+	 * @param content content to merge with
 	 * @return true if the merge operation succeed, false if it failed.
 	 */
-	public static boolean mergeNodesTextContent(Node nodeA, Node nodeB) {
-		// TODO: improve this method
-		if (!nodeA.getNodeName().equals(nodeB.getNodeName())) {
-			return false;
-		}
+	public static boolean mergeNodesTextContent(Node nodeA, String content) {
 		String contentA = nodeA.getTextContent().trim().replace("\\s+", " ");
-		String contentB = nodeB.getTextContent().trim().replace("\\s+", " ");
+		String contentB = content.trim().replace("\\s+", " ");
 		contentA = contentA.replace(contentB, "");
 		nodeA.setTextContent(contentA + "\n" + contentB);
 		return true;
@@ -627,9 +608,10 @@ public class XMLManager {
 		}
 		name = name.replaceFirst(Notation.getDocumentationVoc(), "");
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
-		name = name.replace(" ", "_");
+		return name.replace(" ", "_");
 		// sanitization for generic WF's task
-		return name.replaceFirst(Notation.getGenericVoc() + "$", "");
+		// TODO: to check
+		// return name.replaceFirst(Notation.getGenericVoc() + "$", "");
 	}
 
 	/**
