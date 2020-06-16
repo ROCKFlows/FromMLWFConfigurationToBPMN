@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
@@ -75,16 +76,18 @@ public class WFInstanceMerger extends WFCompleteMerger {
 		String associationConstraint = ((ConstraintFactoryImpl) super.getConstraintFactory())
 				.getAssociationConstraint(wfName, Arrays.asList(metaReferrence));
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
+		this.addReferences(wfDocument);
 	}
 
 	/**
 	 * Returns the referenced metaworkflow's name.
 	 *
-	 * @param wfDocument document containing the reference.
+	 * @param wfDocument document containing the reference
 	 * @return the referenced metaworkflow's name
+	 *
+	 * @since 1.0
 	 */
 	private String getMetaReferenced(Document wfDocument) {
-		// TODO: factorize and improve this method
 		NodeList docNodes = wfDocument.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
 		if (docNodes.getLength() > 0) {
 			Node docNode = docNodes.item(0);
@@ -93,6 +96,30 @@ public class WFInstanceMerger extends WFCompleteMerger {
 		}
 		// TODO: log error
 		return null;
+	}
+
+	/**
+	 * Adds a description {@code Node} to the current {@code createdWFNode}
+	 * containing all references (meta-workflow, dataset, author/articleà
+	 *
+	 * @param wfDocument document containing the references
+	 *
+	 * @since 1.0
+	 */
+	private void addReferences(Document wfDocument) {
+		logger.debug("Adding references...");
+		// getting global annotation content
+		Node globalAnnotation = getGlobalAnnotationNode(wfDocument);
+		String references = globalAnnotation.getTextContent();
+		// removing WF's name
+		// and references delimiters
+		// TODO: remove WF's name part
+		references = references.replace(Notation.getReferencesDelimiterLeft(), "");
+		references = references.replace(Notation.getReferencesDelimiterRight(), "");
+		// getting/creating the createdWFNode description
+		Node descNode = this.createTag(this.createdWFNode, FeatureModelNames.DESCRIPTION);
+		// merging content with description
+		mergeNodesTextContent(descNode, references);
 	}
 
 	/**
