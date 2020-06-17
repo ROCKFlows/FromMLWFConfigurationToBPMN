@@ -1,4 +1,4 @@
-package com.ml2wf.merge.complete;
+package com.ml2wf.merge.concretes;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,6 +14,8 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.merge.base.BaseMergerImpl;
+import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -21,16 +23,16 @@ import com.ml2wf.util.XMLManager;
  *
  * <p>
  *
- * It is an extension of the {@link WFCompleteMerger} base class.
+ * It is an extension of the {@link BaseMergerImpl} base class.
  *
  * @author Nicolas Lacroix
  *
  * @version 1.0
  *
- * @see WFCompleteMerger
+ * @see BaseMergerImpl
  *
  */
-public class WFMetaMerger extends WFCompleteMerger {
+public class WFMetaMerger extends BaseMergerImpl {
 
 	/**
 	 * Meta default task tag name.
@@ -49,12 +51,18 @@ public class WFMetaMerger extends WFCompleteMerger {
 	}
 
 	@Override
-	protected Node getRootParentNode() {
+	public Node getSuitableParent(Node child) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Node getRootParentNode() {
 		return this.getMetaTask();
 	}
 
 	@Override
-	protected void processSpecificNeeds(Document wfDocument, String wfName) throws Exception {
+	public void processSpecificNeeds(Pair<String, Document> wfInfo) throws Exception {
 		// adds new metatasks
 		/*-List<Node> wfTasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
 		this.processTasks(wfTasks);*/
@@ -92,7 +100,7 @@ public class WFMetaMerger extends WFCompleteMerger {
 		// AbstractMerger#createConstraintTag()
 		logger.debug("Instances node not found.");
 		logger.debug("Starting creation...");
-		Element instancesNode = this.getDocument().createElement(FeatureModelNames.AND.getName());
+		Element instancesNode = getDocument().createElement(FeatureModelNames.AND.getName());
 		instancesNode.setAttribute(FeatureModelAttributes.NAME.getName(), META_TASK);
 		logMsg = String.format("Instances node created : %s", instancesNode.getNodeName());
 		logger.debug(logMsg);

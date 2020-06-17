@@ -5,7 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import com.ml2wf.merge.AbstractMerger;
-import com.ml2wf.merge.tasks.WFTasksMerger;
+import com.ml2wf.merge.base.BaseMerger;
+import com.ml2wf.merge.concretes.WFInstanceMerger;
+import com.ml2wf.util.XMLManager;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -57,10 +59,11 @@ public class Merge extends AbstractCommand {
 	@Override
 	public void run() {
 		Configurator.setLevel(getPackageName(), getVerbLevel(this.verbose));
-		WFTasksMerger merger;
+		BaseMerger merger;
 		try {
-			merger = new WFTasksMerger(this.output);
-			merger.mergeWithWF(this.backUp, this.input);
+			merger = new WFInstanceMerger(this.output);
+			merger.mergeWithWF(this.backUp, true, this.input); // TODO: modify true according to cmd args
+			((XMLManager) merger).save(((XMLManager) merger).getPath());
 			LogManager.shutdown();
 		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");

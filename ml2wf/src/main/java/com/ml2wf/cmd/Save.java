@@ -4,9 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import com.ml2wf.merge.WFMerger;
-import com.ml2wf.merge.complete.WFInstanceMerger;
-import com.ml2wf.merge.complete.WFMetaMerger;
+import com.ml2wf.merge.base.BaseMerger;
+import com.ml2wf.merge.concretes.WFMetaMerger;
+import com.ml2wf.util.XMLManager;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -29,7 +29,6 @@ import picocli.CommandLine.Option;
  * @version 1.0
  *
  * @see AbstractCommand
- * @see WFMerger
  * @see Command
  * @see Logger
  *
@@ -60,12 +59,11 @@ public class Save extends AbstractCommand {
 	public void run() {
 		// TODO: process Merge verifications
 		Configurator.setLevel(getPackageName(), getVerbLevel(this.verbose));
-		WFMerger merger;
+		BaseMerger merger;
 		try {
 			merger = new WFMetaMerger(this.output);
-			((WFMetaMerger) merger).mergeWithWF(this.backUp, this.input[0]);
-			merger = new WFInstanceMerger(this.output);
-			((WFInstanceMerger) merger).mergeWithWF(this.backUp, this.input[1]);
+			merger.mergeWithWF(this.backUp, true, this.input[0]); // TODO: modify true according to cmd args
+			((XMLManager) merger).save(((XMLManager) merger).getPath());
 			LogManager.shutdown();
 		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");

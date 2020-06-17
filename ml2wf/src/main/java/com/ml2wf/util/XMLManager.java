@@ -68,7 +68,7 @@ public class XMLManager {
 	 *
 	 * @see Document
 	 */
-	private Document document;
+	private static Document document;
 	/**
 	 * Extension separator for files.
 	 */
@@ -106,7 +106,7 @@ public class XMLManager {
 	public XMLManager(String filePath) throws ParserConfigurationException, SAXException, IOException {
 		this.path = filePath;
 		this.sourceFile = new File(this.path);
-		this.document = XMLManager.preprocess(this.sourceFile);
+		XMLManager.setDocument(XMLManager.preprocess(this.sourceFile));
 	}
 
 	/**
@@ -156,8 +156,8 @@ public class XMLManager {
 	 *
 	 * @see Document
 	 */
-	public Document getDocument() {
-		return this.document;
+	public static Document getDocument() {
+		return XMLManager.document;
 	}
 
 	/**
@@ -167,8 +167,8 @@ public class XMLManager {
 	 *
 	 * @see Document
 	 */
-	public void setDocument(Document document) {
-		this.document = document;
+	public static void setDocument(Document document) {
+		XMLManager.document = document;
 	}
 
 	/**
@@ -190,10 +190,10 @@ public class XMLManager {
 	 *
 	 * @since 1.0
 	 */
-	protected void save(String resultPath) throws TransformerException {
+	public void save(String resultPath) throws TransformerException {
 		String logMsg = String.format("Saving file at location : %s...", resultPath);
 		logger.info(logMsg);
-		DOMSource source = new DOMSource(this.document);
+		DOMSource source = new DOMSource(document);
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		// --- protection against XXE attacks
 		logger.debug("Protecting against XXE attacks");
@@ -453,14 +453,12 @@ public class XMLManager {
 	 * @see Node
 	 */
 	public static Node getNodeWithName(Node root, String name) {
-		// TODO: to test
 		NodeList children = root.getChildNodes();
 		Node child;
 		Node recursiveResult; // result of recursive call
 		for (int i = 0; i < children.getLength(); i++) {
 			child = children.item(i);
 			String childName = XMLManager.getNodeName(child);
-			logger.debug("child name : " + childName);
 			if (childName.equals(name)) {
 				return child;
 			} else if ((recursiveResult = getNodeWithName(child, name)) != null) {
@@ -628,10 +626,10 @@ public class XMLManager {
 	 * @see Node
 	 */
 	public void addDocumentationNode(Node node, String content) {
-		Element documentation = this.document.createElement(BPMNNodesNames.DOCUMENTATION.getName());
+		Element documentation = document.createElement(BPMNNodesNames.DOCUMENTATION.getName());
 		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
 		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
-		CDATASection refersTo = this.document.createCDATASection(Notation.getReferenceVoc() + content);
+		CDATASection refersTo = document.createCDATASection(Notation.getReferenceVoc() + content);
 		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
 		logger.debug(logMsg);
 		documentation.appendChild(refersTo);

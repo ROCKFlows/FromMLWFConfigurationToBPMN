@@ -104,7 +104,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		logger.info("Starting the Workflow instatiation...");
 		this.addMetaWFReferences();
 		String logMsg;
-		for (Node node : XMLManager.getTasksList(super.getDocument(), BPMNNodesNames.SELECTOR)) {
+		for (Node node : XMLManager.getTasksList(getDocument(), BPMNNodesNames.SELECTOR)) {
 			logMsg = String.format("Instantiating the node %s...", node);
 			logger.debug(logMsg);
 			this.instantiateNode(node);
@@ -188,7 +188,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	private void addMetaWFReferences() {
 		// TODO: add logs
 		logger.debug("Adding the meta reference...");
-		String metaReference = XMLManager.getWorkflowName(this.getDocument()).replace(" ", "_");
+		String metaReference = XMLManager.getWorkflowName(getDocument()).replace(" ", "_");
 		this.addMetaWFRefDoc(metaReference);
 		this.addWFRefAnnot(metaReference);
 	}
@@ -202,7 +202,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	private void addMetaWFRefDoc(String referred) {
 		logger.debug("Adding meta referrence in the documentation...");
-		NodeList processNodeList = this.getDocument().getElementsByTagName(BPMNNodesNames.PROCESS.getName());
+		NodeList processNodeList = getDocument().getElementsByTagName(BPMNNodesNames.PROCESS.getName());
 		if (processNodeList.getLength() == 0) {
 			logger.error("Error while getting the reffered metaworkflow's name.");
 			logger.warn("Skipping this step...");
@@ -220,7 +220,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @since 1.0
 	 */
 	private void addWFRefAnnot(String reference) {
-		Node globalAnnotation = XMLManager.getGlobalAnnotationNode(this.getDocument());
+		Node globalAnnotation = XMLManager.getGlobalAnnotationNode(getDocument());
 		List<String> lines = new ArrayList<>(Notation.getGlobalAnnotationDefaultContent());
 		String metaRef = lines.remove(1);
 		metaRef = String.format(metaRef, Notation.getReferencesDelimiterLeft(), reference,
@@ -230,7 +230,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 						Notation.getReferencesDelimiterRight()))
 				.collect(Collectors.toList());
 		lines.add(1, metaRef);
-		Node newTextNode = this.getDocument().createElement(BPMNNodesNames.TEXT.getName());
+		Node newTextNode = getDocument().createElement(BPMNNodesNames.TEXT.getName());
 		newTextNode.setTextContent(String.join("\n", lines));
 		globalAnnotation.appendChild(newTextNode);
 	}
@@ -248,8 +248,8 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	private void addExtensionNode(Node node) {
-		Node extension = super.getDocument().createElement(BPMNNodesNames.EXTENSION.getName());
-		Element style = super.getDocument().createElement(BPMNNodesNames.STYLE.getName());
+		Node extension = getDocument().createElement(BPMNNodesNames.EXTENSION.getName());
+		Element style = getDocument().createElement(BPMNNodesNames.STYLE.getName());
 		String logMsg = String.format("	Adding style %s to node %s", INSTANTIATE_COLOR, node);
 		logger.debug(logMsg);
 		style.setAttribute(BPMNNodesAttributes.BACKGROUND.getName(), INSTANTIATE_COLOR);
