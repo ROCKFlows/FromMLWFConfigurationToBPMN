@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import com.ml2wf.App;
 
 import picocli.CommandLine.Model;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.ScopeType;
 import picocli.CommandLine.Spec;
 
 /**
@@ -25,8 +27,11 @@ public abstract class AbstractCommand implements Runnable {
 	Model.CommandSpec spec;
 
 	@Option(names = { "-v",
-			"--verbose" }, arity = "1", order = 1, defaultValue = "0", description = "verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL")
-	int verbose;
+			"--verbose" }, arity = "1", order = 1, defaultValue = "0", description = "verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL", scope = ScopeType.INHERIT)
+	public void processVerboseArg(int verboseLevel) {
+		Configurator.setLevel(getPackageName(), getVerbLevel(verboseLevel));
+	}
+
 	/**
 	 * Package name to change the logger level.
 	 */

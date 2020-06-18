@@ -1,5 +1,6 @@
 package com.ml2wf.merge.concretes;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,8 +47,16 @@ public class WFMetaMerger extends BaseMergerImpl {
 	 */
 	private static final Logger logger = LogManager.getLogger(WFMetaMerger.class);
 
-	public WFMetaMerger(String filePath) throws ParserConfigurationException, SAXException, IOException {
-		super(filePath);
+	/**
+	 * {@code WFMetaMerger}'s default constructor.
+	 *
+	 * @param file the XML {@code File}
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	public WFMetaMerger(File file) throws ParserConfigurationException, SAXException, IOException {
+		super(file);
 	}
 
 	@Override

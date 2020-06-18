@@ -61,13 +61,13 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	/**
 	 * {@code InstanceFactory}'s default constructor.
 	 *
-	 * @param filePath the XML filepath.
+	 * @param file the XML file.
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public InstanceFactoryImpl(String filePath) throws ParserConfigurationException, SAXException, IOException {
-		super(filePath);
+	public InstanceFactoryImpl(File file) throws ParserConfigurationException, SAXException, IOException {
+		super(file);
 	}
 
 	/**
@@ -99,9 +99,12 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	@Override
-	public void getWFInstance(String resultPath)
+	public void getWFInstance(File outputDir)
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		logger.info("Starting the Workflow instatiation...");
+		if (!outputDir.isDirectory()) {
+			outputDir = outputDir.getParentFile();
+		}
 		this.addMetaWFReferences();
 		String logMsg;
 		for (Node node : XMLManager.getTasksList(getDocument(), BPMNNodesNames.SELECTOR)) {
@@ -111,12 +114,12 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		}
 		logger.info("Instantiation finished.");
 		String resultFname = XMLManager.insertInFileName(super.getSourceFile().getName(), Notation.getInstanceVoc());
-		super.save(Paths.get(resultPath, resultFname).toString());
+		super.save(new File(Paths.get(outputDir.getPath(), resultFname).toString()));
 	}
 
 	/**
 	 * Calls the {@link #getWFInstance(String)} method with
-	 * {@link #getSourceFile()}'s directory as parameter.
+	 * {@link #getSourceFile()} as parameter.
 	 *
 	 * @throws TransformerException
 	 * @throws SAXException
@@ -128,8 +131,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see {@link #getWFInstance(String)}
 	 */
 	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		String absolutePath = super.getSourceFile().getAbsolutePath();
-		this.getWFInstance(absolutePath.substring(0, absolutePath.lastIndexOf(File.separator)));
+		this.getWFInstance(super.getSourceFile());
 	}
 
 	/**

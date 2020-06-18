@@ -1,5 +1,6 @@
 package com.ml2wf.merge.concretes;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -55,13 +56,13 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	/**
 	 * {@code WFInstanceMerger}'s default constructor.
 	 *
-	 * @param filePath the XML filepath
+	 * @param file the XML {@code File}
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public WFInstanceMerger(String filePath) throws ParserConfigurationException, SAXException, IOException {
-		super(filePath);
+	public WFInstanceMerger(File file) throws ParserConfigurationException, SAXException, IOException {
+		super(file);
 	}
 
 	/**

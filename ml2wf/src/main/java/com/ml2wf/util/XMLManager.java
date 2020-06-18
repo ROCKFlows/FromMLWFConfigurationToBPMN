@@ -98,14 +98,14 @@ public class XMLManager {
 	 * <b>Note</b> that the {@link #preprocess()} method is called to initialize
 	 * {@link #document}.
 	 *
-	 * @param filePath the XML filePath.
+	 * @param file the XML file
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public XMLManager(String filePath) throws ParserConfigurationException, SAXException, IOException {
-		this.path = filePath;
-		this.sourceFile = new File(this.path);
+	public XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
+		this.sourceFile = file;
+		this.path = file.getAbsolutePath();
 		XMLManager.setDocument(XMLManager.preprocess(this.sourceFile));
 	}
 
@@ -183,16 +183,21 @@ public class XMLManager {
 	// Saving methods
 
 	/**
-	 * Saves the result file.
+	 * Saves the current {@code document} into the given {@code destFile}.
 	 *
-	 * @param resultFname filename of result file
+	 * @param file the destination {@code File}
 	 * @throws TransformerException
+	 * @throws IOException
 	 *
 	 * @since 1.0
 	 */
-	public void save(String resultPath) throws TransformerException {
-		String logMsg = String.format("Saving file at location : %s...", resultPath);
+	public void save(File destFile) throws TransformerException, IOException {
+		String logMsg = String.format("Saving file at location : %s...", destFile.getAbsolutePath());
 		logger.info(logMsg);
+		if (!destFile.createNewFile()) {
+			logger.debug("[SAVE] Destination file aldready exists.");
+			logger.debug("[SAVE] Overriding...");
+		}
 		DOMSource source = new DOMSource(document);
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		// --- protection against XXE attacks
@@ -201,9 +206,22 @@ public class XMLManager {
 		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 		// ---
 		Transformer transformer = transformerFactory.newTransformer();
-		StreamResult result = new StreamResult(resultPath);
+		StreamResult result = new StreamResult(destFile);
 		transformer.transform(source, result);
 		logger.info("File saved.");
+	}
+
+	/**
+	 * Saves the current {@code document} into the given {@code destFile}.
+	 *
+	 * @param file the destination {@code File}
+	 * @throws TransformerException
+	 * @throws IOException
+	 *
+	 * @since 1.0
+	 */
+	public void save() throws TransformerException, IOException {
+		this.save(this.getSourceFile());
 	}
 
 	/**
@@ -219,16 +237,18 @@ public class XMLManager {
 	 * <b>Note</b> that this method hasn't any retroactive effect.
 	 *
 	 * @throws TransformerException
+	 * @throws IOException
 	 *
 	 * @since 1.0
 	 */
-	protected void backUp() throws TransformerException {
+	protected void backUp() throws TransformerException, IOException {
 		logger.info("Backing up...");
 		SimpleDateFormat dateFormater = null;
 		Date backUpDate = new Date();
 		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
 		String backUpPath = insertInFileName(this.path, Notation.getBackupVoc() + dateFormater.format(backUpDate));
-		this.save(backUpPath);
+		File destFile = new File(backUpPath);
+		this.save(destFile);
 		logger.info("Back up finished.");
 	}
 

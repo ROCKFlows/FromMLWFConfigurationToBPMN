@@ -83,13 +83,13 @@ public abstract class AbstractMerger extends XMLManager {
 	/**
 	 * {@code AbstractMerger}'s default constructor.
 	 *
-	 * @param filePath the XML filepath.
+	 * @param file the XML {@code File}.
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public AbstractMerger(String filePath) throws ParserConfigurationException, SAXException, IOException {
-		super(filePath);
+	public AbstractMerger(File file) throws ParserConfigurationException, SAXException, IOException {
+		super(file);
 		this.constraintFactory = new ConstraintFactoryImpl(getDocument());
 	}
 
@@ -110,7 +110,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 * the workflow's name is already in the feature model, return an empty
 	 * {@code Pair}.
 	 *
-	 * @param filePath file path of the workflow
+	 * @param file {@code File} instance of the workflow
 	 * @return a {@code Pair} association between the workflow's name and its
 	 *         {@code Document} instance or an empty {@code Pair} if something is
 	 *         wrong.
@@ -122,9 +122,8 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @see Pair
 	 * @see Document
 	 */
-	protected Pair<String, Document> getWFDocInfoFromPath(String filePath)
+	protected Pair<String, Document> getWFDocInfoFromPath(File file)
 			throws ParserConfigurationException, SAXException, IOException {
-		File file = new File(filePath);
 		String wfTaskName;
 		String logMsg;
 		Document wfDocument;
@@ -139,7 +138,7 @@ public abstract class AbstractMerger extends XMLManager {
 				return new Pair<>();
 			}
 		} else {
-			logMsg = String.format("Invalid filepath : %s", filePath);
+			logMsg = String.format("Invalid filepath : %s", file.getAbsolutePath());
 			logger.fatal(logMsg);
 			return new Pair<>();
 		}

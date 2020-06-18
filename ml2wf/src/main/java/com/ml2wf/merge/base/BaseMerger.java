@@ -1,5 +1,7 @@
 package com.ml2wf.merge.base;
 
+import java.io.File;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -19,14 +21,14 @@ import com.ml2wf.util.Pair;
 public interface BaseMerger {
 
 	/**
-	 * Merges the workflow file at {@code filesPath} location into the WF document.
+	 * Merges the workflow {@code File} location into the FM document.
 	 *
 	 * <p>
 	 *
 	 * Saves the current FeatureModel before any modification if {@code backup} is
 	 * {@code true}.
 	 *
-	 * @param filePath      path of the workflow file.
+	 * @param wfFile        the workflow {@code File}.
 	 * @param backUp        indicates if a backup is needed
 	 * @param completeMerge indicates whether the workflow has to be completely
 	 *                      merged or not
@@ -34,7 +36,7 @@ public interface BaseMerger {
 	 *
 	 * @since 1.0
 	 */
-	public void mergeWithWF(boolean backUp, boolean completeMerge, String filePath) throws Exception;
+	public void mergeWithWF(boolean backUp, boolean completeMerge, File wfFile) throws Exception;
 
 	/**
 	 * Merges the workflow files at {@code filesPath} location into the WF document.
@@ -44,7 +46,7 @@ public interface BaseMerger {
 	 * Saves the current FeatureModel before any modification if {@code backup} is
 	 * {@code true}.
 	 *
-	 * @param filesPath     paths of the workflow files.
+	 * @param wfFiles       {@code File} instances of the workflow files.
 	 * @param backUp        indicates if a backup is needed
 	 * @param completeMerge indicates whether the workflow has to be completely
 	 *                      merged or not
@@ -52,7 +54,7 @@ public interface BaseMerger {
 	 *
 	 * @since 1.0
 	 */
-	public void mergeWithWF(boolean backUp, boolean completeMerge, String... filesPath) throws Exception;
+	public void mergeWithWF(boolean backUp, boolean completeMerge, File... wfFiles) throws Exception;
 
 	/**
 	 * Returns a suitable parent {@code Node} for the given {@code Node}.

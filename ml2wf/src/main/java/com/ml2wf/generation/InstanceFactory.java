@@ -1,5 +1,7 @@
 package com.ml2wf.generation;
 
+import java.io.File;
+
 /**
  * This interface provides a method for the <b>instantiation of a generic
  * workflow</b>.
@@ -14,12 +16,13 @@ package com.ml2wf.generation;
 public interface InstanceFactory {
 
 	/**
-	 * Instantiates a generic workflow.
+	 * Instantiates a generic workflow and saves it under the given
+	 * {@code ouputDir}.
 	 *
-	 * @param resultPath result path
+	 * @param outputDir the output directory
 	 * @throws Exception
 	 *
 	 * @since 1.0
 	 */
-	public void getWFInstance(String resultPath) throws Exception; // TODO: check parameters
+	public void getWFInstance(File outputDir) throws Exception; // TODO: check parameters
 }

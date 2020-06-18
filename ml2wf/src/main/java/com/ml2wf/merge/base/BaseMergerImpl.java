@@ -1,5 +1,6 @@
 package com.ml2wf.merge.base;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -29,22 +30,22 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	/**
 	 * {@code BaseMergerImpl}'s default constructor.
 	 *
-	 * @param filePath the FeatureModel file path
+	 * @param filePath the FeatureModel {@code File}
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public BaseMergerImpl(String filePath) throws ParserConfigurationException, SAXException, IOException {
+	public BaseMergerImpl(File file) throws ParserConfigurationException, SAXException, IOException {
 		// TODO: change String filePath to Path filePath (or File)
-		super(filePath);
+		super(file);
 	}
 
 	@Override
-	public void mergeWithWF(boolean backUp, boolean completeMerge, String filePath) throws Exception {
+	public void mergeWithWF(boolean backUp, boolean completeMerge, File wfFile) throws Exception {
 		if (backUp) {
 			super.backUp();
 		}
-		Pair<String, Document> wfInfo = this.getWFDocInfoFromPath(filePath);
+		Pair<String, Document> wfInfo = this.getWFDocInfoFromPath(wfFile);
 		if (wfInfo.isEmpty()) {
 			// TODO: add logs
 			return;
@@ -62,16 +63,10 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	}
 
 	@Override
-	public void mergeWithWF(boolean backUp, boolean completeMerge, String... filesPath) throws Exception {
-		for (String path : filesPath) {
-			this.mergeWithWF(backUp, completeMerge, path);
+	public void mergeWithWF(boolean backUp, boolean completeMerge, File... wfFiles) throws Exception {
+		for (File wfFile : wfFiles) {
+			this.mergeWithWF(backUp, completeMerge, wfFile);
 		}
-		// TODO
-		/*-try (Stream<Path> paths = Files.walk(Paths.get("/home/you/Desktop"))) {
-			paths
-					.filter(Files::isRegularFile)
-					.forEach(p -> this.mergeWithWF(backUp, p));
-		}*/
 	}
 
 	private void processCompleteMerge(Pair<String, Document> wfInfo) throws InvalidConstraintException {
