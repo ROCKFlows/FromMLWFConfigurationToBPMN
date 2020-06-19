@@ -81,7 +81,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		String currentTaskName;
 		// retrieving all existing FM's tasks names
 		// for each task
-		for (Node nestedTask : this.getNestedNodesBis(task)) {
+		for (Node nestedTask : this.getNestedNodes(task)) {
 			// for each subtask
 			currentTaskName = XMLManager.getNodeName(nestedTask);
 			if (this.isDuplicated(currentTaskName)) {

@@ -659,6 +659,26 @@ public class XMLManager {
 	}
 
 	/**
+	 * returns whether the given {@code Element} is a meta-task or not.
+	 *
+	 * @param node node to check
+	 * @return whether the given {@code Element} is a meta-task or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean isMetaTask(Element node) {
+		String regex = String.format("%s+", Notation.getReferenceVoc());
+		final Pattern pattern = Pattern.compile(regex);
+		NodeList docNodes = node.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
+		for (int i = 0; i < docNodes.getLength(); i++) {
+			if (pattern.matcher(docNodes.item(i).getTextContent()).find()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Returns the referred meta task from the given {@code reference} text.
 	 *
 	 * @param reference reference containing the referred meta task

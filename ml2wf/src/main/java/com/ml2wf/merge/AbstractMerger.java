@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -464,41 +463,8 @@ public abstract class AbstractMerger extends XMLManager {
 	 *         {@code node}
 	 *
 	 * @since 1.0
-	 * @see Element
 	 */
 	protected List<Node> getNestedNodes(Node node) {
-		List<Node> result = new ArrayList<>();
-		// retrieving all nested nodes' names
-		String[] nodeName = XMLManager.getNodeName(node).split(Notation.getGeneratedPrefixVoc());
-		String lastReferred = "";
-		Element nestedNode;
-		for (String taskName : nodeName) {
-			// for each nested subtasks to create
-			// cloning source node
-			nestedNode = (Element) node.cloneNode(false);
-			getDocument().adoptNode(nestedNode);
-			// updating nested node's name
-			nestedNode.setAttribute(BPMNNodesAttributes.NAME.getName(), taskName);
-			if (!lastReferred.isBlank()) {
-				// TODO: change node to abstract ?
-				// updating reference
-				this.addDocumentationNode(nestedNode, lastReferred);
-			} else {
-				// not a nested node
-				Node docNode = ((Element) node).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName()).item(0);
-				if (docNode != null) {
-					// if it is an instantiated task
-					getDocument().adoptNode(docNode);
-					nestedNode.appendChild(docNode);
-				}
-			}
-			result.add(nestedNode);
-			lastReferred = taskName;
-		}
-		return result;
-	}
-
-	protected List<Node> getNestedNodesBis(Node node) {
 		List<Node> result = new ArrayList<>();
 		// retrieving all nested nodes' names
 		String[] nodeName = XMLManager.getNodeName(node).split(Notation.getGeneratedPrefixVoc());
@@ -516,6 +482,21 @@ public abstract class AbstractMerger extends XMLManager {
 		return result;
 	}
 
+	/**
+	 * Creates and returns the nested {@code Node} according to the {@code parent}
+	 * data.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that the created {@code Node} is not added to the
+	 * {@code parent}'s children.
+	 *
+	 * @param parent parent of the created nested node
+	 * @param name   name of the nested node
+	 * @return the nested {@code Node} according to the {@code parent} data
+	 *
+	 * @since 1.0
+	 */
 	protected Element createNestedNode(Element parent, String name) {
 		Element created = getDocument().createElement(parent.getNodeName());
 		created.setAttribute(FeatureModelAttributes.NAME.getName(), name);
@@ -523,18 +504,6 @@ public abstract class AbstractMerger extends XMLManager {
 			this.addDocumentationNode(created, parent.getAttribute(BPMNNodesAttributes.NAME.getName()));
 		}
 		return created;
-	}
-
-	protected boolean isMetaTask(Element node) {
-		String regex = String.format("%s+", Notation.getReferenceVoc());
-		final Pattern pattern = Pattern.compile(regex);
-		NodeList docNodes = node.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
-		for (int i = 0; i < docNodes.getLength(); i++) {
-			if (pattern.matcher(docNodes.item(i).getTextContent()).find()) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 }
