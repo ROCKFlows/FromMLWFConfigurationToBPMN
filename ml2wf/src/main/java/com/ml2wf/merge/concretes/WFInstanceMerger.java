@@ -115,6 +115,12 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		Document wfDocument = wfInfo.getValue();
 		logger.debug("Specific need : meta reference.");
 		String metaReferrence = this.getMetaReferenced(wfDocument);
+		if (metaReferrence == null) {
+			logger.error("No referenced meta-workflow.");
+			logger.info("Make sure to use instance-Workflows using the generate command before merging/building.");
+			logger.error("Skipping...");
+			return;
+		}
 		String associationConstraint = ((ConstraintFactoryImpl) super.getConstraintFactory())
 				.getAssociationConstraint(wfInfo.getKey(), Arrays.asList(metaReferrence));
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
@@ -136,7 +142,6 @@ public class WFInstanceMerger extends BaseMergerImpl {
 			// TODO: improve verification
 			return XMLManager.getReferredTask(docNode.getTextContent());
 		}
-		// TODO: log error
 		return null;
 	}
 

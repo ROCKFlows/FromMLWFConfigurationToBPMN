@@ -60,7 +60,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			// wfFile is a regular file (not a directory)
 			files.add(wfFile);
 		}
-		files.forEach(System.out::println);
 		for (File file : files) {
 			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
 			if (wfInfo.isEmpty()) {
@@ -89,6 +88,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 
 	private void processCompleteMerge(Pair<String, Document> wfInfo) throws InvalidConstraintException {
 		String wfName = wfInfo.getKey();
+		// TODO: check order execution (node creation before assocConstraints)
 		this.processAssocConstraints(wfInfo.getValue(), wfName);
 		this.createdWFNode = this.createFeatureWithName(wfName);
 		Node root = this.getRootParentNode();

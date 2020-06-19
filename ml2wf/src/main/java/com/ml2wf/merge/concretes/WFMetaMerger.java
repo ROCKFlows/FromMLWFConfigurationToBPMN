@@ -39,7 +39,7 @@ public class WFMetaMerger extends BaseMergerImpl {
 	 * Meta default task tag name.
 	 */
 	private static final String META_TASK = "Meta";
-	private static final String STEP_TASK = "Step";
+	private static final String STEP_TASK = "Steps";
 	/**
 	 * Logger instance.
 	 *
@@ -62,12 +62,12 @@ public class WFMetaMerger extends BaseMergerImpl {
 
 	@Override
 	public Node getSuitableParent(Node child) {
-		return this.getMetaTask(STEP_TASK);
+		return this.getGlobalMetaTask(STEP_TASK);
 	}
 
 	@Override
 	public Node getRootParentNode() {
-		return this.getMetaTask(META_TASK);
+		return this.getGlobalMetaTask(META_TASK);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class WFMetaMerger extends BaseMergerImpl {
 	}
 
 	/**
-	 * Returns the <b>meta</b> {@code Node} task.
+	 * Returns the <b>global meta</b> {@code Node} task.
 	 *
 	 * <p>
 	 *
@@ -91,7 +91,7 @@ public class WFMetaMerger extends BaseMergerImpl {
 	 * @since 1.0
 	 * @see Node
 	 */
-	private Node getMetaTask(String globalNodeName) {
+	private Node getGlobalMetaTask(String globalNodeName) {
 		String logMsg;
 		// TODO: factorize with a similar method in WFTasksMerger and the
 		// WFInstanceMerger#getInstancesTask
