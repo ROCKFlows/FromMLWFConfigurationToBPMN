@@ -1,6 +1,8 @@
 package com.ml2wf.samples;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -58,12 +60,11 @@ public class TestSamplesInstantiation {
 	private static final Logger logger = LogManager.getLogger(TestSamplesInstantiation.class);
 
 	@BeforeEach
-	public void setUp() throws ParserConfigurationException, SAXException, IOException {
+	public void setUp() throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
 		logger.info("Hello World!");
 		this.classLoader = this.getClass().getClassLoader();
 		this.url = this.classLoader.getResource(SIMPLE_WF_PATH);
-		String fDirectory = this.url.getPath().replace("%20", " "); // TODO: improve sanitization
-		this.factory = new InstanceFactoryImpl(fDirectory);
+		this.factory = new InstanceFactoryImpl(new File(this.url.toURI()));
 	}
 
 	@AfterEach

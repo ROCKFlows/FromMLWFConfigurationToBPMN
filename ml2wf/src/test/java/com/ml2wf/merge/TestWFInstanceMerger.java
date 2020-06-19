@@ -2,6 +2,7 @@ package com.ml2wf.merge;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -32,7 +33,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
 import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
 import com.ml2wf.conventions.enums.fm.FeatureModelNames;
-import com.ml2wf.merge.tasks.WFTasksMerger;
+import com.ml2wf.merge.concretes.WFInstanceMerger;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -56,7 +57,7 @@ import com.ml2wf.util.XMLManager;
  *
  */
 @DisplayName("Test of WFTasksMerger")
-public class TestWFTasksMerger extends AbstractXMLTest {
+public class TestWFInstanceMerger extends AbstractXMLTest {
 
 	/**
 	 * Back up path.
@@ -71,7 +72,7 @@ public class TestWFTasksMerger extends AbstractXMLTest {
 	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
 			InvalidConstraintException {
 		// loading xml test file
-		this.testedClass = new WFTasksMerger(FM_FILE_PATH);
+		this.testedClass = new WFInstanceMerger(new File(FM_FILE_PATH));
 	}
 
 	@AfterEach
@@ -135,12 +136,8 @@ public class TestWFTasksMerger extends AbstractXMLTest {
 	 * <p>
 	 *
 	 * <b>Note</b> that this is a {@link ParameterizedTest}.
-	 *
-	 * @throws IOException
-	 * @throws SAXException
-	 * @throws ParserConfigurationException
-	 * @throws InvalidConstraintException
-	 * @throws TransformerException
+	 * 
+	 * @throws Exception
 	 *
 	 * @since 1.0
 	 *
@@ -149,12 +146,10 @@ public class TestWFTasksMerger extends AbstractXMLTest {
 	@MethodSource("instanceFiles")
 	@DisplayName("Test of merging feature")
 	public void testMergingStructure(Path path)
-			throws ParserConfigurationException, SAXException, IOException, TransformerException,
-			InvalidConstraintException {
-		((WFTasksMerger) this.testedClass).mergeWithWF(path.toString()); // TODO: save before modifications
-																			// (true parameter)
+			throws Exception {
+		((WFInstanceMerger) this.testedClass).mergeWithWF(false, true, new File(path.toUri()));
 		this.sourceDocument = XMLManager.preprocess(path.toFile());
-		this.resultDocument = this.testedClass.getDocument();
+		this.resultDocument = XMLManager.getDocument();
 		// getting WF's source task nodes
 		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNodesNames.SELECTOR);
 		// List<Node> sourceNestedNodes = ;

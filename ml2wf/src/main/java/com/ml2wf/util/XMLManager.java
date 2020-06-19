@@ -68,7 +68,7 @@ public class XMLManager {
 	 *
 	 * @see Document
 	 */
-	private Document document;
+	private static Document document;
 	/**
 	 * Extension separator for files.
 	 */
@@ -98,15 +98,15 @@ public class XMLManager {
 	 * <b>Note</b> that the {@link #preprocess()} method is called to initialize
 	 * {@link #document}.
 	 *
-	 * @param filePath the XML filePath.
+	 * @param file the XML file
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public XMLManager(String filePath) throws ParserConfigurationException, SAXException, IOException {
-		this.path = filePath;
-		this.sourceFile = new File(this.path);
-		this.document = XMLManager.preprocess(this.sourceFile);
+	public XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
+		this.sourceFile = file;
+		this.path = file.getAbsolutePath();
+		XMLManager.setDocument(XMLManager.preprocess(this.sourceFile));
 	}
 
 	/**
@@ -156,8 +156,8 @@ public class XMLManager {
 	 *
 	 * @see Document
 	 */
-	public Document getDocument() {
-		return this.document;
+	public static Document getDocument() {
+		return XMLManager.document;
 	}
 
 	/**
@@ -167,8 +167,8 @@ public class XMLManager {
 	 *
 	 * @see Document
 	 */
-	public void setDocument(Document document) {
-		this.document = document;
+	public static void setDocument(Document document) {
+		XMLManager.document = document;
 	}
 
 	/**
@@ -183,17 +183,22 @@ public class XMLManager {
 	// Saving methods
 
 	/**
-	 * Saves the result file.
+	 * Saves the current {@code document} into the given {@code destFile}.
 	 *
-	 * @param resultFname filename of result file
+	 * @param file the destination {@code File}
 	 * @throws TransformerException
+	 * @throws IOException
 	 *
 	 * @since 1.0
 	 */
-	protected void save(String resultPath) throws TransformerException {
-		String logMsg = String.format("Saving file at location : %s...", resultPath);
+	public void save(File destFile) throws TransformerException, IOException {
+		String logMsg = String.format("Saving file at location : %s...", destFile.getAbsolutePath());
 		logger.info(logMsg);
-		DOMSource source = new DOMSource(this.document);
+		if (!destFile.createNewFile()) {
+			logger.debug("[SAVE] Destination file aldready exists.");
+			logger.debug("[SAVE] Overriding...");
+		}
+		DOMSource source = new DOMSource(document);
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		// --- protection against XXE attacks
 		logger.debug("Protecting against XXE attacks");
@@ -201,9 +206,22 @@ public class XMLManager {
 		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 		// ---
 		Transformer transformer = transformerFactory.newTransformer();
-		StreamResult result = new StreamResult(resultPath);
+		StreamResult result = new StreamResult(destFile);
 		transformer.transform(source, result);
 		logger.info("File saved.");
+	}
+
+	/**
+	 * Saves the current {@code document} into the given {@code destFile}.
+	 *
+	 * @param file the destination {@code File}
+	 * @throws TransformerException
+	 * @throws IOException
+	 *
+	 * @since 1.0
+	 */
+	public void save() throws TransformerException, IOException {
+		this.save(this.getSourceFile());
 	}
 
 	/**
@@ -219,16 +237,18 @@ public class XMLManager {
 	 * <b>Note</b> that this method hasn't any retroactive effect.
 	 *
 	 * @throws TransformerException
+	 * @throws IOException
 	 *
 	 * @since 1.0
 	 */
-	protected void backUp() throws TransformerException {
+	protected void backUp() throws TransformerException, IOException {
 		logger.info("Backing up...");
 		SimpleDateFormat dateFormater = null;
 		Date backUpDate = new Date();
 		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
 		String backUpPath = insertInFileName(this.path, Notation.getBackupVoc() + dateFormater.format(backUpDate));
-		this.save(backUpPath);
+		File destFile = new File(backUpPath);
+		this.save(destFile);
 		logger.info("Back up finished.");
 	}
 
@@ -423,14 +443,14 @@ public class XMLManager {
 	 */
 	public static String getNodeName(Node node) {
 		String logMsg = String.format("Retrieving name for node : %s...", node);
-		logger.debug(logMsg);
+		logger.trace(logMsg);
 		if (!node.hasAttributes()) {
 			return "";
 		}
 		Node n = node.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
 		if (n != null) {
 			logMsg = String.format("Node's name is : %s", n.getNodeValue());
-			logger.debug(logMsg);
+			logger.trace(logMsg);
 			return n.getNodeValue();
 		}
 		return "";
@@ -453,14 +473,12 @@ public class XMLManager {
 	 * @see Node
 	 */
 	public static Node getNodeWithName(Node root, String name) {
-		// TODO: to test
 		NodeList children = root.getChildNodes();
 		Node child;
 		Node recursiveResult; // result of recursive call
 		for (int i = 0; i < children.getLength(); i++) {
 			child = children.item(i);
 			String childName = XMLManager.getNodeName(child);
-			logger.debug("child name : " + childName);
 			if (childName.equals(name)) {
 				return child;
 			} else if ((recursiveResult = getNodeWithName(child, name)) != null) {
@@ -608,6 +626,7 @@ public class XMLManager {
 		}
 		name = name.replaceFirst(Notation.getDocumentationVoc(), "");
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
+		name = name.trim();
 		return name.replace(" ", "_");
 		// sanitization for generic WF's task
 		// TODO: to check
@@ -628,16 +647,36 @@ public class XMLManager {
 	 * @see Node
 	 */
 	public void addDocumentationNode(Node node, String content) {
-		Element documentation = this.document.createElement(BPMNNodesNames.DOCUMENTATION.getName());
+		Element documentation = document.createElement(BPMNNodesNames.DOCUMENTATION.getName());
 		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
 		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
-		CDATASection refersTo = this.document.createCDATASection(Notation.getReferenceVoc() + content);
+		CDATASection refersTo = document.createCDATASection(Notation.getReferenceVoc() + content);
 		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
 		logger.debug(logMsg);
 		documentation.appendChild(refersTo);
 		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
 		logger.debug(logMsg);
 		node.insertBefore(documentation, node.getFirstChild());
+	}
+
+	/**
+	 * returns whether the given {@code Element} is a meta-task or not.
+	 *
+	 * @param node node to check
+	 * @return whether the given {@code Element} is a meta-task or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean isMetaTask(Element node) {
+		String regex = String.format("%s+", Notation.getReferenceVoc());
+		final Pattern pattern = Pattern.compile(regex);
+		NodeList docNodes = node.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
+		for (int i = 0; i < docNodes.getLength(); i++) {
+			if (pattern.matcher(docNodes.item(i).getTextContent()).find()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

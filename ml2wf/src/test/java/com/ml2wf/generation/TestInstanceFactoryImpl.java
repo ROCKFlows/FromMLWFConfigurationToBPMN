@@ -2,7 +2,9 @@ package com.ml2wf.generation;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
@@ -68,14 +70,13 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 
 	@BeforeAll
 	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
-			InvalidConstraintException {
+			InvalidConstraintException, URISyntaxException {
 		// loading xml test file
 		URL url = classLoader.getResource(SOURCE_FILE_PATH);
-		String fDirectory = url.getPath().replace("%20", " "); // TODO: improve sanitization
 		// getting source document
 		this.sourceDocument = XMLManager.getDocumentFromURL(url);
 		// initializing factory
-		this.testedClass = new InstanceFactoryImpl(fDirectory);
+		this.testedClass = new InstanceFactoryImpl(new File(url.toURI()));
 		// instantializing generic WF
 		((InstanceFactoryImpl) this.testedClass).getWFInstance();
 	}
