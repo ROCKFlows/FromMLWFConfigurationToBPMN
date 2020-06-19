@@ -35,7 +35,7 @@ import picocli.CommandLine.Option;
  * @see Logger
  *
  */
-@Command(name = "-s", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "saves a worklow as a task in a FeatureModel")
+@Command(name = "save", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "saves a worklow as a task in a FeatureModel")
 public class Save extends AbstractCommand {
 
 	@Option(names = { "-i",

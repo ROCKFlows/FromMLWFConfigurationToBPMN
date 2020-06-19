@@ -3,6 +3,7 @@ package com.ml2wf;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ml2wf.cmd.Build;
 import com.ml2wf.cmd.Generate;
 import com.ml2wf.cmd.Merge;
 import com.ml2wf.cmd.Save;
@@ -27,9 +28,10 @@ public class App {
 
 	public static void main(String[] args) {
 		CommandLine commandLine = new CommandLine(new App())
-				.addSubcommand("-g", new Generate())
-				.addSubcommand("-s", new Save())
-				.addSubcommand("-m", new Merge());
+				.addSubcommand("generate", new Generate())
+				.addSubcommand("save", new Save())
+				.addSubcommand("build", new Build())
+				.addSubcommand("merge", new Merge());
 		commandLine.execute(args);
 		if (commandLine.isUsageHelpRequested()) {
 			logger.info(commandLine.getUsageMessage());

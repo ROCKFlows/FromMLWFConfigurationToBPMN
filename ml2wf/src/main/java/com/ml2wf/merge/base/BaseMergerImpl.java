@@ -2,7 +2,11 @@ package com.ml2wf.merge.base;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -36,7 +40,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @throws IOException
 	 */
 	public BaseMergerImpl(File file) throws ParserConfigurationException, SAXException, IOException {
-		// TODO: change String filePath to Path filePath (or File)
 		super(file);
 	}
 
@@ -45,20 +48,33 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		if (backUp) {
 			super.backUp();
 		}
-		Pair<String, Document> wfInfo = this.getWFDocInfoFromPath(wfFile);
-		if (wfInfo.isEmpty()) {
-			// TODO: add logs
-			return;
+		List<File> files;
+		try (Stream<Path> stream = Files.walk(wfFile.toPath())) {
+			// TODO: factorize endsWith filter in a dedicated method
+			files = stream.parallel().map(Path::toFile).filter(File::isFile)
+					.filter(p -> p.getName().endsWith(".bpmn") || p.getName().endsWith(".bpmn2"))
+					.collect(Collectors.toList());
 		}
-		Document wfDocument = wfInfo.getValue();
-		List<Node> tasks = getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
-		for (Node task : tasks) {
-			this.processTask(task);
+		if (files.isEmpty()) {
+			// wfFile is a regular file (not a directory)
+			files.add(wfFile);
 		}
-		this.processAnnotations(wfDocument);
-		if (completeMerge) {
-			this.processCompleteMerge(wfInfo);
-			this.processSpecificNeeds(wfInfo);
+		for (File file : files) {
+			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
+			if (wfInfo.isEmpty()) {
+				// TODO: add logs
+				return;
+			}
+			Document wfDocument = wfInfo.getValue();
+			List<Node> tasks = getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
+			for (Node task : tasks) {
+				this.processTask(task);
+			}
+			this.processAnnotations(wfDocument);
+			if (completeMerge) {
+				this.processCompleteMerge(wfInfo);
+				this.processSpecificNeeds(wfInfo);
+			}
 		}
 	}
 
@@ -84,6 +100,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		for (Node nestedTask : this.getNestedNodes(task)) {
 			// for each subtask
 			currentTaskName = XMLManager.getNodeName(nestedTask);
+			currentTaskName = XMLManager.sanitizeName(currentTaskName);
 			if (this.isDuplicated(currentTaskName)) {
 				// TODO: change behavior according to #77 / #78
 				continue;

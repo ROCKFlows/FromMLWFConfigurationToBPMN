@@ -39,6 +39,7 @@ public class WFMetaMerger extends BaseMergerImpl {
 	 * Meta default task tag name.
 	 */
 	private static final String META_TASK = "Meta";
+	private static final String STEP_TASK = "Step";
 	/**
 	 * Logger instance.
 	 *
@@ -61,20 +62,17 @@ public class WFMetaMerger extends BaseMergerImpl {
 
 	@Override
 	public Node getSuitableParent(Node child) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getMetaTask(STEP_TASK);
 	}
 
 	@Override
 	public Node getRootParentNode() {
-		return this.getMetaTask();
+		return this.getMetaTask(META_TASK);
 	}
 
 	@Override
 	public void processSpecificNeeds(Pair<String, Document> wfInfo) throws Exception {
-		// adds new metatasks
-		/*-List<Node> wfTasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
-		this.processTasks(wfTasks);*/
+		// TODO
 	}
 
 	/**
@@ -86,19 +84,21 @@ public class WFMetaMerger extends BaseMergerImpl {
 	 *
 	 * <p>
 	 *
+	 * @param globalNodeName the global node's name that contains the wished
+	 *                       meta-task
 	 * @return the instances {@code Node} task
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	private Node getMetaTask() {
+	private Node getMetaTask(String globalNodeName) {
 		String logMsg;
 		// TODO: factorize with a similar method in WFTasksMerger and the
 		// WFInstanceMerger#getInstancesTask
-		List<Node> tasksNodes = XMLManager.getTasksList(super.getDocument(), FeatureModelNames.SELECTOR);
+		List<Node> tasksNodes = XMLManager.getTasksList(getDocument(), FeatureModelNames.SELECTOR);
 		for (Node taskNode : tasksNodes) {
 			Node namedItem = taskNode.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
-			if ((namedItem != null) && namedItem.getNodeValue().equals(META_TASK)) {
+			if ((namedItem != null) && namedItem.getNodeValue().equals(globalNodeName)) {
 				// aldready exists
 				logger.debug("Instances node found.");
 				return taskNode;
@@ -110,11 +110,11 @@ public class WFMetaMerger extends BaseMergerImpl {
 		logger.debug("Instances node not found.");
 		logger.debug("Starting creation...");
 		Element instancesNode = getDocument().createElement(FeatureModelNames.AND.getName());
-		instancesNode.setAttribute(FeatureModelAttributes.NAME.getName(), META_TASK);
+		instancesNode.setAttribute(FeatureModelAttributes.NAME.getName(), globalNodeName);
 		logMsg = String.format("Instances node created : %s", instancesNode.getNodeName());
 		logger.debug(logMsg);
 		logger.debug("Inserting at default position...");
-		return super.getDocument().getElementsByTagName(FeatureModelNames.AND.getName()).item(1)
+		return getDocument().getElementsByTagName(FeatureModelNames.AND.getName()).item(1)
 				.appendChild(instancesNode);
 	}
 

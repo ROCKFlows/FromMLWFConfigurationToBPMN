@@ -37,7 +37,7 @@ import picocli.CommandLine.Option;
  * @see Logger
  *
  */
-@Command(name = "-m", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "import a worklow in a FeatureModel")
+@Command(name = "merge", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "import a worklow in a FeatureModel")
 public class Merge extends AbstractCommand {
 
 	@ArgGroup(exclusive = true, multiplicity = "1")

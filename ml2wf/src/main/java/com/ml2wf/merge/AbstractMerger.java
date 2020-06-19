@@ -123,7 +123,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @see Pair
 	 * @see Document
 	 */
-	protected Pair<String, Document> getWFDocInfoFromPath(File file)
+	protected Pair<String, Document> getWFDocInfoFromFile(File file)
 			throws ParserConfigurationException, SAXException, IOException {
 		String wfTaskName;
 		String logMsg;

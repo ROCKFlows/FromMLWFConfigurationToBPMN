@@ -37,7 +37,7 @@ import picocli.CommandLine.Option;
  * @see Logger
  *
  */
-@Command(name = "-g", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "generate a workflow")
+@Command(name = "generate", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "generate a workflow")
 public class Generate extends AbstractCommand {
 
 	@Option(names = { "-i", "--input" }, required = true, arity = "1", order = 1, description = "input file")

@@ -626,6 +626,7 @@ public class XMLManager {
 		}
 		name = name.replaceFirst(Notation.getDocumentationVoc(), "");
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
+		name = name.trim();
 		return name.replace(" ", "_");
 		// sanitization for generic WF's task
 		// TODO: to check
