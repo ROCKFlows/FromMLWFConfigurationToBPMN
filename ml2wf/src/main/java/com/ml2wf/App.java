@@ -4,9 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.ml2wf.cmd.Generate;
+import com.ml2wf.cmd.Merge;
 import com.ml2wf.cmd.Save;
-import com.ml2wf.cmd.merge.MergeInstance;
-import com.ml2wf.cmd.merge.MergeMeta;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -30,8 +29,7 @@ public class App {
 		CommandLine commandLine = new CommandLine(new App())
 				.addSubcommand("-g", new Generate())
 				.addSubcommand("-s", new Save())
-				.addSubcommand("-m --meta", new MergeMeta())
-				.addSubcommand("-m --instance", new MergeInstance());
+				.addSubcommand("-m", new Merge());
 		commandLine.execute(args);
 		if (commandLine.isUsageHelpRequested()) {
 			logger.info(commandLine.getUsageMessage());
