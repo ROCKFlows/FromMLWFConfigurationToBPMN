@@ -443,14 +443,14 @@ public class XMLManager {
 	 */
 	public static String getNodeName(Node node) {
 		String logMsg = String.format("Retrieving name for node : %s...", node);
-		logger.debug(logMsg);
+		logger.trace(logMsg);
 		if (!node.hasAttributes()) {
 			return "";
 		}
 		Node n = node.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
 		if (n != null) {
 			logMsg = String.format("Node's name is : %s", n.getNodeValue());
-			logger.debug(logMsg);
+			logger.trace(logMsg);
 			return n.getNodeValue();
 		}
 		return "";
@@ -485,6 +485,7 @@ public class XMLManager {
 				return recursiveResult;
 			}
 		}
+		// TODO: create Node with given name if not exists
 		return null;
 	}
 

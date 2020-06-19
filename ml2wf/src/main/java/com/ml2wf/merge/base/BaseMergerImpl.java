@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,17 +49,18 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		if (backUp) {
 			super.backUp();
 		}
-		List<File> files;
+		Set<File> files;
 		try (Stream<Path> stream = Files.walk(wfFile.toPath())) {
 			// TODO: factorize endsWith filter in a dedicated method
 			files = stream.parallel().map(Path::toFile).filter(File::isFile)
 					.filter(p -> p.getName().endsWith(".bpmn") || p.getName().endsWith(".bpmn2"))
-					.collect(Collectors.toList());
+					.collect(Collectors.toSet());
 		}
 		if (files.isEmpty()) {
 			// wfFile is a regular file (not a directory)
 			files.add(wfFile);
 		}
+		files.forEach(System.out::println);
 		for (File file : files) {
 			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
 			if (wfInfo.isEmpty()) {

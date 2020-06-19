@@ -108,7 +108,7 @@ public class Merge extends AbstractCommand {
 			this.processMerge();
 		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");
-			logger.fatal(e.getMessage());
+			e.printStackTrace(); // TODO: to replace by logger
 		}
 
 	}

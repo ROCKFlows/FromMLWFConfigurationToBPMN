@@ -95,7 +95,7 @@ public class Build extends AbstractCommand {
 	 */
 	private void processInstances() throws Exception {
 		this.merger = new WFInstanceMerger(this.featureModel);
-		this.merger.mergeWithWF(this.backUp, true, this.metaDirectory);
+		this.merger.mergeWithWF(this.backUp, true, this.instanceDirectory);
 	}
 
 	@Override
@@ -104,6 +104,7 @@ public class Build extends AbstractCommand {
 		try {
 			logger.info("Processing meta-workflows in directory : {}...", this.metaDirectory);
 			this.processMeta();
+			((XMLManager) this.merger).save();
 			logger.info("Processing instance-workflows in directory : {}...", this.instanceDirectory);
 			this.processInstances();
 			((XMLManager) this.merger).save();
