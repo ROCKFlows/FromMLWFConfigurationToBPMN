@@ -485,7 +485,6 @@ public class XMLManager {
 				return recursiveResult;
 			}
 		}
-		// TODO: create Node with given name if not exists
 		return null;
 	}
 
