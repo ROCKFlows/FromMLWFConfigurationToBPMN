@@ -3,7 +3,9 @@ package com.ml2wf.merge;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -454,7 +456,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 *
 	 * <p>
 	 *
-	 * <b>Note</b> that nested nodes are creating using the given {@code node}'s
+	 * <b>Note</b> that nested nodes are created using the given {@code node}'s
 	 * data.
 	 *
 	 * @param node node to extract nested ones
@@ -484,19 +486,55 @@ public abstract class AbstractMerger extends XMLManager {
 			} else {
 				// not a nested node
 				Node docNode = ((Element) node).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName()).item(0);
-				if (docNode == null) {
-					String logMsg = String.format("Can't read documentation for node : %s.", taskName);
-					logger.error(logMsg);
-					logger.error("Skipping...");
-					continue;
+				if (docNode != null) {
+					// if it is an instantiated task
+					getDocument().adoptNode(docNode);
+					nestedNode.appendChild(docNode);
 				}
-				getDocument().adoptNode(docNode);
-				nestedNode.appendChild(docNode);
 			}
 			result.add(nestedNode);
 			lastReferred = taskName;
 		}
 		return result;
+	}
+
+	protected List<Node> getNestedNodesBis(Node node) {
+		List<Node> result = new ArrayList<>();
+		// retrieving all nested nodes' names
+		String[] nodeName = XMLManager.getNodeName(node).split(Notation.getGeneratedPrefixVoc());
+		List<String> names = new ArrayList<>(Arrays.asList(nodeName));
+		names.removeIf(String::isBlank); // removing blanks
+		// Manage the parentNode
+		Element parentNode = (Element) node.cloneNode(true);
+		parentNode.setAttribute(BPMNNodesAttributes.NAME.getName(), names.remove(0));
+		result.add(parentNode);
+		// foreach nested node's name
+		for (String name : names) {
+			parentNode = this.createNestedNode(parentNode, name);
+			result.add(parentNode);
+		}
+		return result;
+	}
+
+	protected Element createNestedNode(Element parent, String name) {
+		Element created = getDocument().createElement(parent.getNodeName());
+		created.setAttribute(FeatureModelAttributes.NAME.getName(), name);
+		if (!this.isMetaTask(parent)) {
+			this.addDocumentationNode(created, parent.getAttribute(BPMNNodesAttributes.NAME.getName()));
+		}
+		return created;
+	}
+
+	protected boolean isMetaTask(Element node) {
+		String regex = String.format("%s+", Notation.getReferenceVoc());
+		final Pattern pattern = Pattern.compile(regex);
+		NodeList docNodes = node.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
+		for (int i = 0; i < docNodes.getLength(); i++) {
+			if (pattern.matcher(docNodes.item(i).getTextContent()).find()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
