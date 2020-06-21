@@ -61,13 +61,13 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	/**
 	 * {@code InstanceFactory}'s default constructor.
 	 *
-	 * @param filePath the XML filepath.
+	 * @param file the XML file.
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public InstanceFactoryImpl(String filePath) throws ParserConfigurationException, SAXException, IOException {
-		super(filePath);
+	public InstanceFactoryImpl(File file) throws ParserConfigurationException, SAXException, IOException {
+		super(file);
 	}
 
 	/**
@@ -99,24 +99,27 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	@Override
-	public void getWFInstance(String resultPath)
+	public void getWFInstance(File outputDir)
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		logger.info("Starting the Workflow instatiation...");
+		if (!outputDir.isDirectory()) {
+			outputDir = outputDir.getParentFile();
+		}
 		this.addMetaWFReferences();
 		String logMsg;
-		for (Node node : XMLManager.getTasksList(super.getDocument(), BPMNNodesNames.SELECTOR)) {
+		for (Node node : XMLManager.getTasksList(getDocument(), BPMNNodesNames.SELECTOR)) {
 			logMsg = String.format("Instantiating the node %s...", node);
 			logger.debug(logMsg);
 			this.instantiateNode(node);
 		}
 		logger.info("Instantiation finished.");
 		String resultFname = XMLManager.insertInFileName(super.getSourceFile().getName(), Notation.getInstanceVoc());
-		super.save(Paths.get(resultPath, resultFname).toString());
+		super.save(new File(Paths.get(outputDir.getPath(), resultFname).toString()));
 	}
 
 	/**
 	 * Calls the {@link #getWFInstance(String)} method with
-	 * {@link #getSourceFile()}'s directory as parameter.
+	 * {@link #getSourceFile()} as parameter.
 	 *
 	 * @throws TransformerException
 	 * @throws SAXException
@@ -128,8 +131,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see {@link #getWFInstance(String)}
 	 */
 	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		String absolutePath = super.getSourceFile().getAbsolutePath();
-		this.getWFInstance(absolutePath.substring(0, absolutePath.lastIndexOf(File.separator)));
+		this.getWFInstance(super.getSourceFile());
 	}
 
 	/**
@@ -188,7 +190,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	private void addMetaWFReferences() {
 		// TODO: add logs
 		logger.debug("Adding the meta reference...");
-		String metaReference = XMLManager.getWorkflowName(this.getDocument()).replace(" ", "_");
+		String metaReference = XMLManager.getWorkflowName(getDocument()).replace(" ", "_");
 		this.addMetaWFRefDoc(metaReference);
 		this.addWFRefAnnot(metaReference);
 	}
@@ -202,7 +204,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	private void addMetaWFRefDoc(String referred) {
 		logger.debug("Adding meta referrence in the documentation...");
-		NodeList processNodeList = this.getDocument().getElementsByTagName(BPMNNodesNames.PROCESS.getName());
+		NodeList processNodeList = getDocument().getElementsByTagName(BPMNNodesNames.PROCESS.getName());
 		if (processNodeList.getLength() == 0) {
 			logger.error("Error while getting the reffered metaworkflow's name.");
 			logger.warn("Skipping this step...");
@@ -220,7 +222,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @since 1.0
 	 */
 	private void addWFRefAnnot(String reference) {
-		Node globalAnnotation = XMLManager.getGlobalAnnotationNode(this.getDocument());
+		Node globalAnnotation = XMLManager.getGlobalAnnotationNode(getDocument());
 		List<String> lines = new ArrayList<>(Notation.getGlobalAnnotationDefaultContent());
 		String metaRef = lines.remove(1);
 		metaRef = String.format(metaRef, Notation.getReferencesDelimiterLeft(), reference,
@@ -230,7 +232,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 						Notation.getReferencesDelimiterRight()))
 				.collect(Collectors.toList());
 		lines.add(1, metaRef);
-		Node newTextNode = this.getDocument().createElement(BPMNNodesNames.TEXT.getName());
+		Node newTextNode = getDocument().createElement(BPMNNodesNames.TEXT.getName());
 		newTextNode.setTextContent(String.join("\n", lines));
 		globalAnnotation.appendChild(newTextNode);
 	}
@@ -248,8 +250,8 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	private void addExtensionNode(Node node) {
-		Node extension = super.getDocument().createElement(BPMNNodesNames.EXTENSION.getName());
-		Element style = super.getDocument().createElement(BPMNNodesNames.STYLE.getName());
+		Node extension = getDocument().createElement(BPMNNodesNames.EXTENSION.getName());
+		Element style = getDocument().createElement(BPMNNodesNames.STYLE.getName());
 		String logMsg = String.format("	Adding style %s to node %s", INSTANTIATE_COLOR, node);
 		logger.debug(logMsg);
 		style.setAttribute(BPMNNodesAttributes.BACKGROUND.getName(), INSTANTIATE_COLOR);

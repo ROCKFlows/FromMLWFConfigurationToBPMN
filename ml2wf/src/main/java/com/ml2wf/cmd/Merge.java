@@ -1,12 +1,17 @@
 package com.ml2wf.cmd;
 
+import java.io.File;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
 
 import com.ml2wf.merge.AbstractMerger;
-import com.ml2wf.merge.tasks.WFTasksMerger;
+import com.ml2wf.merge.base.BaseMerger;
+import com.ml2wf.merge.concretes.WFInstanceMerger;
+import com.ml2wf.merge.concretes.WFMetaMerger;
+import com.ml2wf.util.XMLManager;
 
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -16,8 +21,7 @@ import picocli.CommandLine.Option;
  * <p>
  *
  * It calls required methods for the importation of a instantiated workflow's
- * tasks to a
- * FeatureModel.
+ * tasks to a FeatureModel.
  *
  * <p>
  *
@@ -33,18 +37,56 @@ import picocli.CommandLine.Option;
  * @see Logger
  *
  */
-@Command(name = "-m", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "import a worklow in a FeatureModel")
+@Command(name = "merge", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "import a worklow in a FeatureModel")
 public class Merge extends AbstractCommand {
 
-	@Option(names = { "-i", "--input" }, required = true, arity = "1", order = 1, description = "input file")
-	String input;
+	@ArgGroup(exclusive = true, multiplicity = "1")
+	Exclusive exclusive;
 
-	@Option(names = { "-o", "--output" }, required = true, arity = "1", order = 1, description = "output file")
-	String output;
+	/**
+	 * Exclusive {@code class} containing the <b>meta/instance</b> options.
+	 *
+	 * <p>
+	 *
+	 * An exclusive {@code class} contains required options that can't be both
+	 * given.
+	 *
+	 * <p>
+	 *
+	 * More informations :
+	 * <a href="https://picocli.info/#_mutually_exclusive_options">Mutually
+	 * exclusive options</a>
+	 *
+	 * @author Nicolas Lacroix
+	 *
+	 * @see ArgGroup
+	 *
+	 */
+	static class Exclusive {
+
+		@Option(names = "--meta")
+		boolean meta;
+		@Option(names = "--instance")
+		boolean instance;
+	}
+
+	@Option(names = { "-i",
+			"--input" }, required = true, arity = "1", order = 1, description = "input file")
+	File input;
+
+	@Option(names = { "-o",
+			"--output" }, required = true, arity = "1", order = 2, description = "output file")
+	File output;
+
+	@Option(names = { "-f",
+			"--full" }, arity = "0", order = 3, description = "Full merge (including meta/instance association")
+	boolean fullMerge;
 
 	@Option(names = { "-b",
-			"--backup" }, arity = "0", order = 1, description = "backup the original FeatureModel file before any modification")
+			"--backup" }, arity = "0", order = 4, description = "backup the original FeatureModel file before any modification")
 	boolean backUp;
+
+	private BaseMerger merger;
 
 	/**
 	 * Logger instance.
@@ -54,17 +96,21 @@ public class Merge extends AbstractCommand {
 	 */
 	private static final Logger logger = LogManager.getLogger(Merge.class);
 
+	protected void processMerge() throws Exception {
+		this.merger.mergeWithWF(this.backUp, this.fullMerge, this.input);
+		((XMLManager) this.merger).save();
+	}
+
 	@Override
 	public void run() {
-		Configurator.setLevel(getPackageName(), getVerbLevel(this.verbose));
-		WFTasksMerger merger;
 		try {
-			merger = new WFTasksMerger(this.output);
-			merger.mergeWithWF(this.backUp, this.input);
-			LogManager.shutdown();
+			this.merger = (this.exclusive.meta) ? new WFMetaMerger(this.output) : new WFInstanceMerger(this.output);
+			this.processMerge();
 		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");
-			logger.fatal(e.getMessage());
+			e.printStackTrace(); // TODO: to replace by logger
 		}
+
 	}
+
 }
