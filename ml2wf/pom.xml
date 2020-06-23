@@ -18,6 +18,10 @@
         <version.picocli>4.3.2</version.picocli>
         <version.log4j>2.13.3</version.log4j>
         <dependency.directory>dependency/</dependency.directory>
+        <sonar.projectKey>MireilleBF_FromMLWFConfigurationToBPMN</sonar.projectKey>
+        <sonar.organization>mireillebf-github</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>4ba0a39c51c4b00ce2d647dac7fce9c8f358d402</sonar.login>
     </properties>
     <build>
         <finalName>ml2wf</finalName>
