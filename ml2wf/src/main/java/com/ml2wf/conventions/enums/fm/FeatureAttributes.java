@@ -10,7 +10,7 @@ package com.ml2wf.conventions.enums.fm;
  * @version 1.0
  *
  */
-public enum FeatureModelAttributes {
+public enum FeatureAttributes {
 
 	NAME("name"), ABSTRACT("abstract"), KEY("key"), VALUE("value");
 
@@ -24,7 +24,7 @@ public enum FeatureModelAttributes {
 	 *
 	 * @param name name of the tag
 	 */
-	private FeatureModelAttributes(String name) {
+	private FeatureAttributes(String name) {
 		this.name = name;
 	}
 

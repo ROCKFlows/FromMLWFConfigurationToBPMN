@@ -21,10 +21,10 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactory;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
-import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
-import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
+import com.ml2wf.conventions.enums.bpmn.BPMNNames;
+import com.ml2wf.conventions.enums.fm.FeatureAttributes;
+import com.ml2wf.conventions.enums.fm.FeatureNames;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
@@ -106,6 +106,211 @@ public abstract class AbstractMerger extends XMLManager {
 	}
 
 	/**
+	 * Adopts and adds new {@code rules} to the FM document's constraint tag.
+	 *
+	 * @param rules {@code List} of {@code Node} rules to add to the FM document
+	 *
+	 * @since 1.0
+	 *
+	 * @see Node
+	 */
+	protected void adoptRules(List<Node> rules) {
+		Node constraintsNode = this.createConstraintTag();
+		// getting constraints
+		List<Node> constraints = new ArrayList<>(
+				XMLManager.nodeListAsList(getDocument().getElementsByTagName(FeatureNames.RULE.getName())));
+		for (Node rule : rules) {
+			if (constraints.stream().noneMatch(rule::isEqualNode)) {
+				// if it is not duplicated constraint
+				getDocument().adoptNode(rule);
+				constraintsNode.appendChild(rule);
+			}
+		}
+	}
+
+	/**
+	 * Creates the <b>constraints</b> {@code Node} if it doesn't exist.
+	 *
+	 * @return the constraints {@code Node}
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	protected Node createConstraintTag() {
+		NodeList nodeList = getDocument().getElementsByTagName(FeatureNames.CONSTRAINTS.getName());
+		if (nodeList.getLength() > 0) {
+			// aldready exists
+			return nodeList.item(0);
+		} else {
+			Node consTag = getDocument().createElement(FeatureNames.CONSTRAINTS.getName());
+			NodeList fmTagList = getDocument().getElementsByTagName(FeatureNames.FEATUREMODEL.getName());
+			if (fmTagList.getLength() == 0) {
+				// if it is an ExtendedFeatureModel
+				fmTagList = getDocument().getElementsByTagName(FeatureNames.EXTENDEDFEATUREMODEL.getName());
+			}
+			Node rootNode = fmTagList.item(0);
+			return rootNode.appendChild(consTag);
+		}
+	}
+
+	/**
+	 * Creates and returns a new feature with the given {@code name}.
+	 *
+	 * @param name name of the feature
+	 * @return a new feature with the given {@code name}
+	 *
+	 * @since 1.0
+	 */
+	protected Element createFeatureWithName(String name) {
+		Element feature = getDocument().createElement(FeatureNames.FEATURE.getName());
+		feature.setAttribute(FeatureAttributes.NAME.getName(), name);
+		return feature;
+	}
+
+	/**
+	 * Creates and returns the nested {@code Node} according to the {@code parent}
+	 * data.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that the created {@code Node} is not added to the
+	 * {@code parent}'s children.
+	 *
+	 * @param parent parent of the created nested node
+	 * @param name   name of the nested node
+	 * @return the nested {@code Node} according to the {@code parent} data
+	 *
+	 * @since 1.0
+	 */
+	protected Element createNestedNode(Element parent, String name) {
+		Element created = getDocument().createElement(parent.getNodeName());
+		created.setAttribute(FeatureAttributes.NAME.getName(), name);
+		if (!this.isMetaTask(parent)) {
+			this.addDocumentationNode(created, parent.getAttribute(BPMNAttributes.NAME.getName()));
+		}
+		return created;
+	}
+
+	/**
+	 * Creates the <b>tagName</b> {@code Node} and append it to the given
+	 * {@code parent} if it doesn't exist.
+	 *
+	 * @param parent  {@code parent} of {@code tagName Node}
+	 * @param tagName name of tag to be created
+	 * @return the created tag
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	protected Node createTag(Element parent, FeatureNames tagName) {
+		NodeList nodeList = parent.getElementsByTagName(tagName.getName());
+		if (nodeList.getLength() > 0) {
+			// aldready exists
+			return nodeList.item(0);
+		}
+		Node newTag = getDocument().createElement(tagName.getName());
+		return parent.appendChild(newTag);
+	}
+
+	/**
+	 * Creates if needed and returns the Unmanaged abstract task {@code Node}.
+	 *
+	 * @return the Unmanaged abstract task {@code Node}
+	 *
+	 * @since 1.0
+	 */
+	protected Node createUnmanagedAbstractTask() {
+		Node parent = getDocument().getElementsByTagName(FeatureNames.AND.getName()).item(1);
+
+		// TODO: factorize with #isDuplicated
+		List<Node> andNodes = new ArrayList<>();
+		andNodes.addAll(
+				XMLManager.nodeListAsList(getDocument().getElementsByTagName(FeatureNames.AND.getName())));
+		for (Node andNode : andNodes) {
+			if (andNode.getAttributes().getNamedItem(FeatureAttributes.NAME.getName()).getNodeValue()
+					.equals(DEFAULT_PARENT_NAME)) {
+				return andNode;
+			}
+		}
+		Element child = getDocument().createElement(FeatureNames.AND.getName());
+		child.setAttribute(FeatureAttributes.ABSTRACT.getName(), String.valueOf(true));
+		child.setAttribute(FeatureAttributes.NAME.getName(), DEFAULT_PARENT_NAME);
+		return parent.appendChild(child);
+	}
+
+	/**
+	 * Returns a {@code List} of nested {@code Element} referred by the given
+	 * {@code node}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that nested nodes are created using the given {@code node}'s
+	 * data.
+	 *
+	 * @param node node to extract nested ones
+	 * @return a {@code List} of nested {@code Node} referred by the given
+	 *         {@code node}
+	 *
+	 * @since 1.0
+	 */
+	protected List<Node> getNestedNodes(Node node) {
+		List<Node> result = new ArrayList<>();
+		// retrieving all nested nodes' names
+		String[] nodeName = XMLManager.getNodeName(node).split(Notation.getGeneratedPrefixVoc());
+		List<String> names = new ArrayList<>(Arrays.asList(nodeName));
+		names.removeIf(String::isBlank); // removing blanks
+		// Manage the parentNode
+		Element parentNode = (Element) node.cloneNode(true);
+		parentNode.setAttribute(BPMNAttributes.NAME.getName(), names.remove(0));
+		result.add(parentNode);
+		// foreach nested node's name
+		for (String name : names) {
+			parentNode = this.createNestedNode(parentNode, name);
+			result.add(parentNode);
+		}
+		return result;
+	}
+
+	/**
+	 * Returns the given {@code task}'s name.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method is different from the
+	 * {@link XMLManager#getNodeName(Node)} because it only returns the deepest
+	 * subtask's name.
+	 *
+	 * @param task task to get name
+	 * @return the given {@code task}'s name
+	 *
+	 * @since 1.0
+	 */
+	protected String getTaskName(Node task) {
+		String logMsg = String.format("Retrieving name for task : %s...", task);
+		logger.debug(logMsg);
+		String taskName = XMLManager.getNodeName(task);
+		String[] splitted = taskName.split(Notation.getGeneratedPrefixVoc());
+		taskName = (splitted.length > 0) ? splitted[splitted.length - 1] : taskName;
+		logMsg = String.format("Task's name is : %s", taskName);
+		logger.debug(logMsg);
+		return taskName;
+	}
+
+	/**
+	 * Returns a {@code List} containing all {@code nodes}' tasks names.
+	 *
+	 * @param nodes nodes to get the names
+	 * @return a {@code List} containing all {@code nodes}' tasks names
+	 *
+	 * @since 1.0
+	 * @see NodeList
+	 */
+	protected List<String> getTasksNames(List<Node> tasks) {
+		return tasks.stream().map(this::getTaskName)
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Returns the workflow's document and name with the given {@code filePath}
 	 * using the {@link Pair} class. If the {@code filePath} is not a valid path or
 	 * the workflow's name is already in the feature model, return an empty
@@ -144,171 +349,6 @@ public abstract class AbstractMerger extends XMLManager {
 			return new Pair<>();
 		}
 		return new Pair<>(wfTaskName, wfDocument);
-	}
-
-	/**
-	 * Processes {@code document}'s annotations and adds constraints.
-	 *
-	 * @param wfDocument Workflow {@code Document}'s instance containing
-	 *                   annotations.
-	 * @throws InvalidConstraintException
-	 *
-	 * @since 1.0
-	 * @see ConstraintFactory
-	 */
-	protected void processAnnotations(Document wfDocument) throws InvalidConstraintException {
-		logger.info("Processing annotations...");
-		List<Node> annotations = XMLManager
-				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName()));
-		List<Pair<Node, Node>> orderPairs; // pair that will contain order constraint data
-		for (Node annotation : annotations) {
-			// TODO: improve performances (check annotation.getChildNodes().item(1)
-			// sufficient ?)
-			for (Node commentNode : XMLManager.nodeListAsList(annotation.getChildNodes())) {
-				String comment = commentNode.getTextContent();
-				orderPairs = this.getConstraintFactory().getOrderNodes(comment);
-				if (!orderPairs.isEmpty()) {
-					// this is an order constraint
-					this.processOrderConstraint(orderPairs);
-				} else {
-					// this is a "classic" constraint
-					List<Node> newRules = this.getConstraintFactory().getRuleNodes(comment);
-					this.adoptRules(newRules);
-				}
-			}
-		}
-		logger.info("Annotations processing ended...");
-	}
-
-	/**
-	 * Processes the order constraints.
-	 *
-	 * *
-	 * <p>
-	 *
-	 * An association constraint is an order implication between two features.
-	 *
-	 * <p>
-	 *
-	 * e.g. A before B, C after D
-	 *
-	 * @param orderPairs {@code List} of {@code Pair} containing the LCA
-	 *                   {@code Node} as key and the descriptive {@code Node} as
-	 *                   value
-	 *
-	 * @since 1.0
-	 *
-	 * @see Node
-	 * @see Pair
-	 */
-	protected void processOrderConstraint(List<Pair<Node, Node>> orderPairs) {
-		for (Pair<Node, Node> pair : orderPairs) {
-			Node docNode = this.createTag(((Element) pair.getKey()), FeatureModelNames.DESCRIPTION);
-			if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
-				logger.error("The merge operation for description nodes failed.");
-			}
-		}
-	}
-
-	/**
-	 * Processes the association constraints.
-	 *
-	 * <p>
-	 *
-	 * An association constraint is an implication between the {@code wfName} and
-	 * the {@code wfDocument}'s tasks.
-	 *
-	 * @param wfDocument workflow's document
-	 * @param wfName     workflow's name
-	 * @throws InvalidConstraintException
-	 *
-	 * @since 1.0
-	 */
-	protected void processAssocConstraints(Document wfDocument, String wfName) throws InvalidConstraintException {
-		String logMsg;
-		logger.debug("Retrieving all FM document tasks...");
-		List<Node> tasks = XMLManager.getTasksList(wfDocument, BPMNNodesNames.SELECTOR);
-		List<String> tasksNames = this.getTasksNames(tasks);
-		logger.debug("Getting the constraint association...");
-		String associationConstraint = ((ConstraintFactoryImpl) this.getConstraintFactory())
-				.getAssociationConstraint(wfName, tasksNames);
-		logMsg = String.format("Generated constraint association : %s", associationConstraint);
-		logger.info(logMsg);
-		// add the new constraint
-		logger.info("Adding association constraint...");
-		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
-	}
-
-	/**
-	 * Creates the <b>tagName</b> {@code Node} and append it to the given
-	 * {@code parent} if it doesn't exist.
-	 *
-	 * @param parent  {@code parent} of {@code tagName Node}
-	 * @param tagName name of tag to be created
-	 * @return the created tag
-	 *
-	 * @since 1.0
-	 * @see Node
-	 */
-	protected Node createTag(Element parent, FeatureModelNames tagName) {
-		NodeList nodeList = parent.getElementsByTagName(tagName.getName());
-		if (nodeList.getLength() > 0) {
-			// aldready exists
-			return nodeList.item(0);
-		}
-		Node newTag = getDocument().createElement(tagName.getName());
-		return parent.appendChild(newTag);
-	}
-
-	/**
-	 * Creates the <b>constraints</b> {@code Node} if it doesn't exist.
-	 *
-	 * @return the constraints {@code Node}
-	 *
-	 * @since 1.0
-	 * @see Node
-	 */
-	protected Node createConstraintTag() {
-		NodeList nodeList = getDocument().getElementsByTagName(FeatureModelNames.CONSTRAINTS.getName());
-		if (nodeList.getLength() > 0) {
-			// aldready exists
-			return nodeList.item(0);
-		} else {
-			Node consTag = getDocument().createElement(FeatureModelNames.CONSTRAINTS.getName());
-			NodeList fmTagList = getDocument().getElementsByTagName(FeatureModelNames.FEATUREMODEL.getName());
-			if (fmTagList.getLength() == 0) {
-				// if it is an ExtendedFeatureModel
-				fmTagList = getDocument().getElementsByTagName(FeatureModelNames.EXTENDEDFEATUREMODEL.getName());
-			}
-			Node rootNode = fmTagList.item(0);
-			return rootNode.appendChild(consTag);
-		}
-	}
-
-	/**
-	 * Creates if needed and returns the Unmanaged abstract task {@code Node}.
-	 *
-	 * @return the Unmanaged abstract task {@code Node}
-	 *
-	 * @since 1.0
-	 */
-	protected Node createUnmanagedAbstractTask() {
-		Node parent = getDocument().getElementsByTagName(FeatureModelNames.AND.getName()).item(1);
-
-		// TODO: factorize with #isDuplicated
-		List<Node> andNodes = new ArrayList<>();
-		andNodes.addAll(
-				XMLManager.nodeListAsList(getDocument().getElementsByTagName(FeatureModelNames.AND.getName())));
-		for (Node andNode : andNodes) {
-			if (andNode.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName()).getNodeValue()
-					.equals(DEFAULT_PARENT_NAME)) {
-				return andNode;
-			}
-		}
-		Element child = getDocument().createElement(FeatureModelNames.AND.getName());
-		child.setAttribute(FeatureModelAttributes.ABSTRACT.getName(), String.valueOf(true));
-		child.setAttribute(FeatureModelAttributes.NAME.getName(), DEFAULT_PARENT_NAME);
-		return parent.appendChild(child);
 	}
 
 	/**
@@ -367,143 +407,103 @@ public abstract class AbstractMerger extends XMLManager {
 	protected boolean isDuplicated(String instTaskName) {
 		// TODO: remove if not necessary (due to the instance tasks' naming changing)
 		// get all tasks
-		List<Node> tasks = XMLManager.getTasksList(getDocument(), FeatureModelNames.SELECTOR);
+		List<Node> tasks = XMLManager.getTasksList(getDocument(), FeatureNames.SELECTOR);
 		// get task name
 		String target = XMLManager.sanitizeName(instTaskName);
 		return XMLManager.getNodesNames(tasks).contains(target);
 	}
 
 	/**
-	 * Adopts and adds new {@code rules} to the FM document's constraint tag.
+	 * Processes {@code document}'s annotations and adds constraints.
 	 *
-	 * @param rules {@code List} of {@code Node} rules to add to the FM document
+	 * @param wfDocument Workflow {@code Document}'s instance containing
+	 *                   annotations.
+	 * @throws InvalidConstraintException
+	 *
+	 * @since 1.0
+	 * @see ConstraintFactory
+	 */
+	protected void processAnnotations(Document wfDocument) throws InvalidConstraintException {
+		logger.info("Processing annotations...");
+		List<Node> annotations = XMLManager
+				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNames.ANNOTATION.getName()));
+		List<Pair<Node, Node>> orderPairs; // pair that will contain order constraint data
+		for (Node annotation : annotations) {
+			// TODO: improve performances (check annotation.getChildNodes().item(1)
+			// sufficient ?)
+			for (Node commentNode : XMLManager.nodeListAsList(annotation.getChildNodes())) {
+				String comment = commentNode.getTextContent();
+				orderPairs = this.getConstraintFactory().getOrderNodes(comment);
+				if (!orderPairs.isEmpty()) {
+					// this is an order constraint
+					this.processOrderConstraint(orderPairs);
+				} else {
+					// this is a "classic" constraint
+					List<Node> newRules = this.getConstraintFactory().getRuleNodes(comment);
+					this.adoptRules(newRules);
+				}
+			}
+		}
+		logger.info("Annotations processing ended...");
+	}
+
+	/**
+	 * Processes the association constraints.
+	 *
+	 * <p>
+	 *
+	 * An association constraint is an implication between the {@code wfName} and
+	 * the {@code wfDocument}'s tasks.
+	 *
+	 * @param wfDocument workflow's document
+	 * @param wfName     workflow's name
+	 * @throws InvalidConstraintException
+	 *
+	 * @since 1.0
+	 */
+	protected void processAssocConstraints(Document wfDocument, String wfName) throws InvalidConstraintException {
+		String logMsg;
+		logger.debug("Retrieving all FM document tasks...");
+		List<Node> tasks = XMLManager.getTasksList(wfDocument, BPMNNames.SELECTOR);
+		List<String> tasksNames = this.getTasksNames(tasks);
+		logger.debug("Getting the constraint association...");
+		String associationConstraint = ((ConstraintFactoryImpl) this.getConstraintFactory())
+				.getAssociationConstraint(wfName, tasksNames);
+		logMsg = String.format("Generated constraint association : %s", associationConstraint);
+		logger.info(logMsg);
+		// add the new constraint
+		logger.info("Adding association constraint...");
+		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
+	}
+
+	/**
+	 * Processes the order constraints.
+	 *
+	 * *
+	 * <p>
+	 *
+	 * An association constraint is an order implication between two features.
+	 *
+	 * <p>
+	 *
+	 * e.g. A before B, C after D
+	 *
+	 * @param orderPairs {@code List} of {@code Pair} containing the LCA
+	 *                   {@code Node} as key and the descriptive {@code Node} as
+	 *                   value
 	 *
 	 * @since 1.0
 	 *
 	 * @see Node
+	 * @see Pair
 	 */
-	protected void adoptRules(List<Node> rules) {
-		Node constraintsNode = this.createConstraintTag();
-		// getting constraints
-		List<Node> constraints = new ArrayList<>(
-				XMLManager.nodeListAsList(getDocument().getElementsByTagName(FeatureModelNames.RULE.getName())));
-		for (Node rule : rules) {
-			if (constraints.stream().noneMatch(rule::isEqualNode)) {
-				// if it is not duplicated constraint
-				getDocument().adoptNode(rule);
-				constraintsNode.appendChild(rule);
+	protected void processOrderConstraint(List<Pair<Node, Node>> orderPairs) {
+		for (Pair<Node, Node> pair : orderPairs) {
+			Node docNode = this.createTag(((Element) pair.getKey()), FeatureNames.DESCRIPTION);
+			if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
+				logger.error("The merge operation for description nodes failed.");
 			}
 		}
-	}
-
-	/**
-	 * Creates and returns a new feature with the given {@code name}.
-	 *
-	 * @param name name of the feature
-	 * @return a new feature with the given {@code name}
-	 *
-	 * @since 1.0
-	 */
-	protected Element createFeatureWithName(String name) {
-		Element feature = getDocument().createElement(FeatureModelNames.FEATURE.getName());
-		feature.setAttribute(FeatureModelAttributes.NAME.getName(), name);
-		return feature;
-	}
-
-	/**
-	 * Returns the given {@code task}'s name.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that this method is different from the
-	 * {@link XMLManager#getNodeName(Node)} because it only returns the deepest
-	 * subtask's name.
-	 *
-	 * @param task task to get name
-	 * @return the given {@code task}'s name
-	 *
-	 * @since 1.0
-	 */
-	protected String getTaskName(Node task) {
-		String logMsg = String.format("Retrieving name for task : %s...", task);
-		logger.debug(logMsg);
-		String taskName = XMLManager.getNodeName(task);
-		String[] splitted = taskName.split(Notation.getGeneratedPrefixVoc());
-		taskName = (splitted.length > 0) ? splitted[splitted.length - 1] : taskName;
-		logMsg = String.format("Task's name is : %s", taskName);
-		logger.debug(logMsg);
-		return taskName;
-	}
-
-	/**
-	 * Returns a {@code List} containing all {@code nodes}' tasks names.
-	 *
-	 * @param nodes nodes to get the names
-	 * @return a {@code List} containing all {@code nodes}' tasks names
-	 *
-	 * @since 1.0
-	 * @see NodeList
-	 */
-	protected List<String> getTasksNames(List<Node> tasks) {
-		return tasks.stream().map(this::getTaskName)
-				.collect(Collectors.toList());
-	}
-
-	/**
-	 * Returns a {@code List} of nested {@code Element} referred by the given
-	 * {@code node}.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that nested nodes are created using the given {@code node}'s
-	 * data.
-	 *
-	 * @param node node to extract nested ones
-	 * @return a {@code List} of nested {@code Node} referred by the given
-	 *         {@code node}
-	 *
-	 * @since 1.0
-	 */
-	protected List<Node> getNestedNodes(Node node) {
-		List<Node> result = new ArrayList<>();
-		// retrieving all nested nodes' names
-		String[] nodeName = XMLManager.getNodeName(node).split(Notation.getGeneratedPrefixVoc());
-		List<String> names = new ArrayList<>(Arrays.asList(nodeName));
-		names.removeIf(String::isBlank); // removing blanks
-		// Manage the parentNode
-		Element parentNode = (Element) node.cloneNode(true);
-		parentNode.setAttribute(BPMNNodesAttributes.NAME.getName(), names.remove(0));
-		result.add(parentNode);
-		// foreach nested node's name
-		for (String name : names) {
-			parentNode = this.createNestedNode(parentNode, name);
-			result.add(parentNode);
-		}
-		return result;
-	}
-
-	/**
-	 * Creates and returns the nested {@code Node} according to the {@code parent}
-	 * data.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that the created {@code Node} is not added to the
-	 * {@code parent}'s children.
-	 *
-	 * @param parent parent of the created nested node
-	 * @param name   name of the nested node
-	 * @return the nested {@code Node} according to the {@code parent} data
-	 *
-	 * @since 1.0
-	 */
-	protected Element createNestedNode(Element parent, String name) {
-		Element created = getDocument().createElement(parent.getNodeName());
-		created.setAttribute(FeatureModelAttributes.NAME.getName(), name);
-		if (!this.isMetaTask(parent)) {
-			this.addDocumentationNode(created, parent.getAttribute(BPMNNodesAttributes.NAME.getName()));
-		}
-		return created;
 	}
 
 }

@@ -29,10 +29,10 @@ import org.xml.sax.SAXException;
 import com.ml2wf.AbstractXMLTest;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
-import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
-import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
+import com.ml2wf.conventions.enums.bpmn.BPMNNames;
+import com.ml2wf.conventions.enums.fm.FeatureAttributes;
+import com.ml2wf.conventions.enums.fm.FeatureNames;
 import com.ml2wf.merge.concretes.WFInstanceMerger;
 import com.ml2wf.util.XMLManager;
 
@@ -151,20 +151,20 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 		this.sourceDocument = XMLManager.preprocess(path.toFile());
 		this.resultDocument = XMLManager.getDocument();
 		// getting WF's source task nodes
-		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNodesNames.SELECTOR);
+		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
 		// List<Node> sourceNestedNodes = ;
 		// getting FM tasks
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FeatureModelNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FeatureNames.SELECTOR);
 		// getting tasks' names
 		List<String> sourceNodesNames = sourceNodes.stream()
 				.flatMap(n -> ((AbstractMerger) this.testedClass).getNestedNodes(n).stream()) // flattening
 				.map(Node::getAttributes) // getting attributes
-				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())) // getting Name attribute
+				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())) // getting Name attribute
 				.map(Node::getNodeValue) // getting name value
 				.map((v) -> XMLManager.sanitizeName(v))
 				.collect(Collectors.toList());
 		List<String> resultNodesNames = resultNodes.stream().map(Node::getAttributes)
-				.map(a -> a.getNamedItem(FeatureModelAttributes.NAME.getName())).map(Node::getNodeValue)
+				.map(a -> a.getNamedItem(FeatureAttributes.NAME.getName())).map(Node::getNodeValue)
 				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
 		// testing
 		assertTrue(resultNodesNames.containsAll(sourceNodesNames)); // #1

@@ -16,7 +16,7 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
  * @version 1.0
  *
  */
-public enum FeatureModelNames implements TaskTagsSelector {
+public enum FeatureNames implements TaskTagsSelector {
 
 	// general tags
 	FEATUREMODEL("featureModel"), EXTENDEDFEATUREMODEL("extendedFeatureModel"), PROPERTIES("properties"),
@@ -40,7 +40,7 @@ public enum FeatureModelNames implements TaskTagsSelector {
 	 *
 	 * @param name name of the tag
 	 */
-	private FeatureModelNames(String name) {
+	private FeatureNames(String name) {
 		this.name = name;
 	}
 
