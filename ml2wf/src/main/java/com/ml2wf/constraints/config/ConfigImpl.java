@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 
 import com.ml2wf.conventions.enums.fm.FeatureNames;
 
-// TODO: reorganize methods order
 
 /**
  * This class contains the current configuration of the application.
