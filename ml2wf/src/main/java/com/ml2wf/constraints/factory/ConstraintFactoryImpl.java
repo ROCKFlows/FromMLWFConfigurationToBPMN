@@ -173,7 +173,6 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 		for (BinaryTree<String> tree : trees) {
 			Node rule = this.document.createElement(FeatureNames.RULE.getName());
-			// rules.add(this.generateNode(tree, rule));
 			this.generateRuleNode(tree, rule);
 			rules.add(rule);
 		}
@@ -195,7 +194,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 				List<Node> nodes = taskNames.stream().map(n -> XMLManager.getNodeWithName(this.document, n))
 						.collect(Collectors.toList());
 				// get and add LCA
-				Node lca = XMLManager.getLowestCommonAncestor(nodes);
+				Node lca = (nodes.contains(null)) ? null : XMLManager.getLowestCommonAncestor(nodes);
 				// set description node
 				description.setTextContent(tree.toString());
 				// add new pair to list

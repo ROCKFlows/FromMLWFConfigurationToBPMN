@@ -499,9 +499,18 @@ public abstract class AbstractMerger extends XMLManager {
 	 */
 	protected void processOrderConstraint(List<Pair<Node, Node>> orderPairs) {
 		for (Pair<Node, Node> pair : orderPairs) {
-			Node docNode = this.createTag(((Element) pair.getKey()), FeatureNames.DESCRIPTION);
-			if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
-				logger.error("The merge operation for description nodes failed.");
+			Element key;
+			if ((key = (Element) pair.getKey()) != null) {
+				// the order association has been parsed
+				Node docNode = this.createTag(key, FeatureNames.DESCRIPTION);
+				if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
+					// if there is a merge failure for description nodes
+					logger.error("The merge operation for description nodes failed.");
+				}
+			} else {
+				// the operation failed
+				logger.error("Can't merge the order constraint : {}", pair.getValue().getTextContent());
+				logger.warn("Maybe one of the involved task is not in the current workflow ?");
 			}
 		}
 	}
