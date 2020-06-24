@@ -18,9 +18,8 @@ import org.xml.sax.SAXException;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
-import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
-import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.conventions.enums.bpmn.BPMNNames;
+import com.ml2wf.conventions.enums.fm.FeatureNames;
 import com.ml2wf.merge.base.BaseMergerImpl;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
@@ -86,13 +85,12 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	 */
 	@Override
 	public Node getSuitableParent(Node task) {
-		// TODO: check behavior
 		// retrieving the references parent
-		Node docNode = ((Element) task).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName()).item(0);
+		Node docNode = ((Element) task).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
 		if (docNode != null) {
 			// if contains a documentation node that can refer to a generic task
 			// retrieving all candidates
-			List<Node> candidates = XMLManager.getTasksList(getDocument(), FeatureModelNames.SELECTOR);
+			List<Node> candidates = XMLManager.getTasksList(getDocument(), FeatureNames.SELECTOR);
 			// electing the good candidate
 			String candidateName;
 			for (Node candidate : candidates) {
@@ -107,7 +105,7 @@ public class WFInstanceMerger extends BaseMergerImpl {
 
 	@Override
 	public Node getRootParentNode() {
-		return this.getInstancesTask();
+		return this.getGlobalTask(INSTANCES_TASK);
 	}
 
 	@Override
@@ -136,7 +134,7 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	 * @since 1.0
 	 */
 	private String getMetaReferenced(Document wfDocument) {
-		NodeList docNodes = wfDocument.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
+		NodeList docNodes = wfDocument.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
 		if (docNodes.getLength() > 0) {
 			Node docNode = docNodes.item(0);
 			// TODO: improve verification
@@ -164,49 +162,9 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		references = references.replace(Notation.getReferencesDelimiterLeft(), "");
 		references = references.replace(Notation.getReferencesDelimiterRight(), "");
 		// getting/creating the createdWFNode description
-		Node descNode = this.createTag(this.createdWFNode, FeatureModelNames.DESCRIPTION);
+		Node descNode = this.createTag(this.createdWFNode, FeatureNames.DESCRIPTION);
 		// merging content with description
 		mergeNodesTextContent(descNode, references);
-	}
-
-	/**
-	 * Returns the <b>instances</b> {@code Node} task.
-	 *
-	 * <p>
-	 *
-	 * Creates it if not exist.
-	 *
-	 * <p>
-	 *
-	 * @return the instances {@code Node} task
-	 *
-	 * @since 1.0
-	 * @see Node
-	 */
-	private Node getInstancesTask() {
-		String logMsg;
-		// TODO: factorize with a similar method in WFTasksMerger
-		List<Node> tasksNodes = XMLManager.getTasksList(getDocument(), FeatureModelNames.SELECTOR);
-		for (Node taskNode : tasksNodes) {
-			Node namedItem = taskNode.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
-			if ((namedItem != null) && namedItem.getNodeValue().equals(INSTANCES_TASK)) {
-				// aldready exists
-				logger.debug("Instances node found.");
-				return taskNode;
-			}
-		}
-		// create the node
-		// TODO: create method in XMLManager and factorize with
-		// AbstractMerger#createConstraintTag()
-		logger.debug("Instances node not found.");
-		logger.debug("Starting creation...");
-		Element instancesNode = getDocument().createElement(FeatureModelNames.AND.getName());
-		instancesNode.setAttribute(FeatureModelAttributes.NAME.getName(), INSTANCES_TASK);
-		logMsg = String.format("Instances node created : %s", instancesNode.getNodeName());
-		logger.debug(logMsg);
-		logger.debug("Inserting at default position...");
-		return getDocument().getElementsByTagName(FeatureModelNames.AND.getName()).item(1)
-				.appendChild(instancesNode);
 	}
 
 }

@@ -29,8 +29,8 @@ import org.xml.sax.SAXException;
 import com.ml2wf.AbstractXMLTest;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
+import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
+import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -115,8 +115,8 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	public void testGlobalStructure(Path path) throws ParserConfigurationException, SAXException, IOException {
 		this.resultDocument = XMLManager.preprocess(path.toFile());
 		// TODO: to complete/improve considering the wished number of instantiated tasks
-		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNodesNames.SELECTOR);
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNodesNames.SELECTOR);
+		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
 		assertTrue(sourceNodes.size() <= resultNodes.size()); // #1
 	}
 
@@ -148,16 +148,16 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	@DisplayName("Verification of the nodes' structures")
 	public void testNodesStructures(Path path) throws ParserConfigurationException, SAXException, IOException {
 		this.resultDocument = XMLManager.preprocess(path.toFile());
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNodesNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
 		for (Node resultNode : resultNodes) {
 			NodeList extensionChildren = ((Element) resultNode)
-					.getElementsByTagName(BPMNNodesNames.EXTENSION.getName());
+					.getElementsByTagName(BPMNNames.EXTENSION.getName());
 			assertTrue(extensionChildren.getLength() > 0);
-			NodeList docChildren = ((Element) resultNode).getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
+			NodeList docChildren = ((Element) resultNode).getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
 			assertTrue(docChildren.getLength() > 0);
 			Node docNode = docChildren.item(0);
 			assertTrue(Pattern.matches(Notation.getDocumentationVoc() + "\\d+",
-					docNode.getAttributes().getNamedItem(BPMNNodesAttributes.ID.getName()).getNodeValue()));
+					docNode.getAttributes().getNamedItem(BPMNAttributes.ID.getName()).getNodeValue()));
 		}
 	}
 
@@ -189,15 +189,15 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 		// TODO: improve readability
 		this.resultDocument = XMLManager.preprocess(path.toFile());
 		// retrieving task nodes
-		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNodesNames.SELECTOR);
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNodesNames.SELECTOR);
+		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
 		// retrieving meta tasks and instantiated references
 		List<String> references = resultNodes.stream().map(Element.class::cast)
-				.map(e -> e.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName())) // getting doc nodes
+				.map(e -> e.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())) // getting doc nodes
 				.map(n -> n.item(0).getTextContent()) // getting first doc node's content
 				.map(XMLManager::getReferredTask).collect(Collectors.toList()); // get referred task
 		List<String> metaTasksNames = sourceNodes.stream().map(Node::getAttributes)
-				.map(a -> a.getNamedItem(BPMNNodesAttributes.NAME.getName())).map(Node::getNodeValue)
+				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())).map(Node::getNodeValue)
 				.map(XMLManager::getReferredTask).collect(Collectors.toList());
 		// comparing
 		assertTrue(references.containsAll(metaTasksNames)); // #1

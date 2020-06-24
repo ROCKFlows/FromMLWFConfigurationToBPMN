@@ -9,7 +9,7 @@ package com.ml2wf.conventions.enums.bpmn;
  * @version 1.0
  *
  */
-public enum BPMNNodesAttributes {
+public enum BPMNAttributes {
 
 	BACKGROUND("ext:shapeBackground"), ID("id"), NAME("name"),
 	// positional attributes
@@ -25,7 +25,7 @@ public enum BPMNNodesAttributes {
 	 *
 	 * @param name name of the tag
 	 */
-	private BPMNNodesAttributes(String name) {
+	private BPMNAttributes(String name) {
 		this.name = name;
 	}
 

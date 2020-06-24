@@ -12,9 +12,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.conventions.enums.fm.FeatureNames;
 
-// TODO: reorganize methods order
 
 /**
  * This class contains the current configuration of the application.
@@ -53,7 +52,7 @@ public class ConfigImpl implements Config {
 	/**
 	 * {@code Map} mapping operators symbol with {@code FeatureModelNames} elements.
 	 *
-	 * @see FeatureModelNames
+	 * @see FeatureNames
 	 */
 	private Map<String, String> vocMapping;
 	/**

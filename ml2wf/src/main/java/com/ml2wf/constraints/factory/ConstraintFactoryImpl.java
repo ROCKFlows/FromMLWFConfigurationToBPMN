@@ -19,7 +19,7 @@ import com.ml2wf.constraints.parser.ConstraintParser;
 import com.ml2wf.constraints.parser.Parser;
 import com.ml2wf.constraints.tree.BinaryTree;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.fm.FeatureModelNames;
+import com.ml2wf.conventions.enums.fm.FeatureNames;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
@@ -172,7 +172,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 		for (BinaryTree<String> tree : trees) {
-			Node rule = this.document.createElement(FeatureModelNames.RULE.getName());
+			Node rule = this.document.createElement(FeatureNames.RULE.getName());
 			// rules.add(this.generateNode(tree, rule));
 			this.generateRuleNode(tree, rule);
 			rules.add(rule);
@@ -188,7 +188,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		if (this.parser.isOrderConstraint(constraintText)) {
 			List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 			for (BinaryTree<String> tree : trees) {
-				description = this.document.createElement(FeatureModelNames.DESCRIPTION.getName());
+				description = this.document.createElement(FeatureNames.DESCRIPTION.getName());
 				// get involved nodes
 				List<String> taskNames = tree.getAllNodes().stream().filter(n -> !this.config.isAnOperator(n))
 						.collect(Collectors.toList());
@@ -288,14 +288,14 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @since 1.0
 	 * @see Node
 	 * @see ConfigImpl
-	 * @see FeatureModelNames
+	 * @see FeatureNames
 	 */
 	public Node createNode(String element) {
 		Node node;
 		if (this.config.isAnOperator(element)) {
 			node = this.document.createElement(this.config.getVocmapping().get(element));
 		} else {
-			node = this.document.createElement(FeatureModelNames.VAR.getName());
+			node = this.document.createElement(FeatureNames.VAR.getName());
 			node.appendChild(this.document.createTextNode(element));
 		}
 		return node;

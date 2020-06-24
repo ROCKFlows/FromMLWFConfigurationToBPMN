@@ -103,7 +103,7 @@ Lets consider this generic workflow :
 
 and this initial feature model :
 
-![](F:\1 - Programmation\2 - Java\WF2BPMN\FromMLWFConfigurationToBPMN\img\initial_fm.png)
+![initial_fm](./img/initial_fm.png)
 
 #### Step 1 : Instantiation & Modification
 
@@ -119,7 +119,7 @@ We now merge our instantiated workflow in the FeatureModel using the **merge** (
 
 Here is the result :
 
-![feature_model](./img/feature_model_merge.png)
+![feature_model_merge](./img/feature_model_merge.png)
 
 
 
@@ -129,7 +129,7 @@ We now save the meta and instance relationship in the FeatureModel using the sav
 
 We now see the constraints between the meta-workflow and the instantiated one :
 
-![](F:\1 - Programmation\2 - Java\WF2BPMN\FromMLWFConfigurationToBPMN\img\feature_model_save.png)
+![feature_model_save](./img/feature_model_save.png)
 
 
 
