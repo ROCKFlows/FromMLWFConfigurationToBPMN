@@ -35,7 +35,7 @@ public class WFMetaMerger extends BaseMergerImpl {
 	/**
 	 * Steps default task tag name.
 	 */
-	private static final String STEP_TASK = "Steps";
+	public static final String STEP_TASK = "Steps";
 
 	/**
 	 * {@code WFMetaMerger}'s default constructor.
