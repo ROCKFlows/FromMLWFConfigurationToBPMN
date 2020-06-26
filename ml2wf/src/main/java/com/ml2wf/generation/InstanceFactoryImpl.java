@@ -19,8 +19,8 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
+import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
+import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -107,7 +107,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		}
 		this.addMetaWFReferences();
 		String logMsg;
-		for (Node node : XMLManager.getTasksList(getDocument(), BPMNNodesNames.SELECTOR)) {
+		for (Node node : XMLManager.getTasksList(getDocument(), BPMNNames.SELECTOR)) {
 			logMsg = String.format("Instantiating the node %s...", node);
 			logger.debug(logMsg);
 			this.instantiateNode(node);
@@ -157,13 +157,13 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	private void instantiateNode(Node node) {
 		// documentation part
 		// TODO: factorize in method ?
-		String content = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName()).getNodeValue();
+		String content = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName()).getNodeValue();
 		content = XMLManager.sanitizeName(content);
 		this.addDocumentationNode(node, content);
 		// extension part
 		this.addExtensionNode(node);
 		// node renaming part
-		Node nodeAttrName = node.getAttributes().getNamedItem(BPMNNodesAttributes.NAME.getName());
+		Node nodeAttrName = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName());
 		// TODO: update instance syntax
 		String nodeName = XMLManager.sanitizeName(nodeAttrName.getNodeValue()) + "_" + this.taskCounter++;
 		nodeAttrName.setNodeValue(nodeName);
@@ -204,7 +204,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	private void addMetaWFRefDoc(String referred) {
 		logger.debug("Adding meta referrence in the documentation...");
-		NodeList processNodeList = getDocument().getElementsByTagName(BPMNNodesNames.PROCESS.getName());
+		NodeList processNodeList = getDocument().getElementsByTagName(BPMNNames.PROCESS.getName());
 		if (processNodeList.getLength() == 0) {
 			logger.error("Error while getting the reffered metaworkflow's name.");
 			logger.warn("Skipping this step...");
@@ -232,7 +232,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 						Notation.getReferencesDelimiterRight()))
 				.collect(Collectors.toList());
 		lines.add(1, metaRef);
-		Node newTextNode = getDocument().createElement(BPMNNodesNames.TEXT.getName());
+		Node newTextNode = getDocument().createElement(BPMNNames.TEXT.getName());
 		newTextNode.setTextContent(String.join("\n", lines));
 		globalAnnotation.appendChild(newTextNode);
 	}
@@ -250,11 +250,11 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	private void addExtensionNode(Node node) {
-		Node extension = getDocument().createElement(BPMNNodesNames.EXTENSION.getName());
-		Element style = getDocument().createElement(BPMNNodesNames.STYLE.getName());
+		Node extension = getDocument().createElement(BPMNNames.EXTENSION.getName());
+		Element style = getDocument().createElement(BPMNNames.STYLE.getName());
 		String logMsg = String.format("	Adding style %s to node %s", INSTANTIATE_COLOR, node);
 		logger.debug(logMsg);
-		style.setAttribute(BPMNNodesAttributes.BACKGROUND.getName(), INSTANTIATE_COLOR);
+		style.setAttribute(BPMNAttributes.BACKGROUND.getName(), INSTANTIATE_COLOR);
 		extension.appendChild(style);
 		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
 		logger.debug(logMsg);
