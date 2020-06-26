@@ -11,11 +11,10 @@ import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
@@ -36,12 +35,20 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected Element createdWFNode;
 	/**
-	 * Logger instance.
+	 * The {@code Element} corresponding of the <b>global unmanaged</b> created
+	 * {@code Node}.
 	 *
-	 * @since 1.0
-	 * @see Logger
+	 * @see Element
 	 */
-	private static final Logger logger = LogManager.getLogger(BaseMergerImpl.class);
+	protected Element unmanagedNode;
+	/**
+	 * Unmanaged parent's name.
+	 *
+	 * <p>
+	 *
+	 * Unmanaged nodes will be placed under a parent with this name.
+	 */
+	private static String UNMANAGED_PARENT_NAME = "Unmanaged";
 
 	/**
 	 * {@code BaseMergerImpl}'s default constructor.
@@ -72,6 +79,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			// wfFile is a regular file (not a directory)
 			files.add(wfFile);
 		}
+		this.unmanagedNode = (Element) this.getGlobalTask(UNMANAGED_PARENT_NAME);
 		for (File file : files) {
 			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
 			if (wfInfo.isEmpty()) {
@@ -160,14 +168,41 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			currentTaskName = XMLManager.getNodeName(nestedTask);
 			currentTaskName = XMLManager.sanitizeName(currentTaskName);
 			if (this.isDuplicated(currentTaskName)) {
-				// TODO: change behavior according to #77 / #78
-				continue;
+				// if task is already in the FM
+				Node child;
+				if ((child = this.getChildWithName(this.unmanagedNode, currentTaskName)) == null) {
+					// if it is not under the unmanaged node
+					continue;
+				}
+				Node duplicatedTask = this.unmanagedNode.removeChild(child);
+				nestedTask = this.mergeNodes(nestedTask, duplicatedTask);
 			}
 			// retrieving a suitable parent
 			Node parentNode = this.getSuitableParent(nestedTask);
 			// inserting the new task
 			this.insertNewTask(parentNode, nestedTask);
 		}
+	}
+
+	protected Node mergeNodes(Node nodeA, Node nodeB) {
+		// TODO: improve considering conflicts (e.g same child & different levels)
+		NodeList nodeBChildren = nodeB.getChildNodes();
+		for (int i = 0; i < nodeBChildren.getLength(); i++) {
+			nodeA.appendChild(nodeBChildren.item(i));
+		}
+		return nodeA;
+	}
+
+	protected Node getChildWithName(Node parent, String childName) {
+		NodeList children = parent.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node candidate = children.item(i);
+			if ((getNodeName(candidate).equals(childName))
+					|| ((candidate = this.getChildWithName(candidate, childName)) != null)) {
+				return candidate;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -189,25 +224,19 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected Node getGlobalTask(String globalNodeName) {
 		// TODO: separate in two distinct methods
-		String logMsg;
 		List<Node> tasksNodes = XMLManager.getTasksList(getDocument(), FeatureNames.SELECTOR);
 		for (Node taskNode : tasksNodes) {
 			Node namedItem = taskNode.getAttributes().getNamedItem(FeatureAttributes.NAME.getName());
 			if ((namedItem != null) && namedItem.getNodeValue().equals(globalNodeName)) {
 				// aldready exists
-				logger.debug("Instances node found.");
 				return taskNode;
 			}
 		}
 		// create the node
-		logger.debug("Instances node not found.");
-		logger.debug("Starting creation...");
-		Element instancesNode = getDocument().createElement(FeatureNames.AND.getName());
-		instancesNode.setAttribute(FeatureAttributes.NAME.getName(), globalNodeName);
-		logMsg = String.format("Instances node created : %s", instancesNode.getNodeName());
-		logger.debug(logMsg);
-		logger.debug("Inserting at default position...");
+		Element globalNode = getDocument().createElement(FeatureNames.AND.getName());
+		globalNode.setAttribute(FeatureAttributes.ABSTRACT.getName(), String.valueOf(true));
+		globalNode.setAttribute(FeatureAttributes.NAME.getName(), globalNodeName);
 		return getDocument().getElementsByTagName(FeatureNames.AND.getName()).item(1)
-				.appendChild(instancesNode);
+				.appendChild(globalNode);
 	}
 }

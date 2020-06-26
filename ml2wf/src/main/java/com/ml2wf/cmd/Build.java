@@ -80,6 +80,7 @@ public class Build extends AbstractCommand {
 	private void processMeta() throws Exception {
 		this.merger = new WFMetaMerger(this.featureModel);
 		this.merger.mergeWithWF(this.backUp, true, this.metaDirectory);
+		this.backUp = false; // allows only one backup
 	}
 
 	/**
@@ -111,7 +112,7 @@ public class Build extends AbstractCommand {
 			LogManager.shutdown();
 		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");
-			logger.fatal(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }

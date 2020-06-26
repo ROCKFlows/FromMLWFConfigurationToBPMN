@@ -70,6 +70,10 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	 *
 	 * <p>
 	 *
+	 * Creates the referred parent node if not exists.
+	 *
+	 * <p>
+	 *
 	 * If there isn't any valid referenced parent, returns the first document node.
 	 *
 	 * <p>
@@ -89,18 +93,21 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		Node docNode = ((Element) task).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
 		if (docNode != null) {
 			// if contains a documentation node that can refer to a generic task
+			String reference = docNode.getTextContent().replace(Notation.getReferenceVoc(), "");
 			// retrieving all candidates
 			List<Node> candidates = XMLManager.getTasksList(getDocument(), FeatureNames.SELECTOR);
 			// electing the good candidate
 			String candidateName;
 			for (Node candidate : candidates) {
 				candidateName = XMLManager.getNodeName(candidate);
-				if (candidateName.equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
+				if (candidateName.equals(reference)) {
 					return candidate;
 				}
 			}
+			Element newParent = this.createFeatureWithName(reference);
+			return this.getGlobalTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
 		}
-		return this.createUnmanagedAbstractTask();
+		return this.unmanagedNode;
 	}
 
 	@Override
