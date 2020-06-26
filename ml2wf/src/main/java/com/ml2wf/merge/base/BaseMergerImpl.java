@@ -199,7 +199,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			Node candidate = children.item(i);
 			if ((getNodeName(candidate).equals(childName))
 					|| ((candidate = this.getChildWithName(candidate, childName)) != null)) {
-				// TODO: check || behavior
 				return candidate;
 			}
 		}
