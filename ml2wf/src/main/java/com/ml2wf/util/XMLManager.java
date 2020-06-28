@@ -38,7 +38,7 @@ import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
-import com.ml2wf.conventions.enums.fm.FeatureAttributes;
+import com.ml2wf.conventions.enums.fm.FMAttributes;
 
 /**
  * This class is the base class for any XML managing class.
@@ -82,7 +82,7 @@ public class XMLManager {
 	 * This counter is used to number each documentation which is required for the
 	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
 	 */
-	private int docCount = 0;
+	private static int docCount = 0;
 	/**
 	 * Logger instance.
 	 *
@@ -179,6 +179,13 @@ public class XMLManager {
 	 */
 	public static String getExtensionSeparator() {
 		return EXTENSION_SEPARATOR;
+	}
+
+	/**
+	 * Increments the {@code docCount} and returns its previous value.
+	 */
+	protected static int incrementDoc() {
+		return docCount++;
 	}
 
 	// file methods
@@ -316,9 +323,9 @@ public class XMLManager {
 	 * @since 1.0
 	 * @see Node
 	 */
-	public void addDocumentationNode(Node node, String content) {
+	public static void addDocumentationNode(Node node, String content) {
 		Element documentation = document.createElement(BPMNNames.DOCUMENTATION.getName());
-		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
+		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDoc());
 		documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
 		CDATASection refersTo = document.createCDATASection(Notation.getReferenceVoc() + content);
 		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
@@ -518,7 +525,7 @@ public class XMLManager {
 		if (!node.hasAttributes()) {
 			return "";
 		}
-		Node n = node.getAttributes().getNamedItem(FeatureAttributes.NAME.getName());
+		Node n = node.getAttributes().getNamedItem(FMAttributes.NAME.getName());
 		if (n != null) {
 			logMsg = String.format("Node's name is : %s", n.getNodeValue());
 			logger.trace(logMsg);
@@ -641,7 +648,7 @@ public class XMLManager {
 	 *
 	 * @since 1.0
 	 */
-	public boolean isMetaTask(Element node) {
+	public static boolean isMetaTask(Element node) {
 		String regex = String.format("%s+", Notation.getReferenceVoc());
 		final Pattern pattern = Pattern.compile(regex);
 		NodeList docNodes = node.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());

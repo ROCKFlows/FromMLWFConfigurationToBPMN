@@ -23,8 +23,10 @@ import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
-import com.ml2wf.conventions.enums.fm.FeatureAttributes;
-import com.ml2wf.conventions.enums.fm.FeatureNames;
+import com.ml2wf.conventions.enums.fm.FMAttributes;
+import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.tasks.factory.TaskFactory;
+import com.ml2wf.tasks.factory.TaskFactoryImpl;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
@@ -60,13 +62,11 @@ import com.ml2wf.util.XMLManager;
 public abstract class AbstractMerger extends XMLManager {
 
 	/**
-	 * Default parent's name.
+	 * {@code TaskFactory}'s instance that will generate {@code Task} instances.
 	 *
-	 * <p>
-	 *
-	 * Unmanaged nodes will be placed under this parent.
+	 * @see TaskFactory
 	 */
-	private static String DEFAULT_PARENT_NAME = "Unmanaged";
+	private TaskFactory taskFactory;
 	/**
 	 * {@code ConstraintFactory}'s instance that will generate constraint nodes.
 	 *
@@ -92,6 +92,18 @@ public abstract class AbstractMerger extends XMLManager {
 	public AbstractMerger(File file) throws ParserConfigurationException, SAXException, IOException {
 		super(file);
 		this.constraintFactory = new ConstraintFactoryImpl(getDocument());
+		this.taskFactory = new TaskFactoryImpl();
+	}
+
+	/**
+	 * Returns the {@code TaskFactory}'s instance.
+	 *
+	 * @return the {@code TaskFactory}'s instance
+	 *
+	 * @see TaskFactory
+	 */
+	public TaskFactory getTaskFactory() {
+		return this.taskFactory;
 	}
 
 	/**
@@ -118,7 +130,7 @@ public abstract class AbstractMerger extends XMLManager {
 		Node constraintsNode = this.createConstraintTag();
 		// getting constraints
 		List<Node> constraints = new ArrayList<>(
-				XMLManager.nodeListAsList(getDocument().getElementsByTagName(FeatureNames.RULE.getName())));
+				XMLManager.nodeListAsList(getDocument().getElementsByTagName(FMNames.RULE.getName())));
 		for (Node rule : rules) {
 			if (constraints.stream().noneMatch(rule::isEqualNode)) {
 				// if it is not duplicated constraint
@@ -136,17 +148,17 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 * @see Node
 	 */
-	protected Node createConstraintTag() {
-		NodeList nodeList = getDocument().getElementsByTagName(FeatureNames.CONSTRAINTS.getName());
+	protected static Node createConstraintTag() {
+		NodeList nodeList = getDocument().getElementsByTagName(FMNames.CONSTRAINTS.getName());
 		if (nodeList.getLength() > 0) {
 			// aldready exists
 			return nodeList.item(0);
 		} else {
-			Node consTag = getDocument().createElement(FeatureNames.CONSTRAINTS.getName());
-			NodeList fmTagList = getDocument().getElementsByTagName(FeatureNames.FEATUREMODEL.getName());
+			Node consTag = getDocument().createElement(FMNames.CONSTRAINTS.getName());
+			NodeList fmTagList = getDocument().getElementsByTagName(FMNames.FEATUREMODEL.getName());
 			if (fmTagList.getLength() == 0) {
 				// if it is an ExtendedFeatureModel
-				fmTagList = getDocument().getElementsByTagName(FeatureNames.EXTENDEDFEATUREMODEL.getName());
+				fmTagList = getDocument().getElementsByTagName(FMNames.EXTENDEDFEATUREMODEL.getName());
 			}
 			Node rootNode = fmTagList.item(0);
 			return rootNode.appendChild(consTag);
@@ -162,8 +174,8 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 */
 	protected Element createFeatureWithName(String name) {
-		Element feature = getDocument().createElement(FeatureNames.FEATURE.getName());
-		feature.setAttribute(FeatureAttributes.NAME.getName(), name);
+		Element feature = getDocument().createElement(FMNames.FEATURE.getName());
+		feature.setAttribute(FMAttributes.NAME.getName(), name);
 		return feature;
 	}
 
@@ -182,11 +194,11 @@ public abstract class AbstractMerger extends XMLManager {
 	 *
 	 * @since 1.0
 	 */
-	protected Element createNestedNode(Element parent, String name) {
+	protected static Element createNestedNode(Element parent, String name) {
 		Element created = getDocument().createElement(parent.getNodeName());
-		created.setAttribute(FeatureAttributes.NAME.getName(), name);
-		if (!this.isMetaTask(parent)) {
-			this.addDocumentationNode(created, parent.getAttribute(BPMNAttributes.NAME.getName()));
+		created.setAttribute(FMAttributes.NAME.getName(), name);
+		if (!isMetaTask(parent)) {
+			addDocumentationNode(created, XMLManager.getNodeName(parent));
 		}
 		return created;
 	}
@@ -202,7 +214,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 * @see Node
 	 */
-	protected Node createTag(Element parent, FeatureNames tagName) {
+	protected Node createTag(Element parent, FMNames tagName) {
 		NodeList nodeList = parent.getElementsByTagName(tagName.getName());
 		if (nodeList.getLength() > 0) {
 			// aldready exists
@@ -210,32 +222,6 @@ public abstract class AbstractMerger extends XMLManager {
 		}
 		Node newTag = getDocument().createElement(tagName.getName());
 		return parent.appendChild(newTag);
-	}
-
-	/**
-	 * Creates if needed and returns the Unmanaged abstract task {@code Node}.
-	 *
-	 * @return the Unmanaged abstract task {@code Node}
-	 *
-	 * @since 1.0
-	 */
-	protected Node createUnmanagedAbstractTask() {
-		Node parent = getDocument().getElementsByTagName(FeatureNames.AND.getName()).item(1);
-
-		// TODO: factorize with #isDuplicated
-		List<Node> andNodes = new ArrayList<>();
-		andNodes.addAll(
-				XMLManager.nodeListAsList(getDocument().getElementsByTagName(FeatureNames.AND.getName())));
-		for (Node andNode : andNodes) {
-			if (andNode.getAttributes().getNamedItem(FeatureAttributes.NAME.getName()).getNodeValue()
-					.equals(DEFAULT_PARENT_NAME)) {
-				return andNode;
-			}
-		}
-		Element child = getDocument().createElement(FeatureNames.AND.getName());
-		child.setAttribute(FeatureAttributes.ABSTRACT.getName(), String.valueOf(true));
-		child.setAttribute(FeatureAttributes.NAME.getName(), DEFAULT_PARENT_NAME);
-		return parent.appendChild(child);
 	}
 
 	/**
@@ -253,19 +239,20 @@ public abstract class AbstractMerger extends XMLManager {
 	 *
 	 * @since 1.0
 	 */
-	protected List<Node> getNestedNodes(Node node) {
+	public static List<Node> getNestedNodes(Node node) {
 		List<Node> result = new ArrayList<>();
 		// retrieving all nested nodes' names
 		String[] nodeName = XMLManager.getNodeName(node).split(Notation.getGeneratedPrefixVoc());
 		List<String> names = new ArrayList<>(Arrays.asList(nodeName));
-		names.removeIf(String::isBlank); // removing blanks
+		// sanitizing names
+		names = names.stream().filter(n -> !n.isBlank()).map(XMLManager::sanitizeName).collect(Collectors.toList());
 		// Manage the parentNode
 		Element parentNode = (Element) node.cloneNode(true);
 		parentNode.setAttribute(BPMNAttributes.NAME.getName(), names.remove(0));
 		result.add(parentNode);
 		// foreach nested node's name
 		for (String name : names) {
-			parentNode = this.createNestedNode(parentNode, name);
+			parentNode = createNestedNode(parentNode, name);
 			result.add(parentNode);
 		}
 		return result;
@@ -353,8 +340,7 @@ public abstract class AbstractMerger extends XMLManager {
 
 	/**
 	 * Inserts and returns the new task corresponding of the given {@code Node task}
-	 * under the
-	 * given {@code Node parentNode}.
+	 * under the given {@code Node parentNode}.
 	 *
 	 * <p>
 	 *
@@ -407,7 +393,7 @@ public abstract class AbstractMerger extends XMLManager {
 	protected boolean isDuplicated(String instTaskName) {
 		// TODO: remove if not necessary (due to the instance tasks' naming changing)
 		// get all tasks
-		List<Node> tasks = XMLManager.getTasksList(getDocument(), FeatureNames.SELECTOR);
+		List<Node> tasks = XMLManager.getTasksList(getDocument(), FMNames.SELECTOR);
 		// get task name
 		String target = XMLManager.sanitizeName(instTaskName);
 		return XMLManager.getNodesNames(tasks).contains(target);
@@ -499,9 +485,18 @@ public abstract class AbstractMerger extends XMLManager {
 	 */
 	protected void processOrderConstraint(List<Pair<Node, Node>> orderPairs) {
 		for (Pair<Node, Node> pair : orderPairs) {
-			Node docNode = this.createTag(((Element) pair.getKey()), FeatureNames.DESCRIPTION);
-			if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
-				logger.error("The merge operation for description nodes failed.");
+			Element key;
+			if ((key = (Element) pair.getKey()) != null) {
+				// the order association has been parsed
+				Node docNode = this.createTag(key, FMNames.DESCRIPTION);
+				if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
+					// if there is a merge failure for description nodes
+					logger.error("The merge operation for description nodes failed.");
+				}
+			} else {
+				// the operation failed
+				logger.error("Can't merge the order constraint : {}", pair.getValue().getTextContent());
+				logger.warn("Maybe one of the involved task is not in the current workflow ?");
 			}
 		}
 	}

@@ -19,7 +19,7 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
-import com.ml2wf.conventions.enums.fm.FeatureNames;
+import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.base.BaseMergerImpl;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
@@ -70,6 +70,10 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	 *
 	 * <p>
 	 *
+	 * Creates the referred parent node if not exists.
+	 *
+	 * <p>
+	 *
 	 * If there isn't any valid referenced parent, returns the first document node.
 	 *
 	 * <p>
@@ -89,18 +93,21 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		Node docNode = ((Element) task).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
 		if (docNode != null) {
 			// if contains a documentation node that can refer to a generic task
+			String reference = docNode.getTextContent().replace(Notation.getReferenceVoc(), "");
 			// retrieving all candidates
-			List<Node> candidates = XMLManager.getTasksList(getDocument(), FeatureNames.SELECTOR);
+			List<Node> candidates = XMLManager.getTasksList(getDocument(), FMNames.SELECTOR);
 			// electing the good candidate
 			String candidateName;
 			for (Node candidate : candidates) {
 				candidateName = XMLManager.getNodeName(candidate);
-				if (candidateName.equals(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""))) {
+				if (candidateName.equals(reference)) {
 					return candidate;
 				}
 			}
+			Element newParent = this.createFeatureWithName(reference);
+			return this.getGlobalTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
 		}
-		return this.createUnmanagedAbstractTask();
+		return this.unmanagedNode;
 	}
 
 	@Override
@@ -162,7 +169,7 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		references = references.replace(Notation.getReferencesDelimiterLeft(), "");
 		references = references.replace(Notation.getReferencesDelimiterRight(), "");
 		// getting/creating the createdWFNode description
-		Node descNode = this.createTag(this.createdWFNode, FeatureNames.DESCRIPTION);
+		Node descNode = this.createTag(this.createdWFNode, FMNames.DESCRIPTION);
 		// merging content with description
 		mergeNodesTextContent(descNode, references);
 	}

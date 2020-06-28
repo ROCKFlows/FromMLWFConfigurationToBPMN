@@ -51,6 +51,18 @@ public enum BPMNNames implements TaskTagsSelector {
 		return this.name;
 	}
 
+	/**
+	 * Returns whether the given tag is a BPMN task tag's name or not.
+	 *
+	 * @param tag tag to check
+	 * @return whether the given tag is a BPMN task tag's name or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean isBPMNTask(String tag) {
+		return this.getTaskTags().contains(tag);
+	}
+
 	@Override
 	public List<String> getTaskTags() {
 		return new ArrayList<>(Arrays.asList(USERTASK.getName(), TASK.getName()));
