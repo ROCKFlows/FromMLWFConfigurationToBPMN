@@ -1,14 +1,24 @@
 package com.ml2wf.tasks;
 
-import org.w3c.dom.Node;
-
 public class BPMNTask extends Task {
 
-	public BPMNTask(String name, Node parent) {
+	private String reference;
+
+	public BPMNTask(String name, Task parent, String reference) {
 		super(name, parent);
+		this.reference = reference;
 	}
 
-	public BPMNTask(String name) {
+	public BPMNTask(String name, String reference) {
 		super(name);
+		this.reference = reference;
+	}
+
+	public String getReference() {
+		return this.reference;
+	}
+
+	public void setReference(String reference) {
+		this.reference = reference;
 	}
 }

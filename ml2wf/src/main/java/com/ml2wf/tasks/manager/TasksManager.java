@@ -1,7 +1,12 @@
 package com.ml2wf.tasks.manager;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.w3c.dom.Node;
 
 import com.ml2wf.tasks.BPMNTask;
 import com.ml2wf.tasks.FMTask;
@@ -61,6 +66,19 @@ public final class TasksManager {
 		return fmTasks;
 	}
 
+	public static Optional<FMTask> getFMTaskWithName(String name) {
+		return fmTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
+	}
+
+	public static List<FMTask> getFMTaskWithParent(Task parent) {
+		return fmTasks.stream().filter(t -> (t.getParent() != null) && t.getParent().equals(parent))
+				.collect(Collectors.toList()); // TODO: remove != null when fixed
+	}
+
+	public static Optional<FMTask> getFMTaskWithNode(Node node) {
+		return fmTasks.stream().filter(t -> t.getNode().equals(node)).findFirst();
+	}
+
 	/**
 	 * Returns all stored {@code BPMNTask}.
 	 *
@@ -72,6 +90,10 @@ public final class TasksManager {
 	 */
 	public static Set<BPMNTask> getBPMNTasks() {
 		return bpmnTasks;
+	}
+
+	public static Optional<BPMNTask> getBPMNTaskWithName(String name) {
+		return bpmnTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
 	}
 
 	// adder
@@ -119,6 +141,22 @@ public final class TasksManager {
 		} else {
 			return bpmnTasks.remove(task);
 		}
+	}
+
+	//
+
+	/**
+	 * Returns whether a task with the given {@code name} exists or not.
+	 *
+	 * @param name name of the task to verify its existence
+	 * @return whether a task with the given {@code name} exists or not
+	 *
+	 * @since 1.0
+	 * @see Task
+	 */
+	public static boolean exists(String name) {
+		return bpmnTasks.stream().map(Task::getName).anyMatch(n -> n.equals(name))
+				|| fmTasks.stream().map(Task::getName).anyMatch(n -> n.equals(name));
 	}
 
 	// clearers

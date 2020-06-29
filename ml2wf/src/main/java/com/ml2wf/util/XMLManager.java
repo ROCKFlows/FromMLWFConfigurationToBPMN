@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -480,34 +479,6 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns the <b>lowest common ancestor</b> (LCA) for given {@code nodes}.
-	 *
-	 * @param nodes nodes to retrieve the LCA
-	 * @return the <b>lowest common ancestor</b> (LCA) for given {@code nodes}
-	 *
-	 * @since 1.0
-	 */
-	public static Node getLowestCommonAncestor(List<Node> nodes) {
-		Node parent;
-		List<Node> commonParents = new ArrayList<>();
-		List<Node> nodeParents = new ArrayList<>();
-		for (Node node : nodes) {
-			// for each node
-			parent = node;
-			while ((parent = parent.getParentNode()) != null) {
-				// get all parents
-				nodeParents.add(parent);
-			}
-			if (commonParents.isEmpty()) {
-				commonParents.addAll(nodeParents);
-			}
-			// retaining common parents
-			commonParents.retainAll(nodeParents);
-		}
-		return commonParents.get(0);
-	}
-
-	/**
 	 * Returns the name tag's value of the given {@code node} if exists.
 	 *
 	 * Returns an empty string if not.
@@ -532,53 +503,6 @@ public class XMLManager {
 			return n.getNodeValue();
 		}
 		return "";
-	}
-
-	/**
-	 * Returns a {@code List} containing all {@code nodes}' names.
-	 *
-	 * @param nodes nodes to get the names
-	 * @return a {@code List} containing all {@code nodes}' names
-	 *
-	 * @since 1.0
-	 *
-	 * @see NodeList
-	 */
-	public static List<String> getNodesNames(List<Node> nodes) {
-		return nodes.stream().map(XMLManager::getNodeName)
-				.collect(Collectors.toList());
-	}
-
-	/**
-	 * Returns the {@code Node} with the given {@code name} in the document.
-	 *
-	 * <p>
-	 *
-	 * Returns null if no node is found.
-	 *
-	 * @param root root containing source nodes
-	 * @param name name of wished node
-	 * @return the {@code Node} with the given {@code name} in the document or null
-	 *         if no node is found
-	 *
-	 * @since 1.0
-	 *
-	 * @see Node
-	 */
-	public static Node getNodeWithName(Node root, String name) {
-		NodeList children = root.getChildNodes();
-		Node child;
-		Node recursiveResult; // result of recursive call
-		for (int i = 0; i < children.getLength(); i++) {
-			child = children.item(i);
-			String childName = XMLManager.getNodeName(child);
-			if (childName.equals(name)) {
-				return child;
-			} else if ((recursiveResult = getNodeWithName(child, name)) != null) {
-				return recursiveResult;
-			}
-		}
-		return null;
 	}
 
 	/**

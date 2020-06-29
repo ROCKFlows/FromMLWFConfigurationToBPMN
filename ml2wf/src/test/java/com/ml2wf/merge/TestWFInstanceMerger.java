@@ -136,7 +136,7 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 	 * <p>
 	 *
 	 * <b>Note</b> that this is a {@link ParameterizedTest}.
-	 * 
+	 *
 	 * @throws Exception
 	 *
 	 * @since 1.0
@@ -157,7 +157,7 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FMNames.SELECTOR);
 		// getting tasks' names
 		List<String> sourceNodesNames = sourceNodes.stream()
-				.flatMap(n -> ((AbstractMerger) this.testedClass).getNestedNodes(n).stream()) // flattening
+				.flatMap(n -> AbstractMerger.getNestedNodes(n).stream()) // flattening
 				.map(Node::getAttributes) // getting attributes
 				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())) // getting Name attribute
 				.map(Node::getNodeValue) // getting name value

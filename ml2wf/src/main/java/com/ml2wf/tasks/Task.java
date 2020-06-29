@@ -24,9 +24,9 @@ public abstract class Task {
 	 */
 	private String name;
 	/**
-	 * Task's parent {@code Node}.
+	 * Task's parent.
 	 */
-	private Node parent;
+	private Task parent;
 
 	/**
 	 * {@code Task}'s full constructor.
@@ -36,7 +36,7 @@ public abstract class Task {
 	 *
 	 * @see Node
 	 */
-	public Task(String name, Node parent) {
+	public Task(String name, Task parent) {
 		this.name = name;
 		this.parent = parent;
 	}
@@ -68,7 +68,7 @@ public abstract class Task {
 	 *
 	 * @return the current task's {@code parent}
 	 */
-	public Node getParent() {
+	public Task getParent() {
 		return this.parent;
 	}
 
@@ -77,7 +77,7 @@ public abstract class Task {
 	 *
 	 * @param parent the new task's {@code parent}
 	 */
-	public void setParent(Node parent) {
+	public void setParent(Task parent) {
 		this.parent = parent;
 	}
 }

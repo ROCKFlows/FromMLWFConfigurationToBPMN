@@ -25,8 +25,11 @@ import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.tasks.FMTask;
+import com.ml2wf.tasks.Task;
 import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.factory.TaskFactoryImpl;
+import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
@@ -127,7 +130,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @see Node
 	 */
 	protected void adoptRules(List<Node> rules) {
-		Node constraintsNode = this.createConstraintTag();
+		Node constraintsNode = createConstraintTag();
 		// getting constraints
 		List<Node> constraints = new ArrayList<>(
 				XMLManager.nodeListAsList(getDocument().getElementsByTagName(FMNames.RULE.getName())));
@@ -166,17 +169,19 @@ public abstract class AbstractMerger extends XMLManager {
 	}
 
 	/**
-	 * Creates and returns a new feature with the given {@code name}.
+	 * Creates and returns a new feature ({@code FMTask}) with the given
+	 * {@code name}.
 	 *
 	 * @param name name of the feature
-	 * @return a new feature with the given {@code name}
+	 * @return a new feature ({@code FMTask}) with the given {@code name}
 	 *
 	 * @since 1.0
+	 * @see FMTask
 	 */
-	protected Element createFeatureWithName(String name) {
+	protected FMTask createFeatureWithName(String name) {
 		Element feature = getDocument().createElement(FMNames.FEATURE.getName());
 		feature.setAttribute(FMAttributes.NAME.getName(), name);
-		return feature;
+		return (FMTask) this.taskFactory.createTasks(feature).stream().findFirst().orElse(null);
 	}
 
 	/**
@@ -214,14 +219,15 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 * @see Node
 	 */
-	protected Node createTag(Element parent, FMNames tagName) {
-		NodeList nodeList = parent.getElementsByTagName(tagName.getName());
+	protected Node createTag(FMTask parentTask, FMNames tagName) {
+		Element parentElement = (Element) parentTask.getNode();
+		NodeList nodeList = parentElement.getElementsByTagName(tagName.getName());
 		if (nodeList.getLength() > 0) {
 			// aldready exists
 			return nodeList.item(0);
 		}
 		Node newTag = getDocument().createElement(tagName.getName());
-		return parent.appendChild(newTag);
+		return parentElement.appendChild(newTag);
 	}
 
 	/**
@@ -325,7 +331,7 @@ public abstract class AbstractMerger extends XMLManager {
 			wfTaskName = getWorkflowName(wfDocument).replace(" ", "_");
 			logMsg = String.format("WF's name is %s.", wfTaskName);
 			logger.debug(logMsg);
-			if (this.isDuplicated(wfTaskName)) {
+			if (TasksManager.exists(wfTaskName)) {
 				logger.warn("This workflow is already in the FeatureModel");
 				logger.warn("Skipping...");
 				return new Pair<>();
@@ -353,50 +359,14 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 * @see Node
 	 */
-	protected Node insertNewTask(Node parentNode, Node task) {
+	protected FMTask insertNewTask(FMTask parentNode, Task task) {
 		// TODO: recurse for nested tasks
-		String debugMsg = String.format("Inserting task : %s", task.getTextContent());
-		logger.debug(debugMsg);
+		logger.debug("Inserting task : {}", task.getName());
 		// retrieving task name content
-		String taskName = XMLManager.getNodeName(task);
-		taskName = XMLManager.sanitizeName(taskName);
-		debugMsg = String.format("task's name : %s", taskName);
-		logger.debug(debugMsg);
+		String taskName = task.getName();
 		// inserting the new node
-		Node newFeature = this.createFeatureWithName(taskName);
+		FMTask newFeature = this.createFeatureWithName(taskName);
 		return parentNode.appendChild(newFeature);
-	}
-
-	/**
-	 * Returns whether the given instantiated task's name is duplicated or not.
-	 *
-	 * <p>
-	 *
-	 * An instantiated task's name that is already in the document
-	 * is considered as duplicated.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that an instantiated task's name is in the form :
-	 *
-	 * <p>
-	 *
-	 * <pre>
-	 * <code>Notation.getGeneratedPrefixVoc() + genericTaskName + Notation.getGeneratedPrefixVoc() + newTaskName</code>
-	 * </pre>
-	 *
-	 * @param task the instantiated task's name
-	 * @return whether the given {@code task} is duplicated or not
-	 *
-	 * @since 1.0
-	 */
-	protected boolean isDuplicated(String instTaskName) {
-		// TODO: remove if not necessary (due to the instance tasks' naming changing)
-		// get all tasks
-		List<Node> tasks = XMLManager.getTasksList(getDocument(), FMNames.SELECTOR);
-		// get task name
-		String target = XMLManager.sanitizeName(instTaskName);
-		return XMLManager.getNodesNames(tasks).contains(target);
 	}
 
 	/**
@@ -413,7 +383,7 @@ public abstract class AbstractMerger extends XMLManager {
 		logger.info("Processing annotations...");
 		List<Node> annotations = XMLManager
 				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNames.ANNOTATION.getName()));
-		List<Pair<Node, Node>> orderPairs; // pair that will contain order constraint data
+		List<Pair<FMTask, Node>> orderPairs; // pair that will contain order constraint data
 		for (Node annotation : annotations) {
 			// TODO: improve performances (check annotation.getChildNodes().item(1)
 			// sufficient ?)
@@ -483,10 +453,10 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @see Node
 	 * @see Pair
 	 */
-	protected void processOrderConstraint(List<Pair<Node, Node>> orderPairs) {
-		for (Pair<Node, Node> pair : orderPairs) {
-			Element key;
-			if ((key = (Element) pair.getKey()) != null) {
+	protected void processOrderConstraint(List<Pair<FMTask, Node>> orderPairs) {
+		for (Pair<FMTask, Node> pair : orderPairs) {
+			FMTask key;
+			if ((key = pair.getKey()) != null) {
 				// the order association has been parsed
 				Node docNode = this.createTag(key, FMNames.DESCRIPTION);
 				if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {

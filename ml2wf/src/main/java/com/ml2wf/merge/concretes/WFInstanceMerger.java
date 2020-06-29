@@ -3,14 +3,13 @@ package com.ml2wf.merge.concretes;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -21,6 +20,9 @@ import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.base.BaseMergerImpl;
+import com.ml2wf.tasks.BPMNTask;
+import com.ml2wf.tasks.FMTask;
+import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
@@ -88,31 +90,20 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	 * @since 1.0
 	 */
 	@Override
-	public Node getSuitableParent(Node task) {
+	public FMTask getSuitableParent(BPMNTask task) {
 		// retrieving the references parent
-		Node docNode = ((Element) task).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
-		if (docNode != null) {
+		String reference = task.getReference();
+		if (reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
-			String reference = docNode.getTextContent().replace(Notation.getReferenceVoc(), "");
-			// retrieving all candidates
-			List<Node> candidates = XMLManager.getTasksList(getDocument(), FMNames.SELECTOR);
-			// electing the good candidate
-			String candidateName;
-			for (Node candidate : candidates) {
-				candidateName = XMLManager.getNodeName(candidate);
-				if (candidateName.equals(reference)) {
-					return candidate;
-				}
-			}
-			Element newParent = this.createFeatureWithName(reference);
-			return this.getGlobalTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
+			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);
+			return optRef.orElseGet(() -> this.createReferred(reference));
 		}
-		return this.unmanagedNode;
+		return this.unmanagedTask;
 	}
 
 	@Override
-	public Node getRootParentNode() {
-		return this.getGlobalTask(INSTANCES_TASK);
+	public FMTask getRootParentNode() {
+		return this.getGlobalFMTask(INSTANCES_TASK);
 	}
 
 	@Override
@@ -130,6 +121,11 @@ public class WFInstanceMerger extends BaseMergerImpl {
 				.getAssociationConstraint(wfInfo.getKey(), Arrays.asList(metaReferrence));
 		this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
 		this.addReferences(wfDocument);
+	}
+
+	private FMTask createReferred(String reference) {
+		FMTask newParent = this.createFeatureWithName(reference);
+		return this.getGlobalFMTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
 	}
 
 	/**
@@ -169,7 +165,7 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		references = references.replace(Notation.getReferencesDelimiterLeft(), "");
 		references = references.replace(Notation.getReferencesDelimiterRight(), "");
 		// getting/creating the createdWFNode description
-		Node descNode = this.createTag(this.createdWFNode, FMNames.DESCRIPTION);
+		Node descNode = this.createTag(this.createdWFTask, FMNames.DESCRIPTION);
 		// merging content with description
 		mergeNodesTextContent(descNode, references);
 	}

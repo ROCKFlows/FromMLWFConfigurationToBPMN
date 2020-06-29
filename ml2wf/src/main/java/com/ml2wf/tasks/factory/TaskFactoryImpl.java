@@ -1,10 +1,13 @@
 package com.ml2wf.tasks.factory;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
@@ -41,15 +44,20 @@ public class TaskFactoryImpl implements TaskFactory {
 		Set<Task> createdTasks = new HashSet<>();
 		String tagName;
 		String nodeName;
+		Task createdTask;
 		for (Node child : AbstractMerger.getNestedNodes(node)) {
 			tagName = child.getNodeName();
 			nodeName = XMLManager.getNodeName(child);
 			nodeName = XMLManager.sanitizeName(nodeName);
 			if (FMNames.SELECTOR.isFMTask(tagName)) { // TODO: to check
-				createdTasks.add(TasksManager.addTask(new FMTask(nodeName, this.isAbstract(child))));
+				createdTask = new FMTask(nodeName, child, this.isAbstract(child));
 			} else if (BPMNNames.SELECTOR.isBPMNTask(tagName)) {
-				createdTasks.add(TasksManager.addTask(new BPMNTask(nodeName)));
+				Optional<String> optRef = this.getReference(node);
+				createdTask = new BPMNTask(nodeName, optRef.orElse(""));
+			} else {
+				continue; // TODO: throw error
 			}
+			createdTasks.add(TasksManager.addTask(createdTask));
 		}
 		return createdTasks;
 	}
@@ -57,5 +65,13 @@ public class TaskFactoryImpl implements TaskFactory {
 	private boolean isAbstract(Node node) {
 		Node abstractAttr = node.getAttributes().getNamedItem(FMAttributes.ABSTRACT.getName());
 		return (abstractAttr != null) && (abstractAttr.getNodeValue().equals(String.valueOf(true)));
+	}
+
+	private Optional<String> getReference(Node node) {
+		Node docNode = ((Element) node).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
+		if (docNode != null) {
+			return Optional.of(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""));
+		}
+		return Optional.empty();
 	}
 }
