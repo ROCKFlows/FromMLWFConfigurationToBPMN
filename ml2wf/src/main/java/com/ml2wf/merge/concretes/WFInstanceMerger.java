@@ -98,11 +98,12 @@ public class WFInstanceMerger extends BaseMergerImpl {
 			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);
 			return optRef.orElseGet(() -> this.createReferred(reference));
 		}
-		return this.unmanagedTask;
+		return unmanagedTask;
 	}
 
 	@Override
 	public FMTask getRootParentNode() {
+		System.out.println("getRootParentNode");
 		return this.getGlobalFMTask(INSTANCES_TASK);
 	}
 
@@ -165,7 +166,7 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		references = references.replace(Notation.getReferencesDelimiterLeft(), "");
 		references = references.replace(Notation.getReferencesDelimiterRight(), "");
 		// getting/creating the createdWFNode description
-		Node descNode = this.createTag(this.createdWFTask, FMNames.DESCRIPTION);
+		Node descNode = this.createTag(createdWFTask, FMNames.DESCRIPTION);
 		// merging content with description
 		mergeNodesTextContent(descNode, references);
 	}

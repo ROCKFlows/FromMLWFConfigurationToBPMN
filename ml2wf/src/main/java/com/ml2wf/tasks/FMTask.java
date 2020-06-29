@@ -93,4 +93,25 @@ public class FMTask extends Task {
 		}
 		return commonParents.get(0);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = (prime * result) + (this.isAbstract ? 1231 : 1237);
+		result = (prime * result) + ((this.node == null) ? 0 : this.node.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof FMTask)) {
+			return false;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		FMTask other = (FMTask) obj;
+		return this.node.equals(other.getNode()) && (this.isAbstract == other.isAbstract());
+	}
 }

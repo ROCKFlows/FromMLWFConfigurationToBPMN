@@ -43,7 +43,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *
 	 * @see Task
 	 */
-	protected FMTask unmanagedTask;
+	protected static FMTask unmanagedTask;
 	/**
 	 * Unmanaged parent's name.
 	 *
@@ -65,14 +65,19 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		super(file);
 	}
 
+	protected static void setUnmanagedTask(FMTask unmanagedTask) {
+		BaseMergerImpl.unmanagedTask = unmanagedTask;
+	}
+
 	@Override
 	public void mergeWithWF(boolean backUp, boolean completeMerge, File wfFile) throws Exception {
 		if (backUp) {
 			super.backUp();
 		}
 		Set<File> files = this.getFiles(wfFile);
-		this.unmanagedTask = this.getGlobalFMTask(UNMANAGED_PARENT_NAME);
+		setUnmanagedTask(this.getGlobalFMTask(UNMANAGED_PARENT_NAME));
 		for (File file : files) {
+			System.out.println("File " + file.getAbsolutePath());
 			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
 			if (wfInfo.isEmpty()) {
 				// TODO: add logs
@@ -91,6 +96,8 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 				this.processCompleteMerge(wfInfo);
 				this.processSpecificNeeds(wfInfo);
 			}
+			System.out.println("- " + this.createdWFTask.getNode().getOwnerDocument().getClass().getName() + "@"
+					+ Integer.toHexString(this.createdWFTask.getNode().getOwnerDocument().hashCode()));
 		}
 	}
 
@@ -147,8 +154,10 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		this.processAssocConstraints(wfInfo.getValue(), wfName);
 		this.createdWFTask = this.createFeatureWithName(wfName);
 		FMTask root = this.getRootParentNode();
-		System.out.println(this.createdWFTask.getNode().getOwnerDocument().getDocumentURI());
-		System.out.println(root.getNode().getOwnerDocument().getDocumentURI());
+		System.out.println(this.createdWFTask.getNode().getOwnerDocument().getClass().getName() + "@"
+				+ Integer.toHexString(this.createdWFTask.getNode().getOwnerDocument().hashCode()));
+		System.out.println(root.getNode().getOwnerDocument().getClass().getName() + "@"
+				+ Integer.toHexString(root.getNode().getOwnerDocument().hashCode()));
 		System.out.println(this.createdWFTask.getNode().getOwnerDocument().equals(root.getNode().getOwnerDocument()));
 		this.createdWFTask = this.insertNewTask(root, this.createdWFTask);
 	}
@@ -158,12 +167,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		Optional<FMTask> opt;
 		if (TasksManager.exists(taskName)) {
 			// if task is already in the FM
-			opt = this.unmanagedTask.getChildWithName(taskName);
+			opt = unmanagedTask.getChildWithName(taskName);
 			if (opt.isEmpty()) {
 				// if it is not under the unmanaged node
 				return;
 			}
-			opt = this.unmanagedTask.removeChild(opt.get());
+			opt = unmanagedTask.removeChild(opt.get());
 			if (opt.isEmpty()) {
 				return; // TODO: throw error
 			}
@@ -208,6 +217,9 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected FMTask getGlobalFMTask(String globalNodeName) {
 		Optional<FMTask> optGlobalTask = TasksManager.getFMTaskWithName(globalNodeName);
+		System.out.println("LOOKED FOR : -" + globalNodeName + "-");
+		TasksManager.getFMTasks().forEach(t -> System.out.println(t + " -" + t.getName() + "-"));
+		System.out.println(optGlobalTask);
 		return optGlobalTask.orElseGet(() -> this.createGlobalFMTask(globalNodeName));
 	}
 
