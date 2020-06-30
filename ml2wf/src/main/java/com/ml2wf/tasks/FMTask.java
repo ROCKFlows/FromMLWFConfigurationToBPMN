@@ -52,12 +52,9 @@ public class FMTask extends Task {
 	}
 
 	private static Optional<FMTask> getChildWithName(Task parent, String childName) {
-		System.out.println("getChildWithName");
 		List<FMTask> childrenTasks = TasksManager.getFMTaskWithParent(parent);
-		System.out.println(childrenTasks);
 		Optional<FMTask> optChild;
 		for (FMTask child : childrenTasks) {
-			System.out.println(child);
 			if (child.getName().equals(childName)) {
 				return Optional.of(child);
 			} else {

@@ -77,7 +77,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		Set<File> files = this.getFiles(wfFile);
 		setUnmanagedTask(this.getGlobalFMTask(UNMANAGED_PARENT_NAME));
 		for (File file : files) {
-			System.out.println("File " + file.getAbsolutePath());
+			System.out.println("\nFile " + file.getAbsolutePath());
 			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
 			if (wfInfo.isEmpty()) {
 				// TODO: add logs
@@ -96,9 +96,8 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 				this.processCompleteMerge(wfInfo);
 				this.processSpecificNeeds(wfInfo);
 			}
-			System.out.println("- " + this.createdWFTask.getNode().getOwnerDocument().getClass().getName() + "@"
-					+ Integer.toHexString(this.createdWFTask.getNode().getOwnerDocument().hashCode()));
 		}
+		System.out.println("EOF");
 	}
 
 	private Set<File> getFiles(File file) throws IOException {
@@ -154,11 +153,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		this.processAssocConstraints(wfInfo.getValue(), wfName);
 		this.createdWFTask = this.createFeatureWithName(wfName);
 		FMTask root = this.getRootParentNode();
-		System.out.println(this.createdWFTask.getNode().getOwnerDocument().getClass().getName() + "@"
-				+ Integer.toHexString(this.createdWFTask.getNode().getOwnerDocument().hashCode()));
-		System.out.println(root.getNode().getOwnerDocument().getClass().getName() + "@"
-				+ Integer.toHexString(root.getNode().getOwnerDocument().hashCode()));
-		System.out.println(this.createdWFTask.getNode().getOwnerDocument().equals(root.getNode().getOwnerDocument()));
 		this.createdWFTask = this.insertNewTask(root, this.createdWFTask);
 	}
 
@@ -219,7 +213,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		Optional<FMTask> optGlobalTask = TasksManager.getFMTaskWithName(globalNodeName);
 		System.out.println("LOOKED FOR : -" + globalNodeName + "-");
 		TasksManager.getFMTasks().forEach(t -> System.out.println(t + " -" + t.getName() + "-"));
-		System.out.println(optGlobalTask);
+		System.out.println("Result : " + optGlobalTask);
 		return optGlobalTask.orElseGet(() -> this.createGlobalFMTask(globalNodeName));
 	}
 

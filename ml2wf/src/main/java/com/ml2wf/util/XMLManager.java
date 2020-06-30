@@ -38,6 +38,7 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
+import com.ml2wf.tasks.manager.TasksManager;
 
 /**
  * This class is the base class for any XML managing class.
@@ -106,7 +107,7 @@ public class XMLManager {
 	public XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
 		this.sourceFile = file;
 		this.path = file.getAbsolutePath();
-		XMLManager.setDocument(XMLManager.preprocess(this.sourceFile));
+		XMLManager.updateDocument(this.sourceFile);
 	}
 
 	/**
@@ -161,14 +162,24 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns the xml's {@code Document} instance
+	 * Updates the xml's {@code Document} instance if the {@code document} is
+	 * {@code null} or the given {@code sourceFile} is different from the
+	 * {@code document}'s source file.
 	 *
-	 * @param document the new xml's {@code Document} instance
+	 * @param sourceFile the {@code document}'s source file
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
 	 *
 	 * @see Document
 	 */
-	public static void setDocument(Document document) {
-		XMLManager.document = document;
+	public static void updateDocument(File sourceFile) throws ParserConfigurationException, SAXException, IOException {
+		if ((XMLManager.document == null)
+				|| !XMLManager.document.getBaseURI().equals(sourceFile.toURI().toString())) {
+			XMLManager.document = XMLManager.preprocess(sourceFile);
+			docCount = 0;
+			TasksManager.clear();
+		}
 	}
 
 	/**
