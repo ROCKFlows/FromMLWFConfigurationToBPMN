@@ -46,13 +46,16 @@ public class TaskFactoryImpl implements TaskFactory {
 		String nodeName;
 		Task createdTask;
 		for (Node child : AbstractMerger.getNestedNodes(node)) {
+			System.out.println(XMLManager.getDocument().hashCode() + " // " + node.getOwnerDocument().hashCode());
 			tagName = child.getNodeName();
 			nodeName = XMLManager.getNodeName(child);
 			nodeName = XMLManager.sanitizeName(nodeName);
-			if (FMNames.SELECTOR.isFMTask(tagName)) { // TODO: to check
+			System.out.println("Creating Task with name : " + nodeName);
+			if (FMNames.SELECTOR.isFMTask(tagName)) {
 				createdTask = new FMTask(nodeName, child, this.isAbstract(child));
 			} else if (BPMNNames.SELECTOR.isBPMNTask(tagName)) {
 				Optional<String> optRef = this.getReference(node);
+				System.out.println("Reference : " + optRef.orElse(""));
 				createdTask = new BPMNTask(nodeName, optRef.orElse(""));
 			} else {
 				continue; // TODO: throw error

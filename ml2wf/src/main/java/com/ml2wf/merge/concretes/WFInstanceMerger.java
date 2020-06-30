@@ -93,7 +93,8 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	public FMTask getSuitableParent(BPMNTask task) {
 		// retrieving the references parent
 		String reference = task.getReference();
-		if (reference.isBlank()) {
+		System.out.println("getSuitableParent : " + reference);
+		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
 			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);
 			return optRef.orElseGet(() -> this.createReferred(reference));
@@ -103,7 +104,6 @@ public class WFInstanceMerger extends BaseMergerImpl {
 
 	@Override
 	public FMTask getRootParentNode() {
-		System.out.println("getRootParentNode");
 		return this.getGlobalFMTask(INSTANCES_TASK);
 	}
 
@@ -166,9 +166,8 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		references = references.replace(Notation.getReferencesDelimiterLeft(), "");
 		references = references.replace(Notation.getReferencesDelimiterRight(), "");
 		// getting/creating the createdWFNode description
-		Node descNode = this.createTag(createdWFTask, FMNames.DESCRIPTION);
+		Node descNode = this.createTag(this.createdWFTask, FMNames.DESCRIPTION);
 		// merging content with description
 		mergeNodesTextContent(descNode, references);
 	}
-
 }

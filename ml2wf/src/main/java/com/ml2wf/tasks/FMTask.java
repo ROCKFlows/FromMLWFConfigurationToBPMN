@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.w3c.dom.Node;
 
 import com.ml2wf.tasks.manager.TasksManager;
+import com.ml2wf.util.XMLManager;
 
 public class FMTask extends Task {
 
@@ -37,7 +38,13 @@ public class FMTask extends Task {
 
 	public FMTask appendChild(FMTask child) {
 		child.setParent(this);
-		this.node.appendChild(child.getNode());
+		System.out
+				.println("Appending child : " + XMLManager.getNodeName(child.getNode()) + " / " + child.getName()
+						+ "  to  "
+						+ this.getName() +
+						" / " + XMLManager.getNodeName(this.node));
+		child.setNode(this.node.appendChild(child.getNode()));
+		System.out.println(this.node.getTextContent());
 		return child;
 	}
 

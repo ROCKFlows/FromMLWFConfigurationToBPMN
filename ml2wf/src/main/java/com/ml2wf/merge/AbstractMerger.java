@@ -331,7 +331,7 @@ public abstract class AbstractMerger extends XMLManager {
 			wfTaskName = getWorkflowName(wfDocument).replace(" ", "_");
 			logMsg = String.format("WF's name is %s.", wfTaskName);
 			logger.debug(logMsg);
-			if (TasksManager.exists(wfTaskName)) {
+			if (TasksManager.existsinFM(wfTaskName)) {
 				logger.warn("This workflow is already in the FeatureModel");
 				logger.warn("Skipping...");
 				return new Pair<>();
@@ -365,6 +365,9 @@ public abstract class AbstractMerger extends XMLManager {
 		// retrieving task name content
 		String taskName = task.getName();
 		// inserting the new node
+		if (task instanceof FMTask) {
+			return parentNode.appendChild((FMTask) task);
+		}
 		FMTask newFeature = this.createFeatureWithName(taskName);
 		return parentNode.appendChild(newFeature);
 	}

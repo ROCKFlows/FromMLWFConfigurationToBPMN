@@ -38,6 +38,7 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
+import com.ml2wf.tasks.FMTask;
 import com.ml2wf.tasks.manager.TasksManager;
 
 /**
@@ -238,6 +239,10 @@ public class XMLManager {
 	public void save(File destFile) throws TransformerException, IOException {
 		String logMsg = String.format("Saving file at location : %s...", destFile);
 		logger.info(logMsg);
+		System.out.println("DOC HASHCODE : " + document.getClass().getName() + "@" + document.hashCode());
+		TasksManager.getFMTasks().stream().map(FMTask::getNode).filter(n -> n.getParentNode() != null)
+				.forEach(n -> System.out.println(
+						XMLManager.getNodeName(n) + " parent : " + XMLManager.getNodeName(n.getParentNode())));
 		if (!destFile.createNewFile()) {
 			logger.debug("[SAVE] Destination file aldready exists.");
 			logger.debug("[SAVE] Overriding...");

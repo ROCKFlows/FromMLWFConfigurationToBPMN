@@ -154,9 +154,8 @@ public final class TasksManager {
 	 * @since 1.0
 	 * @see Task
 	 */
-	public static boolean exists(String name) {
-		return bpmnTasks.stream().map(Task::getName).anyMatch(n -> n.equals(name))
-				|| fmTasks.stream().map(Task::getName).anyMatch(n -> n.equals(name));
+	public static boolean existsinFM(String name) {
+		return fmTasks.stream().map(Task::getName).anyMatch(n -> n.equals(name));
 	}
 
 	// clearers
