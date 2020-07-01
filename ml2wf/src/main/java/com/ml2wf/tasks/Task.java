@@ -103,19 +103,14 @@ public abstract class Task {
 		}
 		Task other = (Task) obj;
 		if (this.name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!this.name.equals(other.name)) {
-			return false;
+			return this.name == other.name;
+		} else {
+			return this.name.equals(other.name);
 		}
-		if (this.parent == null) {
-			if (other.parent != null) {
-				return false;
-			}
-		} else if (!this.parent.equals(other.parent)) {
-			return false;
-		}
-		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "\nTask [name=" + this.name + ", parent=" + this.parent + "]";
 	}
 }

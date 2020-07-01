@@ -200,11 +200,11 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 */
 	protected static Element createNestedNode(Element parent, String name) {
-		Element created = getDocument().createElement(parent.getNodeName());
-		created.setAttribute(FMAttributes.NAME.getName(), name);
+		Element created = parent.getOwnerDocument().createElement(parent.getNodeName());
+		created.setAttribute(BPMNAttributes.NAME.getName(), name);
 		if (!isMetaTask(parent)) {
 			addDocumentationNode(created, XMLManager.getNodeName(parent));
-		}
+		} // TODO: else set abstract attr to true
 		return created;
 	}
 
@@ -252,6 +252,10 @@ public abstract class AbstractMerger extends XMLManager {
 		List<String> names = new ArrayList<>(Arrays.asList(nodeName));
 		// sanitizing names
 		names = names.stream().filter(n -> !n.isBlank()).map(XMLManager::sanitizeName).collect(Collectors.toList());
+		if (names.size() == 1) {
+			// if there is no nested node
+			return Arrays.asList(node); // return the current node as a list
+		}
 		// Manage the parentNode
 		Element parentNode = (Element) node.cloneNode(true);
 		parentNode.setAttribute(BPMNAttributes.NAME.getName(), names.remove(0));
@@ -352,24 +356,24 @@ public abstract class AbstractMerger extends XMLManager {
 	 *
 	 * The new task is converted to match the FeatureModel format.
 	 *
-	 * @param parentNode Parent node of the new task
+	 * @param parentTask Parent task
 	 * @param task       task to insert
 	 * @return the added child
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	protected FMTask insertNewTask(FMTask parentNode, Task task) {
+	protected FMTask insertNewTask(FMTask parentTask, Task task) {
 		// TODO: recurse for nested tasks
 		logger.debug("Inserting task : {}", task.getName());
 		// retrieving task name content
 		String taskName = task.getName();
 		// inserting the new node
 		if (task instanceof FMTask) {
-			return parentNode.appendChild((FMTask) task);
+			return parentTask.appendChild((FMTask) task);
 		}
 		FMTask newFeature = this.createFeatureWithName(taskName);
-		return parentNode.appendChild(newFeature);
+		return parentTask.appendChild(newFeature);
 	}
 
 	/**

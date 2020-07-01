@@ -28,7 +28,6 @@ import com.ml2wf.tasks.FMTask;
 import com.ml2wf.tasks.Task;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
-import com.ml2wf.util.XMLManager;
 
 public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerger {
 
@@ -98,8 +97,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 				this.processSpecificNeeds(wfInfo);
 			}
 		}
-		getTasksList(getDocument(), FMNames.SELECTOR)
-				.forEach(n -> System.out.println("Node : " + n + " with name " + XMLManager.getNodeName(n)));
 	}
 
 	private Set<File> getFiles(File file) throws IOException {
@@ -126,9 +123,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	}
 
 	private void createFMTasks() {
-		for (Node fmNode : getTasksList(getDocument(), FMNames.SELECTOR)) {
-			this.getTaskFactory().createTasks(fmNode);
-		}
+		getTasksList(getDocument(), FMNames.SELECTOR).forEach(this.getTaskFactory()::createTasks);
 	}
 
 	/**
@@ -165,11 +160,9 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	}
 
 	protected void processTask(BPMNTask task) {
-		System.out.println("Processing task : " + task.getName());
 		String taskName = task.getName();
 		Optional<FMTask> opt;
 		if (TasksManager.existsinFM(taskName)) {
-			System.out.println("Task already exists");
 			// if task is already in the FM
 			opt = unmanagedTask.getChildWithName(taskName);
 			if (opt.isEmpty()) {
@@ -185,7 +178,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		}
 		// retrieving a suitable parent
 		FMTask parentTask = this.getSuitableParent(task);
-		System.out.println("Suitable parent = " + parentTask.getName());
 		// inserting the new task
 		this.insertNewTask(parentTask, task);
 

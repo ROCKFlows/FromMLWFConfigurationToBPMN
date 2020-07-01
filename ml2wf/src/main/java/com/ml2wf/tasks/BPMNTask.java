@@ -32,13 +32,14 @@ public class BPMNTask extends Task {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof FMTask)) {
+		if (!(obj instanceof BPMNTask)) {
 			return false;
 		}
-		if (!super.equals(obj)) {
-			return false;
-		}
-		BPMNTask other = (BPMNTask) obj;
-		return this.reference.equals(other.getReference());
+		return super.equals(obj);
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "[\n\tBPMNTask [reference=" + this.reference + "]]";
 	}
 }

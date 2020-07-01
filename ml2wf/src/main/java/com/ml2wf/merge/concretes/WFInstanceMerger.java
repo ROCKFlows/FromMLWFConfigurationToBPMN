@@ -93,7 +93,6 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	public FMTask getSuitableParent(BPMNTask task) {
 		// retrieving the references parent
 		String reference = task.getReference();
-		System.out.println("getSuitableParent : " + reference);
 		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
 			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);

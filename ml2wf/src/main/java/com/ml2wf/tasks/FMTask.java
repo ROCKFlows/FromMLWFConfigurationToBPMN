@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.w3c.dom.Node;
 
 import com.ml2wf.tasks.manager.TasksManager;
-import com.ml2wf.util.XMLManager;
 
 public class FMTask extends Task {
 
@@ -37,14 +36,8 @@ public class FMTask extends Task {
 	}
 
 	public FMTask appendChild(FMTask child) {
-		child.setParent(this);
-		System.out
-				.println("Appending child : " + XMLManager.getNodeName(child.getNode()) + " / " + child.getName()
-						+ "  to  "
-						+ this.getName() +
-						" / " + XMLManager.getNodeName(this.node));
 		child.setNode(this.node.appendChild(child.getNode()));
-		System.out.println(this.node.getTextContent());
+		child.setParent(this);
 		return child;
 	}
 
@@ -112,10 +105,12 @@ public class FMTask extends Task {
 		if (!(obj instanceof FMTask)) {
 			return false;
 		}
-		if (!super.equals(obj)) {
-			return false;
-		}
-		FMTask other = (FMTask) obj;
-		return this.node.equals(other.getNode()) && (this.isAbstract == other.isAbstract());
+		return super.equals(obj);
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "\n\t[FMTask [node=" + this.node + ", isAbstract="
+				+ this.isAbstract + "]]";
 	}
 }
