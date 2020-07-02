@@ -379,6 +379,22 @@ public abstract class AbstractMerger extends XMLManager {
 	}
 
 	/**
+	 * Returns a {@code List<Node>} containing all annotations of the
+	 * {@code wfDocument}.
+	 *
+	 * @param wfDocument {@code Document} containing annotations
+	 * @return a {@code List<Node>} containing all annotations of the
+	 *         {@code wfDocument}
+	 *
+	 * @since 1.0
+	 * @see Document
+	 */
+	protected List<Node> getAnnotations(Document wfDocument) {
+		return XMLManager
+				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNames.ANNOTATION.getName()));
+	}
+
+	/**
 	 * Processes {@code document}'s annotations and adds constraints.
 	 *
 	 * @param wfDocument Workflow {@code Document}'s instance containing
@@ -388,10 +404,8 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 * @see ConstraintFactory
 	 */
-	protected void processAnnotations(Document wfDocument) throws InvalidConstraintException {
+	protected void processAnnotations(List<Node> annotations) throws InvalidConstraintException {
 		logger.info("Processing annotations...");
-		List<Node> annotations = XMLManager
-				.nodeListAsList(wfDocument.getElementsByTagName(BPMNNames.ANNOTATION.getName()));
 		List<Pair<FMTask, Node>> orderPairs; // pair that will contain order constraint data
 		for (Node annotation : annotations) {
 			// TODO: improve performances (check annotation.getChildNodes().item(1)

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -90,6 +91,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		if (backUp) {
 			super.backUp();
 		}
+		List<Node> annotations = new ArrayList<>();
 		Set<File> files = this.getFiles(wfFile);
 		this.createFMTasks();
 		setUnmanagedTask(this.getGlobalFMTask(UNMANAGED));
@@ -103,7 +105,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			// create associated tasks
 			Set<Task> tasks = getTasksList(wfDocument, BPMNNames.SELECTOR).stream()
 					.map(this.getTaskFactory()::createTasks).flatMap(Collection::stream).collect(Collectors.toSet());
-			this.processAnnotations(wfDocument);
+			annotations.addAll(this.getAnnotations(wfDocument));
 			if (completeMerge) {
 				this.processCompleteMerge(wfInfo.getKey(), tasks);
 				this.processSpecificNeeds(wfInfo);
@@ -112,6 +114,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		}
 		// process created tasks
 		TasksManager.getBPMNTasks().stream().forEach(this::processTask);
+		this.processAnnotations(annotations);
 	}
 
 	@Override
