@@ -50,7 +50,15 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *
 	 * Unmanaged nodes will be placed under a parent with this name.
 	 */
-	private static String UNMANAGED_PARENT_NAME = "Unmanaged";
+	private static final String UNMANAGED = "Unmanaged";
+	/**
+	 * Root's parent name.
+	 *
+	 * <p>
+	 *
+	 * Global nodes (e.g. Meta, Steps, Unmanaged...) will be placed under this one.
+	 */
+	private static final String ROOT = "AD";
 
 	/**
 	 * {@code BaseMergerImpl}'s default constructor.
@@ -75,7 +83,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		}
 		Set<File> files = this.getFiles(wfFile);
 		this.createFMTasks();
-		setUnmanagedTask(this.getGlobalFMTask(UNMANAGED_PARENT_NAME));
+		setUnmanagedTask(this.getGlobalFMTask(UNMANAGED));
 		for (File file : files) {
 			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
 			if (wfInfo.isEmpty()) {
@@ -224,12 +232,30 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		return optGlobalTask.orElseGet(() -> this.createGlobalFMTask(globalNodeName));
 	}
 
+	/**
+	 * Creates the global {@code FMTask} instance corresponding to the given
+	 * {@code globalNodeName}.
+	 *
+	 * @param globalNodeName the global node name
+	 * @return the created global {@code FMTask} instance
+	 *
+	 * @since 1.0
+	 * @see FMTask
+	 */
 	protected FMTask createGlobalFMTask(String globalNodeName) {
+		// create the node element
 		Element globalElement = getDocument().createElement(FMNames.AND.getName());
 		globalElement.setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(true));
 		globalElement.setAttribute(FMAttributes.NAME.getName(), globalNodeName);
-		Node globalNode = getDocument().getElementsByTagName(FMNames.AND.getName()).item(1)
-				.appendChild(globalElement); // TODO: use TasksManager
-		return (FMTask) this.getTaskFactory().createTasks(globalNode).stream().findFirst().orElse(null);
+		// create the global task
+		Optional<Task> optGlobalTask = this.getTaskFactory().createTasks(globalElement).stream().findFirst();
+		if (optGlobalTask.isPresent()) {
+			FMTask globalTask = (FMTask) optGlobalTask.get();
+			Optional<FMTask> optRoot = TasksManager.getFMTaskWithName(ROOT); // get the root
+			if (optRoot.isPresent()) {
+				return optRoot.get().appendChild(globalTask);
+			}
+		}
+		return null;
 	}
 }
