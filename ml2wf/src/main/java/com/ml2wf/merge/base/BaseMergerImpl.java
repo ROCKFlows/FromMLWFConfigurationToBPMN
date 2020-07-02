@@ -25,6 +25,7 @@ import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.tasks.BPMNTask;
 import com.ml2wf.tasks.FMTask;
 import com.ml2wf.tasks.Task;
+import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
 
@@ -72,6 +73,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		super(file);
 	}
 
+	/**
+	 * Sets the {@link BaseMergerImpl#unmanagedTask} value.
+	 *
+	 * @param unmanagedTask the new unmanaged {@code FMTask}
+	 *
+	 * @since 1.0
+	 */
 	protected static void setUnmanagedTask(FMTask unmanagedTask) {
 		BaseMergerImpl.unmanagedTask = unmanagedTask;
 	}
@@ -106,6 +114,23 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		TasksManager.getBPMNTasks().stream().forEach(this::processTask);
 	}
 
+	@Override
+	public void mergeWithWF(boolean backUp, boolean completeMerge, File... wfFiles) throws Exception {
+		for (File wfFile : wfFiles) {
+			this.mergeWithWF(backUp, completeMerge, wfFile);
+		}
+	}
+
+	/**
+	 * Returns a {@code List<File>} from the given {@code File}.
+	 *
+	 * @param file the file to retrieve contained files
+	 * @return a {@code List<File>} from the given {@code File}
+	 * @throws IOException
+	 *
+	 * @since 1.0
+	 * @see File
+	 */
 	private Set<File> getFiles(File file) throws IOException {
 		Set<File> files;
 		try (Stream<Path> stream = Files.walk(file.toPath())) {
@@ -122,13 +147,14 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		return files;
 	}
 
-	@Override
-	public void mergeWithWF(boolean backUp, boolean completeMerge, File... wfFiles) throws Exception {
-		for (File wfFile : wfFiles) {
-			this.mergeWithWF(backUp, completeMerge, wfFile);
-		}
-	}
-
+	/**
+	 * Calls the {@link #getTaskFactory()} to create {@code FMTask} instances from
+	 * the FM {@link #getDocument()}.
+	 *
+	 * @since 1.0
+	 * @see TaskFactory
+	 * @see FMTask
+	 */
 	private void createFMTasks() {
 		List<Node> fmTasksList = getTasksList(getDocument(), FMNames.SELECTOR);
 		// create fm tasks foreach task node
@@ -170,6 +196,31 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		this.createdWFTask = this.insertNewTask(root, this.createdWFTask);
 	}
 
+	/**
+	 * Processes the given {@code task} converting it from {@link BPMNTask} to
+	 * {@link FMTask}.
+	 *
+	 * <p>
+	 *
+	 * More precisely, this method :
+	 *
+	 * <p>
+	 *
+	 * <ul>
+	 * <li>removes the corresponding {@code FMTask} from the {@link #unmanagedTask}
+	 * if it is contained by this one,</li>
+	 * <li>retrieves a suitable parent for the given {@code task} using the
+	 * {@link #getSuitableParent(BPMNTask)} method,</li>
+	 * <li>inserts the given {@code task} under the retrieved {@code parentTask}
+	 * using the {@link #insertNewTask(FMTask, Task)} method.</li>
+	 * </ul>
+	 *
+	 * @param task task to process
+	 *
+	 * @since 1.0
+	 * @see BPMNTask
+	 * @see FMTask
+	 */
 	protected void processTask(BPMNTask task) {
 		String taskName = task.getName();
 		Optional<FMTask> opt;
@@ -194,6 +245,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 
 	}
 
+	// TODO
 	protected Task mergeNodes(Task taskA, Task taskB) {
 		// TODO: to change according to recent changes in task OOC
 		// TODO: improve considering conflicts (e.g same child & different levels)

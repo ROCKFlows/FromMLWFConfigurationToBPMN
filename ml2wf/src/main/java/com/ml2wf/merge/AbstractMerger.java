@@ -185,17 +185,17 @@ public abstract class AbstractMerger extends XMLManager {
 	}
 
 	/**
-	 * Creates and returns the nested {@code Node} according to the {@code parent}
-	 * data.
+	 * Creates and returns the nested {@code Element} according to the
+	 * {@code parent} data.
 	 *
 	 * <p>
 	 *
-	 * <b>Note</b> that the created {@code Node} is not added to the
+	 * <b>Note</b> that the created {@code Element} is not added to the
 	 * {@code parent}'s children.
 	 *
 	 * @param parent parent of the created nested node
 	 * @param name   name of the nested node
-	 * @return the nested {@code Node} according to the {@code parent} data
+	 * @return the nested {@code Element} according to the {@code parent} data
 	 *
 	 * @since 1.0
 	 */
@@ -349,19 +349,20 @@ public abstract class AbstractMerger extends XMLManager {
 	}
 
 	/**
-	 * Inserts and returns the new task corresponding of the given {@code Node task}
-	 * under the given {@code Node parentNode}.
+	 * Inserts and returns the new task corresponding of the given {@code task}
+	 * under the given {@code parentTask}.
 	 *
 	 * <p>
 	 *
-	 * The new task is converted to match the FeatureModel format.
+	 * The result task matchs the FeatureModel format.
 	 *
 	 * @param parentTask Parent task
 	 * @param task       task to insert
 	 * @return the added child
 	 *
 	 * @since 1.0
-	 * @see Node
+	 * @see Task
+	 * @see FMTask
 	 */
 	protected FMTask insertNewTask(FMTask parentTask, Task task) {
 		// TODO: recurse for nested tasks
@@ -452,12 +453,12 @@ public abstract class AbstractMerger extends XMLManager {
 	 * e.g. A before B, C after D
 	 *
 	 * @param orderPairs {@code List} of {@code Pair} containing the LCA
-	 *                   {@code Node} as key and the descriptive {@code Node} as
+	 *                   {@code FMTask} as key and the descriptive {@code Node} as
 	 *                   value
 	 *
 	 * @since 1.0
 	 *
-	 * @see Node
+	 * @see FMTask
 	 * @see Pair
 	 */
 	protected void processOrderConstraint(List<Pair<FMTask, Node>> orderPairs) {

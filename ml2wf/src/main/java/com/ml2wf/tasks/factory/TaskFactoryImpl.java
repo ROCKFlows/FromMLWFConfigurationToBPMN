@@ -35,8 +35,11 @@ import com.ml2wf.util.XMLManager;
  */
 public class TaskFactoryImpl implements TaskFactory {
 
+	/**
+	 * {@code TaskFactoryImpl}'s empty constructor.
+	 */
 	public TaskFactoryImpl() {
-		// TODO Auto-generated constructor stub
+		// empty constructor
 	}
 
 	@Override
@@ -62,11 +65,32 @@ public class TaskFactoryImpl implements TaskFactory {
 		return createdTasks;
 	}
 
+	/**
+	 * Returns whether the given {@code node} is abstract or not.
+	 *
+	 * <p>
+	 *
+	 * This helps setting the {@link FMTask#isAbstract} attribute.
+	 *
+	 * @param node node containing the abstract information
+	 * @return whether the given {@code node} is abstract or not
+	 *
+	 * @since 1.0
+	 * @see FMTask
+	 */
 	private boolean isAbstract(Node node) {
 		Node abstractAttr = node.getAttributes().getNamedItem(FMAttributes.ABSTRACT.getName());
 		return (abstractAttr != null) && (abstractAttr.getNodeValue().equals(String.valueOf(true)));
 	}
 
+	/**
+	 * Returns an {@code Optional} containing the given {@code node} reference.
+	 *
+	 * @param node node containing a reference
+	 * @return an {@code Optional} containing the given {@code node} reference
+	 *
+	 * @since 1.0
+	 */
 	private Optional<String> getReference(Node node) {
 		Node docNode = ((Element) node).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
 		if (docNode != null) {

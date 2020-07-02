@@ -8,7 +8,7 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
 
 /**
  * This {@code enum} contains handled tags' names according to the
- * <a href="https://www.bpmn.org/">BPMN standard</a>.
+ * <a href="http://www.bpmn.org/">BPMN standard</a>.
  *
  * @author Nicolas Lacroix
  *

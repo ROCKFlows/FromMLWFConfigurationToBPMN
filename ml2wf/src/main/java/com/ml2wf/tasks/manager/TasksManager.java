@@ -68,15 +68,63 @@ public final class TasksManager {
 		return fmTasks;
 	}
 
+	/**
+	 * Returns an {@code Optional} containing the {@code FMTask} with the given
+	 * {@code name}.
+	 *
+	 * <p>
+	 *
+	 * If there is no {@code FMTask} with the given {@code name}, then the
+	 * returned {@code Optional} is empty.
+	 *
+	 * @param name name of wanted task
+	 * @return an {@code Optional} containing the {@code FMTask} with the given
+	 *         {@code name}
+	 *
+	 * @since 1.0
+	 * @see FMTask
+	 */
 	public static Optional<FMTask> getFMTaskWithName(String name) {
 		return fmTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
 	}
 
+	/**
+	 * Returns an {@code Optional} containing the {@code FMTask} with the given
+	 * {@code parent}.
+	 *
+	 * <p>
+	 *
+	 * If there is no {@code FMTask} with the given {@code parent}, then the
+	 * returned {@code Optional} is empty.
+	 *
+	 * @param parent parent of wanted task
+	 * @return an {@code Optional} containing the {@code FMTask} with the given
+	 *         {@code parent}
+	 *
+	 * @since 1.0
+	 * @see FMTask
+	 */
 	public static List<FMTask> getFMTaskWithParent(Task parent) {
 		return fmTasks.stream().filter(t -> (t.getParent() != null) && t.getParent().equals(parent))
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * Returns an {@code Optional} containing the {@code FMTask} with the given
+	 * {@code node}.
+	 *
+	 * <p>
+	 *
+	 * If there is no {@code FMTask} with the given {@code node}, then the returned
+	 * {@code Optional} is empty.
+	 *
+	 * @param node node of wanted task
+	 * @return an {@code Optional} containing the {@code FMTask} with the given
+	 *         {@code node}
+	 *
+	 * @since 1.0
+	 * @see FMTask
+	 */
 	public static Optional<FMTask> getFMTaskWithNode(Node node) {
 		return fmTasks.stream().filter(t -> t.getNode().equals(node)).findFirst();
 	}
@@ -94,6 +142,22 @@ public final class TasksManager {
 		return bpmnTasks;
 	}
 
+	/**
+	 * Returns an {@code Optional} containing the {@code BPMNTask} with the given
+	 * {@code name}.
+	 *
+	 * <p>
+	 *
+	 * If there is no {@code BPMNTask} with the given {@code name}, then the
+	 * returned {@code Optional} is empty.
+	 *
+	 * @param name name of wanted task
+	 * @return an {@code Optional} containing the {@code BPMNTask} with the given
+	 *         {@code name}
+	 *
+	 * @since 1.0
+	 * @see BPMNTask
+	 */
 	public static Optional<BPMNTask> getBPMNTaskWithName(String name) {
 		return bpmnTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
 	}
@@ -117,7 +181,7 @@ public final class TasksManager {
 				fmTasks.add((FMTask) task);
 			} else {
 				// removing if a task with the same name and a blank reference is already
-				// contained to keep more precise tasks
+				// contained to keep most precise tasks
 				bpmnTasks.removeIf(
 						t -> (t.getName() != null) && t.getName().equals(task.getName()) && t.getReference().isBlank());
 				bpmnTasks.add((BPMNTask) task);
