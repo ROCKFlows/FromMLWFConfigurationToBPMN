@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -417,18 +418,18 @@ public abstract class AbstractMerger extends XMLManager {
 	 * <p>
 	 *
 	 * An association constraint is an implication between the {@code wfName} and
-	 * the {@code wfDocument}'s tasks.
+	 * the {@code Set<BPMNTask>}.
 	 *
-	 * @param wfDocument workflow's document
-	 * @param wfName     workflow's name
+	 * @param wfName workflow's name
+	 * @param tasks  {@code Set<Task>} containing all workflow's tasks
 	 * @throws InvalidConstraintException
 	 *
 	 * @since 1.0
 	 */
-	protected void processAssocConstraints(Document wfDocument, String wfName) throws InvalidConstraintException {
+	protected void processAssocConstraints(String wfName, Set<Task> tasks) throws InvalidConstraintException {
 		String logMsg;
 		logger.debug("Retrieving all FM document tasks...");
-		List<String> tasksNames = TasksManager.getBPMNTasks().stream().map(Task::getName)
+		List<String> tasksNames = tasks.stream().map(Task::getName)
 				.collect(Collectors.toList());
 		logger.debug("Getting the constraint association...");
 		String associationConstraint = ((ConstraintFactoryImpl) this.getConstraintFactory())

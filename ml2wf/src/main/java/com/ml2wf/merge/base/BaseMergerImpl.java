@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -99,16 +100,15 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 				return;
 			}
 			Document wfDocument = wfInfo.getValue();
-			// get all wf's task nodes
-			List<Node> tasksNodes = getTasksList(wfDocument, BPMNNames.SELECTOR);
 			// create associated tasks
-			tasksNodes.stream().forEach(this.getTaskFactory()::createTasks);
-			tasksNodes.clear(); // clearing to free memory
+			Set<Task> tasks = getTasksList(wfDocument, BPMNNames.SELECTOR).stream()
+					.map(this.getTaskFactory()::createTasks).flatMap(Collection::stream).collect(Collectors.toSet());
 			this.processAnnotations(wfDocument);
 			if (completeMerge) {
-				this.processCompleteMerge(wfInfo);
+				this.processCompleteMerge(wfInfo.getKey(), tasks);
 				this.processSpecificNeeds(wfInfo);
 			}
+			tasks.clear(); // clearing to free memory
 		}
 		// process created tasks
 		TasksManager.getBPMNTasks().stream().forEach(this::processTask);
@@ -187,13 +187,11 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *
 	 * @see Pair
 	 */
-	private void processCompleteMerge(Pair<String, Document> wfInfo) throws InvalidConstraintException {
-		String wfName = wfInfo.getKey();
-		// TODO: check order execution (node creation before assocConstraints)
-		this.processAssocConstraints(wfInfo.getValue(), wfName);
+	private void processCompleteMerge(String wfName, Set<Task> tasks) throws InvalidConstraintException {
 		this.createdWFTask = this.createFeatureWithName(wfName);
 		FMTask root = this.getRootParentNode();
 		this.createdWFTask = this.insertNewTask(root, this.createdWFTask);
+		this.processAssocConstraints(wfName, tasks);
 	}
 
 	/**
