@@ -22,7 +22,7 @@ public enum BPMNNames implements TaskTagsSelector {
 	EXTENSION("bpmn2:extensionElements"), STYLE("ext:style"), DOCUMENTATION("bpmn2:documentation"),
 	ANNOTATION("bpmn2:textAnnotation"), TEXT("bpmn2:text"), DIAGRAM("bpmndi:BPMNDiagram"), PLANE("bpmndi:BPMNPlane"),
 	// task tags
-	TASK("bpmn2:task"), USERTASK("bpmn2:userTask"),
+	TASK("bpmn2:task"), USERTASK("bpmn2:userTask"), SERVICETASK("bpmn2:serviceTask"),
 	// positional tags
 	SHAPE("bpmndi:BPMNShape"), BOUNDS("dc:Bounds"), LABEL("bpmndi:BPMNLabel"),
 	// reserved tags
@@ -65,6 +65,6 @@ public enum BPMNNames implements TaskTagsSelector {
 
 	@Override
 	public List<String> getTaskTags() {
-		return new ArrayList<>(Arrays.asList(USERTASK.getName(), TASK.getName()));
+		return new ArrayList<>(Arrays.asList(USERTASK.getName(), TASK.getName(), SERVICETASK.getName()));
 	}
 }
