@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -38,7 +37,8 @@ import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
-import com.ml2wf.conventions.enums.fm.FeatureAttributes;
+import com.ml2wf.conventions.enums.fm.FMAttributes;
+import com.ml2wf.tasks.manager.TasksManager;
 
 /**
  * This class is the base class for any XML managing class.
@@ -82,7 +82,7 @@ public class XMLManager {
 	 * This counter is used to number each documentation which is required for the
 	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
 	 */
-	private int docCount = 0;
+	private static int docCount = 0;
 	/**
 	 * Logger instance.
 	 *
@@ -107,7 +107,7 @@ public class XMLManager {
 	public XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
 		this.sourceFile = file;
 		this.path = file.getAbsolutePath();
-		XMLManager.setDocument(XMLManager.preprocess(this.sourceFile));
+		XMLManager.updateDocument(this.sourceFile);
 	}
 
 	/**
@@ -162,14 +162,24 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns the xml's {@code Document} instance
+	 * Updates the xml's {@code Document} instance if the {@code document} is
+	 * {@code null} or the given {@code sourceFile} is different from the
+	 * {@code document}'s source file.
 	 *
-	 * @param document the new xml's {@code Document} instance
+	 * @param sourceFile the {@code document}'s source file
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
 	 *
 	 * @see Document
 	 */
-	public static void setDocument(Document document) {
-		XMLManager.document = document;
+	public static void updateDocument(File sourceFile) throws ParserConfigurationException, SAXException, IOException {
+		if ((XMLManager.document == null)
+				|| !XMLManager.document.getBaseURI().equals(sourceFile.toURI().toString())) {
+			XMLManager.document = XMLManager.preprocess(sourceFile);
+			docCount = 0;
+			TasksManager.clear();
+		}
 	}
 
 	/**
@@ -179,6 +189,13 @@ public class XMLManager {
 	 */
 	public static String getExtensionSeparator() {
 		return EXTENSION_SEPARATOR;
+	}
+
+	/**
+	 * Increments the {@code docCount} and returns its previous value.
+	 */
+	protected static int incrementDoc() {
+		return docCount++;
 	}
 
 	// file methods
@@ -316,11 +333,11 @@ public class XMLManager {
 	 * @since 1.0
 	 * @see Node
 	 */
-	public void addDocumentationNode(Node node, String content) {
-		Element documentation = document.createElement(BPMNNames.DOCUMENTATION.getName());
-		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
+	public static void addDocumentationNode(Node node, String content) {
+		Element documentation = node.getOwnerDocument().createElement(BPMNNames.DOCUMENTATION.getName());
+		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDoc());
 		documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
-		CDATASection refersTo = document.createCDATASection(Notation.getReferenceVoc() + content);
+		CDATASection refersTo = node.getOwnerDocument().createCDATASection(Notation.getReferenceVoc() + content);
 		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
 		logger.debug(logMsg);
 		documentation.appendChild(refersTo);
@@ -473,34 +490,6 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns the <b>lowest common ancestor</b> (LCA) for given {@code nodes}.
-	 *
-	 * @param nodes nodes to retrieve the LCA
-	 * @return the <b>lowest common ancestor</b> (LCA) for given {@code nodes}
-	 *
-	 * @since 1.0
-	 */
-	public static Node getLowestCommonAncestor(List<Node> nodes) {
-		Node parent;
-		List<Node> commonParents = new ArrayList<>();
-		List<Node> nodeParents = new ArrayList<>();
-		for (Node node : nodes) {
-			// for each node
-			parent = node;
-			while ((parent = parent.getParentNode()) != null) {
-				// get all parents
-				nodeParents.add(parent);
-			}
-			if (commonParents.isEmpty()) {
-				commonParents.addAll(nodeParents);
-			}
-			// retaining common parents
-			commonParents.retainAll(nodeParents);
-		}
-		return commonParents.get(0);
-	}
-
-	/**
 	 * Returns the name tag's value of the given {@code node} if exists.
 	 *
 	 * Returns an empty string if not.
@@ -515,63 +504,16 @@ public class XMLManager {
 	public static String getNodeName(Node node) {
 		String logMsg = String.format("Retrieving name for node : %s...", node);
 		logger.trace(logMsg);
-		if (!node.hasAttributes()) {
+		if ((node == null) || !node.hasAttributes()) {
 			return "";
 		}
-		Node n = node.getAttributes().getNamedItem(FeatureAttributes.NAME.getName());
+		Node n = node.getAttributes().getNamedItem(FMAttributes.NAME.getName());
 		if (n != null) {
 			logMsg = String.format("Node's name is : %s", n.getNodeValue());
 			logger.trace(logMsg);
 			return n.getNodeValue();
 		}
 		return "";
-	}
-
-	/**
-	 * Returns a {@code List} containing all {@code nodes}' names.
-	 *
-	 * @param nodes nodes to get the names
-	 * @return a {@code List} containing all {@code nodes}' names
-	 *
-	 * @since 1.0
-	 *
-	 * @see NodeList
-	 */
-	public static List<String> getNodesNames(List<Node> nodes) {
-		return nodes.stream().map(XMLManager::getNodeName)
-				.collect(Collectors.toList());
-	}
-
-	/**
-	 * Returns the {@code Node} with the given {@code name} in the document.
-	 *
-	 * <p>
-	 *
-	 * Returns null if no node is found.
-	 *
-	 * @param root root containing source nodes
-	 * @param name name of wished node
-	 * @return the {@code Node} with the given {@code name} in the document or null
-	 *         if no node is found
-	 *
-	 * @since 1.0
-	 *
-	 * @see Node
-	 */
-	public static Node getNodeWithName(Node root, String name) {
-		NodeList children = root.getChildNodes();
-		Node child;
-		Node recursiveResult; // result of recursive call
-		for (int i = 0; i < children.getLength(); i++) {
-			child = children.item(i);
-			String childName = XMLManager.getNodeName(child);
-			if (childName.equals(name)) {
-				return child;
-			} else if ((recursiveResult = getNodeWithName(child, name)) != null) {
-				return recursiveResult;
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -641,7 +583,7 @@ public class XMLManager {
 	 *
 	 * @since 1.0
 	 */
-	public boolean isMetaTask(Element node) {
+	public static boolean isMetaTask(Element node) {
 		String regex = String.format("%s+", Notation.getReferenceVoc());
 		final Pattern pattern = Pattern.compile(regex);
 		NodeList docNodes = node.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());

@@ -159,7 +159,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		// TODO: factorize in method ?
 		String content = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName()).getNodeValue();
 		content = XMLManager.sanitizeName(content);
-		this.addDocumentationNode(node, content);
+		addDocumentationNode(node, content);
 		// extension part
 		this.addExtensionNode(node);
 		// node renaming part
@@ -211,7 +211,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			return;
 		}
 		Node processNode = processNodeList.item(0);
-		this.addDocumentationNode(processNode, referred);
+		addDocumentationNode(processNode, referred);
 	}
 
 	/**

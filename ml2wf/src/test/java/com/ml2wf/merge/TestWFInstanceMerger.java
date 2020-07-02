@@ -31,8 +31,8 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
-import com.ml2wf.conventions.enums.fm.FeatureAttributes;
-import com.ml2wf.conventions.enums.fm.FeatureNames;
+import com.ml2wf.conventions.enums.fm.FMAttributes;
+import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.concretes.WFInstanceMerger;
 import com.ml2wf.util.XMLManager;
 
@@ -136,7 +136,7 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 	 * <p>
 	 *
 	 * <b>Note</b> that this is a {@link ParameterizedTest}.
-	 * 
+	 *
 	 * @throws Exception
 	 *
 	 * @since 1.0
@@ -154,17 +154,17 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
 		// List<Node> sourceNestedNodes = ;
 		// getting FM tasks
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FeatureNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FMNames.SELECTOR);
 		// getting tasks' names
 		List<String> sourceNodesNames = sourceNodes.stream()
-				.flatMap(n -> ((AbstractMerger) this.testedClass).getNestedNodes(n).stream()) // flattening
+				.flatMap(n -> AbstractMerger.getNestedNodes(n).stream()) // flattening
 				.map(Node::getAttributes) // getting attributes
 				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())) // getting Name attribute
 				.map(Node::getNodeValue) // getting name value
 				.map((v) -> XMLManager.sanitizeName(v))
 				.collect(Collectors.toList());
 		List<String> resultNodesNames = resultNodes.stream().map(Node::getAttributes)
-				.map(a -> a.getNamedItem(FeatureAttributes.NAME.getName())).map(Node::getNodeValue)
+				.map(a -> a.getNamedItem(FMAttributes.NAME.getName())).map(Node::getNodeValue)
 				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
 		// testing
 		assertTrue(resultNodesNames.containsAll(sourceNodesNames)); // #1

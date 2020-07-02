@@ -19,9 +19,10 @@ import com.ml2wf.constraints.parser.ConstraintParser;
 import com.ml2wf.constraints.parser.Parser;
 import com.ml2wf.constraints.tree.BinaryTree;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.fm.FeatureNames;
+import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.tasks.FMTask;
+import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
-import com.ml2wf.util.XMLManager;
 
 /**
  * This class is a factory for {@code Node} from constraints.
@@ -172,7 +173,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 		for (BinaryTree<String> tree : trees) {
-			Node rule = this.document.createElement(FeatureNames.RULE.getName());
+			Node rule = this.document.createElement(FMNames.RULE.getName());
 			this.generateRuleNode(tree, rule);
 			rules.add(rule);
 		}
@@ -180,21 +181,21 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	}
 
 	@Override
-	public List<Pair<Node, Node>> getOrderNodes(String constraintText) {
+	public List<Pair<FMTask, Node>> getOrderNodes(String constraintText) {
 		// TODO : to test
-		List<Pair<Node, Node>> pairs = new ArrayList<>();
+		List<Pair<FMTask, Node>> pairs = new ArrayList<>();
 		Node description;
 		if (this.parser.isOrderConstraint(constraintText)) {
 			List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 			for (BinaryTree<String> tree : trees) {
-				description = this.document.createElement(FeatureNames.DESCRIPTION.getName());
+				description = this.document.createElement(FMNames.DESCRIPTION.getName());
 				// get involved nodes
 				List<String> taskNames = tree.getAllNodes().stream().filter(n -> !this.config.isAnOperator(n))
 						.collect(Collectors.toList());
-				List<Node> nodes = taskNames.stream().map(n -> XMLManager.getNodeWithName(this.document, n))
+				List<FMTask> tasks = taskNames.stream().map(TasksManager::getFMTaskWithName).map(o -> o.orElse(null))
 						.collect(Collectors.toList());
 				// get and add LCA
-				Node lca = (nodes.contains(null)) ? null : XMLManager.getLowestCommonAncestor(nodes);
+				FMTask lca = (tasks.contains(null)) ? null : FMTask.getLCA(tasks);
 				// set description node
 				description.setTextContent(tree.toString());
 				// add new pair to list
@@ -287,14 +288,14 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @since 1.0
 	 * @see Node
 	 * @see ConfigImpl
-	 * @see FeatureNames
+	 * @see FMNames
 	 */
 	public Node createNode(String element) {
 		Node node;
 		if (this.config.isAnOperator(element)) {
 			node = this.document.createElement(this.config.getVocmapping().get(element));
 		} else {
-			node = this.document.createElement(FeatureNames.VAR.getName());
+			node = this.document.createElement(FMNames.VAR.getName());
 			node.appendChild(this.document.createTextNode(element));
 		}
 		return node;

@@ -3,8 +3,9 @@ package com.ml2wf.merge.base;
 import java.io.File;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
+import com.ml2wf.tasks.BPMNTask;
+import com.ml2wf.tasks.FMTask;
 import com.ml2wf.util.Pair;
 
 /**
@@ -57,33 +58,34 @@ public interface BaseMerger {
 	public void mergeWithWF(boolean backUp, boolean completeMerge, File... wfFiles) throws Exception;
 
 	/**
-	 * Returns a suitable parent {@code Node} for the given {@code Node}.
+	 * Returns a suitable parent {@code FMTask} for the given {@code Task}.
 	 *
-	 * @return a suitable parent {@code Node} for the given {@code Node}
+	 * @return a suitable parent {@code FMTask} for the given {@code Task}
 	 *
 	 * @since 1.0
 	 *
-	 * @see Node
+	 * @see FMTask
+	 * @see BPMNTask
 	 */
-	public abstract Node getSuitableParent(Node child);
+	public abstract FMTask getSuitableParent(BPMNTask child);
 
 	/**
-	 * Returns the root parent {@code Node} according to the workflow's type (meta
+	 * Returns the root parent {@code FMTask} according to the workflow's type (meta
 	 * or instance).
 	 *
 	 * <p>
 	 *
-	 * This root parent {@code Node} is used during the workflow's task insertion
+	 * This root parent {@code FMTask} is used during the workflow's task insertion
 	 * (complete merge).
 	 *
-	 * @return the root parent {@code Node} according to the workflow's type (meta
+	 * @return the root parent {@code FMTask} according to the workflow's type (meta
 	 *         or instance)
 	 *
 	 * @since 1.0
 	 *
-	 * @see Node
+	 * @see FMTask
 	 */
-	public abstract Node getRootParentNode();
+	public abstract FMTask getRootParentNode();
 
 	/**
 	 * Processes specific needs to complete the merge operation.

@@ -2,7 +2,7 @@ package com.ml2wf.conventions.enums.bpmn;
 
 /**
  * This {@code enum} contains handled attributes' names according to the
- * <a href="https://www.bpmn.org/">BPMN standard</a>.
+ * <a href="http://www.bpmn.org/">BPMN standard</a>.
  *
  * @author Nicolas Lacroix
  *

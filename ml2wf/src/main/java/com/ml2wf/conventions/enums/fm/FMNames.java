@@ -16,7 +16,7 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
  * @version 1.0
  *
  */
-public enum FeatureNames implements TaskTagsSelector {
+public enum FMNames implements TaskTagsSelector {
 
 	// general tags
 	FEATUREMODEL("featureModel"), EXTENDEDFEATUREMODEL("extendedFeatureModel"), PROPERTIES("properties"),
@@ -40,7 +40,7 @@ public enum FeatureNames implements TaskTagsSelector {
 	 *
 	 * @param name name of the tag
 	 */
-	private FeatureNames(String name) {
+	private FMNames(String name) {
 		this.name = name;
 	}
 
@@ -51,6 +51,18 @@ public enum FeatureNames implements TaskTagsSelector {
 	 */
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * Returns whether the given tag is a FeatureModel task tag's name or not.
+	 *
+	 * @param tag tag to check
+	 * @return whether the given tag is a FeatureModel task tag's name or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean isFMTask(String tag) {
+		return this.getTaskTags().contains(tag);
 	}
 
 	@Override
