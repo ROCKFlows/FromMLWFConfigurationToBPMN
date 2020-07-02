@@ -17,6 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
@@ -259,6 +260,27 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		// TODO: STEPS :
 		// foreach child of taskB, get child's FMTask
 		// append child to taskA
+		return null;
+	}
+
+	protected Node mergeNodes(Node nodeA, Node nodeB) {
+		// TODO: improve considering conflicts (e.g same child & different levels)
+		NodeList nodeBChildren = nodeB.getChildNodes();
+		for (int i = 0; i < nodeBChildren.getLength(); i++) {
+			nodeA.appendChild(nodeBChildren.item(i));
+		}
+		return nodeA;
+	}
+
+	protected Node getChildWithName(Node parent, String childName) {
+		NodeList children = parent.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node candidate = children.item(i);
+			if ((getNodeName(candidate).equals(childName))
+					|| ((candidate = this.getChildWithName(candidate, childName)) != null)) {
+				return candidate;
+			}
+		}
 		return null;
 	}
 
