@@ -1,6 +1,7 @@
 package com.ml2wf.tasks.manager;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,8 +37,13 @@ public final class TasksManager {
 
 	/**
 	 * {@code Set} containing all {@code FMTask}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this is a {@code LinkedHashSet} that allows to keep the
+	 * insertion order which is needed for workflows (which are sequantial).
 	 */
-	private static Set<FMTask> fmTasks = new HashSet<>();
+	private static Set<FMTask> fmTasks = new LinkedHashSet<>();
 	/**
 	 * {@code Set} containing all {@code BPMNTask}.
 	 */

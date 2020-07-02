@@ -428,8 +428,8 @@ public abstract class AbstractMerger extends XMLManager {
 	protected void processAssocConstraints(Document wfDocument, String wfName) throws InvalidConstraintException {
 		String logMsg;
 		logger.debug("Retrieving all FM document tasks...");
-		List<Node> tasks = XMLManager.getTasksList(wfDocument, BPMNNames.SELECTOR);
-		List<String> tasksNames = this.getTasksNames(tasks);
+		List<String> tasksNames = TasksManager.getBPMNTasks().stream().map(Task::getName)
+				.collect(Collectors.toList());
 		logger.debug("Getting the constraint association...");
 		String associationConstraint = ((ConstraintFactoryImpl) this.getConstraintFactory())
 				.getAssociationConstraint(wfName, tasksNames);
