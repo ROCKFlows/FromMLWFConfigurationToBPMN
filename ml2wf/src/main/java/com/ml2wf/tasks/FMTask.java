@@ -103,10 +103,7 @@ public class FMTask extends Task {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof FMTask)) {
-			return false;
-		}
-		return super.equals(obj);
+		return (obj instanceof FMTask) && super.equals(obj);
 	}
 
 	@Override

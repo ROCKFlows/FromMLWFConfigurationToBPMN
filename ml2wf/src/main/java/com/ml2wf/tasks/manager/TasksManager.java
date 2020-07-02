@@ -18,7 +18,8 @@ import com.ml2wf.util.XMLManager;
  *
  * <p>
  *
- * <b>Note</b> that it uses {@code Set} to store created tasks.
+ * <b>Note</b> that it uses {@code Set} to store created tasks and thus to avoid
+ * tasks duplication.
  *
  * @author Nicolas Lacroix
  *
@@ -31,7 +32,7 @@ import com.ml2wf.util.XMLManager;
  */
 public final class TasksManager {
 
-	// TODO: use FMTask or Task for generic type
+	// TODO: use FMTask or Task for generic type ?
 
 	/**
 	 * {@code Set} containing all {@code FMTask}.
@@ -115,6 +116,10 @@ public final class TasksManager {
 			if (task instanceof FMTask) {
 				fmTasks.add((FMTask) task);
 			} else {
+				// removing if a task with the same name and a blank reference is already
+				// contained to keep more precise tasks
+				bpmnTasks.removeIf(
+						t -> (t.getName() != null) && t.getName().equals(task.getName()) && t.getReference().isBlank());
 				bpmnTasks.add((BPMNTask) task);
 			}
 		}

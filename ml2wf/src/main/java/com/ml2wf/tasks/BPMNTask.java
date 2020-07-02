@@ -32,10 +32,7 @@ public class BPMNTask extends Task {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof BPMNTask)) {
-			return false;
-		}
-		return super.equals(obj);
+		return (obj instanceof BPMNTask) && super.equals(obj);
 	}
 
 	@Override

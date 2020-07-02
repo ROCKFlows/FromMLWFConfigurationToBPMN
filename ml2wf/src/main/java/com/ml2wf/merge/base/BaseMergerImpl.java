@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -84,19 +83,19 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 				return;
 			}
 			Document wfDocument = wfInfo.getValue();
+			// get all wf's task nodes
 			List<Node> tasksNodes = getTasksList(wfDocument, BPMNNames.SELECTOR);
-			for (ListIterator<Node> iter = tasksNodes.listIterator(); iter.hasNext();) {
-				for (Task task : this.getTaskFactory().createTasks(iter.next())) {
-					this.processTask((BPMNTask) task);
-				}
-				iter.remove(); // removing from list to free memory
-			}
+			// create associated tasks
+			tasksNodes.stream().forEach(this.getTaskFactory()::createTasks);
+			tasksNodes.clear(); // clearing to free memory
 			this.processAnnotations(wfDocument);
 			if (completeMerge) {
 				this.processCompleteMerge(wfInfo);
 				this.processSpecificNeeds(wfInfo);
 			}
 		}
+		// process created tasks
+		TasksManager.getBPMNTasks().stream().forEach(this::processTask);
 	}
 
 	private Set<File> getFiles(File file) throws IOException {
