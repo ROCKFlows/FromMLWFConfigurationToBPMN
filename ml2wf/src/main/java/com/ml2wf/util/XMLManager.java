@@ -504,7 +504,7 @@ public class XMLManager {
 	public static String getNodeName(Node node) {
 		String logMsg = String.format("Retrieving name for node : %s...", node);
 		logger.trace(logMsg);
-		if (!node.hasAttributes()) {
+		if ((node == null) || !node.hasAttributes()) {
 			return "";
 		}
 		Node n = node.getAttributes().getNamedItem(FMAttributes.NAME.getName());

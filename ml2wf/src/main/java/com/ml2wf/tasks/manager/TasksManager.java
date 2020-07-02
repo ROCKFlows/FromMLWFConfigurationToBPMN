@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 import com.ml2wf.tasks.BPMNTask;
 import com.ml2wf.tasks.FMTask;
 import com.ml2wf.tasks.Task;
+import com.ml2wf.util.XMLManager;
 
 /**
  * This class manages all created tasks.
@@ -72,7 +73,7 @@ public final class TasksManager {
 
 	public static List<FMTask> getFMTaskWithParent(Task parent) {
 		return fmTasks.stream().filter(t -> (t.getParent() != null) && t.getParent().equals(parent))
-				.collect(Collectors.toList()); // TODO: remove != null when fixed
+				.collect(Collectors.toList());
 	}
 
 	public static Optional<FMTask> getFMTaskWithNode(Node node) {
@@ -152,10 +153,32 @@ public final class TasksManager {
 	 * @return whether a task with the given {@code name} exists or not
 	 *
 	 * @since 1.0
-	 * @see Task
+	 * @see FMTask
 	 */
 	public static boolean existsinFM(String name) {
 		return fmTasks.stream().map(Task::getName).anyMatch(n -> n.equals(name));
+	}
+
+	/**
+	 * Updates the given {@code tasks}' parents.
+	 *
+	 * <p>
+	 *
+	 * This can be useful after a batch treatment where the order treatment is
+	 * random and thus where parents can be treated after children.
+	 *
+	 * @param tasks tasks to update
+	 *
+	 * @since 1.0
+	 * @see FMTask
+	 */
+	public static void updateFMParents(Set<FMTask> tasks) {
+		tasks.stream().filter(t -> t.getParent() == null).forEach(t -> {
+			Optional<FMTask> opt = TasksManager.getFMTaskWithName(XMLManager.getNodeName(t.getNode().getParentNode()));
+			if (opt.isPresent()) {
+				t.setParent(opt.get());
+			}
+		});
 	}
 
 	// clearers

@@ -123,7 +123,11 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	}
 
 	private void createFMTasks() {
-		getTasksList(getDocument(), FMNames.SELECTOR).forEach(this.getTaskFactory()::createTasks);
+		List<Node> fmTasksList = getTasksList(getDocument(), FMNames.SELECTOR);
+		// create fm tasks foreach task node
+		fmTasksList.stream().forEach(this.getTaskFactory()::createTasks);
+		// update created tasks' parents
+		TasksManager.updateFMParents(TasksManager.getFMTasks());
 	}
 
 	/**
@@ -191,6 +195,10 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			nodeA.appendChild(nodeBChildren.item(i));
 		}
 		return nodeA;*/
+
+		// TODO: STEPS :
+		// foreach child of taskB, get child's FMTask
+		// append child to taskA
 		return null;
 	}
 

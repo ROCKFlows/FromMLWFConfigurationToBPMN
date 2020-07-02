@@ -46,6 +46,7 @@ public class FMTask extends Task {
 		Optional<FMTask> optTask = TasksManager.getFMTaskWithNode(oldNode);
 		if (optTask.isPresent()) {
 			this.node.removeChild(oldNode);
+			oldChild.setParent(null);
 			return optTask;
 		}
 		return Optional.empty();
