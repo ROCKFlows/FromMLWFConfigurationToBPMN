@@ -93,6 +93,10 @@ public final class Notation {
 	 * Sentence for referred author/article.
 	 */
 	private static final String AUTHOR_REFERENCE_SENTENCE = "Author/Article : %s%s.";
+	/**
+	 * The optionality keyword.
+	 */
+	private static final String OPTIONALITY = "@Optional";
 
 	/**
 	 * {@code Notation's} default constructor.
@@ -249,7 +253,7 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the {@link WF_NAME_SENTENCE} notation.
+	 * Returns the {@link #WF_NAME_SENTENCE} notation.
 	 *
 	 * @return the worflow's name notation
 	 *
@@ -260,7 +264,7 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the {@link META_REFERENCE_SENTENCE} notation.
+	 * Returns the {@link #META_REFERENCE_SENTENCE} notation.
 	 *
 	 * @return the referred meta-workflow notation
 	 *
@@ -271,7 +275,7 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the {@link DATA_REFERENCE_SENTENCE} notation.
+	 * Returns the {@link #DATA_REFERENCE_SENTENCE} notation.
 	 *
 	 * @return the referred data notation
 	 *
@@ -282,7 +286,7 @@ public final class Notation {
 	}
 
 	/**
-	 * Returns the {@link AUTHOR_REFERENCE_SENTENCE} notation.
+	 * Returns the {@link #AUTHOR_REFERENCE_SENTENCE} notation.
 	 *
 	 * @return the referred author/article notation
 	 *
@@ -290,6 +294,17 @@ public final class Notation {
 	 */
 	public static String getAuthorReferenceSentence() {
 		return AUTHOR_REFERENCE_SENTENCE;
+	}
+
+	/**
+	 * Returns the {@link #OPTIONALITY} keyword notation.
+	 *
+	 * @return the optionality keyword notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getOptionality() {
+		return OPTIONALITY;
 	}
 
 	/**

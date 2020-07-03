@@ -158,7 +158,6 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		// documentation part
 		// TODO: factorize in method ?
 		String content = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName()).getNodeValue();
-		content = XMLManager.sanitizeName(content);
 		addDocumentationNode(node, content);
 		// extension part
 		this.addExtensionNode(node);

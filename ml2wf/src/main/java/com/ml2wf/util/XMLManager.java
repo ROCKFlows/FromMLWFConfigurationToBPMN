@@ -321,6 +321,21 @@ public class XMLManager {
 	}
 
 	/**
+	 * Returns the formated documentation content.
+	 *
+	 * @param content content containing documentation informations
+	 * @return the formated documentation content
+	 *
+	 * @since 1.0
+	 */
+	public static String getDocumentationContent(String content) {
+		boolean isOptional = content.contains(Notation.getOptionality());
+		String docContent = Notation.getOptionality() + " : " + isOptional;
+		content = XMLManager.sanitizeName(content);
+		return docContent + "\n" + Notation.getReferenceVoc() + content;
+	}
+
+	/**
 	 * Adds the documentation part to the given {@code node}.
 	 *
 	 * <p>
@@ -334,10 +349,11 @@ public class XMLManager {
 	 * @see Node
 	 */
 	public static void addDocumentationNode(Node node, String content) {
+		content = getDocumentationContent(content);
 		Element documentation = node.getOwnerDocument().createElement(BPMNNames.DOCUMENTATION.getName());
 		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDoc());
 		documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
-		CDATASection refersTo = node.getOwnerDocument().createCDATASection(Notation.getReferenceVoc() + content);
+		CDATASection refersTo = node.getOwnerDocument().createCDATASection(content);
 		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
 		logger.debug(logMsg);
 		documentation.appendChild(refersTo);
@@ -646,6 +662,7 @@ public class XMLManager {
 		}
 		name = name.replaceFirst(Notation.getDocumentationVoc(), "");
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
+		name = name.replace(Notation.getOptionality(), "");
 		name = name.trim();
 		return name.replace(" ", "_");
 	}

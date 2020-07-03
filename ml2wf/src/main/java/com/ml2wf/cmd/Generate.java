@@ -67,9 +67,9 @@ public class Generate extends AbstractCommand {
 				logger.fatal(CANT_INSTANTIATE);
 				logger.fatal("The input is not a file.");
 				return;
-			} else if (!this.output.isFile()) {
+			} else if (!this.output.isDirectory()) {
 				logger.fatal(CANT_INSTANTIATE);
-				logger.fatal("The output is not a file.");
+				logger.fatal("The output is not a directory.");
 				return;
 			}
 			factory = new InstanceFactoryImpl(this.input);
@@ -77,7 +77,7 @@ public class Generate extends AbstractCommand {
 			LogManager.shutdown();
 		} catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
 			logger.fatal(CANT_INSTANTIATE);
-			logger.fatal(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
