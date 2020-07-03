@@ -3,12 +3,15 @@ package com.ml2wf.constraints.factory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -21,6 +24,7 @@ import com.ml2wf.constraints.tree.BinaryTree;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.tasks.FMTask;
+import com.ml2wf.tasks.Task;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
 
@@ -67,6 +71,13 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @see Document
 	 */
 	private Document document;
+	/**
+	 * Logger instance.
+	 *
+	 * @since 1.0
+	 * @see Logger
+	 */
+	private static final Logger logger = LogManager.getLogger(ConstraintFactoryImpl.class);
 
 	/**
 	 * {@code ConstraintFactoryImpl}'s complete constructor.
@@ -173,6 +184,17 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 		for (BinaryTree<String> tree : trees) {
+			// TODO: check performances
+			Set<String> taskNames = TasksManager.getTasks().stream().map(Task::getName).collect(Collectors.toSet());
+			List<String> treeNodes = tree.getAllNodes().stream()
+					.filter(n -> (n != null) && !this.config.isAnOperator(n))
+					.collect(Collectors.toList());
+			if (!taskNames.containsAll(treeNodes)) {
+				logger.warn("Can't add the constraint : {}{}{} ",
+						Notation.getConstraintDelimiterLeft(), tree, Notation.getConstraintDelimiterRight());
+				logger.warn("Make sure that all constrained tasks are in the FeatureModel");
+				continue;
+			}
 			Node rule = this.document.createElement(FMNames.RULE.getName());
 			this.generateRuleNode(tree, rule);
 			rules.add(rule);

@@ -448,7 +448,7 @@ public class BinaryTree<T> {
 		StringBuilder builder = new StringBuilder();
 		builder.append(" ");
 		if (this.hasLeftChild()) {
-			builder.append(this.leftChild.getRoot().toString());
+			builder.append(this.leftChild.toString());
 			builder.append(" ");
 		}
 		if (this.root != null) {
