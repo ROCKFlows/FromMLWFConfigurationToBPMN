@@ -96,6 +96,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		Set<File> files = this.getFiles(wfFile);
 		this.createFMTasks();
 		setUnmanagedTask(this.getGlobalFMTask(UNMANAGED));
+		Set<Task> tasks;
 		for (File file : files) {
 			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
 			if (wfInfo.isEmpty()) {
@@ -104,7 +105,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			}
 			Document wfDocument = wfInfo.getValue();
 			// create associated tasks
-			Set<Task> tasks = getTasksList(wfDocument, BPMNNames.SELECTOR).stream()
+			tasks = getTasksList(wfDocument, BPMNNames.SELECTOR).stream()
 					.map(this.getTaskFactory()::createTasks).flatMap(Collection::stream).collect(Collectors.toSet());
 			annotations.addAll(this.getAnnotations(wfDocument));
 			if (completeMerge) {
