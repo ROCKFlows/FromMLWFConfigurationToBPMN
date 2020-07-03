@@ -1,7 +1,8 @@
 ---
 name: Conflict
-about: Describe this issue template's purpose here.
-title: ''
+about: A new detected conflict (situation which can't be fixed automatically during
+  a merge/generate operation))
+title: "[CONFLICT]"
 labels: conflict
 assignees: MireilleBF, yaelamraou, NicolasLacroix
 
