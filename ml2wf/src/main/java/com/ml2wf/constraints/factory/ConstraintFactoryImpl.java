@@ -181,10 +181,8 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 */
 	@Override
 	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException {
-		System.out.println("Constraint Text : " + constraintText);
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
-		System.out.println("TREES : " + trees);
 		for (BinaryTree<String> tree : trees) {
 			// TODO: check performances
 			Set<String> taskNames = TasksManager.getTasks().stream().map(Task::getName).collect(Collectors.toSet());
@@ -197,7 +195,6 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 				logger.warn("Make sure that all constrained tasks are in the FeatureModel");
 				continue;
 			}
-			System.out.println("TREE : " + tree);
 			Node rule = this.document.createElement(FMNames.RULE.getName());
 			this.generateRuleNode(tree, rule);
 			rules.add(rule);
