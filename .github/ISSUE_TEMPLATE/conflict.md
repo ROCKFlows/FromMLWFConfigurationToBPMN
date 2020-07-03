@@ -12,4 +12,6 @@ assignees: MireilleBF, yaelamraou, NicolasLacroix
 
 **Situation** : A complete description of the situation leading to the reported conflict
 
+**Proposition** : A proposition to resolve this conflict
+
 **Example** (Optional) : A precise (illustrated if possible) example
