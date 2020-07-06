@@ -94,6 +94,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	private Optional<String> getReference(Node node) {
 		Node docNode = ((Element) node).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
 		if (docNode != null) {
+			System.out.println(docNode.getTextContent());
 			return Optional.of(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""));
 		}
 		return Optional.empty();

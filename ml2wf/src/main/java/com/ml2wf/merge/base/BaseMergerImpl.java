@@ -54,7 +54,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *
 	 * Unmanaged nodes will be placed under a parent with this name.
 	 */
-	private static final String UNMANAGED = "Unmanaged";
+	public static final String UNMANAGED = "Unmanaged";
 	/**
 	 * Root's parent name.
 	 *

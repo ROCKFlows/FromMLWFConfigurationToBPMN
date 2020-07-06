@@ -93,6 +93,8 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	public FMTask getSuitableParent(BPMNTask task) {
 		// retrieving the references parent
 		String reference = task.getReference();
+		System.out.println("Task : " + task.getName());
+		System.out.println("Reference : " + reference);
 		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
 			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);
@@ -138,12 +140,14 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	 */
 	private String getMetaReferenced(Document wfDocument) {
 		NodeList docNodes = wfDocument.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
-		if (docNodes.getLength() > 0) {
-			Node docNode = docNodes.item(0);
-			// TODO: improve verification
-			return XMLManager.getReferredTask(docNode.getTextContent());
+		for (int i = 0; i < docNodes.getLength(); i++) {
+			Node docNode = docNodes.item(i);
+			Optional<String> opt = XMLManager.getReferredTask(docNode.getTextContent());
+			if (opt.isPresent()) {
+				return opt.get();
+			}
 		}
-		return null;
+		return UNMANAGED;
 	}
 
 	/**

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -533,13 +534,25 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns the referred meta task from the given {@code reference} text.
+	 * Returns an {@code Optional} containing the referred meta task from the given
+	 * {@code reference} text.
 	 *
 	 * @param reference reference containing the referred meta task
-	 * @return the referred meta task from the given {@code reference} text
+	 * @return an {@code Optional} containing the referred meta task from the given
+	 *         {@code reference} text
+	 *
+	 * @since 1.0
 	 */
-	public static String getReferredTask(String reference) {
-		return reference.replace(Notation.getReferenceVoc(), "").replace(Notation.getGenericVoc(), "");
+	public static Optional<String> getReferredTask(String reference) {
+		String regex = String.format("%s(\\w)*", Notation.getReferenceVoc());
+		final Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(reference);
+		if (matcher.find()) {
+			return Optional
+					.of(matcher.group(1).replace(Notation.getReferenceVoc(), "").replace(Notation.getGenericVoc(), ""));
+			// TODO: check generic voc replacement
+		}
+		return Optional.empty();
 	}
 
 	/**
@@ -592,7 +605,7 @@ public class XMLManager {
 	}
 
 	/**
-	 * returns whether the given {@code Element} is a meta-task or not.
+	 * Returns whether the given {@code Element} is a meta-task or not.
 	 *
 	 * @param node node to check
 	 * @return whether the given {@code Element} is a meta-task or not
@@ -600,11 +613,9 @@ public class XMLManager {
 	 * @since 1.0
 	 */
 	public static boolean isMetaTask(Element node) {
-		String regex = String.format("%s+", Notation.getReferenceVoc());
-		final Pattern pattern = Pattern.compile(regex);
 		NodeList docNodes = node.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
 		for (int i = 0; i < docNodes.getLength(); i++) {
-			if (pattern.matcher(docNodes.item(i).getTextContent()).find()) {
+			if (getReferredTask(docNodes.item(i).getTextContent()).isEmpty()) {
 				return false;
 			}
 		}
