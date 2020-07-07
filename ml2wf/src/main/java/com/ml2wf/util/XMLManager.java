@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -448,6 +449,22 @@ public class XMLManager {
 	}
 
 	/**
+	 * Returns a {@code List<String>} containing all documentations' content for the
+	 * given BPMN {@code element}.
+	 *
+	 * @param node node to extract docuemntation content
+	 * @return a {@code List<String>} containing all documentations' content for the
+	 *         given BPMN {@code element}
+	 *
+	 * @since 1.0
+	 * @see Element
+	 */
+	public static List<String> getAllBPMNDocContent(Element element) {
+		return XMLManager.nodeListAsList(element.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())).stream()
+				.map(Node::getTextContent).collect(Collectors.toList());
+	}
+
+	/**
 	 * Returns the {@code Document} according to the specified {@code url}.
 	 *
 	 * @param url url of the xml file
@@ -544,15 +561,40 @@ public class XMLManager {
 	 * @since 1.0
 	 */
 	public static Optional<String> getReferredTask(String reference) {
-		String regex = String.format("%s(\\w)*", Notation.getReferenceVoc());
+		String regex = String.format("%s(\\w*)", Notation.getReferenceVoc());
 		final Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(reference);
 		if (matcher.find()) {
-			return Optional
-					.of(matcher.group(1).replace(Notation.getReferenceVoc(), "").replace(Notation.getGenericVoc(), ""));
-			// TODO: check generic voc replacement
+			return Optional.of(matcher.group(1));
 		}
 		return Optional.empty();
+	}
+
+	/**
+	 * Returns an {@code Optional} containing the first referred meta task from the
+	 * given {@code references}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method calls the {@link #getReferredTask(String)}
+	 * method for each reference in {@code references} and returns the first non
+	 * empty result.
+	 *
+	 * @param references references containing the referred meta task
+	 * @return an {@code Optional} containing the first referred meta task from the
+	 *         given {@code reference} text
+	 *
+	 * @since 1.0
+	 */
+	public static Optional<String> getReferredTask(List<String> references) {
+		Optional<String> result = Optional.empty();
+		for (String reference : references) {
+			result = getReferredTask(reference);
+			if (result.isPresent()) {
+				return result;
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -605,21 +647,22 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns whether the given {@code Element} is a meta-task or not.
+	 * Returns whether the given {@code element} is a meta-task or not.
 	 *
-	 * @param node node to check
-	 * @return whether the given {@code Element} is a meta-task or not
+	 * @param element element to check
+	 * @return whether the given {@code element} is a meta-task or not
 	 *
 	 * @since 1.0
+	 * @see Element
 	 */
-	public static boolean isMetaTask(Element node) {
-		NodeList docNodes = node.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
-		for (int i = 0; i < docNodes.getLength(); i++) {
-			if (getReferredTask(docNodes.item(i).getTextContent()).isEmpty()) {
+	public static boolean isMetaTask(Element element) {
+		for (String content : getAllBPMNDocContent(element)) {
+			if (getReferredTask(content).isEmpty()) {
 				return false;
 			}
 		}
 		return true;
+
 	}
 
 	/**

@@ -203,9 +203,7 @@ public abstract class AbstractMerger extends XMLManager {
 	protected static Element createNestedNode(Element parent, String name) {
 		Element created = parent.getOwnerDocument().createElement(parent.getNodeName());
 		created.setAttribute(BPMNAttributes.NAME.getName(), name);
-		if (!isMetaTask(parent)) {
-			addDocumentationNode(created, XMLManager.getNodeName(parent));
-		} // TODO: else set abstract attr to true
+		addDocumentationNode(created, XMLManager.getNodeName(parent));
 		return created;
 	}
 

@@ -146,7 +146,7 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	 */
 	@ParameterizedTest
 	@MethodSource("instanceFiles")
-	@DisplayName("Verification of the nodes' structures")
+	@DisplayName("Verification of the nodes structure")
 	public void testNodesStructures(Path path) throws ParserConfigurationException, SAXException, IOException {
 		this.resultDocument = XMLManager.preprocess(path.toFile());
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
@@ -187,29 +187,12 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	@MethodSource("instanceFiles")
 	@DisplayName("Verification of references")
 	public void testReferences(Path path) throws ParserConfigurationException, SAXException, IOException {
-		System.out.println("test ref");
 		// TODO: improve readability
 		this.resultDocument = XMLManager.preprocess(path.toFile());
 		// retrieving task nodes
 		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
 		// retrieving meta tasks and instantiated references
-		resultNodes.stream().map(Element.class::cast)
-				.map(e -> e.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())) // getting doc nodes
-				.map(n -> n.item(0).getTextContent()).forEach(e -> System.out.println(e));
-		System.out.println("-");
-		resultNodes.stream().map(Element.class::cast)
-				.map(e -> e.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())) // getting doc nodes
-				.map(n -> n.item(0).getTextContent()) // getting first doc node's content
-				.map(XMLManager::getReferredTask).forEach(e -> System.out.println(e.orElse("EMPTY")));
-		System.out.println("-".repeat(10));
-		sourceNodes.stream().map(Element.class::cast)
-				.map(e -> e.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())) // getting doc nodes
-				.map(n -> n.item(0).getTextContent()).forEach(e -> System.out.println(e));
-		System.out.println("-");
-		sourceNodes.stream().map(Node::getAttributes)
-				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map(XMLManager::getReferredTask).forEach(e -> System.out.println(e.orElse("EMPTY")));
 		List<String> references = resultNodes.stream().map(Element.class::cast)
 				.map(e -> e.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())) // getting doc nodes
 				.map(n -> n.item(0).getTextContent()) // getting first doc node's content
@@ -218,8 +201,7 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 				.collect(Collectors.toList()); // get referred task
 		List<String> metaTasksNames = sourceNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map(XMLManager::getReferredTask)
-				.map(r -> r.orElse(BaseMergerImpl.UNMANAGED))
+				.map(XMLManager::sanitizeName)
 				.collect(Collectors.toList());
 		// comparing
 		assertTrue(references.containsAll(metaTasksNames)); // #1

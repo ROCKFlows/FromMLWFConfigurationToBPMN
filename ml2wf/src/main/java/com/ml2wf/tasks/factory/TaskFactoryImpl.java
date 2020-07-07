@@ -7,7 +7,6 @@ import java.util.Set;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
@@ -55,7 +54,7 @@ public class TaskFactoryImpl implements TaskFactory {
 			if (FMNames.SELECTOR.isFMTask(tagName)) {
 				createdTask = new FMTask(nodeName, child, this.isAbstract(child));
 			} else if (BPMNNames.SELECTOR.isBPMNTask(tagName)) {
-				Optional<String> optRef = this.getReference(child);
+				Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) child));
 				createdTask = new BPMNTask(nodeName, optRef.orElse(""));
 			} else {
 				continue; // TODO: throw error
@@ -81,22 +80,5 @@ public class TaskFactoryImpl implements TaskFactory {
 	private boolean isAbstract(Node node) {
 		Node abstractAttr = node.getAttributes().getNamedItem(FMAttributes.ABSTRACT.getName());
 		return (abstractAttr != null) && (abstractAttr.getNodeValue().equals(String.valueOf(true)));
-	}
-
-	/**
-	 * Returns an {@code Optional} containing the given {@code node} reference.
-	 *
-	 * @param node node containing a reference
-	 * @return an {@code Optional} containing the given {@code node} reference
-	 *
-	 * @since 1.0
-	 */
-	private Optional<String> getReference(Node node) {
-		Node docNode = ((Element) node).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
-		if (docNode != null) {
-			System.out.println(docNode.getTextContent());
-			return Optional.of(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""));
-		}
-		return Optional.empty();
 	}
 }

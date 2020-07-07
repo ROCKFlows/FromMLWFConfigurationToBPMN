@@ -25,6 +25,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
+import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.tasks.BPMNTask;
 import com.ml2wf.tasks.FMTask;
 import com.ml2wf.tasks.Task;
@@ -333,5 +334,44 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the given {@code task}'s referred {@code FMTask} or the given
+	 * {@code defaultTask} if no valid reference was found.
+	 *
+	 * @param task        {@code BPMNTask} containing the reference
+	 * @param defaultTask the default {@code FMTask}
+	 * @return the given {@code task}'s referred {@code FMTask} or the given
+	 *         {@code defaultTask} if no valid reference was found
+	 *
+	 * @since 1.0
+	 * @see BPMNTask
+	 * @see FMTask
+	 */
+	protected FMTask getReferredFMTask(BPMNTask task, FMTask defaultTask) {
+		String reference = task.getReference();
+		if (!reference.isBlank()) {
+			// if contains a documentation node that can refer to a generic task
+			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);
+			return optRef.orElseGet(() -> this.createReferredFMTask(reference));
+		}
+		return defaultTask;
+	}
+
+	/**
+	 * Creates and returns a {@code FMTask} specified by the given
+	 * {@code reference}.
+	 *
+	 * @param reference reference to create
+	 * @return a {@code FMTask} specified by the given
+	 *         {@code reference}
+	 * 
+	 * @since 1.0
+	 * @see FMTask
+	 */
+	protected FMTask createReferredFMTask(String reference) {
+		FMTask newParent = this.createFeatureWithName(reference);
+		return this.getGlobalFMTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
 	}
 }
