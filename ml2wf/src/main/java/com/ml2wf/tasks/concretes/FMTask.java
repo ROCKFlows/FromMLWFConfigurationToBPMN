@@ -1,4 +1,4 @@
-package com.ml2wf.tasks;
+package com.ml2wf.tasks.concretes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.tasks.base.Task;
+import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.manager.TasksManager;
 
 /**
@@ -24,16 +26,12 @@ import com.ml2wf.tasks.manager.TasksManager;
  * @see Task
  *
  */
-public class FMTask extends Task {
+public final class FMTask extends Task {
 
 	/**
-	 * The task's {@code Node} instance.
+	 * Task's parent.
 	 */
-	private Node node;
-	/**
-	 * Abstract status.
-	 */
-	private boolean isAbstract;
+	private Task parent;
 
 	/**
 	 * {@code FMTask}'s full constructor.
@@ -49,9 +47,8 @@ public class FMTask extends Task {
 	 * @param isAbstract whether the task is abstract or not
 	 */
 	public FMTask(String name, Task parent, Node node, boolean isAbstract) {
-		super(name, parent);
-		this.node = node;
-		this.isAbstract = isAbstract;
+		super(name, node, isAbstract);
+		this.parent = parent;
 	}
 
 	/**
@@ -67,34 +64,49 @@ public class FMTask extends Task {
 	 * @param isAbstract whether the task is abstract or not
 	 */
 	public FMTask(String name, Node node, boolean isAbstract) {
-		this(name, null, node, isAbstract);
+		super(name, node, isAbstract);
 	}
 
 	/**
-	 * Returns whether the current task {@link #isAbstract} or not.
+	 * {@code FMTask}'s constructor based on an existing {@code WFTask} instance.
 	 *
-	 * @return whether the current task is abstract or not
+	 * <p>
+	 *
+	 * It initializes a {@code FMTask} using the given {@code task} specs.
+	 *
+	 * <p>
+	 *
+	 * It is equivalent to a {@code Task} convertion from {@code WFTask} to
+	 * {@code FMTask}.
+	 *
+	 * @param task {@code WFTask} instance to be converted
+	 *
+	 * @see WFTask
 	 */
-	public boolean isAbstract() {
-		return this.isAbstract;
+	public FMTask(WFTask task) {
+		super(task.getName(), task.getNode(), task.isAbstract());
+		Optional<FMTask> optReferredTask = TasksManager.getFMTaskWithName(task.getReference());
+		if (optReferredTask.isPresent()) {
+			this.parent = optReferredTask.get();
+		}
 	}
 
 	/**
-	 * Returns the current task's {@link #node}.
+	 * Returns the current task's {@code parent}.
 	 *
-	 * @return the current task's {@code node}
+	 * @return the current task's {@code parent}
 	 */
-	public Node getNode() {
-		return this.node;
+	public Task getParent() {
+		return this.parent;
 	}
 
 	/**
-	 * Sets the current task's {@link #node}.
+	 * Sets the current task's {@code parent}.
 	 *
-	 * @param the new task's {@code node}
+	 * @param parent the new task's {@code parent}
 	 */
-	public void setNode(Node node) {
-		this.node = node;
+	public void setParent(Task parent) {
+		this.parent = parent;
 	}
 
 	/**
@@ -113,7 +125,7 @@ public class FMTask extends Task {
 	 *
 	 * <p>
 	 *
-	 * <b>Note</b> that a {@code FMTask} can only have a unique {@code parent} but
+	 * <b>Note</b> that a {@code Task} can only have a unique {@code parent} but
 	 * multiple children.
 	 *
 	 * @param child task to append as child
@@ -122,9 +134,12 @@ public class FMTask extends Task {
 	 * @since 1.0
 	 * @see Node
 	 */
-	public FMTask appendChild(FMTask child) {
+	@Override
+	public Task appendChild(Task child) {
 		child.setNode(this.node.appendChild(child.getNode()));
-		child.setParent(this);
+		if (child instanceof FMTask) {
+			((FMTask) child).setParent(this);
+		}
 		return child;
 	}
 
@@ -156,13 +171,16 @@ public class FMTask extends Task {
 	 * @since 1.0
 	 * @see Node
 	 */
-	public Optional<FMTask> removeChild(FMTask oldChild) {
+	@Override
+	public Optional<Task> removeChild(Task oldChild) {
 		Node oldNode = oldChild.getNode();
 		Optional<FMTask> optTask = TasksManager.getFMTaskWithNode(oldNode);
 		if (optTask.isPresent()) {
 			this.node.removeChild(oldNode);
-			oldChild.setParent(null);
-			return optTask;
+			if (oldChild instanceof FMTask) {
+				((FMTask) oldChild).setParent(null);
+			}
+			return Optional.of((Task) optTask.get());
 		}
 		return Optional.empty();
 	}
@@ -179,7 +197,7 @@ public class FMTask extends Task {
 	 * @param childName name of child to retrieve
 	 * @return an {@code Optional} containing the given {@code parent}'s child with
 	 *         the given {@code name} or an empty one if no suitable child was found
-	 * 
+	 *
 	 * @since 1.0
 	 */
 	private static Optional<FMTask> getChildWithName(Task parent, String childName) {
@@ -248,9 +266,8 @@ public class FMTask extends Task {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
-		result = (prime * result) + (this.isAbstract ? 1231 : 1237);
-		result = (prime * result) + ((this.node == null) ? 0 : this.node.hashCode());
+		int result = 1;
+		result = (prime * result) + ((this.parent == null) ? 0 : this.parent.hashCode());
 		return result;
 	}
 
@@ -259,9 +276,4 @@ public class FMTask extends Task {
 		return (obj instanceof FMTask) && super.equals(obj);
 	}
 
-	@Override
-	public String toString() {
-		return super.toString() + "\n\t[FMTask [node=" + this.node + ", isAbstract="
-				+ this.isAbstract + "]]";
-	}
 }

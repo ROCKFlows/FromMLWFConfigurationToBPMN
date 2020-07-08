@@ -10,9 +10,9 @@ import java.util.stream.Stream;
 
 import org.w3c.dom.Node;
 
-import com.ml2wf.tasks.BPMNTask;
-import com.ml2wf.tasks.FMTask;
-import com.ml2wf.tasks.Task;
+import com.ml2wf.tasks.base.Task;
+import com.ml2wf.tasks.concretes.BPMNTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -179,6 +179,26 @@ public final class TasksManager {
 	 */
 	public static Optional<BPMNTask> getBPMNTaskWithName(String name) {
 		return bpmnTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
+	}
+
+	/**
+	 * Returns an {@code Optional} containing the {@code FMTask} with the given
+	 * {@code node}.
+	 *
+	 * <p>
+	 *
+	 * If there is no {@code FMTask} with the given {@code node}, then the returned
+	 * {@code Optional} is empty.
+	 *
+	 * @param node node of wanted task
+	 * @return an {@code Optional} containing the {@code FMTask} with the given
+	 *         {@code node}
+	 *
+	 * @since 1.0
+	 * @see FMTask
+	 */
+	public static Optional<BPMNTask> getBPMNTaskWithNode(Node node) {
+		return bpmnTasks.stream().filter(t -> t.getNode().equals(node)).findFirst();
 	}
 
 	// adder

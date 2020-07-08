@@ -26,9 +26,9 @@ import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.merge.concretes.WFMetaMerger;
-import com.ml2wf.tasks.BPMNTask;
-import com.ml2wf.tasks.FMTask;
-import com.ml2wf.tasks.Task;
+import com.ml2wf.tasks.base.Task;
+import com.ml2wf.tasks.concretes.BPMNTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
@@ -227,19 +227,20 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected void processTask(BPMNTask task) {
 		String taskName = task.getName();
-		Optional<FMTask> opt;
+		Optional<FMTask> optFMTask;
+		Optional<Task> optTask;
 		if (TasksManager.existsinFM(taskName)) {
 			// if task is already in the FM
-			opt = unmanagedTask.getChildWithName(taskName);
-			if (opt.isEmpty()) {
+			optFMTask = unmanagedTask.getChildWithName(taskName);
+			if (optFMTask.isEmpty()) {
 				// if it is not under the unmanaged node
 				return;
 			}
-			opt = unmanagedTask.removeChild(opt.get());
-			if (opt.isEmpty()) {
+			optTask = unmanagedTask.removeChild(optFMTask.get());
+			if (optTask.isEmpty()) {
 				return; // TODO: throw error
 			}
-			Task duplicatedTask = opt.get();
+			Task duplicatedTask = optTask.get();
 			// task = this.mergeNodes(task, duplicatedTask); // TODO: to modify
 		}
 		// retrieving a suitable parent
@@ -330,7 +331,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			FMTask globalTask = (FMTask) optGlobalTask.get();
 			Optional<FMTask> optRoot = TasksManager.getFMTaskWithName(ROOT); // get the root
 			if (optRoot.isPresent()) {
-				return optRoot.get().appendChild(globalTask);
+				return (FMTask) optRoot.get().appendChild(globalTask);
 			}
 		}
 		return null;
@@ -366,12 +367,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @param reference reference to create
 	 * @return a {@code FMTask} specified by the given
 	 *         {@code reference}
-	 * 
+	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
 	protected FMTask createReferredFMTask(String reference) {
 		FMTask newParent = this.createFeatureWithName(reference);
-		return this.getGlobalFMTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
+		return (FMTask) this.getGlobalFMTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
 	}
 }

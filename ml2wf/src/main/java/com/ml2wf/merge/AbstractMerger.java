@@ -26,8 +26,8 @@ import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
-import com.ml2wf.tasks.FMTask;
-import com.ml2wf.tasks.Task;
+import com.ml2wf.tasks.base.Task;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.factory.TaskFactoryImpl;
 import com.ml2wf.tasks.manager.TasksManager;
@@ -370,10 +370,10 @@ public abstract class AbstractMerger extends XMLManager {
 		String taskName = task.getName();
 		// inserting the new node
 		if (task instanceof FMTask) {
-			return parentTask.appendChild((FMTask) task);
+			return (FMTask) parentTask.appendChild(task);
 		}
 		FMTask newFeature = this.createFeatureWithName(taskName);
-		return parentTask.appendChild(newFeature);
+		return (FMTask) parentTask.appendChild(newFeature);
 	}
 
 	/**
