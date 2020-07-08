@@ -657,7 +657,7 @@ public class XMLManager {
 	 */
 	public static boolean isMetaTask(Element element) {
 		for (String content : getAllBPMNDocContent(element)) {
-			if (getReferredTask(content).isEmpty()) {
+			if (getReferredTask(content).isPresent()) {
 				return false;
 			}
 		}

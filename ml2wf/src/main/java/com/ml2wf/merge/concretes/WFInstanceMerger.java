@@ -37,7 +37,7 @@ import com.ml2wf.util.XMLManager;
  * @see BaseMergerImpl
  *
  */
-public class WFInstanceMerger extends BaseMergerImpl {
+public final class WFInstanceMerger extends BaseMergerImpl {
 
 	/**
 	 * Instances default task tag name.

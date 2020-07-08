@@ -27,7 +27,7 @@ import com.ml2wf.util.Pair;
  * @see BaseMergerImpl
  *
  */
-public class WFMetaMerger extends BaseMergerImpl {
+public final class WFMetaMerger extends BaseMergerImpl {
 
 	/**
 	 * Meta default task tag name.

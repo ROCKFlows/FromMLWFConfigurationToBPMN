@@ -72,22 +72,27 @@ public final class FMTask extends Task {
 	 *
 	 * <p>
 	 *
-	 * It initializes a {@code FMTask} using the given {@code task} specs.
+	 * It initializes a {@code FMTask} using the given {@code task} specs and
+	 * consider the given {@code task}'s parent if {@code saveParent} is
+	 * {@code true}.
 	 *
 	 * <p>
 	 *
 	 * It is equivalent to a {@code Task} convertion from {@code WFTask} to
 	 * {@code FMTask}.
 	 *
-	 * @param task {@code WFTask} instance to be converted
-	 *
+	 * @param task       {@code WFTask} instance to be converted
+	 * @param saveParent whether the result task should save the given
+	 *                   {@code task}'s parent as its own parent or not.
 	 * @see WFTask
 	 */
-	public FMTask(WFTask task) {
+	public FMTask(WFTask task, boolean saveParent) {
 		super(task.getName(), task.getNode(), task.isAbstract());
-		Optional<FMTask> optReferredTask = TasksManager.getFMTaskWithName(task.getReference());
-		if (optReferredTask.isPresent()) {
-			this.parent = optReferredTask.get();
+		if (saveParent) {
+			Optional<FMTask> optReferredTask = TasksManager.getFMTaskWithName(task.getReference());
+			if (optReferredTask.isPresent()) {
+				this.parent = optReferredTask.get();
+			}
 		}
 	}
 

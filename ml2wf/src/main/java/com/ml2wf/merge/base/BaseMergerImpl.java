@@ -194,7 +194,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see Pair
 	 */
 	private void processCompleteMerge(String wfName, Set<Task> tasks) throws InvalidConstraintException {
-		this.createdWFTask = this.createFeatureWithName(wfName);
+		this.createdWFTask = this.createFeatureWithName(wfName, this instanceof WFMetaMerger);
 		FMTask root = this.getRootParentNode();
 		this.createdWFTask = this.insertNewTask(root, this.createdWFTask);
 		this.processAssocConstraints(wfName, tasks);
@@ -372,7 +372,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see FMTask
 	 */
 	protected FMTask createReferredFMTask(String reference) {
-		FMTask newParent = this.createFeatureWithName(reference);
+		FMTask newParent = this.createFeatureWithName(reference, true);
 		return (FMTask) this.getGlobalFMTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
 	}
 }

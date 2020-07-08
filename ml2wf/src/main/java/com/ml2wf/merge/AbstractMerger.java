@@ -27,6 +27,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.tasks.base.Task;
+import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.factory.TaskFactoryImpl;
@@ -170,19 +171,38 @@ public abstract class AbstractMerger extends XMLManager {
 	}
 
 	/**
+	 * Creates and returns a new feature {@code Element} with the given
+	 * {@code name}.
+	 *
+	 * @param name       name of the feature
+	 * @param isAbstract whether the wished created feature {@code Element} must be
+	 *                   abstract or not
+	 * @return a new feature {@code Element} with the given {@code name}
+	 *
+	 * @since 1.0
+	 * @see Element
+	 */
+	public static Element createFeatureNode(String name, boolean isAbstract) {
+		Element feature = getDocument().createElement(FMNames.FEATURE.getName());
+		feature.setAttribute(FMAttributes.NAME.getName(), name);
+		feature.setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(isAbstract));
+		return feature;
+	}
+
+	/**
 	 * Creates and returns a new feature ({@code FMTask}) with the given
 	 * {@code name}.
 	 *
-	 * @param name name of the feature
+	 * @param name       name of the feature
+	 * @param isAbstract whether the wished created feature must be abstract or not
 	 * @return a new feature ({@code FMTask}) with the given {@code name}
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	protected FMTask createFeatureWithName(String name) {
-		Element feature = getDocument().createElement(FMNames.FEATURE.getName());
-		feature.setAttribute(FMAttributes.NAME.getName(), name);
-		return (FMTask) this.taskFactory.createTasks(feature).stream().findFirst().orElse(null);
+	protected FMTask createFeatureWithName(String name, boolean isAbstract) {
+		return (FMTask) this.taskFactory.createTasks(createFeatureNode(name, isAbstract)).stream().findFirst()
+				.orElse(null);
 	}
 
 	/**
@@ -366,13 +386,11 @@ public abstract class AbstractMerger extends XMLManager {
 	protected FMTask insertNewTask(FMTask parentTask, Task task) {
 		// TODO: recurse for nested tasks
 		logger.debug("Inserting task : {}", task.getName());
-		// retrieving task name content
-		String taskName = task.getName();
 		// inserting the new node
 		if (task instanceof FMTask) {
 			return (FMTask) parentTask.appendChild(task);
 		}
-		FMTask newFeature = this.createFeatureWithName(taskName);
+		FMTask newFeature = this.taskFactory.convertWFtoFMTask((WFTask) task);
 		return (FMTask) parentTask.appendChild(newFeature);
 	}
 
