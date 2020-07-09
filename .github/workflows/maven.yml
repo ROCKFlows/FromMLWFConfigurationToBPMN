@@ -23,7 +23,7 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file ml2wf/pom.xml
       #Scanning the project with SonarCloud 
-    - name: SonarCloud Scan
+    - name: SonarCloud Scan #...
       run: 
        mvn -B verify sonar:sonar --file ml2wf/pom.xml
       env:
