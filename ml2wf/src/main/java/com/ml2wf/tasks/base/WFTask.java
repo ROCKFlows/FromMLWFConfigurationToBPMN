@@ -72,4 +72,9 @@ public abstract class WFTask extends Task {
 		return (obj instanceof WFTask) && super.equals(obj);
 	}
 
+	@Override
+	public String toString() {
+		return "WFTask : " + this.getName();
+	}
+
 }

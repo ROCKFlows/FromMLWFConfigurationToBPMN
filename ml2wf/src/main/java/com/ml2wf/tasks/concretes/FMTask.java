@@ -281,4 +281,9 @@ public final class FMTask extends Task {
 		return (obj instanceof FMTask) && super.equals(obj);
 	}
 
+	@Override
+	public String toString() {
+		return "FMTask : " + this.getName();
+	}
+
 }

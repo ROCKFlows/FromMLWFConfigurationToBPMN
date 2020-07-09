@@ -144,4 +144,9 @@ public abstract class Task {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "Task : " + this.getName();
+	}
+
 }

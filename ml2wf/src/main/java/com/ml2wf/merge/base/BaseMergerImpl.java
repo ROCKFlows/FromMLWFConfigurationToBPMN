@@ -355,24 +355,29 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
 			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);
-			return optRef.orElseGet(() -> this.createReferredFMTask(reference));
+			return optRef.orElseGet(() -> this.createReferredFMTask(task));
 		}
 		return defaultTask;
 	}
 
 	/**
 	 * Creates and returns a {@code FMTask} specified by the given
-	 * {@code reference}.
+	 * {@code task}'s reference.
 	 *
-	 * @param reference reference to create
+	 * @param task task containing the reference
 	 * @return a {@code FMTask} specified by the given
-	 *         {@code reference}
+	 *         {@code task}'s reference
 	 *
 	 * @since 1.0
+	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected FMTask createReferredFMTask(String reference) {
-		FMTask newParent = this.createFeatureWithName(reference, true);
-		return (FMTask) this.getGlobalFMTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
+	protected FMTask createReferredFMTask(BPMNTask task) {
+		FMTask newParent = this.createFeatureWithName(task.getReference(), task.isAbstract());
+		Optional<BPMNTask> opt = TasksManager.getBPMNTaskWithName(newParent.getName());
+		if (opt.isEmpty()) {
+			return this.getGlobalFMTask(WFMetaMerger.STEP_TASK);
+		}
+		return (FMTask) this.getSuitableParent(opt.get()).appendChild(newParent);
 	}
 }

@@ -90,4 +90,10 @@ public final class BPMNTask extends WFTask {
 	public boolean equals(Object obj) {
 		return (obj instanceof BPMNTask) && super.equals(obj);
 	}
+
+	@Override
+	public String toString() {
+		return "BPMNTask : " + this.getName();
+	}
+
 }

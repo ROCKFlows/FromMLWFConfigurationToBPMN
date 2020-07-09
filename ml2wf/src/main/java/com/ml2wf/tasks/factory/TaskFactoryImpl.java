@@ -52,12 +52,11 @@ public class TaskFactoryImpl implements TaskFactory {
 			tagName = child.getNodeName();
 			nodeName = XMLManager.getNodeName(child);
 			nodeName = XMLManager.sanitizeName(nodeName);
+			// TODO: change this if-elseif statement
 			if (FMNames.SELECTOR.isFMTask(tagName)) {
 				createdTask = new FMTask(nodeName, child, this.isAbstract(child));
 			} else if (BPMNNames.SELECTOR.isBPMNTask(tagName)) {
 				Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) child));
-				System.out.println("AA : Name : " + AbstractMerger.getNodeName(child) + " is Abstract : "
-						+ XMLManager.isMetaTask((Element) child));
 				createdTask = new BPMNTask(nodeName, child, XMLManager.isMetaTask((Element) child), optRef.orElse(""));
 			} else {
 				continue; // TODO: throw error
@@ -70,7 +69,6 @@ public class TaskFactoryImpl implements TaskFactory {
 	@Override
 	public FMTask convertWFtoFMTask(WFTask task) {
 		FMTask createdFMTask = (FMTask) TasksManager.addTask(new FMTask(task, false));
-		System.out.println("ISABSTRACT : " + task.isAbstract() + " | " + createdFMTask.isAbstract());
 		createdFMTask.setNode(AbstractMerger.createFeatureNode(createdFMTask.getName(), createdFMTask.isAbstract()));
 		return (FMTask) TasksManager.addTask(createdFMTask);
 	}

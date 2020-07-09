@@ -1,5 +1,6 @@
 package com.ml2wf.tasks.manager;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -104,6 +105,9 @@ public final class TasksManager {
 	 * @see FMTask
 	 */
 	public static Optional<FMTask> getFMTaskWithName(String name) {
+		if (name == null) {
+			return Optional.empty();
+		}
 		return fmTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
 	}
 
@@ -124,6 +128,9 @@ public final class TasksManager {
 	 * @see FMTask
 	 */
 	public static List<FMTask> getFMTaskWithParent(Task parent) {
+		if (parent == null) {
+			return new ArrayList<>();
+		}
 		return fmTasks.stream().filter(t -> (t.getParent() != null) && t.getParent().equals(parent))
 				.collect(Collectors.toList());
 	}
@@ -145,6 +152,9 @@ public final class TasksManager {
 	 * @see FMTask
 	 */
 	public static Optional<FMTask> getFMTaskWithNode(Node node) {
+		if (node == null) {
+			return Optional.empty();
+		}
 		return fmTasks.stream().filter(t -> t.getNode().equals(node)).findFirst();
 	}
 
@@ -178,6 +188,9 @@ public final class TasksManager {
 	 * @see BPMNTask
 	 */
 	public static Optional<BPMNTask> getBPMNTaskWithName(String name) {
+		if (name == null) {
+			return Optional.empty();
+		}
 		return bpmnTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
 	}
 
@@ -198,6 +211,9 @@ public final class TasksManager {
 	 * @see FMTask
 	 */
 	public static Optional<BPMNTask> getBPMNTaskWithNode(Node node) {
+		if (node == null) {
+			return Optional.empty();
+		}
 		return bpmnTasks.stream().filter(t -> t.getNode().equals(node)).findFirst();
 	}
 
