@@ -26,77 +26,81 @@ import com.ml2wf.generation.InstanceFactory;
 public final class Notation {
 
 	/**
-	 * <b>generated prefix</b> notation.
+	 * The <b>generated prefix</b> notation.
 	 */
 	private static final String GENERATED_PREFIX_VOC = "#";
 	/**
-	 * <b>instance</b> notation.
+	 * The <b>instance</b> notation.
 	 */
 	private static final String INSTANCE_VOC = "_instance";
 	/**
-	 * <b>reference</b> notation.
+	 * The <b>reference</b> notation.
 	 */
 	private static final String REFERENCE_VOC = "refersTo: ";
 	/**
-	 * <b>generic</b> notation.
+	 * The <b>generic</b> notation.
 	 */
 	private static final String GENERIC_VOC = "_Step";
 	/**
-	 * <b>documentation</b> notation.
+	 * The <b>documentation</b> notation.
 	 */
 	private static final String DOCUMENTATION_VOC = "Documentation_";
 	/**
-	 * <b>Text annotation</b> notation.
+	 * The <b>text annotation</b> notation.
 	 */
 	private static final String TEXT_ANNOTATION_VOC = "TextAnnotation_";
 	/**
-	 * <b>BPMN shape</b> notation.
+	 * The <b>BPMN shape</b> notation.
 	 */
 	private static final String BPMN_SHAPE_VOC = "BPMNShape_";
 	/**
-	 * <b>back up</b> notation.
+	 * The <b>back up</b> notation.
 	 */
 	private static final String BACKUP_VOC = "_save";
 	/**
-	 * <b>Left delimiter</b> for the workflow's references section.
+	 * The <b>left delimiter</b> for the workflow's references section.
 	 */
 	private static final String REFERENCES_DELIMITER_LEFT = "{{";
 	/**
-	 * <b>Right delimiter</b> for the workflow's references section.
+	 * The <b>right delimiter</b> for the workflow's references section.
 	 */
 	private static final String REFERENCES_DELIMITER_RIGHT = "}}";
 	/**
-	 * <b>Left delimiter</b> for the constraint section.
+	 * The <b>left delimiter</b> for the constraint section.
 	 */
 	private static final String CONSTRAINT_DELIMITER_LEFT = "[[";
 	/**
-	 * <b>Right delimiter</b> for the constraint section.
+	 * The <b>right delimiter</b> for the constraint section.
 	 */
 	private static final String CONSTRAINT_DELIMITER_RIGHT = "]]";
 	/**
-	 * <b>ID</b> for the global annotation node.
+	 * The <b>ID</b> for the global annotation node.
 	 */
 	private static final String GLOBAL_ANNOTATION_ID = "Global_Annotation";
 	/**
-	 * Sentence for workflow's name.
+	 * The sentence for workflow's name.
 	 */
 	private static final String WF_NAME_SENTENCE = "Workflow's name %s%s.";
 	/**
-	 * Sentence for referred meta-workflow.
+	 * The sentence for referred meta-workflow.
 	 */
 	private static final String META_REFERENCE_SENTENCE = "Meta-Workflow : %s%s%s.";
 	/**
-	 * Sentence for referred data.
+	 * The sentence for referred data.
 	 */
 	private static final String DATA_REFERENCE_SENTENCE = "Data : %s%s.";
 	/**
-	 * Sentence for referred author/article.
+	 * The sentence for referred author/article.
 	 */
 	private static final String AUTHOR_REFERENCE_SENTENCE = "Author/Article : %s%s.";
 	/**
 	 * The optionality keyword.
 	 */
 	private static final String OPTIONALITY = "@Optional";
+	/**
+	 * The <b>category prefix</b> notation.
+	 */
+	private static final String CATEGORY_PREFIX_VOC = "$";
 
 	/**
 	 * {@code Notation's} default constructor.
@@ -305,6 +309,17 @@ public final class Notation {
 	 */
 	public static String getOptionality() {
 		return OPTIONALITY;
+	}
+
+	/**
+	 * Returns the {@link #CATEGORY_PREFIX_VOC} keyword notation.
+	 *
+	 * @return the category prefix notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getCategoryPrefixVoc() {
+		return CATEGORY_PREFIX_VOC;
 	}
 
 	/**

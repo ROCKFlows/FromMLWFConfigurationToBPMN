@@ -1,79 +1,63 @@
 package com.ml2wf.tasks.specs;
 
-import org.w3c.dom.Element;
+import java.util.regex.Pattern;
 
-public enum Specs implements Spec {
+import com.ml2wf.tasks.base.Task;
+import com.ml2wf.util.RegexManager;
 
-	ABSTRACT("abstract") {
+public enum Specs implements Spec<Task> {
+
+	OPTIONAL(RegexManager.getOptionalityPattern()) {
 
 		@Override
-		public boolean hasSpec(Element element) {
+		public boolean hasSpec(Task task) {
 			// TODO Auto-generated method stub
+			// return this.getPattern().matcher(task.getNode());
 			return false;
 		}
 
 		@Override
-		public String getSpecValue(Element element) {
+		public String getSpecValue(Task task) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public void apply(Element element) {
+		public void apply(Task task) {
 			// TODO Auto-generated method stub
 
 		}
 	},
-	OPTIONAL("optional") {
+	CATEGORY(RegexManager.getCategoryPattern()) {
 
 		@Override
-		public boolean hasSpec(Element element) {
+		public boolean hasSpec(Task task) {
 			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
-		public String getSpecValue(Element element) {
+		public String getSpecValue(Task task) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public void apply(Element element) {
-			// TODO Auto-generated method stub
-
-		}
-	},
-	CATEGORY("category") {
-
-		@Override
-		public boolean hasSpec(Element element) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public String getSpecValue(Element element) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void apply(Element element) {
+		public void apply(Task task) {
 			// TODO Auto-generated method stub
 
 		}
 
 	};
 
-	private String name;
+	private Pattern pattern;
 
-	private Specs(String name) {
-		this.name = name;
+	private Specs(Pattern pattern) {
+		this.pattern = pattern;
 	}
 
-	public String getName() {
-		return this.name;
+	public Pattern getPattern() {
+		return this.pattern;
 	}
 
 }
