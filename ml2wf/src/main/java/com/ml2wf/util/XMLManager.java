@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Attr;
@@ -35,9 +36,9 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.TaskTagsSelector;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesAttributes;
-import com.ml2wf.conventions.enums.bpmn.BPMNNodesNames;
-import com.ml2wf.conventions.enums.fm.FeatureModelAttributes;
+import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
+import com.ml2wf.conventions.enums.bpmn.BPMNNames;
+import com.ml2wf.conventions.enums.fm.FeatureAttributes;
 
 /**
  * This class is the base class for any XML managing class.
@@ -180,7 +181,33 @@ public class XMLManager {
 		return EXTENSION_SEPARATOR;
 	}
 
-	// Saving methods
+	// file methods
+
+	/**
+	 * Preprocess the given XML file before any treatment.
+	 *
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 *
+	 * @since 1.0
+	 *
+	 * @see Document
+	 */
+	public static Document preprocess(File file) throws ParserConfigurationException, SAXException, IOException {
+		String logMsg = String.format("Preprocessing file : %s...", file.getName());
+		logger.info(logMsg);
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		// --- protection against XXE attacks
+		logger.debug("Protecting against XXE attacks");
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
+		// ---
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document document = dBuilder.parse(file);
+		document.getDocumentElement().normalize();
+		return document;
+	}
 
 	/**
 	 * Saves the current {@code document} into the given {@code destFile}.
@@ -192,7 +219,7 @@ public class XMLManager {
 	 * @since 1.0
 	 */
 	public void save(File destFile) throws TransformerException, IOException {
-		String logMsg = String.format("Saving file at location : %s...", destFile.getAbsolutePath());
+		String logMsg = String.format("Saving file at location : %s...", destFile);
 		logger.info(logMsg);
 		if (!destFile.createNewFile()) {
 			logger.debug("[SAVE] Destination file aldready exists.");
@@ -252,7 +279,81 @@ public class XMLManager {
 		logger.info("Back up finished.");
 	}
 
-	// General static methods
+	/**
+	 * Inserts given {@code content} between the FileBaseName and the FileExtension.
+	 *
+	 * @param fName   filename
+	 * @param content content to insert
+	 * @return the new {@code fName} with the inserted {@code content}
+	 *
+	 * @since 1.0
+	 */
+	public static String insertInFileName(String fName, String content) {
+		String extension = FilenameUtils.getExtension(fName);
+		if (extension != null) {
+			String name = FilenameUtils.getBaseName(fName);
+			String parentPath = FilenameUtils.getFullPath(fName);
+			return parentPath + name + content + EXTENSION_SEPARATOR + extension;
+		}
+		String logMsg = String.format("Error while renaming file : %s", fName);
+		logger.warn(logMsg);
+		String errorfName = "BACKUP_ERROR.xml";
+		logMsg = String.format("Saving backup file as : %s", errorfName);
+		logger.warn(logMsg);
+		return errorfName;
+	}
+
+	/**
+	 * Adds the documentation part to the given {@code node}.
+	 *
+	 * <p>
+	 *
+	 * The documentation contains informations about the task's ID and the referred
+	 * generic task.
+	 *
+	 * @param node Node to add the documentation
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	public void addDocumentationNode(Node node, String content) {
+		Element documentation = document.createElement(BPMNNames.DOCUMENTATION.getName());
+		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
+		documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
+		CDATASection refersTo = document.createCDATASection(Notation.getReferenceVoc() + content);
+		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
+		logger.debug(logMsg);
+		documentation.appendChild(refersTo);
+		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
+		logger.debug(logMsg);
+		node.insertBefore(documentation, node.getFirstChild());
+	}
+
+	/**
+	 * Creates the global annotation {@code Node}.
+	 *
+	 * @param wfDocument document to get the global annotation node
+	 * @return the global annotation {@code Node}
+	 *
+	 * @since 1.0
+	 *
+	 * @see Node
+	 */
+	public static Node createGlobalAnnotationNode(Document wfDocument) {
+		// getting process node
+		NodeList processNodeList = wfDocument.getElementsByTagName(BPMNNames.PROCESS.getName());
+		Node processNode = processNodeList.item(0);
+		// creating the annotation node
+		Element annotationNode = wfDocument.createElement(BPMNNames.ANNOTATION.getName());
+		String annotID = Notation.getGlobalAnnotationId();
+		// creating the id attribute
+		annotationNode.setAttribute(BPMNAttributes.ID.getName(), annotID);
+		annotationNode.setIdAttribute(BPMNAttributes.ID.getName(), true);
+		// locating the annotation node
+		createPositionalNode(wfDocument, annotID, 0., 0.);
+		// adding to parent node
+		return processNode.appendChild(annotationNode);
+	}
 
 	/**
 	 * Creates and returns a positional {@code Node}.
@@ -276,36 +377,36 @@ public class XMLManager {
 		// TODO: improve this method (refactoring required)
 		// TODO: refactor creating methods in enums
 		logger.debug("Creating positional Node...");
-		Element shapeNode = wfDocument.createElement(BPMNNodesNames.SHAPE.getName());
+		Element shapeNode = wfDocument.createElement(BPMNNames.SHAPE.getName());
 		// creating shape node's id attribute
 		String idAttrName = Notation.getBpmnShapeVoc() + referredElement;
-		Attr idAttr = wfDocument.createAttribute(BPMNNodesAttributes.ID.getName());
+		Attr idAttr = wfDocument.createAttribute(BPMNAttributes.ID.getName());
 		idAttr.setNodeValue(idAttrName);
 		shapeNode.setAttributeNode(idAttr);
 		// adding referred element attribute
-		shapeNode.setAttribute(BPMNNodesAttributes.ELEMENT.getName(), referredElement);
+		shapeNode.setAttribute(BPMNAttributes.ELEMENT.getName(), referredElement);
 		// creating bounds child
-		Element boundsNode = wfDocument.createElement(BPMNNodesNames.BOUNDS.getName());
+		Element boundsNode = wfDocument.createElement(BPMNNames.BOUNDS.getName());
 		// adding location attributes
-		boundsNode.setAttribute(BPMNNodesAttributes.HEIGHT.getName(), "90"); // TODO: store in constants
-		boundsNode.setAttribute(BPMNNodesAttributes.WIDTH.getName(), "180");
-		boundsNode.setAttribute(BPMNNodesAttributes.X.getName(), String.valueOf(x));
-		boundsNode.setAttribute(BPMNNodesAttributes.Y.getName(), String.valueOf(y));
+		boundsNode.setAttribute(BPMNAttributes.HEIGHT.getName(), "90"); // TODO: store in constants
+		boundsNode.setAttribute(BPMNAttributes.WIDTH.getName(), "180");
+		boundsNode.setAttribute(BPMNAttributes.X.getName(), String.valueOf(x));
+		boundsNode.setAttribute(BPMNAttributes.Y.getName(), String.valueOf(y));
 		shapeNode.appendChild(boundsNode);
 		// creating label child
-		Element labelNode = wfDocument.createElement(BPMNNodesNames.LABEL.getName());
+		Element labelNode = wfDocument.createElement(BPMNNames.LABEL.getName());
 		shapeNode.appendChild(labelNode);
 		// TODO: create label id
 		// creating bounds child
-		boundsNode = wfDocument.createElement(BPMNNodesNames.BOUNDS.getName());
+		boundsNode = wfDocument.createElement(BPMNNames.BOUNDS.getName());
 		// adding location attributes
-		boundsNode.setAttribute(BPMNNodesAttributes.HEIGHT.getName(), "145");
-		boundsNode.setAttribute(BPMNNodesAttributes.WIDTH.getName(), "160");
-		boundsNode.setAttribute(BPMNNodesAttributes.X.getName(), String.valueOf(x + 5));
-		boundsNode.setAttribute(BPMNNodesAttributes.Y.getName(), String.valueOf(y));
+		boundsNode.setAttribute(BPMNAttributes.HEIGHT.getName(), "145");
+		boundsNode.setAttribute(BPMNAttributes.WIDTH.getName(), "160");
+		boundsNode.setAttribute(BPMNAttributes.X.getName(), String.valueOf(x + 5));
+		boundsNode.setAttribute(BPMNAttributes.Y.getName(), String.valueOf(y));
 		labelNode.appendChild(boundsNode);
 		// selecting main diagram node
-		NodeList planeNodeList = wfDocument.getElementsByTagName(BPMNNodesNames.PLANE.getName());
+		NodeList planeNodeList = wfDocument.getElementsByTagName(BPMNNames.PLANE.getName());
 		Node planeNode = planeNodeList.item(0);
 		// appending new positional node
 		planeNode.appendChild(shapeNode);
@@ -313,29 +414,29 @@ public class XMLManager {
 	}
 
 	/**
-	 * Creates the global annotation {@code Node}.
+	 * Returns the {@code Document} according to the specified {@code url}.
 	 *
-	 * @param wfDocument document to get the global annotation node
-	 * @return the global annotation {@code Node}
+	 * @param url url of the xml file
+	 * @return the {@code Document} according to the specified {@code url}.
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws ParserConfigurationException
 	 *
 	 * @since 1.0
 	 *
-	 * @see Node
+	 * @see Document
+	 * @see URL
 	 */
-	public static Node createGlobalAnnotationNode(Document wfDocument) {
-		// getting process node
-		NodeList processNodeList = wfDocument.getElementsByTagName(BPMNNodesNames.PROCESS.getName());
-		Node processNode = processNodeList.item(0);
-		// creating the annotation node
-		Element annotationNode = wfDocument.createElement(BPMNNodesNames.ANNOTATION.getName());
-		String annotID = Notation.getGlobalAnnotationId();
-		// creating the id attribute
-		annotationNode.setAttribute(BPMNNodesAttributes.ID.getName(), annotID);
-		// TODO: check setIdAttributeNode benefits
-		// locating the annotation node
-		createPositionalNode(wfDocument, annotID, 0., 0.);
-		// adding to parent node
-		return processNode.appendChild(annotationNode);
+	public static Document getDocumentFromURL(URL url) throws SAXException, IOException, ParserConfigurationException {
+		String logMsg = String.format("Retrieving document for URL : %s...", url);
+		logger.debug(logMsg);
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document document = dBuilder.parse(url.openStream());
+		document.getDocumentElement().normalize();
+		return document;
 	}
 
 	/**
@@ -355,14 +456,13 @@ public class XMLManager {
 	 */
 	public static Node getGlobalAnnotationNode(Document wfDocument) {
 		logger.debug("Getting global annotation node...");
-		NodeList nodeList = wfDocument.getElementsByTagName(BPMNNodesNames.ANNOTATION.getName());
+		NodeList nodeList = wfDocument.getElementsByTagName(BPMNNames.ANNOTATION.getName());
 		List<Node> annotationNodes = XMLManager.nodeListAsList(nodeList);
 		String annotID = Notation.getGlobalAnnotationId();
-		// TODO: factorize delimiter with the getWorkflowName one
 		for (Node annotation : annotationNodes) {
 			NamedNodeMap attributes = annotation.getAttributes();
 			if (attributes.getLength() > 0) {
-				Node currentId = attributes.getNamedItem(BPMNNodesAttributes.ID.getName());
+				Node currentId = attributes.getNamedItem(BPMNAttributes.ID.getName());
 				if ((currentId != null) && annotID.equals(currentId.getNodeValue())) {
 					return annotation;
 				}
@@ -401,35 +501,6 @@ public class XMLManager {
 	}
 
 	/**
-	 * Parses the document's annotations and returns the workflow's name.
-	 *
-	 * <p>
-	 *
-	 * If it is not found, returns the document's name.
-	 *
-	 * @param wfDocument document containing the workflow's name
-	 * @return the workflow's name
-	 */
-	public static String getWorkflowName(Document wfDocument) {
-		// TODO: add logs
-		logger.debug("Getting workflow's name...");
-		Node annotation = XMLManager.getGlobalAnnotationNode(wfDocument);
-		// TODO: foreach line
-		String regex = String.format("%s(.+)%s", Notation.getQuotedNotation(Notation.getReferencesDelimiterLeft()),
-				Notation.getQuotedNotation(Notation.getReferencesDelimiterRight()));
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = null;
-		if (annotation != null) {
-			String wfNameLine = annotation.getTextContent().split("\n")[0];
-			matcher = pattern.matcher(wfNameLine);
-			if (matcher.find() && (matcher.groupCount() > 0) && !matcher.group(1).isBlank()) {
-				return matcher.group(1);
-			}
-		}
-		return new File(wfDocument.getDocumentURI()).getName().split("\\.")[0];
-	}
-
-	/**
 	 * Returns the name tag's value of the given {@code node} if exists.
 	 *
 	 * Returns an empty string if not.
@@ -447,13 +518,28 @@ public class XMLManager {
 		if (!node.hasAttributes()) {
 			return "";
 		}
-		Node n = node.getAttributes().getNamedItem(FeatureModelAttributes.NAME.getName());
+		Node n = node.getAttributes().getNamedItem(FeatureAttributes.NAME.getName());
 		if (n != null) {
 			logMsg = String.format("Node's name is : %s", n.getNodeValue());
 			logger.trace(logMsg);
 			return n.getNodeValue();
 		}
 		return "";
+	}
+
+	/**
+	 * Returns a {@code List} containing all {@code nodes}' names.
+	 *
+	 * @param nodes nodes to get the names
+	 * @return a {@code List} containing all {@code nodes}' names
+	 *
+	 * @since 1.0
+	 *
+	 * @see NodeList
+	 */
+	public static List<String> getNodesNames(List<Node> nodes) {
+		return nodes.stream().map(XMLManager::getNodeName)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -489,18 +575,13 @@ public class XMLManager {
 	}
 
 	/**
-	 * Merges {@code nodeA}'s text content with the given {@code content}.
+	 * Returns the referred meta task from the given {@code reference} text.
 	 *
-	 * @param nodeA   first node
-	 * @param content content to merge with
-	 * @return true if the merge operation succeed, false if it failed.
+	 * @param reference reference containing the referred meta task
+	 * @return the referred meta task from the given {@code reference} text
 	 */
-	public static boolean mergeNodesTextContent(Node nodeA, String content) {
-		String contentA = nodeA.getTextContent().trim().replace("\\s+", " ");
-		String contentB = content.trim().replace("\\s+", " ");
-		contentA = contentA.replace(contentB, "");
-		nodeA.setTextContent(contentA + "\n" + contentB);
-		return true;
+	public static String getReferredTask(String reference) {
+		return reference.replace(Notation.getReferenceVoc(), "").replace(Notation.getGenericVoc(), "");
 	}
 
 	/**
@@ -524,55 +605,67 @@ public class XMLManager {
 	}
 
 	/**
-	 * Preprocess the given XML file before any treatment.
+	 * Parses the document's annotations and returns the workflow's name.
 	 *
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
+	 * <p>
 	 *
-	 * @since 1.0
+	 * If it is not found, returns the document's name.
 	 *
-	 * @see Document
+	 * @param wfDocument document containing the workflow's name
+	 * @return the workflow's name
 	 */
-	public static Document preprocess(File file) throws ParserConfigurationException, SAXException, IOException {
-		String logMsg = String.format("Preprocessing file : %s...", file.getName());
-		logger.info(logMsg);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		// --- protection against XXE attacks
-		logger.debug("Protecting against XXE attacks");
-		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
-		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
-		// ---
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document document = dBuilder.parse(file);
-		document.getDocumentElement().normalize();
-		return document;
+	public static String getWorkflowName(Document wfDocument) {
+		logger.debug("Getting workflow's name...");
+		Node annotation = XMLManager.getGlobalAnnotationNode(wfDocument);
+		String regex = String.format("%s(.+)%s", Notation.getQuotedNotation(Notation.getReferencesDelimiterLeft()),
+				Notation.getQuotedNotation(Notation.getReferencesDelimiterRight()));
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = null;
+		if (annotation != null) {
+			String wfNameLine = annotation.getTextContent().split("\n")[0];
+			matcher = pattern.matcher(wfNameLine);
+			if (matcher.find() && (matcher.groupCount() > 0) && !matcher.group(1).isBlank()) {
+				return matcher.group(1);
+			}
+		}
+		logger.debug("No workflow's name was found.");
+		logger.debug("Using file name as new workflow's name.");
+		return new File(wfDocument.getDocumentURI()).getName().split("\\.")[0];
 	}
 
 	/**
-	 * Returns the {@code Document} according to the specified {@code url}.
+	 * returns whether the given {@code Element} is a meta-task or not.
 	 *
-	 * @param url url of the xml file
-	 * @return the {@code Document} according to the specified {@code url}.
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
+	 * @param node node to check
+	 * @return whether the given {@code Element} is a meta-task or not
 	 *
 	 * @since 1.0
-	 *
-	 * @see Document
-	 * @see URL
 	 */
-	public static Document getDocumentFromURL(URL url) throws SAXException, IOException, ParserConfigurationException {
-		String logMsg = String.format("Retrieving document for URL : %s...", url);
-		logger.debug(logMsg);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document document = dBuilder.parse(url.openStream());
-		document.getDocumentElement().normalize();
-		return document;
+	public boolean isMetaTask(Element node) {
+		String regex = String.format("%s+", Notation.getReferenceVoc());
+		final Pattern pattern = Pattern.compile(regex);
+		NodeList docNodes = node.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
+		for (int i = 0; i < docNodes.getLength(); i++) {
+			if (pattern.matcher(docNodes.item(i).getTextContent()).find()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Merges {@code nodeA}'s text content with the given {@code content}.
+	 *
+	 * @param nodeA   first node
+	 * @param content content to merge with
+	 * @return true if the merge operation succeed, false if it failed.
+	 */
+	public static boolean mergeNodesTextContent(Node nodeA, String content) {
+		String contentA = nodeA.getTextContent().trim().replace("\\s+", " ");
+		String contentB = content.trim().replace("\\s+", " ");
+		contentA = contentA.replace(contentB, "");
+		nodeA.setTextContent(contentA + "\n" + contentB);
+		return true;
 	}
 
 	/**
@@ -595,21 +688,6 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns a {@code List} containing all {@code nodes}' names.
-	 *
-	 * @param nodes nodes to get the names
-	 * @return a {@code List} containing all {@code nodes}' names
-	 *
-	 * @since 1.0
-	 *
-	 * @see NodeList
-	 */
-	public static List<String> getNodesNames(List<Node> nodes) {
-		return nodes.stream().map(XMLManager::getNodeName)
-				.collect(Collectors.toList());
-	}
-
-	/**
 	 * Sanitizes {@code name} removing genericity and instantiation caracteristics.
 	 *
 	 * @param name name to sanitize
@@ -628,88 +706,6 @@ public class XMLManager {
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
 		name = name.trim();
 		return name.replace(" ", "_");
-		// sanitization for generic WF's task
-		// TODO: to check
-		// return name.replaceFirst(Notation.getGenericVoc() + "$", "");
 	}
 
-	/**
-	 * Adds the documentation part to the given {@code node}.
-	 *
-	 * <p>
-	 *
-	 * The documentation contains informations about the task's ID and the referred
-	 * generic task.
-	 *
-	 * @param node Node to add the documentation
-	 *
-	 * @since 1.0
-	 * @see Node
-	 */
-	public void addDocumentationNode(Node node, String content) {
-		Element documentation = document.createElement(BPMNNodesNames.DOCUMENTATION.getName());
-		documentation.setAttribute(BPMNNodesAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
-		documentation.setIdAttribute(BPMNNodesAttributes.ID.getName(), true);
-		CDATASection refersTo = document.createCDATASection(Notation.getReferenceVoc() + content);
-		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
-		logger.debug(logMsg);
-		documentation.appendChild(refersTo);
-		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
-		logger.debug(logMsg);
-		node.insertBefore(documentation, node.getFirstChild());
-	}
-
-	/**
-	 * returns whether the given {@code Element} is a meta-task or not.
-	 *
-	 * @param node node to check
-	 * @return whether the given {@code Element} is a meta-task or not
-	 *
-	 * @since 1.0
-	 */
-	public boolean isMetaTask(Element node) {
-		String regex = String.format("%s+", Notation.getReferenceVoc());
-		final Pattern pattern = Pattern.compile(regex);
-		NodeList docNodes = node.getElementsByTagName(BPMNNodesNames.DOCUMENTATION.getName());
-		for (int i = 0; i < docNodes.getLength(); i++) {
-			if (pattern.matcher(docNodes.item(i).getTextContent()).find()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Returns the referred meta task from the given {@code reference} text.
-	 *
-	 * @param reference reference containing the referred meta task
-	 * @return the referred meta task from the given {@code reference} text
-	 */
-	public static String getReferredTask(String reference) {
-		return reference.replace(Notation.getReferenceVoc(), "").replace(Notation.getGenericVoc(), "");
-	}
-
-	/**
-	 * Inserts given {@code content} between the FileBaseName and the FileExtension.
-	 *
-	 * @param fName   filename
-	 * @param content content to insert
-	 * @return the new {@code fName} with the inserted {@code content}
-	 *
-	 * @since 1.0
-	 */
-	public static String insertInFileName(String fName, String content) {
-		// TODO: fix ..\ issue when splitting with .
-		String[] splittedPath = fName.split(Pattern.quote(EXTENSION_SEPARATOR));
-		int length = splittedPath.length;
-		if (length > 1) {
-			return splittedPath[length - 2] + content + EXTENSION_SEPARATOR + splittedPath[length - 1];
-		}
-		String logMsg = String.format("Error while renaming file : %s", fName);
-		logger.warn(logMsg);
-		String errorfName = "BACKUP_ERROR.xml";
-		logMsg = String.format("Saving backup file as : %s", errorfName);
-		logger.warn(logMsg);
-		return errorfName;
-	}
 }

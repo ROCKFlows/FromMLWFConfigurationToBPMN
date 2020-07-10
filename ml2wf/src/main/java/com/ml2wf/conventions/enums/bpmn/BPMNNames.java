@@ -15,7 +15,7 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
  * @version 1.0
  *
  */
-public enum BPMNNodesNames implements TaskTagsSelector {
+public enum BPMNNames implements TaskTagsSelector {
 
 	// general tags
 	PROCESS("bpmn2:process"), INCOMING("bpmn2:incoming"), OUTGOING("bpmn2:outgoing"),
@@ -38,7 +38,7 @@ public enum BPMNNodesNames implements TaskTagsSelector {
 	 *
 	 * @param name name of the tag
 	 */
-	private BPMNNodesNames(String name) {
+	private BPMNNames(String name) {
 		this.name = name;
 	}
 
