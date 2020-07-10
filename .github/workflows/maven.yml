@@ -23,9 +23,9 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file ml2wf/pom.xml
       #Scanning the project with SonarCloud 
-   # - name: SonarCloud Scan #...
-   #   run: 
-   #    mvn -B verify sonar:sonar --file ml2wf/pom.xml
-   #   env:
-   #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-   #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: SonarCloud Scan #...
+      run: 
+       mvn -B verify sonar:sonar --file ml2wf/pom.xml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
