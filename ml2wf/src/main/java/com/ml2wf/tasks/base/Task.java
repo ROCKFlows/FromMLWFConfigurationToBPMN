@@ -1,8 +1,13 @@
 package com.ml2wf.tasks.base;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.w3c.dom.Node;
+
+import com.ml2wf.tasks.manager.TasksManager;
+import com.ml2wf.tasks.specs.Spec;
 
 /**
  * This class represents a {@code Task}.
@@ -12,14 +17,17 @@ import org.w3c.dom.Node;
  * More precisely, it only contains uselful {@code Node}'s data and is more easy
  * to use than a classic {@code Node}.
  *
+ *
  * @author Nicolas Lacroix
+ *
+ * @param <T> Any {@code class} implementing the {@code Spec interface}
  *
  * @version 1.0
  *
  * @see Node
  *
  */
-public abstract class Task {
+public abstract class Task<T extends Spec<?>> {
 
 	/**
 	 * Task's name.
@@ -33,6 +41,10 @@ public abstract class Task {
 	 * Abstract status.
 	 */
 	protected boolean isAbstract;
+	/**
+	 * {@code Map} containing the current task specifications.
+	 */
+	protected Map<T, String> specs; // TODO: check EnumMap
 
 	/**
 	 * {@code Task}'s full constructor.
@@ -50,6 +62,8 @@ public abstract class Task {
 		this.name = name;
 		this.node = node;
 		this.isAbstract = isAbstract;
+		this.specs = new HashMap<>();
+		TasksManager.addTask(this); // add the new task to the manager
 	}
 
 	/**
@@ -89,18 +103,66 @@ public abstract class Task {
 	}
 
 	/**
+	 * Returns the current task's specifications {@code Map}.
+	 *
+	 * @return the current task's specifications {@code Map}
+	 *
+	 * @since 1.0
+	 * @see Spec
+	 */
+
+	public Map<T, String> getSpecs() {
+		return this.specs;
+	}
+
+	/**
+	 * Returns the given {@code spec} value contained in the current task's
+	 * specifications {@code Map} or {@code null} if it is not found.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method behaves like the {@link Map#get(Object)}
+	 * method.
+	 *
+	 * @param spec specification to retrieve
+	 * @return the current task's specifications {@code Map}
+	 *
+	 * @since 1.0
+	 * @see Spec
+	 */
+	public String getSpecValue(T spec) {
+		return this.specs.get(spec);
+	}
+
+	/**
+	 * Adds the given {@code spec} associated to its given {@code value} to the
+	 * current task's specifications {@code Map}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method behaves like the {@link Map#put(Object, Object)}
+	 * method.
+	 *
+	 * @param spec  specification to add
+	 * @param value the {@code spec} value
+	 *
+	 * @since 1.0
+	 * @see Spec
+	 */
+	public void addSpec(T spec, String value) {
+		this.specs.put(spec, value);
+	}
+
+	/**
 	 * Appends the given {@code child} to the current task.
 	 *
 	 * @param child task to append as child
 	 * @return the appended child
 	 *
 	 * @since 1.0
-	 * @see Node
+	 * @see Nod
 	 */
-	public Task appendChild(Task child) {
-		child.setNode(this.node.appendChild(child.getNode()));
-		return child;
-	}
+	public abstract Task<T> appendChild(Task<T> child);
 
 	/**
 	 * Removes the given {@code oldChild} from the current {@code node}'s children
@@ -113,7 +175,7 @@ public abstract class Task {
 	 * @since 1.0
 	 * @see Node
 	 */
-	public abstract Optional<Task> removeChild(Task oldChild);
+	public abstract Optional<Task<T>> removeChild(Task<T> oldChild);
 
 	@Override
 	public int hashCode() {
@@ -136,7 +198,8 @@ public abstract class Task {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		Task other = (Task) obj;
+		@SuppressWarnings("unchecked")
+		Task<T> other = (Task<T>) obj;
 		if (this.name == null) {
 			return this.name == other.name;
 		} else {

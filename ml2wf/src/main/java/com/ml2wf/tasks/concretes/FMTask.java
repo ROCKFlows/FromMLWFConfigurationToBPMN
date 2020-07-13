@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.manager.TasksManager;
+import com.ml2wf.tasks.specs.FMTaskSpecs;
 
 /**
  * This class represents {@code Task} using the
@@ -26,12 +27,12 @@ import com.ml2wf.tasks.manager.TasksManager;
  * @see Task
  *
  */
-public final class FMTask extends Task {
+public final class FMTask extends Task<FMTaskSpecs> {
 
 	/**
 	 * Task's parent.
 	 */
-	private Task parent;
+	private FMTask parent;
 
 	/**
 	 * {@code FMTask}'s full constructor.
@@ -46,7 +47,7 @@ public final class FMTask extends Task {
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
 	 */
-	public FMTask(String name, Task parent, Node node, boolean isAbstract) {
+	public FMTask(String name, FMTask parent, Node node, boolean isAbstract) {
 		super(name, node, isAbstract);
 		this.parent = parent;
 	}
@@ -101,7 +102,7 @@ public final class FMTask extends Task {
 	 *
 	 * @return the current task's {@code parent}
 	 */
-	public Task getParent() {
+	public FMTask getParent() {
 		return this.parent;
 	}
 
@@ -110,7 +111,7 @@ public final class FMTask extends Task {
 	 *
 	 * @param parent the new task's {@code parent}
 	 */
-	public void setParent(Task parent) {
+	public void setParent(FMTask parent) {
 		this.parent = parent;
 	}
 
@@ -140,12 +141,10 @@ public final class FMTask extends Task {
 	 * @see Node
 	 */
 	@Override
-	public Task appendChild(Task child) {
+	public FMTask appendChild(Task<FMTaskSpecs> child) {
 		child.setNode(this.node.appendChild(child.getNode()));
-		if (child instanceof FMTask) {
-			((FMTask) child).setParent(this);
-		}
-		return child;
+		((FMTask) child).setParent(this);
+		return (FMTask) child;
 	}
 
 	/**
@@ -177,7 +176,7 @@ public final class FMTask extends Task {
 	 * @see Node
 	 */
 	@Override
-	public Optional<Task> removeChild(Task oldChild) {
+	public Optional<Task<FMTaskSpecs>> removeChild(Task<FMTaskSpecs> oldChild) {
 		Node oldNode = oldChild.getNode();
 		Optional<FMTask> optTask = TasksManager.getFMTaskWithNode(oldNode);
 		if (optTask.isPresent()) {
@@ -185,7 +184,7 @@ public final class FMTask extends Task {
 			if (oldChild instanceof FMTask) {
 				((FMTask) oldChild).setParent(null);
 			}
-			return Optional.of((Task) optTask.get());
+			return Optional.of(optTask.get());
 		}
 		return Optional.empty();
 	}
@@ -205,7 +204,7 @@ public final class FMTask extends Task {
 	 *
 	 * @since 1.0
 	 */
-	private static Optional<FMTask> getChildWithName(Task parent, String childName) {
+	private static Optional<FMTask> getChildWithName(Task<FMTaskSpecs> parent, String childName) {
 		List<FMTask> childrenTasks = TasksManager.getFMTaskWithParent(parent);
 		Optional<FMTask> optChild;
 		for (FMTask child : childrenTasks) {
@@ -255,7 +254,7 @@ public final class FMTask extends Task {
 		for (FMTask task : tasks) {
 			// for each node
 			parent = task;
-			while ((parent = (FMTask) parent.getParent()) != null) {
+			while ((parent = parent.getParent()) != null) {
 				// get all parents
 				nodeParents.add(parent);
 			}

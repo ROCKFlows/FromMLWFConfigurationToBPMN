@@ -15,7 +15,6 @@ import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
 import com.ml2wf.tasks.concretes.FMTask;
-import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -42,35 +41,46 @@ public class TaskFactoryImpl implements TaskFactory {
 		// empty constructor
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Set<Task> createTasks(Node node) {
-		Set<Task> createdTasks = new HashSet<>();
+	public <T extends Task<?>> Set<T> createTasks(Node node) {
+		Set<T> createdTasks = new HashSet<>();
 		String tagName;
 		String nodeName;
-		Task createdTask;
+		T createdTask;
 		for (Node child : AbstractMerger.getNestedNodes(node)) {
 			tagName = child.getNodeName();
 			nodeName = XMLManager.getNodeName(child);
 			nodeName = XMLManager.sanitizeName(nodeName);
 			// TODO: change this if-elseif statement
 			if (FMNames.SELECTOR.isFMTask(tagName)) {
-				createdTask = new FMTask(nodeName, child, this.isAbstract(child));
+				createdTask = (T) this.createFMTask(nodeName, child);
 			} else if (BPMNNames.SELECTOR.isBPMNTask(tagName)) {
-				Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) child));
-				createdTask = new BPMNTask(nodeName, child, XMLManager.isMetaTask((Element) child), optRef.orElse(""));
+				createdTask = (T) this.createWFTask(nodeName, child);
 			} else {
 				continue; // TODO: throw error
 			}
-			createdTasks.add(TasksManager.addTask(createdTask));
+			createdTasks.add(createdTask);
 		}
 		return createdTasks;
 	}
 
 	@Override
 	public FMTask convertWFtoFMTask(WFTask task) {
-		FMTask createdFMTask = (FMTask) TasksManager.addTask(new FMTask(task, false));
+		FMTask createdFMTask = new FMTask(task, false);
 		createdFMTask.setNode(AbstractMerger.createFeatureNode(createdFMTask.getName(), createdFMTask.isAbstract()));
-		return (FMTask) TasksManager.addTask(createdFMTask);
+		return createdFMTask;
+	}
+
+	private FMTask createFMTask(String nodeName, Node child) {
+		return new FMTask(nodeName, child, this.isAbstract(child));
+	}
+
+	private WFTask createWFTask(String nodeName, Node child) {
+		// TODO: change created type considering user convention (e.g. BPMN)
+		Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) child));
+		return new BPMNTask(nodeName, child, XMLManager.isMetaTask((Element) child),
+				optRef.orElse(""));
 	}
 
 	/**

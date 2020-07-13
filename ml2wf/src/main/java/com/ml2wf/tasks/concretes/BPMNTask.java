@@ -7,6 +7,7 @@ import org.w3c.dom.Node;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.manager.TasksManager;
+import com.ml2wf.tasks.specs.WFTaskSpecs;
 
 /**
  * This class represents {@code Task} using the
@@ -71,12 +72,12 @@ public final class BPMNTask extends WFTask {
 	 * @see Node
 	 */
 	@Override
-	public Optional<Task> removeChild(Task oldChild) {
+	public Optional<Task<WFTaskSpecs>> removeChild(Task<WFTaskSpecs> oldChild) {
 		Node oldNode = oldChild.getNode();
-		Optional<BPMNTask> optTask = TasksManager.getBPMNTaskWithNode(oldNode);
+		Optional<WFTask> optTask = TasksManager.getWFTaskWithNode(oldNode);
 		if (optTask.isPresent()) {
 			this.node.removeChild(oldNode);
-			return Optional.of((Task) optTask.get());
+			return Optional.of((BPMNTask) optTask.get());
 		}
 		return Optional.empty();
 	}

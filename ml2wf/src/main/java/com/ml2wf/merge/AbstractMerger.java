@@ -375,6 +375,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 *
 	 * The result task matchs the FeatureModel format.
 	 *
+	 * @param <T>        Any {@code class} extending the {@code Task class}
 	 * @param parentTask Parent task
 	 * @param task       task to insert
 	 * @return the added child
@@ -383,15 +384,15 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @see Task
 	 * @see FMTask
 	 */
-	protected FMTask insertNewTask(FMTask parentTask, Task task) {
+	protected <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) {
 		// TODO: recurse for nested tasks
 		logger.debug("Inserting task : {}", task.getName());
 		// inserting the new node
 		if (task instanceof FMTask) {
-			return (FMTask) parentTask.appendChild(task);
+			return parentTask.appendChild((FMTask) task);
 		}
 		FMTask newFeature = this.taskFactory.convertWFtoFMTask((WFTask) task);
-		return (FMTask) parentTask.appendChild(newFeature);
+		return parentTask.appendChild(newFeature);
 	}
 
 	/**
@@ -450,13 +451,15 @@ public abstract class AbstractMerger extends XMLManager {
 	 * An association constraint is an implication between the {@code wfName} and
 	 * the {@code Set<BPMNTask>}.
 	 *
+	 * @param <T>    Any {@code class} extending the {@code Task class}
 	 * @param wfName workflow's name
 	 * @param tasks  {@code Set<Task>} containing all workflow's tasks
 	 * @throws InvalidConstraintException
 	 *
 	 * @since 1.0
 	 */
-	protected void processAssocConstraints(String wfName, Set<Task> tasks) throws InvalidConstraintException {
+	protected <T extends Task<?>> void processAssocConstraints(String wfName, Set<T> tasks)
+			throws InvalidConstraintException {
 		String logMsg;
 		logger.debug("Retrieving all FM document tasks...");
 		List<String> tasksNames = tasks.stream().map(Task::getName)

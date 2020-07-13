@@ -2,6 +2,8 @@ package com.ml2wf.tasks.base;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.tasks.specs.WFTaskSpecs;
+
 /**
  * This class represents a workflow {@code Task}.
  *
@@ -16,7 +18,7 @@ import org.w3c.dom.Node;
  * @see Task
  *
  */
-public abstract class WFTask extends Task {
+public abstract class WFTask extends Task<WFTaskSpecs> {
 
 	/**
 	 * The name of the referred meta-task.
@@ -57,6 +59,12 @@ public abstract class WFTask extends Task {
 	 */
 	public void setReference(String reference) {
 		this.reference = reference;
+	}
+
+	@Override
+	public WFTask appendChild(Task<WFTaskSpecs> child) {
+		child.setNode(this.node.appendChild(child.getNode()));
+		return (WFTask) child;
 	}
 
 	@Override
