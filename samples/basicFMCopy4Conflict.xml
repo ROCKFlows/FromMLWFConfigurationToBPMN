@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><extendedFeatureModel>
+	<properties>
+		<graphics key="showhiddenfeatures" value="true"/>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="AnomalyDetectionExploration">
+			<and mandatory="true" name="AD">
+				<graphics key="collapsed" value="false"/>
+				<and name="References">
+					<graphics key="collapsed" value="false"/>
+					<and abstract="true" name="PHD">
+						<graphics key="collapsed" value="false"/>
+						<feature name="Yassine"/>
+					</and>
+				</and>
+				<and mandatory="true" name="Criteria">
+					<graphics key="collapsed" value="false"/>
+					<and abstract="true" mandatory="true" name="DatasetCriteria">
+						<graphics key="collapsed" value="false"/>
+						<or abstract="true" name="AnomalieClassesCriteria">
+							<feature name="FewAnomaiyClasses"/>
+							<feature name="multipleAnomalyClasses"/>
+						</or>
+						<feature abstract="true" mandatory="true" name="DataSize"/>
+						<and abstract="true" name="DataStructuration">
+							<feature name="TimeSeries"/>
+						</and>
+					</and>
+					<and abstract="true" name="Requirement">
+						<graphics key="collapsed" value="false"/>
+						<feature name="Stability"/>
+					</and>
+				</and>
+				<and abstract="true" name="tools">
+					<graphics key="collapsed" value="false"/>
+					<and abstract="true" name="MLAlgorithm">
+						<graphics key="collapsed" value="false"/>
+						<and abstract="true" name=" basedOnSimilarity">
+							<graphics key="collapsed" value="false"/>
+							<feature name="OC_SVM"/>
+						</and>
+						<feature name="LSTM"/>
+					</and>
+				</and>
+				<and abstract="true" name="Steps">
+					<graphics key="collapsed" value="false"/>
+					<feature abstract="true" name="RefineModel_step"/>
+					<and abstract="true" name="Training_step">
+						<graphics key="collapsed" value="false"/>
+						<feature name="train OC_SVM"/>
+					</and>
+					<feature abstract="true" name="Labeling_step">
+						<graphics key="collapsed" value="false"/>
+					</feature>
+					<feature abstract="true" name="Preprocessing_step"/>
+				<feature name="Missing_Values"/><feature name="Preprocess_data"/><feature name="Training_$ml_model"/></and>
+				<and abstract="true" name="Methods">
+					<graphics key="collapsed" value="false"/>
+					<feature name="ensureStability"/>
+				</and>
+			<and abstract="true" name="Unmanaged"/></and>
+		</and>
+	</struct>
+	<constraints>
+		<rule>
+			<imp>
+				<var>Stability</var>
+				<var>ensureStability</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<var>Training_step</var>
+				<var>MLAlgorithm</var>
+			</imp>
+		</rule>
+	</constraints>
+</extendedFeatureModel>
