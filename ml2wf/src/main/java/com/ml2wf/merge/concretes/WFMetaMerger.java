@@ -51,7 +51,7 @@ public final class WFMetaMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public FMTask getSuitableParent(WFTask task) {
+	public FMTask getSuitableParent(WFTask<?> task) {
 		return this.getReferredFMTask(task, this.getGlobalFMTask(STEP_TASK));
 	}
 

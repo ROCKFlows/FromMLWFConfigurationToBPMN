@@ -391,7 +391,7 @@ public abstract class AbstractMerger extends XMLManager {
 		if (task instanceof FMTask) {
 			return parentTask.appendChild((FMTask) task);
 		}
-		FMTask newFeature = this.taskFactory.convertWFtoFMTask((WFTask) task);
+		FMTask newFeature = this.taskFactory.convertWFtoFMTask((WFTask<?>) task);
 		return parentTask.appendChild(newFeature);
 	}
 

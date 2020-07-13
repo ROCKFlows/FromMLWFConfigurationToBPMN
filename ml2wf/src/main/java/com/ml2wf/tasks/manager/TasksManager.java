@@ -47,7 +47,7 @@ public final class TasksManager {
 	/**
 	 * {@code Set} containing all {@code WFTask}.
 	 */
-	private static Set<WFTask> wfTasks = new HashSet<>();
+	private static Set<WFTask<?>> wfTasks = new HashSet<>();
 
 	/**
 	 * {@code TasksManager}'s default constructor.
@@ -167,7 +167,7 @@ public final class TasksManager {
 	 *
 	 * @since 1.0
 	 */
-	public static Set<WFTask> getWFTasks() {
+	public static Set<WFTask<?>> getWFTasks() {
 		return wfTasks;
 	}
 
@@ -187,7 +187,7 @@ public final class TasksManager {
 	 * @since 1.0
 	 * @see WFTask
 	 */
-	public static Optional<WFTask> getWFTaskWithName(String name) {
+	public static Optional<WFTask<?>> getWFTaskWithName(String name) {
 		if (name == null) {
 			return Optional.empty();
 		}
@@ -210,7 +210,7 @@ public final class TasksManager {
 	 * @since 1.0
 	 * @see WFTask
 	 */
-	public static Optional<WFTask> getWFTaskWithNode(Node node) {
+	public static Optional<WFTask<?>> getWFTaskWithNode(Node node) {
 		if (node == null) {
 			return Optional.empty();
 		}
@@ -240,7 +240,7 @@ public final class TasksManager {
 				// contained to keep most precise tasks
 				wfTasks.removeIf(
 						t -> (t.getName() != null) && t.getName().equals(task.getName()) && t.getReference().isBlank());
-				wfTasks.add((WFTask) task);
+				wfTasks.add((WFTask<?>) task);
 			}
 		}
 		return task;

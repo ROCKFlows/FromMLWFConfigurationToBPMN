@@ -67,7 +67,7 @@ public interface BaseMerger {
 	 * @see FMTask
 	 * @see WFTask
 	 */
-	public abstract FMTask getSuitableParent(WFTask child);
+	public abstract FMTask getSuitableParent(WFTask<?> child);
 
 	/**
 	 * Returns the root parent {@code FMTask} according to the workflow's type (meta

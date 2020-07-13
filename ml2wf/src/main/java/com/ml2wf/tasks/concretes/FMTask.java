@@ -87,7 +87,7 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 *                   {@code task}'s parent as its own parent or not.
 	 * @see WFTask
 	 */
-	public FMTask(WFTask task, boolean saveParent) {
+	public FMTask(WFTask<?> task, boolean saveParent) {
 		super(task.getName(), task.getNode(), task.isAbstract());
 		if (saveParent) {
 			Optional<FMTask> optReferredTask = TasksManager.getFMTaskWithName(task.getReference());

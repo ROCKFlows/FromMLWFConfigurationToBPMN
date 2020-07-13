@@ -2,11 +2,12 @@ package com.ml2wf.tasks.specs;
 
 import java.util.regex.Pattern;
 
-import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.base.WFTask;
+import com.ml2wf.tasks.concretes.BPMNTask;
 import com.ml2wf.util.RegexManager;
 
 /**
- * This {@code enum} contains all specifications that a {@code FMTask} can
+ * This {@code enum} contains all specifications that a {@code BPMNTask} can
  * contain.
  *
  * <p>
@@ -24,47 +25,48 @@ import com.ml2wf.util.RegexManager;
  * @version 1.0
  *
  * @see Spec
- * @see FMTask
+ * @see BPMNTask
  *
  */
-public enum FMTaskSpecs implements Spec<FMTask> {
+public enum BPMNTaskSpecs implements Spec<WFTask<?>> {
 
 	OPTIONAL(RegexManager.getOptionalityPattern()) {
 
 		@Override
-		public boolean hasSpec(FMTask task) {
+		public boolean hasSpec(WFTask<?> task) {
 			// TODO Auto-generated method stub
 			// return this.getPattern().matcher(task.getNode());
 			return false;
 		}
 
 		@Override
-		public String getSpecValue(FMTask task) {
+		public String getSpecValue(WFTask<?> task) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public void apply(FMTask task) {
-			task.addSpec(OPTIONAL, this.getSpecValue(task));
+		public void apply(WFTask<?> task) {
+			// TODO Auto-generated method stub
+
 		}
 	},
 	CATEGORY(RegexManager.getCategoryPattern()) {
 
 		@Override
-		public boolean hasSpec(FMTask task) {
+		public boolean hasSpec(WFTask<?> task) {
 			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
-		public String getSpecValue(FMTask task) {
+		public String getSpecValue(WFTask<?> task) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public void apply(FMTask task) {
+		public void apply(WFTask<?> task) {
 			// TODO Auto-generated method stub
 
 		}
@@ -79,9 +81,9 @@ public enum FMTaskSpecs implements Spec<FMTask> {
 	private Pattern pattern;
 
 	/**
-	 * {@code FMTaskSpecs}'s default constructor.
+	 * {@code BPMNTaskSpecs}'s default constructor.
 	 */
-	private FMTaskSpecs(Pattern pattern) {
+	private BPMNTaskSpecs(Pattern pattern) {
 		this.pattern = pattern;
 	}
 

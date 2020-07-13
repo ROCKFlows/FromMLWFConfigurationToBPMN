@@ -46,5 +46,5 @@ public interface TaskFactory {
 	 * @param task task to convert
 	 * @return the converted task
 	 */
-	public FMTask convertWFtoFMTask(WFTask task);
+	public FMTask convertWFtoFMTask(WFTask<?> task);
 }

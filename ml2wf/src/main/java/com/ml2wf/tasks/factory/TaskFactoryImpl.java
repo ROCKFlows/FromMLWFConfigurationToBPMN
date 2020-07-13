@@ -66,7 +66,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	}
 
 	@Override
-	public FMTask convertWFtoFMTask(WFTask task) {
+	public FMTask convertWFtoFMTask(WFTask<?> task) {
 		FMTask createdFMTask = new FMTask(task, false);
 		createdFMTask.setNode(AbstractMerger.createFeatureNode(createdFMTask.getName(), createdFMTask.isAbstract()));
 		return createdFMTask;
@@ -76,7 +76,7 @@ public class TaskFactoryImpl implements TaskFactory {
 		return new FMTask(nodeName, child, this.isAbstract(child));
 	}
 
-	private WFTask createWFTask(String nodeName, Node child) {
+	private WFTask<?> createWFTask(String nodeName, Node child) {
 		// TODO: change created type considering user convention (e.g. BPMN)
 		Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) child));
 		return new BPMNTask(nodeName, child, XMLManager.isMetaTask((Element) child),

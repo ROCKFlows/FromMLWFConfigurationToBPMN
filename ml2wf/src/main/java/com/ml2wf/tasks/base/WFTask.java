@@ -2,7 +2,7 @@ package com.ml2wf.tasks.base;
 
 import org.w3c.dom.Node;
 
-import com.ml2wf.tasks.specs.WFTaskSpecs;
+import com.ml2wf.tasks.specs.Spec;
 
 /**
  * This class represents a workflow {@code Task}.
@@ -14,11 +14,12 @@ import com.ml2wf.tasks.specs.WFTaskSpecs;
  * @author Nicolas Lacroix
  *
  * @version 1.0
+ * @param <T>
  *
  * @see Task
  *
  */
-public abstract class WFTask extends Task<WFTaskSpecs> {
+public abstract class WFTask<T extends Spec<?>> extends Task<T> {
 
 	/**
 	 * The name of the referred meta-task.
@@ -62,9 +63,9 @@ public abstract class WFTask extends Task<WFTaskSpecs> {
 	}
 
 	@Override
-	public WFTask appendChild(Task<WFTaskSpecs> child) {
+	public WFTask<T> appendChild(Task<T> child) {
 		child.setNode(this.node.appendChild(child.getNode()));
-		return (WFTask) child;
+		return (WFTask<T>) child;
 	}
 
 	@Override
