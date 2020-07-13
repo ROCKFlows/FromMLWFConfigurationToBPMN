@@ -1,5 +1,7 @@
 package com.ml2wf.tasks.specs;
 
+import java.util.Optional;
+
 import com.ml2wf.tasks.base.Task;
 
 /**
@@ -29,14 +31,17 @@ public interface Spec<T> {
 	public boolean hasSpec(T element);
 
 	/**
-	 * Returns the given {@code element}'s specification value.
+	 * Returns an {@code Optional} that contains the given {@code element}'s
+	 * specification value.
 	 *
 	 * @param element element to test
 	 * @return the given {@code element}'s specification value
 	 *
 	 * @since 1.0
+	 *
+	 * @see Optional
 	 */
-	public String getSpecValue(T element);
+	public Optional<String> getSpecValue(T element);
 
 	/**
 	 * Retrieves and applies the current specification value of the given

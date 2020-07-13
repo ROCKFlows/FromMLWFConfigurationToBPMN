@@ -72,14 +72,34 @@ public class TaskFactoryImpl implements TaskFactory {
 		return createdFMTask;
 	}
 
-	private FMTask createFMTask(String nodeName, Node child) {
-		return new FMTask(nodeName, child, this.isAbstract(child));
+	/**
+	 * Creates and returns a new {@code FMTask} considering given arguments.
+	 *
+	 * @param name name of the new task
+	 * @param node node of the new task
+	 * @return a new {@code FMTask} considering given arguments
+	 *
+	 * @since 1.0
+	 * @see FMTask
+	 */
+	private FMTask createFMTask(String name, Node node) {
+		return new FMTask(name, node, this.isAbstract(node));
 	}
 
-	private WFTask<?> createWFTask(String nodeName, Node child) {
+	/**
+	 * Creates and returns a new {@code WFTask} considering given arguments.
+	 *
+	 * @param name name of the new task
+	 * @param node node of the new task
+	 * @return a new {@code WFTask} considering given arguments
+	 *
+	 * @since 1.0
+	 * @see WFTask
+	 */
+	private WFTask<?> createWFTask(String name, Node node) {
 		// TODO: change created type considering user convention (e.g. BPMN)
-		Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) child));
-		return new BPMNTask(nodeName, child, XMLManager.isMetaTask((Element) child),
+		Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
+		return new BPMNTask(name, node, XMLManager.isMetaTask((Element) node),
 				optRef.orElse(""));
 	}
 

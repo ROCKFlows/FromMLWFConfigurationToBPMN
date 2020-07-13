@@ -44,7 +44,7 @@ public abstract class Task<T extends Spec<?>> {
 	/**
 	 * {@code Map} containing the current task specifications.
 	 */
-	protected Map<T, String> specs; // TODO: check EnumMap
+	protected Map<String, String> specs;
 
 	/**
 	 * {@code Task}'s full constructor.
@@ -111,7 +111,7 @@ public abstract class Task<T extends Spec<?>> {
 	 * @see Spec
 	 */
 
-	public Map<T, String> getSpecs() {
+	public Map<String, String> getSpecs() {
 		return this.specs;
 	}
 
@@ -130,7 +130,7 @@ public abstract class Task<T extends Spec<?>> {
 	 * @since 1.0
 	 * @see Spec
 	 */
-	public String getSpecValue(T spec) {
+	public String getSpecValue(String spec) {
 		return this.specs.get(spec);
 	}
 
@@ -149,7 +149,7 @@ public abstract class Task<T extends Spec<?>> {
 	 * @since 1.0
 	 * @see Spec
 	 */
-	public void addSpec(T spec, String value) {
+	public void addSpec(String spec, String value) {
 		this.specs.put(spec, value);
 	}
 
