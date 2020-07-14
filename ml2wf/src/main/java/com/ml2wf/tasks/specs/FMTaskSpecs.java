@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.RegexManager;
 
@@ -40,53 +41,30 @@ public enum FMTaskSpecs implements Spec<FMTask> {
 	OPTIONAL("optional", RegexManager.getOptionalityPattern()) {
 
 		@Override
-		public Optional<String> getSpecValue(FMTask task) {
-			if (this.hasSpec(task)) {
-				return Optional.of(task.getSpecValue(this.getName()));
-			} else {
-				NodeList docNodes = ((Element) task.getNode()).getElementsByTagName(FMNames.DESCRIPTION.getName());
-				if (docNodes.getLength() == 0) {
-					return Optional.empty();
-				}
-				Node docNode = docNodes.item(0);
-				Matcher matcher = this.getPattern().matcher(docNode.getTextContent());
-				if (matcher.matches() && (matcher.groupCount() > 0)) {
-					return Optional.of(matcher.group(1));
-				}
-			}
-			return Optional.empty();
-		}
-
-		@Override
 		public void apply(FMTask task) {
-			Optional<String> optSpecValue;
-			if (!this.hasSpec(task)) {
-				optSpecValue = this.getSpecValue(task);
-				if (optSpecValue.isEmpty()) {
-					return;
-				}
-				NodeList docNodes = ((Element) task.getNode()).getElementsByTagName(FMNames.DESCRIPTION.getName());
-				if (docNodes.getLength() == 0) {
-					return;
-				}
-				// TODO
-				task.addSpec(this.getName(), optSpecValue.get());
+			// TODO: factorize with other apply implementations
+			Optional<String> optSpecValue = this.getSpecValue(task);
+			if (optSpecValue.isEmpty()) {
+				return;
 			}
+			Element featureAttribute = AbstractMerger.createFeatureAttribute(this.getName(),
+					Boolean.valueOf(optSpecValue.get()));
+			task.getNode().appendChild(featureAttribute);
+			task.addSpec(this.getName(), optSpecValue.get());
 		}
 
 	},
 	CATEGORY("category", RegexManager.getCategoryPattern()) {
 
 		@Override
-		public Optional<String> getSpecValue(FMTask task) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
 		public void apply(FMTask task) {
-			// TODO Auto-generated method stub
-
+			Optional<String> optSpecValue = this.getSpecValue(task);
+			if (optSpecValue.isEmpty()) {
+				return;
+			}
+			Element featureAttribute = AbstractMerger.createFeatureAttribute(this.getName(), optSpecValue.get());
+			task.getNode().appendChild(featureAttribute);
+			task.addSpec(this.getName(), optSpecValue.get());
 		}
 
 	};
@@ -134,6 +112,32 @@ public enum FMTaskSpecs implements Spec<FMTask> {
 	@Override
 	public boolean hasSpec(FMTask task) {
 		return task.getSpecs().containsKey(this.getName());
+	}
+
+	@Override
+	public Optional<String> getSpecValue(FMTask task) {
+		// TODO: factorize with BPMNTaskSpecs#getSpecValue(FMTask)
+		if (this.hasSpec(task)) {
+			return Optional.of(task.getSpecValue(this.getName()));
+		} else {
+			NodeList docNodes = ((Element) task.getNode()).getElementsByTagName(FMNames.DESCRIPTION.getName());
+			if (docNodes.getLength() == 0) {
+				return Optional.empty();
+			}
+			Node docNode = docNodes.item(0);
+			Matcher matcher = this.getPattern().matcher(docNode.getTextContent());
+			if (matcher.matches() && (matcher.groupCount() > 0)) {
+				return Optional.of(matcher.group(1));
+			}
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public void applyAll(FMTask task) {
+		for (FMTaskSpecs spec : FMTaskSpecs.values()) {
+			spec.apply(task);
+		}
 	}
 
 }

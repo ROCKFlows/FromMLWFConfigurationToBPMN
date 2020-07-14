@@ -80,17 +80,17 @@ public enum BPMNTaskSpecs implements Spec<WFTask<?>> {
 
 	@Override
 	public boolean hasSpec(WFTask<?> task) {
-		return task.getSpecs().containsKey(this.getName());
+		return task.getSpecs().containsKey(this.name);
 	}
 
 	@Override
 	public Optional<String> getSpecValue(WFTask<?> task) {
 		if (this.hasSpec(task)) {
-			return Optional.of(task.getSpecValue(this.getName()));
+			return Optional.of(task.getSpecValue(this.name));
 		} else {
 			for (String documentation : XMLManager.getAllBPMNDocContent((Element) task.getNode())) {
-				Matcher matcher = this.getPattern().matcher(documentation);
-				if (matcher.matches() && (matcher.groupCount() > 0)) {
+				Matcher matcher = this.getPattern().matcher(documentation.replace(" ", ""));
+				if (matcher.find() && (matcher.groupCount() > 0)) {
 					return Optional.of(matcher.group(1));
 				}
 			}
@@ -107,6 +107,13 @@ public enum BPMNTaskSpecs implements Spec<WFTask<?>> {
 				return;
 			}
 			task.addSpec(this.getName(), optSpecValue.get());
+		}
+	}
+
+	@Override
+	public void applyAll(WFTask<?> task) {
+		for (BPMNTaskSpecs spec : BPMNTaskSpecs.values()) {
+			spec.apply(task);
 		}
 	}
 

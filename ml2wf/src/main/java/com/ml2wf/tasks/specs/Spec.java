@@ -52,4 +52,14 @@ public interface Spec<T> {
 	 * @since 1.0
 	 */
 	public void apply(T element);
+
+	/**
+	 * Retrieves and applies all the specifications of the given
+	 * {@code element}.
+	 *
+	 * @param element element to update the current specification value
+	 *
+	 * @since 1.0
+	 */
+	public void applyAll(T element);
 }

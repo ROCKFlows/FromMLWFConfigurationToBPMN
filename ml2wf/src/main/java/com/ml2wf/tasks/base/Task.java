@@ -154,6 +154,29 @@ public abstract class Task<T extends Spec<?>> {
 	}
 
 	/**
+	 * Adds the given {@code specs} to the current task's specifications
+	 * {@code Map}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method behaves like the {@link Map#putAll(Map)}
+	 * method.
+	 *
+	 * @param specs specifications to add
+	 *
+	 * @since 1.0
+	 * @see Spec
+	 */
+	public void addAllSpecs(Map<String, String> specs) {
+		this.specs.putAll(specs);
+	}
+
+	/**
+	 * Applies the current specifications to the current {@link node}.
+	 */
+	public abstract void applySpecs();
+
+	/**
 	 * Appends the given {@code child} to the current task.
 	 *
 	 * @param child task to append as child

@@ -268,6 +268,11 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	}
 
 	@Override
+	public void applySpecs() {
+		FMTaskSpecs.values()[0].applyAll(this);
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

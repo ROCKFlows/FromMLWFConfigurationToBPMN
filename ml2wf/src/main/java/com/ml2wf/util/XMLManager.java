@@ -323,7 +323,7 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns the formated documentation content.
+	 * Returns a formated documentation content from a raw task name.
 	 *
 	 * @param content content containing documentation informations
 	 * @return the formated documentation content

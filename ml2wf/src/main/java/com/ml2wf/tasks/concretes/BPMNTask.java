@@ -83,6 +83,11 @@ public final class BPMNTask extends WFTask<BPMNTaskSpecs> {
 	}
 
 	@Override
+	public void applySpecs() {
+		BPMNTaskSpecs.values()[0].applyAll(this);
+	}
+
+	@Override
 	public int hashCode() {
 		return super.hashCode();
 	}

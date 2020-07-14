@@ -171,6 +171,26 @@ public abstract class AbstractMerger extends XMLManager {
 	}
 
 	/**
+	 * Creates and returns a new feature attribute {@code Element} with the given
+	 * {@code name}.
+	 *
+	 * @param name  name of the feature attribute
+	 * @param value value of the feature attribute
+	 * @return a new feature attribute {@code Element} with the given {@code name}
+	 *
+	 * @since 1.0
+	 * @see Element
+	 */
+	public static Element createFeatureAttribute(String name, Object value) {
+		// TODO: factorize with createFeatureNode
+		Element feature = getDocument().createElement(FMNames.ATTRIBUTE.getName());
+		feature.setAttribute(FMAttributes.NAME.getName(), name);
+		feature.setAttribute(FMAttributes.TYPE.getName(), value.getClass().getSimpleName().toLowerCase());
+		feature.setAttribute(FMAttributes.VALUE.getName(), String.valueOf(value));
+		return feature;
+	}
+
+	/**
 	 * Creates and returns a new feature {@code Element} with the given
 	 * {@code name}.
 	 *
