@@ -34,6 +34,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.concretes.WFMetaMerger;
+import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -148,7 +149,7 @@ public class TestWFMetaMerger extends AbstractXMLTest {
 	public void testMergingStructure(Path path)
 			throws Exception {
 		((WFMetaMerger) this.testedClass).mergeWithWF(false, true, new File(path.toUri()));
-		this.sourceDocument = XMLManager.preprocess(path.toFile());
+		this.sourceDocument = FileHandler.preprocess(path.toFile());
 		this.resultDocument = XMLManager.getDocument();
 		// getting WF's source task nodes
 		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);

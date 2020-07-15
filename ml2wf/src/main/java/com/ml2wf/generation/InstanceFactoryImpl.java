@@ -2,7 +2,6 @@ package com.ml2wf.generation;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +20,7 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
+import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -99,12 +99,9 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	@Override
-	public void getWFInstance(File outputDir)
+	public void getWFInstance(File outputFile)
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		logger.info("Starting the Workflow instatiation...");
-		if (!outputDir.isDirectory()) {
-			outputDir = outputDir.getParentFile();
-		}
 		this.addMetaWFReferences();
 		String logMsg;
 		for (Node node : XMLManager.getTasksList(getDocument(), BPMNNames.SELECTOR)) {
@@ -113,8 +110,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			this.instantiateNode(node);
 		}
 		logger.info("Instantiation finished.");
-		String resultFname = XMLManager.insertInFileName(super.getSourceFile().getName(), Notation.getInstanceVoc());
-		super.save(new File(Paths.get(outputDir.getPath(), resultFname).toString()));
+		FileHandler.saveDocument(FileHandler.processResultFile(outputFile), getDocument());
 	}
 
 	/**

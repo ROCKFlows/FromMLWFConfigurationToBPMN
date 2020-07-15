@@ -17,8 +17,6 @@ import com.ml2wf.conventions.Notation;
  */
 public final class RegexManager {
 
-	// TODO: check +/*
-
 	/**
 	 * Regular expression for the <b>reference</b> retrieval.
 	 */
