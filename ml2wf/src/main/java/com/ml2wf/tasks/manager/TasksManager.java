@@ -1,5 +1,6 @@
 package com.ml2wf.tasks.manager;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -10,9 +11,9 @@ import java.util.stream.Stream;
 
 import org.w3c.dom.Node;
 
-import com.ml2wf.tasks.BPMNTask;
-import com.ml2wf.tasks.FMTask;
-import com.ml2wf.tasks.Task;
+import com.ml2wf.tasks.base.Task;
+import com.ml2wf.tasks.base.WFTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -29,12 +30,10 @@ import com.ml2wf.util.XMLManager;
  *
  * @see Task
  * @see FMTask
- * @see BPMNTask
+ * @see WFTask
  *
  */
 public final class TasksManager {
-
-	// TODO: use FMTask or Task for generic type ?
 
 	/**
 	 * {@code Set} containing all {@code FMTask}.
@@ -46,9 +45,9 @@ public final class TasksManager {
 	 */
 	private static Set<FMTask> fmTasks = new LinkedHashSet<>();
 	/**
-	 * {@code Set} containing all {@code BPMNTask}.
+	 * {@code Set} containing all {@code WFTask}.
 	 */
-	private static Set<BPMNTask> bpmnTasks = new HashSet<>();
+	private static Set<WFTask<?>> wfTasks = new HashSet<>();
 
 	/**
 	 * {@code TasksManager}'s default constructor.
@@ -67,13 +66,15 @@ public final class TasksManager {
 	/**
 	 * Returns all stored {@code Task}.
 	 *
+	 * @param <T> Any {@code class} extending the {@code Task class}
+	 *
 	 * @return all stored {@code Task}
 	 *
 	 * @see Task
 	 */
-	public static Set<Task> getTasks() {
-		return Stream.concat(fmTasks.stream(), bpmnTasks.stream())
-				.collect(Collectors.toSet());
+	@SuppressWarnings("unchecked")
+	public static <T extends Task<?>> Set<T> getTasks() {
+		return (Set<T>) Stream.concat(fmTasks.stream(), wfTasks.stream()).collect(Collectors.toSet());
 	}
 
 	/**
@@ -104,6 +105,9 @@ public final class TasksManager {
 	 * @see FMTask
 	 */
 	public static Optional<FMTask> getFMTaskWithName(String name) {
+		if (name == null) {
+			return Optional.empty();
+		}
 		return fmTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
 	}
 
@@ -123,7 +127,10 @@ public final class TasksManager {
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	public static List<FMTask> getFMTaskWithParent(Task parent) {
+	public static List<FMTask> getFMTaskWithParent(Task<?> parent) {
+		if (parent == null) {
+			return new ArrayList<>();
+		}
 		return fmTasks.stream().filter(t -> (t.getParent() != null) && t.getParent().equals(parent))
 				.collect(Collectors.toList());
 	}
@@ -145,40 +152,69 @@ public final class TasksManager {
 	 * @see FMTask
 	 */
 	public static Optional<FMTask> getFMTaskWithNode(Node node) {
+		if (node == null) {
+			return Optional.empty();
+		}
 		return fmTasks.stream().filter(t -> t.getNode().equals(node)).findFirst();
 	}
 
 	/**
-	 * Returns all stored {@code BPMNTask}.
+	 * Returns all stored {@code WFTask}.
 	 *
-	 * @return all stored {@code BPMNTask}
+	 * @return all stored {@code WFTask}
 	 *
-	 * @see BPMNTask
+	 * @see WFTask
 	 *
 	 * @since 1.0
 	 */
-	public static Set<BPMNTask> getBPMNTasks() {
-		return bpmnTasks;
+	public static Set<WFTask<?>> getWFTasks() {
+		return wfTasks;
 	}
 
 	/**
-	 * Returns an {@code Optional} containing the {@code BPMNTask} with the given
+	 * Returns an {@code Optional} containing the {@code WFTask} with the given
 	 * {@code name}.
 	 *
 	 * <p>
 	 *
-	 * If there is no {@code BPMNTask} with the given {@code name}, then the
+	 * If there is no {@code WFTask} with the given {@code name}, then the
 	 * returned {@code Optional} is empty.
 	 *
 	 * @param name name of wanted task
-	 * @return an {@code Optional} containing the {@code BPMNTask} with the given
+	 * @return an {@code Optional} containing the {@code WFTask} with the given
 	 *         {@code name}
 	 *
 	 * @since 1.0
-	 * @see BPMNTask
+	 * @see WFTask
 	 */
-	public static Optional<BPMNTask> getBPMNTaskWithName(String name) {
-		return bpmnTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
+	public static Optional<WFTask<?>> getWFTaskWithName(String name) {
+		if (name == null) {
+			return Optional.empty();
+		}
+		return wfTasks.stream().filter(t -> t.getName().equals(name)).findFirst();
+	}
+
+	/**
+	 * Returns an {@code Optional} containing the {@code WFTask} with the given
+	 * {@code node}.
+	 *
+	 * <p>
+	 *
+	 * If there is no {@code WFTask} with the given {@code node}, then the returned
+	 * {@code Optional} is empty.
+	 *
+	 * @param node node of wanted task
+	 * @return an {@code Optional} containing the {@code WFTask} with the given
+	 *         {@code node}
+	 *
+	 * @since 1.0
+	 * @see WFTask
+	 */
+	public static Optional<WFTask<?>> getWFTaskWithNode(Node node) {
+		if (node == null) {
+			return Optional.empty();
+		}
+		return wfTasks.stream().filter(t -> t.getNode().equals(node)).findFirst();
 	}
 
 	// adder
@@ -187,6 +223,7 @@ public final class TasksManager {
 	 * Adds the given {@code task} to the right {@code Set} according to its nature
 	 * and returns it.
 	 *
+	 * @param <T>  Any {@code class} extending the {@code Task class}
 	 * @param task task to add
 	 *
 	 * @return the added {@code task}
@@ -194,16 +231,16 @@ public final class TasksManager {
 	 * @since 1.0
 	 * @see Task
 	 */
-	public static Task addTask(Task task) {
+	public static <T extends Task<?>> T addTask(T task) {
 		if (task != null) {
 			if (task instanceof FMTask) {
 				fmTasks.add((FMTask) task);
 			} else {
 				// removing if a task with the same name and a blank reference is already
 				// contained to keep most precise tasks
-				bpmnTasks.removeIf(
+				wfTasks.removeIf(
 						t -> (t.getName() != null) && t.getName().equals(task.getName()) && t.getReference().isBlank());
-				bpmnTasks.add((BPMNTask) task);
+				wfTasks.add((WFTask<?>) task);
 			}
 		}
 		return task;
@@ -215,20 +252,21 @@ public final class TasksManager {
 	 * Removes the given {@code task} from the right {@code Set} according to its
 	 * nature.
 	 *
+	 * @param <T>  Any {@code class} extending the {@code Task class}
 	 * @param task task to remove
 	 * @return whether the remove operation succeed or not
 	 *
 	 * @since 1.0
 	 * @see Task
 	 */
-	public static boolean removeTask(Task task) {
+	public static <T extends Task<?>> boolean removeTask(T task) {
 		if (task == null) {
 			return false;
 		}
 		if (task instanceof FMTask) {
 			return fmTasks.remove(task);
 		} else {
-			return bpmnTasks.remove(task);
+			return wfTasks.remove(task);
 		}
 	}
 
@@ -273,13 +311,13 @@ public final class TasksManager {
 
 	/**
 	 * Clears all {@code Set}s by calling the {@link #clearFMTasks()} and
-	 * {@link #clearBPMNTasks()} methods.
+	 * {@link #clearWFTasks()} methods.
 	 *
 	 * @since 1.0
 	 */
 	public static void clear() {
 		clearFMTasks();
-		clearBPMNTasks();
+		clearWFTasks();
 	}
 
 	/**
@@ -292,12 +330,12 @@ public final class TasksManager {
 	}
 
 	/**
-	 * Clears the {@link #bpmnTasks}.
+	 * Clears the {@link #wfTasks}.
 	 *
 	 * @since 1.0
 	 */
-	public static void clearBPMNTasks() {
-		bpmnTasks.clear();
+	public static void clearWFTasks() {
+		wfTasks.clear();
 	}
 
 }

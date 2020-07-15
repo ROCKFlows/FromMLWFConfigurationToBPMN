@@ -72,7 +72,7 @@ public class Save extends AbstractCommand {
 			LogManager.shutdown();
 		} catch (Exception e) {
 			logger.fatal("Can't merge the Workflow with the FeatureModel.");
-			logger.fatal(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }
