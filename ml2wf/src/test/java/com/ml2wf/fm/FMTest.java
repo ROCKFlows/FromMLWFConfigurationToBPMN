@@ -38,4 +38,15 @@ class FMTest {
 		assertTrue(fm.isChildOf("Steps", "train OC_SVM"));
 	}
 
+	@Test
+	void testConstraints() throws ParserConfigurationException, SAXException, IOException {
+		String sourceFM="../samples/basicFM.xml";
+		File ffm = new File(sourceFM);
+		assertTrue(ffm.exists());
+		FMHelper fm = new FMHelper(sourceFM);
+		List<String> constraints =fm.getConstraintList();
+		//System.out.println(constraints);
+		assertTrue(constraints.contains("Stability=>ensureStability"));
+		assertTrue(constraints.contains("Training_step=>MLAlgorithm"));
+	}
 }

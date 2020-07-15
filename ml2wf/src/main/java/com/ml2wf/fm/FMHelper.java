@@ -3,6 +3,7 @@ package com.ml2wf.fm;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -31,12 +32,20 @@ public class FMHelper {
 
 	private static final String FEATURE = "feature";
 	private static final String AND = "and";
-
+	private static final String CONSTRAINTS = "constraints";
+	private static final String RULE = "rule";
+	private static final String IMPLY_NOTATION = "=>";
+	
 	private DocumentBuilder builder;
 	private Document document;
 	private Element racine;
 
 	private List<String> featureNameList = new ArrayList<>();
+	private List<String> constraintList = new ArrayList<>();
+
+	public List<String> getConstraintList() {
+		return new ArrayList<>(constraintList);
+	}
 
 	public List<String> getFeatureNameList() {
 		return new ArrayList<>(featureNameList);
@@ -54,8 +63,88 @@ public class FMHelper {
 		document = builder.parse(new File(path));
 		racine = document.getDocumentElement();
 		featureNameList = listFeatures();
+		constraintList = listConstraints();
 	}
 
+//DOING
+	private List<String> listConstraints() {
+		logger.debug("-------- List Constraints ------");
+		List<String> constraints = new ArrayList<>();
+		for (Node child : iterable(racine.getChildNodes())) {
+			constraints.addAll(listConstraints(child));
+		}
+		return constraints;
+	}
+	
+	
+//DOING
+	private Collection<? extends String> listConstraints(Node n) {
+		List<String> list = new ArrayList<>();
+		switch (n.getNodeName()) {
+		case CONSTRAINTS:
+			list.addAll(readConstraints(n));
+			break;
+		}
+		return list;
+	}
+
+	private Collection<? extends String>  readConstraints(Node n) {
+		List<String> list = new ArrayList<>();
+		for (Node child : iterable(n.getChildNodes())) {
+			if (child.getNodeName().equals(RULE)){
+				logger.debug("Manage Rule : {}",child);
+				list.add(ruleToString(child));
+			}
+		}
+		return list;
+	}
+
+	private String ruleToString(Node ruleNode) {
+		String rule = "";
+		for (Node child : iterable(ruleNode.getChildNodes())) {
+			if ( (child != null) 
+					&& (child.getNodeName() != null) )
+			{
+				if (child.getNodeName().equals("imp")) {
+					logger.debug("imp : {}",child);
+					rule = extractImply(child); 
+				}
+				//else {
+				//	rule = child.getNodeName() + " : " + child.getNodeValue();
+				//}
+			}
+		}
+		return rule;
+	}
+
+	//IMPROVE
+	private String extractImply(Node node) {
+		String rule = "";
+		List<String> operands = readOperands(node);
+		if ((operands.size() == 2) ) {
+			rule += operands.get(0);
+			rule += IMPLY_NOTATION;
+			rule += operands.get(1);
+		} else
+			rule += "Unexpected operands for imply : " +operands;
+		return rule;
+	}
+
+
+
+	private List<String> readOperands(Node node) {
+		List<String> operands = new ArrayList<>();
+		for (Node child : iterable(node.getChildNodes())) {
+			if ( (child != null) 
+					&& (child.getNodeName() != null) )
+			{
+				if (child.getNodeName().equals("var")) {
+						operands.add(child.getTextContent());
+				}
+			}
+		}
+		return operands;
+	}
 
 	//Extract Feature as a Node
 	public Node extractFeature(String featureName) {

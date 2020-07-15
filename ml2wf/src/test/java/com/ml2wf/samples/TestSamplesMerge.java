@@ -36,6 +36,10 @@ import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.util.Pair;
 
 
+/**
+ * @author blay
+ *
+ */
 public class TestSamplesMerge {
 
 	
@@ -77,8 +81,7 @@ public class TestSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("added features : %s ", afterList);
+		nothingIsLost(fmBefore, fmAfter);
 		
 
 		//FIX 
@@ -89,6 +92,87 @@ public class TestSamplesMerge {
 		//Check idempotence
 		checkIdempotence(copiedFM, command);
 	}
+	
+	
+	@Test
+	@DisplayName("Test with a basic workflow adding one Step and one constraint")
+	public void testBasicWFWithOneConstraintUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+		String metaWFPATH = "../BPMN-Models/BasicMetaWFWithConstraint2.bpmn2";
+		String sourceFM="../samples/basicFM.xml";
+		//FIX avoid to make a copy
+		String copiedFM="../samples/basicFMCopy.xml";
+		File copiedFile = new File(copiedFM);
+		File sourceFile = new File(sourceFM);
+		FileUtils.copyFile(sourceFile, copiedFile);
+		File fin = new File(metaWFPATH);
+		String pwd = System.getProperty("user.dir");
+        System.out.println("Le répertoire courant est : " + pwd);
+		assertTrue(fin.exists());
+		assertTrue(copiedFile.exists());
+		
+		FMHelper fmBefore = new FMHelper(copiedFM);
+		//Command
+		String[] command = new String[] {"merge","--meta", "-i ", metaWFPATH, "-o ",copiedFM, "-v","7"};
+		com.ml2wf.App.main(command);
+		assertTrue(copiedFile.exists());
+		FMHelper fmAfter = new FMHelper(copiedFM);
+		
+		//General Properties to check
+		nothingIsLost(fmBefore, fmAfter);
+		
+
+		//FIX 
+		//assertEquals(1, afterList.size());
+		assertTrue(fmAfter.isFeature("Evaluating_step"));
+		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
+		//Todo test constraint
+		//Training_step => MLAlgorithm
+		//Check idempotence
+		checkIdempotence(copiedFM, command);
+	}
+	
+	@Test
+	@DisplayName("Test with a basic workflow adding one Step, one criteria and one constraint")
+	public void testBasicWFWithOneContraintAddingACriteriaUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+		String metaWFPATH = "../BPMN-Models/BasicMetaWFWithConstraint.bpmn2";
+		String sourceFM="../samples/basicFM.xml";
+		//FIX avoid to make a copy
+		String copiedFM="../samples/basicFMCopyWithConstraint.xml";
+		File copiedFile = new File(copiedFM);
+		File sourceFile = new File(sourceFM);
+		FileUtils.copyFile(sourceFile, copiedFile);
+		File fin = new File(metaWFPATH);
+		String pwd = System.getProperty("user.dir");
+        System.out.println("Le répertoire courant est : " + pwd);
+		assertTrue(fin.exists());
+		assertTrue(copiedFile.exists());
+		
+		FMHelper fmBefore = new FMHelper(copiedFM);
+		//Command
+		String[] command = new String[] {"merge","--meta", "-i ", metaWFPATH, "-o ",copiedFM, "-v","7"};
+		com.ml2wf.App.main(command);
+		assertTrue(copiedFile.exists());
+		FMHelper fmAfter = new FMHelper(copiedFM);
+		
+		//General Properties to check
+		nothingIsLost(fmBefore, fmAfter);
+		
+
+		//FIX 
+		//Evaluating_step  =>  Evaluation_criteria I was expecting Evaluation_criteria to be added as an unmanaged Feature
+		
+		//assertEquals(1, afterList.size());
+		assertTrue(fmAfter.isFeature("Evaluating_step"));
+		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
+		//Todo test constraint
+		//...
+		//FIX 
+		//Ensure a new feature has been added
+		//Check idempotence
+		checkIdempotence(copiedFM, command);
+		//FIX Constraint is duplicated (check it) Evaluating_step  =>  Evaluation_criteria
+	}
+	
 	
 	
 	@Test
@@ -113,8 +197,7 @@ public class TestSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("added features : %s ", afterList);
+		nothingIsLost(fmBefore, fmAfter);
 		
 		//FIX 
 		//assertEquals(2, afterList.size());
@@ -152,8 +235,7 @@ public class TestSamplesMerge {
 		
 		
 		//General Properties to check
-		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("added features : %s ", afterList);
+		nothingIsLost(fmBefore, fmAfter);
 				
 		//FIX 
 		//assertEquals(1, afterList.size());
@@ -194,9 +276,7 @@ public class TestSamplesMerge {
 
 		
 		//General Properties to check
-		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("added features : %s ", afterList);
-		//todo check that no tacks are lost
+		nothingIsLost(fmBefore, fmAfter);
 		
 		//
 		//FIX 
@@ -214,6 +294,8 @@ public class TestSamplesMerge {
 		//Check idempotence
 		checkIdempotence(copiedFM, command);
 	}
+
+
 	
 	@Test
 	@DisplayName("#Conflict : A same task as a subtask of several meta task ")
@@ -239,9 +321,7 @@ public class TestSamplesMerge {
 
 		
 		//General Properties to check
-		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("added features : %s ", afterList);
-		//todo check that no tacks are lost
+		nothingIsLost(fmBefore, fmAfter);
 		
 		//
 		//FIX 
@@ -313,31 +393,6 @@ public class TestSamplesMerge {
 	}
 	
 	
-	private void checkIdempotence(String fM, String[] command)
-			throws ParserConfigurationException, SAXException, IOException {
-		FMHelper fmBefore;
-		FMHelper fmAfter;
-		List<String> afterList;
-		fmBefore = new FMHelper(fM);
-		com.ml2wf.App.main(command);
-		fmAfter = new FMHelper(fM);
-		afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("AFTER should be empty : %s", afterList);
-		assertTrue(afterList.isEmpty());
-	}
-
-	
-	private List<String> checkNoFeaturesAreLost(FMHelper fmAfter, FMHelper fmBefore) {
-		List<String> beforeList = fmBefore.getFeatureNameList();
-		List<String> afterList = fmAfter.getFeatureNameList();
-		logger.debug("Before features : %s ", beforeList);
-		logger.debug("after features : %s ", afterList);
-		assertTrue(fmAfter.getFeatureNameList().containsAll(beforeList));
-		afterList.removeAll(beforeList);
-		return afterList;
-	}
-	
-	
 	
 	//todo: improve testing the content of the file.
 	@Test
@@ -364,9 +419,11 @@ public class TestSamplesMerge {
 
 		
 		//General Properties to check
+		nothingIsLost(fmBefore, fmAfter);
+		
+		//TODO Improve to avoid double testing
 		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
 		logger.debug("added features : %s ", afterList);
-		//todo check that no tacks are lost
 		
 		//
 		//TODO : IMPROVE with a getTaskList
@@ -394,6 +451,56 @@ public class TestSamplesMerge {
 	
 	}
 	
+	
+	/*
+	 * 
+	 * Utility methods
+	 */
 
+	
+	private void nothingIsLost(FMHelper fmBefore, FMHelper fmAfter) {
+		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
+		logger.debug("added features : %s ", afterList);
+		afterList = checkNoConstraintsAreLost(fmAfter, fmBefore);
+		logger.debug("added Constraints : %s ", afterList);
+		//todo check that no tasks are lost
+	}
+	
+	//TODO add test on constraints
+	private void checkIdempotence(String fM, String[] command)
+			throws ParserConfigurationException, SAXException, IOException {
+		FMHelper fmBefore;
+		FMHelper fmAfter;
+		List<String> afterList;
+		fmBefore = new FMHelper(fM);
+		com.ml2wf.App.main(command);
+		fmAfter = new FMHelper(fM);
+		afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
+		logger.debug("AFTER should be empty : %s", afterList);
+		assertTrue(afterList.isEmpty());
+	}
+
+	
+	private List<String> checkNoFeaturesAreLost(FMHelper fmAfter, FMHelper fmBefore) {
+		List<String> beforeList = fmBefore.getFeatureNameList();
+		List<String> afterList = fmAfter.getFeatureNameList();
+		logger.debug("Before features : %s ", beforeList);
+		logger.debug("after features : %s ", afterList);
+		assertTrue(fmAfter.getFeatureNameList().containsAll(beforeList));
+		afterList.removeAll(beforeList);
+		return afterList;
+	}
+	
+	private List<String> checkNoConstraintsAreLost(FMHelper fmAfter, FMHelper fmBefore) {
+		List<String> beforeList = fmBefore.getConstraintList();
+		List<String> afterList = fmAfter.getConstraintList();
+		logger.debug("Before constraints : %s ", beforeList);
+		logger.debug("after constraints : %s ", afterList);
+		assertTrue(afterList.containsAll(beforeList));
+		afterList.removeAll(beforeList);
+		return afterList;
+	}
+	
+	
 
 }
