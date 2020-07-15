@@ -32,6 +32,7 @@ import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.merge.base.BaseMergerImpl;
+import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -114,7 +115,7 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	@MethodSource("instanceFiles")
 	@DisplayName("Verification of the global structure")
 	public void testGlobalStructure(Path path) throws ParserConfigurationException, SAXException, IOException {
-		this.resultDocument = XMLManager.preprocess(path.toFile());
+		this.resultDocument = FileHandler.preprocess(path.toFile());
 		// TODO: to complete/improve considering the wished number of instantiated tasks
 		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
@@ -148,7 +149,7 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	@MethodSource("instanceFiles")
 	@DisplayName("Verification of the nodes structure")
 	public void testNodesStructures(Path path) throws ParserConfigurationException, SAXException, IOException {
-		this.resultDocument = XMLManager.preprocess(path.toFile());
+		this.resultDocument = FileHandler.preprocess(path.toFile());
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
 		for (Node resultNode : resultNodes) {
 			NodeList extensionChildren = ((Element) resultNode)
@@ -188,7 +189,7 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	@DisplayName("Verification of references")
 	public void testReferences(Path path) throws ParserConfigurationException, SAXException, IOException {
 		// TODO: improve readability
-		this.resultDocument = XMLManager.preprocess(path.toFile());
+		this.resultDocument = FileHandler.preprocess(path.toFile());
 		// retrieving task nodes
 		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);

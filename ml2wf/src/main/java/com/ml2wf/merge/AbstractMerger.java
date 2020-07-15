@@ -33,6 +33,7 @@ import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.factory.TaskFactoryImpl;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.BPMNTaskSpecs;
+import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
@@ -419,7 +420,7 @@ public abstract class AbstractMerger extends XMLManager {
 		String logMsg;
 		Document wfDocument;
 		if (file.exists()) {
-			wfDocument = XMLManager.preprocess(file);
+			wfDocument = FileHandler.preprocess(file);
 			wfTaskName = getWorkflowName(wfDocument).replace(" ", "_");
 			logMsg = String.format("WF's name is %s.", wfTaskName);
 			logger.debug(logMsg);

@@ -3,10 +3,8 @@ package com.ml2wf.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -17,13 +15,8 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Attr;
@@ -72,10 +65,6 @@ public class XMLManager {
 	 * @see Document
 	 */
 	private static Document document;
-	/**
-	 * Extension separator for files.
-	 */
-	private static final String EXTENSION_SEPARATOR = ".";
 	/**
 	 * Documentation's counter.
 	 *
@@ -178,19 +167,10 @@ public class XMLManager {
 	public static void updateDocument(File sourceFile) throws ParserConfigurationException, SAXException, IOException {
 		if ((XMLManager.document == null)
 				|| !XMLManager.document.getBaseURI().equals(sourceFile.toURI().toString())) {
-			XMLManager.document = XMLManager.preprocess(sourceFile);
+			XMLManager.document = FileHandler.preprocess(sourceFile);
 			docCount = 0;
 			TasksManager.clear();
 		}
-	}
-
-	/**
-	 * Returns the file extension separator.
-	 *
-	 * @return the file extension separator
-	 */
-	public static String getExtensionSeparator() {
-		return EXTENSION_SEPARATOR;
 	}
 
 	/**
@@ -198,63 +178,6 @@ public class XMLManager {
 	 */
 	protected static int incrementDoc() {
 		return docCount++;
-	}
-
-	// file methods
-
-	/**
-	 * Preprocess the given XML file before any treatment.
-	 *
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 *
-	 * @since 1.0
-	 *
-	 * @see Document
-	 */
-	public static Document preprocess(File file) throws ParserConfigurationException, SAXException, IOException {
-		String logMsg = String.format("Preprocessing file : %s...", file.getName());
-		logger.info(logMsg);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		// --- protection against XXE attacks
-		logger.debug("Protecting against XXE attacks");
-		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
-		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
-		// ---
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document document = dBuilder.parse(file);
-		document.getDocumentElement().normalize();
-		return document;
-	}
-
-	/**
-	 * Saves the current {@code document} into the given {@code destFile}.
-	 *
-	 * @param file the destination {@code File}
-	 * @throws TransformerException
-	 * @throws IOException
-	 *
-	 * @since 1.0
-	 */
-	public void save(File destFile) throws TransformerException, IOException {
-		String logMsg = String.format("Saving file at location : %s...", destFile);
-		logger.info(logMsg);
-		if (!destFile.createNewFile()) {
-			logger.debug("[SAVE] Destination file aldready exists.");
-			logger.debug("[SAVE] Overriding...");
-		}
-		DOMSource source = new DOMSource(document);
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		// --- protection against XXE attacks
-		logger.debug("Protecting against XXE attacks");
-		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-		// ---
-		Transformer transformer = transformerFactory.newTransformer();
-		StreamResult result = new StreamResult(destFile);
-		transformer.transform(source, result);
-		logger.info("File saved.");
 	}
 
 	/**
@@ -267,59 +190,7 @@ public class XMLManager {
 	 * @since 1.0
 	 */
 	public void save() throws TransformerException, IOException {
-		this.save(this.getSourceFile());
-	}
-
-	/**
-	 * Backs up the current {@link #sourceFile}.
-	 *
-	 * <p>
-	 *
-	 * The result filename will be : <b>FileBaseName</b> +
-	 * {@link Notation#getBackupVoc()} + <b>_dd_MM_yy_hh_mm.FileExtension</b>.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that this method hasn't any retroactive effect.
-	 *
-	 * @throws TransformerException
-	 * @throws IOException
-	 *
-	 * @since 1.0
-	 */
-	protected void backUp() throws TransformerException, IOException {
-		logger.info("Backing up...");
-		SimpleDateFormat dateFormater = null;
-		Date backUpDate = new Date();
-		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
-		String backUpPath = insertInFileName(this.path, Notation.getBackupVoc() + dateFormater.format(backUpDate));
-		File destFile = new File(backUpPath);
-		this.save(destFile);
-		logger.info("Back up finished.");
-	}
-
-	/**
-	 * Inserts given {@code content} between the FileBaseName and the FileExtension.
-	 *
-	 * @param fName   filename
-	 * @param content content to insert
-	 * @return the new {@code fName} with the inserted {@code content}
-	 *
-	 * @since 1.0
-	 */
-	public static String insertInFileName(String fName, String content) {
-		String extension = FilenameUtils.getExtension(fName);
-		if (extension != null) {
-			String name = FilenameUtils.getBaseName(fName);
-			String parentPath = FilenameUtils.getFullPath(fName);
-			return parentPath + name + content + EXTENSION_SEPARATOR + extension;
-		}
-		String logMsg = String.format("Error while renaming file : %s", fName);
-		logger.warn(logMsg);
-		String errorfName = "BACKUP_ERROR.xml";
-		logMsg = String.format("Saving backup file as : %s", errorfName);
-		logger.warn(logMsg);
-		return errorfName;
+		FileHandler.saveDocument(this.getSourceFile(), document);
 	}
 
 	/**

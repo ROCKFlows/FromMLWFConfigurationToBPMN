@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,6 +33,7 @@ import com.ml2wf.tasks.concretes.BPMNTask;
 import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.manager.TasksManager;
+import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.Pair;
 
 public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerger {
@@ -92,7 +94,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	@Override
 	public void mergeWithWF(boolean backUp, boolean completeMerge, File wfFile) throws Exception {
 		if (backUp) {
-			super.backUp();
+			FileHandler.backUp(this.getPath(), getDocument());
 		}
 		List<Node> annotations = new ArrayList<>();
 		Set<File> files = this.getFiles(wfFile);
@@ -142,10 +144,8 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	private Set<File> getFiles(File file) throws IOException {
 		Set<File> files;
 		try (Stream<Path> stream = Files.walk(file.toPath())) {
-			// TODO: factorize endsWith filter in a dedicated method (add extension in
-			// notation and use the apache-io api
 			files = stream.parallel().map(Path::toFile).filter(File::isFile)
-					.filter(p -> p.getName().endsWith(".bpmn") || p.getName().endsWith(".bpmn2"))
+					.filter(p -> FilenameUtils.isExtension(p.getName(), FileHandler.getWfExtensions()))
 					.collect(Collectors.toSet());
 		}
 		if (files.isEmpty()) {

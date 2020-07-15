@@ -1,14 +1,9 @@
 package com.ml2wf.cmd;
 
 import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.xml.sax.SAXException;
 
 import com.ml2wf.generation.InstanceFactory;
 import com.ml2wf.generation.InstanceFactoryImpl;
@@ -43,7 +38,8 @@ public class Generate extends AbstractCommand {
 	@Option(names = { "-i", "--input" }, required = true, arity = "1", order = 1, description = "input file")
 	File input;
 
-	@Option(names = { "-o", "--output" }, required = true, arity = "1", order = 1, description = "output directory")
+	@Option(names = { "-o",
+			"--output" }, required = true, arity = "1", order = 1, description = "output file or directory")
 	File output;
 
 	/**
@@ -54,28 +50,20 @@ public class Generate extends AbstractCommand {
 	 */
 	private static final Logger logger = LogManager.getLogger(Generate.class);
 
-	// TODO: to comment if kept
+	/**
+	 * Error message due to an error that occured during the instantiation process.
+	 */
 	private static final String CANT_INSTANTIATE = "Can't instantiate the WorkFlow.";
 
 	@Override
 	public void run() {
 
-		InstanceFactoryImpl factory;
+		InstanceFactory factory;
 		try {
-			// TODO: improve file verification and logs position
-			if (!this.input.isFile()) {
-				logger.fatal(CANT_INSTANTIATE);
-				logger.fatal("The input is not a file.");
-				return;
-			} else if (!this.output.isDirectory()) {
-				logger.fatal(CANT_INSTANTIATE);
-				logger.fatal("The output is not a directory.");
-				return;
-			}
 			factory = new InstanceFactoryImpl(this.input);
 			factory.getWFInstance(this.output);
 			LogManager.shutdown();
-		} catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
+		} catch (Exception e) {
 			logger.fatal(CANT_INSTANTIATE);
 			e.printStackTrace();
 		}
