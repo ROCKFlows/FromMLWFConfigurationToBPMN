@@ -182,20 +182,23 @@ public class FMHelper {
 		switch (n.getNodeName()) {
 		case FEATURE:
 			list.add(getFeatureName(n));
+			extractChildFeatures(n, list);
 			break;
 		case AND:
 			list.add(getFeatureName(n));
-			for (Node child : iterable(n.getChildNodes())) {
-				list.addAll(listFeature(child));
-			}
+			extractChildFeatures(n, list);
 			break;
 		default:
-			for (Node child : iterable(n.getChildNodes())) {
-				list.addAll(listFeature(child));
-			}
+			extractChildFeatures(n, list);
 			break;
 		}
 		return list;
+	}
+
+	private void extractChildFeatures(Node n, List<String> list) {
+		for (Node child : iterable(n.getChildNodes())) {
+			list.addAll(listFeature(child));
+		}
 	}
 	// todo improve it
 	private static Iterable<Node> iterable(final NodeList n) {

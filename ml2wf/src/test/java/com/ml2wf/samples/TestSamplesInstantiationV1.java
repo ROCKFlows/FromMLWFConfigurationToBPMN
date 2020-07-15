@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -68,21 +67,6 @@ public class TestSamplesInstantiationV1 {
 	 */
 	private static final Logger logger = LogManager.getLogger(TestSamplesInstantiationV1.class);
 
-	@BeforeEach
-	public void setUp() throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
-		logger.info("Hello World!");
-		this.classLoader = this.getClass().getClassLoader();
-		this.url = this.classLoader.getResource(SIMPLE_WF_PATH);
-		this.factory = new InstanceFactoryImpl(new File(this.url.toURI()));
-	}
-
-	@AfterEach
-	public void clean() {
-		this.classLoader = null;
-		this.url = null;
-		this.factory = null;
-	}
-
 	
 	//todo: improve testing the content of the file.
 	@Test
@@ -92,8 +76,8 @@ public class TestSamplesInstantiationV1 {
 		String outputWFPATH = "../BPMN-Models";
 		File fin = new File(metaWFPATH);
 		File fout = new File(outputWFPATH);
-		String pwd = System.getProperty("user.dir");
-        System.out.println("Le répertoire courant est : " + pwd);
+		//String pwd = System.getProperty("user.dir");
+        //System.out.println("Le répertoire courant est : " + pwd);
 		assertTrue(fout.exists() && fout.isDirectory());
 		assertTrue(fin.exists());
 		//Test By code
@@ -118,6 +102,26 @@ public class TestSamplesInstantiationV1 {
 		assertThrows(FileNotFoundException.class, 
 				() -> {factory = new InstanceFactoryImpl(fin);} );
 	}
+	
+
+	@Test
+	@DisplayName("Test Generation when output is not a directory")
+	public void testGenerationWithNoOutputDirectory() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+		String metaWFPATH = "../BPMN-Models/FeatureBasedMetaWF.bpmn2";
+		String outputWFPATH = "../BPMN-Models/instance.bpmn2";
+		File fin = new File(metaWFPATH);
+		File fout = new File(outputWFPATH);
+		assertTrue(fin.exists());
+		assertFalse(fout.isDirectory());
+		//Test By code
+		factory = new InstanceFactoryImpl(fin);
+		//Test By code
+		//FIX : I have no idea what the program does! 
+//				assertThrows(FileNotFoundException.class, 
+//						() -> {		factory.getWFInstance(fout);} );
+	}
+	
+	
 	//fix it: If we choose to fix the generation, by generating according to the return file (and not by giving it a predefined name), then there should be no error, because in this case, the file may not exist.
 	//	On the contrary, if we decide to save in a directory, there should be an error message if that directory does not exist.
 	// Currently it generates in the tree above, if the output does not exist.
@@ -145,7 +149,7 @@ public class TestSamplesInstantiationV1 {
 	@DisplayName("Test Generation with a complex workflow using command line")
 	public void testCommandLineGeneration() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH = "../BPMN-Models/FeatureBasedMetaWF.bpmn2";
-		String outputWFPATH = "../BPMN-Models/instance.bpmn2";
+		String outputWFPATH = "../BPMN-Models";
 		File fin = new File(metaWFPATH);
 		File fout = new File(outputWFPATH);
 		assertTrue(fin.exists());
@@ -166,7 +170,7 @@ public class TestSamplesInstantiationV1 {
 	@DisplayName("Test Generation with a simple meta workflow using command line")
 	public void testSimpleCommandLineGeneration() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWF.bpmn2";
-		String outputWFPATH = "../BPMN-Models/instance.bpmn2";
+		String outputWFPATH = "../BPMN-Models";
 		File fin = new File(metaWFPATH);
 		File fout = new File(outputWFPATH);
 		assertTrue(fin.exists());

@@ -101,13 +101,11 @@ public class TestMetaSamplesMerge {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFWithConstraint2.bpmn2";
 		String sourceFM="../samples/basicFM.xml";
 		//FIX avoid to make a copy
-		String copiedFM="../samples/basicFMCopy.xml";
+		String copiedFM="../samples/basicFMCopy_1.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
-		String pwd = System.getProperty("user.dir");
-        System.out.println("Le répertoire courant est : " + pwd);
 		assertTrue(fin.exists());
 		assertTrue(copiedFile.exists());
 		
@@ -126,8 +124,9 @@ public class TestMetaSamplesMerge {
 		//assertEquals(1, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
-		//Todo test constraint
-		//Training_step => MLAlgorithm
+
+		fmAfter.getConstraintList().contains("Training_step=>Evaluating_step");
+
 		//Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
@@ -138,13 +137,11 @@ public class TestMetaSamplesMerge {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFWithConstraint.bpmn2";
 		String sourceFM="../samples/basicFM.xml";
 		//FIX avoid to make a copy
-		String copiedFM="../samples/basicFMCopyWithConstraint.xml";
+		String copiedFM="../samples/basicFMCopy_2.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
-		String pwd = System.getProperty("user.dir");
-        System.out.println("Le répertoire courant est : " + pwd);
 		assertTrue(fin.exists());
 		assertTrue(copiedFile.exists());
 		
@@ -165,8 +162,12 @@ public class TestMetaSamplesMerge {
 		//assertEquals(1, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
-		//Todo test constraint
-		//...
+		//FIX test constraint : Evaluating_step => Evaluation_criteria
+		//assertTrue(fmAfter.isFeature("Evaluation_criteria"));
+		//FIX Test position of criteria to be improved
+		//assertTrue(fmAfter.isChildOf("criteria", "Evaluation_criteria"));
+		//assertTrue(fmAfter.getConstraintList().contains("Evaluating_step=>Evaluation_criteria"));
+
 		//FIX 
 		//Ensure a new feature has been added
 		//Check idempotence
@@ -182,7 +183,7 @@ public class TestMetaSamplesMerge {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWF2.bpmn2";
 		String sourceFM="../samples/basicFM.xml";
 		//FIX avoid to make a copy
-		String copiedFM="../samples/basicFMCopy.xml";
+		String copiedFM="../samples/basicFMCopy_3.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
@@ -219,7 +220,7 @@ public class TestMetaSamplesMerge {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie.bpmn2";
 		String sourceFM="../samples/basicFM.xml";
 		//FIX avoid to make a copy
-		String copiedFM="../samples/basicFMCopyHierarchie.xml";
+		String copiedFM="../samples/basicFMCopy_4.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
@@ -234,7 +235,6 @@ public class TestMetaSamplesMerge {
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
-		
 		//General Properties to check
 		TestHelper.nothingIsLost(fmBefore, fmAfter);
 				
@@ -245,9 +245,10 @@ public class TestMetaSamplesMerge {
 		assertTrue(fmBefore.isFeature(parent));
 		assertFalse(fmBefore.isFeature(f1));
 		assertTrue(fmAfter.isFeature(f1));
-		//FIX
-		//assertFalse(fmAfter.isDirectChildOf("Steps", f1));
+		//Test SubFeature
+		assertFalse(fmAfter.isDirectChildOf("Steps", f1));
 		assertTrue(fmAfter.isChildOf("Steps", f1));
+		assertTrue(fmAfter.isChildOf(parent, f1));
 		
 		//Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
@@ -259,7 +260,7 @@ public class TestMetaSamplesMerge {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie2.bpmn2";
 		String sourceFM="../samples/basicFM.xml";
 		//FIX avoid to make a copy
-		String copiedFM="../samples/basicFMCopyHierarchie.xml";
+		String copiedFM="../samples/basicFMCopy_5.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
@@ -282,14 +283,17 @@ public class TestMetaSamplesMerge {
 		//
 		//FIX 
 		//assertEquals(1, afterList.size());
-		String parent  = "Preprocessing_step";
+		String otherParent = "Preprocess_data";
 		String f1 = "Missing_Values";
-		assertTrue(fmBefore.isFeature(parent));
 		assertFalse(fmBefore.isFeature(f1));
+		assertFalse(fmBefore.isFeature(otherParent));
 		assertTrue(fmAfter.isFeature(f1));
+		assertTrue(fmAfter.isFeature(otherParent));
 		//FIX
-		//assertFalse(fmAfter.isDirectChildOf("Steps", f1));
+		assertFalse(fmAfter.isDirectChildOf("Steps", f1));
 		assertTrue(fmAfter.isChildOf("Steps", f1));
+		assertTrue(fmAfter.isChildOf("Steps", otherParent));
+		assertTrue(fmAfter.isChildOf(otherParent, f1));
 		
 		
 		//Check idempotence
@@ -304,7 +308,7 @@ public class TestMetaSamplesMerge {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie3.bpmn2";
 		String sourceFM="../samples/basicFM.xml";
 		//FIX avoid to make a copy
-		String copiedFM="../samples/basicFMCopy4Conflict.xml";
+		String copiedFM="../samples/basicFMCopy_6.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
@@ -326,18 +330,23 @@ public class TestMetaSamplesMerge {
 		
 		//
 		//FIX 
-		//A conflict should be detected and a suggestion should be done
+		//assertEquals(1, afterList.size());
 		String parent  = "Preprocessing_step";
+		String otherParent = "Preprocess_data";
 		String f1 = "Missing_Values";
 		assertTrue(fmBefore.isFeature(parent));
 		assertFalse(fmBefore.isFeature(f1));
+		assertFalse(fmBefore.isFeature(otherParent));
 		assertTrue(fmAfter.isFeature(f1));
+		assertTrue(fmAfter.isFeature(otherParent));
 		//FIX
-		//assertFalse(fmAfter.isDirectChildOf("Steps", f1));
+		assertFalse(fmAfter.isDirectChildOf("Steps", f1));
 		assertTrue(fmAfter.isChildOf("Steps", f1));
-		//assertTrue(fmAfter.isChildOf(parent, f1));
-		//assertTrue(fmAfter.isDirectChildOf(parent,"Preprocess_data");
-		//assertTrue(fmAfter.isDirectChildOf("Preprocess_data",f1);
+		assertTrue(fmAfter.isChildOf("Steps", otherParent));
+		assertTrue(fmAfter.isChildOf(parent, f1));
+		//assertTrue(fmAfter.isChildOf(otherParent, f1));
+		//Not SURE for this one
+		//assertTrue(fmAfter.isChildOf(parent, otherParent));
 		
 		//Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
@@ -350,7 +359,7 @@ public class TestMetaSamplesMerge {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchieX.bpmn2";
 		String sourceFM="../samples/basicFM.xml";
 		//FIX avoid to make a copy
-		String copiedFM="../samples/basicFMCopyHierarchie.xml";
+		String copiedFM="../samples/basicFMCopy_7.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);

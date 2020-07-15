@@ -25,7 +25,7 @@
     <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="Task_3" targetRef="EndEvent_1"/>
     <bpmn2:sequenceFlow id="SequenceFlow_4" sourceRef="StartEvent_1" targetRef="Task_1"/>
     <bpmn2:textAnnotation id="TextAnnotation_1">
-      <bpmn2:text>[[Training_step => MLAlgorithm]]</bpmn2:text>
+      <bpmn2:text>[[Training_step =>Evaluating_step]]</bpmn2:text>
     </bpmn2:textAnnotation>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
