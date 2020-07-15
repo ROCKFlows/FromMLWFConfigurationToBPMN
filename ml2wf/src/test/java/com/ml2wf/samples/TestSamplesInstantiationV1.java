@@ -158,4 +158,26 @@ public class TestSamplesInstantiationV1 {
 		//fout.delete();
 		
 	}
+	
+	
+	//todo: improve testing the content of the file.
+	//fix : correct the test: it is not consistent to give an output file and get the result in another file.
+	@Test
+	@DisplayName("Test Generation with a simple meta workflow using command line")
+	public void testSimpleCommandLineGeneration() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+		String metaWFPATH = "../BPMN-Models/BasicMetaWF.bpmn2";
+		String outputWFPATH = "../BPMN-Models/instance.bpmn2";
+		File fin = new File(metaWFPATH);
+		File fout = new File(outputWFPATH);
+		assertTrue(fin.exists());
+		//FIX
+		assertTrue(fout.exists());
+		com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
+		fout = new File("../BPMN-Models/BasicMetaWF_instance.bpmn2");
+		assertTrue(fout.exists());
+		//FIX
+		//fout.delete();
+		
+	}
+	
 }

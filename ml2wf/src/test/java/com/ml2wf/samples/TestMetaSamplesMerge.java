@@ -29,6 +29,7 @@ import org.xml.sax.SAXException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.ml2wf.TestHelper;
 import com.ml2wf.fm.FMHelper;
 import com.ml2wf.generation.InstanceFactoryImpl;
 import com.ml2wf.merge.base.BaseMergerImpl;
@@ -40,13 +41,13 @@ import com.ml2wf.util.Pair;
  * @author blay
  *
  */
-public class TestSamplesMerge {
+public class TestMetaSamplesMerge {
 
 	
 	/**
 	 * {@code Logger}'s instance.
 	 */
-	private static final Logger logger = LogManager.getLogger(TestSamplesMerge.class);
+	private static final Logger logger = LogManager.getLogger(TestMetaSamplesMerge.class);
 
 	@BeforeEach
 	public void setUp() throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
@@ -81,7 +82,7 @@ public class TestSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		nothingIsLost(fmBefore, fmAfter);
+		TestHelper.nothingIsLost(fmBefore, fmAfter);
 		
 
 		//FIX 
@@ -90,7 +91,7 @@ public class TestSamplesMerge {
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
 		
 		//Check idempotence
-		checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 	}
 	
 	
@@ -118,7 +119,7 @@ public class TestSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		nothingIsLost(fmBefore, fmAfter);
+		TestHelper.nothingIsLost(fmBefore, fmAfter);
 		
 
 		//FIX 
@@ -128,7 +129,7 @@ public class TestSamplesMerge {
 		//Todo test constraint
 		//Training_step => MLAlgorithm
 		//Check idempotence
-		checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 	}
 	
 	@Test
@@ -155,7 +156,7 @@ public class TestSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		nothingIsLost(fmBefore, fmAfter);
+		TestHelper.nothingIsLost(fmBefore, fmAfter);
 		
 
 		//FIX 
@@ -169,7 +170,7 @@ public class TestSamplesMerge {
 		//FIX 
 		//Ensure a new feature has been added
 		//Check idempotence
-		checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 		//FIX Constraint is duplicated (check it) Evaluating_step  =>  Evaluation_criteria
 	}
 	
@@ -197,7 +198,7 @@ public class TestSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		nothingIsLost(fmBefore, fmAfter);
+		TestHelper.nothingIsLost(fmBefore, fmAfter);
 		
 		//FIX 
 		//assertEquals(2, afterList.size());
@@ -209,7 +210,7 @@ public class TestSamplesMerge {
 		assertTrue(fmAfter.isDirectChildOf("Steps", f2));
 		
 		//Check idempotence
-		checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 	}
 	
 	@Test
@@ -235,7 +236,7 @@ public class TestSamplesMerge {
 		
 		
 		//General Properties to check
-		nothingIsLost(fmBefore, fmAfter);
+		TestHelper.nothingIsLost(fmBefore, fmAfter);
 				
 		//FIX 
 		//assertEquals(1, afterList.size());
@@ -249,7 +250,7 @@ public class TestSamplesMerge {
 		assertTrue(fmAfter.isChildOf("Steps", f1));
 		
 		//Check idempotence
-				checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 	}
 	
 	@Test
@@ -276,7 +277,7 @@ public class TestSamplesMerge {
 
 		
 		//General Properties to check
-		nothingIsLost(fmBefore, fmAfter);
+		TestHelper.nothingIsLost(fmBefore, fmAfter);
 		
 		//
 		//FIX 
@@ -292,7 +293,7 @@ public class TestSamplesMerge {
 		
 		
 		//Check idempotence
-		checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
 
@@ -321,7 +322,7 @@ public class TestSamplesMerge {
 
 		
 		//General Properties to check
-		nothingIsLost(fmBefore, fmAfter);
+		TestHelper.nothingIsLost(fmBefore, fmAfter);
 		
 		//
 		//FIX 
@@ -339,7 +340,7 @@ public class TestSamplesMerge {
 		//assertTrue(fmAfter.isDirectChildOf("Preprocess_data",f1);
 		
 		//Check idempotence
-		checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 	}
 	
 
@@ -361,7 +362,7 @@ public class TestSamplesMerge {
 		String[] command = new String[] {"merge","--meta", "-i ", metaWFPATH, "-o ",copiedFM, "-v","7"};
 		
 		//Check idempotence : nothing's happening
-		checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 		
 		//com.ml2wf.App.main(command);
 		//FIX there is one exception but it's catch...
@@ -419,10 +420,10 @@ public class TestSamplesMerge {
 
 		
 		//General Properties to check
-		nothingIsLost(fmBefore, fmAfter);
+		TestHelper.nothingIsLost(fmBefore, fmAfter);
 		
 		//TODO Improve to avoid double testing
-		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
+		List<String> afterList = TestHelper.checkNoFeaturesAreLost(fmAfter, fmBefore);
 		logger.debug("added features : %s ", afterList);
 		
 		//
@@ -446,61 +447,11 @@ public class TestSamplesMerge {
 	
 		
 		//Check idempotence
-		checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 		
 	
 	}
-	
-	
-	/*
-	 * 
-	 * Utility methods
-	 */
 
-	
-	private void nothingIsLost(FMHelper fmBefore, FMHelper fmAfter) {
-		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("added features : %s ", afterList);
-		afterList = checkNoConstraintsAreLost(fmAfter, fmBefore);
-		logger.debug("added Constraints : %s ", afterList);
-		//todo check that no tasks are lost
-	}
-	
-	//TODO add test on constraints
-	private void checkIdempotence(String fM, String[] command)
-			throws ParserConfigurationException, SAXException, IOException {
-		FMHelper fmBefore;
-		FMHelper fmAfter;
-		List<String> afterList;
-		fmBefore = new FMHelper(fM);
-		com.ml2wf.App.main(command);
-		fmAfter = new FMHelper(fM);
-		afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("AFTER should be empty : %s", afterList);
-		assertTrue(afterList.isEmpty());
-	}
-
-	
-	private List<String> checkNoFeaturesAreLost(FMHelper fmAfter, FMHelper fmBefore) {
-		List<String> beforeList = fmBefore.getFeatureNameList();
-		List<String> afterList = fmAfter.getFeatureNameList();
-		logger.debug("Before features : %s ", beforeList);
-		logger.debug("after features : %s ", afterList);
-		assertTrue(fmAfter.getFeatureNameList().containsAll(beforeList));
-		afterList.removeAll(beforeList);
-		return afterList;
-	}
-	
-	private List<String> checkNoConstraintsAreLost(FMHelper fmAfter, FMHelper fmBefore) {
-		List<String> beforeList = fmBefore.getConstraintList();
-		List<String> afterList = fmAfter.getConstraintList();
-		logger.debug("Before constraints : %s ", beforeList);
-		logger.debug("after constraints : %s ", afterList);
-		assertTrue(afterList.containsAll(beforeList));
-		afterList.removeAll(beforeList);
-		return afterList;
-	}
-	
 	
 
 }
