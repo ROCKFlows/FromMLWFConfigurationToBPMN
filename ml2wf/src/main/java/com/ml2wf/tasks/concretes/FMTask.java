@@ -6,10 +6,12 @@ import java.util.Optional;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.FMTaskSpecs;
+import com.ml2wf.util.XMLManager;
 
 /**
  * This class represents {@code Task} using the
@@ -142,6 +144,7 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 */
 	@Override
 	public FMTask appendChild(Task<FMTaskSpecs> child) {
+		XMLManager.getDocument().renameNode(this.node, null, FMNames.AND.getName());
 		child.setNode(this.node.appendChild(child.getNode()));
 		((FMTask) child).setParent(this);
 		return (FMTask) child;
@@ -181,6 +184,9 @@ public final class FMTask extends Task<FMTaskSpecs> {
 		Optional<FMTask> optTask = TasksManager.getFMTaskWithNode(oldNode);
 		if (optTask.isPresent()) {
 			this.node.removeChild(oldNode);
+			if (!this.node.hasChildNodes()) {
+				XMLManager.getDocument().renameNode(this.node, null, FMNames.FEATURE.getName());
+			}
 			if (oldChild instanceof FMTask) {
 				((FMTask) oldChild).setParent(null);
 			}
