@@ -323,18 +323,15 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns a formated documentation content from a raw task name.
+	 * Returns a formated documentation containing the reference declaration.
 	 *
-	 * @param content content containing documentation informations
-	 * @return the formated documentation content
+	 * @param content content containing the referred element
+	 * @return a formated documentation containing the reference declaration
 	 *
 	 * @since 1.0
 	 */
-	public static String getDocumentationContent(String content) {
-		boolean isOptional = content.contains(Notation.getOptionality());
-		String docContent = Notation.getOptionality() + " : " + isOptional;
-		content = XMLManager.sanitizeName(content);
-		return docContent + "\n" + Notation.getReferenceVoc() + content;
+	public static String getReferenceDocumentation(String content) {
+		return Notation.getReferenceVoc() + XMLManager.sanitizeName(content);
 	}
 
 	/**
@@ -342,26 +339,23 @@ public class XMLManager {
 	 *
 	 * <p>
 	 *
-	 * The documentation contains informations about the task's ID and the referred
-	 * generic task.
+	 * The documentation will contain informations about the task's ID, the referred
+	 * generic task and some attributes values.
 	 *
 	 * @param node Node to add the documentation
+	 * @return the created documentation {@code Node}
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	public static void addDocumentationNode(Node node, String content) {
-		content = getDocumentationContent(content);
+	public static Node addDocumentationNode(Node node) {
 		Element documentation = node.getOwnerDocument().createElement(BPMNNames.DOCUMENTATION.getName());
 		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDoc());
 		documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
-		CDATASection refersTo = node.getOwnerDocument().createCDATASection(content);
-		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
-		logger.debug(logMsg);
+		CDATASection refersTo = node.getOwnerDocument().createCDATASection("");
 		documentation.appendChild(refersTo);
-		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
-		logger.debug(logMsg);
-		node.insertBefore(documentation, node.getFirstChild());
+		logger.debug("   Inserting node : {} before {}...", node, node.getFirstChild());
+		return node.insertBefore(documentation, node.getFirstChild());
 	}
 
 	/**
@@ -676,7 +670,8 @@ public class XMLManager {
 		String contentA = nodeA.getTextContent().trim().replace("\\s+", " ");
 		String contentB = content.trim().replace("\\s+", " ");
 		contentA = contentA.replace(contentB, "");
-		nodeA.setTextContent(contentA + "\n" + contentB);
+		String result = contentA + "\n" + contentB;
+		nodeA.setTextContent(result.trim());
 		return true;
 	}
 

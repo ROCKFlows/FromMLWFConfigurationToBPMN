@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.w3c.dom.Element;
 
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
 import com.ml2wf.util.RegexManager;
@@ -33,10 +34,35 @@ import com.ml2wf.util.XMLManager;
  * @see BPMNTask
  *
  */
-public enum BPMNTaskSpecs implements Spec<WFTask<?>> {
+public enum BPMNTaskSpecs implements WFSpec<WFTask<?>> {
 
 	// TODO: add ABSTRACT
-	OPTIONAL("optional", RegexManager.getOptionalityPattern()), CATEGORY("category", RegexManager.getCategoryPattern());
+	OPTIONAL("optional", RegexManager.getOptionalityPattern()) {
+
+		@Override
+		public Optional<String> getSpecValue(WFTask<?> task) {
+			if (this.hasSpec(task)) {
+				return Optional.of(task.getSpecValue(this.getName()));
+			} else {
+				for (String documentation : XMLManager.getAllBPMNDocContent((Element) task.getNode())) {
+					Matcher matcher = this.getPattern().matcher(documentation.replace(" ", ""));
+					if (matcher.find() && (matcher.groupCount() > 0)) {
+						return Optional.of(matcher.group(1));
+					}
+				}
+			}
+			return Optional.empty();
+		}
+
+		@Override
+		public String formatSpec(String content) {
+			if (content.contains(Notation.getOptionality())) {
+				return Notation.getOptionality() + " : " + true;
+			}
+			return "";
+		}
+	},
+	CATEGORY("category", RegexManager.getCategoryPattern());
 
 	/**
 	 * The current specification's name.
@@ -84,21 +110,6 @@ public enum BPMNTaskSpecs implements Spec<WFTask<?>> {
 	}
 
 	@Override
-	public Optional<String> getSpecValue(WFTask<?> task) {
-		if (this.hasSpec(task)) {
-			return Optional.of(task.getSpecValue(this.name));
-		} else {
-			for (String documentation : XMLManager.getAllBPMNDocContent((Element) task.getNode())) {
-				Matcher matcher = this.getPattern().matcher(documentation.replace(" ", ""));
-				if (matcher.find() && (matcher.groupCount() > 0)) {
-					return Optional.of(matcher.group(1));
-				}
-			}
-		}
-		return Optional.empty();
-	}
-
-	@Override
 	public void apply(WFTask<?> task) {
 		Optional<String> optSpecValue;
 		if (!this.hasSpec(task)) {
@@ -115,6 +126,21 @@ public enum BPMNTaskSpecs implements Spec<WFTask<?>> {
 		for (BPMNTaskSpecs spec : BPMNTaskSpecs.values()) {
 			spec.apply(task);
 		}
+	}
+
+	@Override
+	public Optional<String> getSpecValue(WFTask<?> task) {
+		if (this.hasSpec(task)) {
+			return Optional.of(task.getSpecValue(this.getName()));
+		} else {
+			for (String documentation : XMLManager.getAllBPMNDocContent((Element) task.getNode())) {
+				Matcher matcher = this.getPattern().matcher(documentation.replace(" ", ""));
+				if (matcher.find() && (matcher.groupCount() > 0)) {
+					return Optional.of(matcher.group(1));
+				}
+			}
+		}
+		return Optional.empty();
 	}
 
 }

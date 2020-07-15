@@ -32,6 +32,7 @@ import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.factory.TaskFactoryImpl;
 import com.ml2wf.tasks.manager.TasksManager;
+import com.ml2wf.tasks.specs.BPMNTaskSpecs;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
@@ -243,7 +244,7 @@ public abstract class AbstractMerger extends XMLManager {
 	protected static Element createNestedNode(Element parent, String name) {
 		Element created = parent.getOwnerDocument().createElement(parent.getNodeName());
 		created.setAttribute(BPMNAttributes.NAME.getName(), name);
-		addDocumentationNode(created, XMLManager.getNodeName(parent));
+		mergeNodesTextContent(addDocumentationNode(created), getReferenceDocumentation(XMLManager.getNodeName(parent)));
 		return created;
 	}
 
@@ -286,25 +287,73 @@ public abstract class AbstractMerger extends XMLManager {
 	 */
 	public static List<Node> getNestedNodes(Node node) {
 		List<Node> result = new ArrayList<>();
+		// retrieving attributes values
+		String rawName = XMLManager.getNodeName(node);
+		String attributesDoc = getAttributesDoc(rawName);
 		// retrieving all nested nodes' names
-		String[] nodeName = XMLManager.getNodeName(node).split(Notation.getGeneratedPrefixVoc());
+		String[] nodeName = rawName.split(Notation.getGeneratedPrefixVoc());
 		List<String> names = new ArrayList<>(Arrays.asList(nodeName));
 		// sanitizing names
 		names = names.stream().filter(n -> !n.isBlank()).map(XMLManager::sanitizeName).collect(Collectors.toList());
 		if (names.size() == 1) {
 			// if there is no nested node
+			addAttributeDoc((Element) node, attributesDoc); // add the attributesDoc to the docNode text content
 			return Arrays.asList(node); // return the current node as a list
 		}
 		// Manage the parentNode
 		Element parentNode = (Element) node.cloneNode(true);
 		parentNode.setAttribute(BPMNAttributes.NAME.getName(), names.remove(0));
+		addAttributeDoc(parentNode, attributesDoc); // add the attributesDoc to the docNode text content
 		result.add(parentNode);
 		// foreach nested node's name
 		for (String name : names) {
 			parentNode = createNestedNode(parentNode, name);
+			addAttributeDoc(parentNode, attributesDoc); // add the attributesDoc to the docNode text content
 			result.add(parentNode);
 		}
 		return result;
+	}
+
+	/**
+	 * Returns a documentation containing all BPMN feature attributes values (e.g.
+	 * optionality, category, ...) for the given {@code rawName}.
+	 *
+	 * @param rawName raw name containing data about feature attributes values
+	 * @return a documentation containing all feature attributes values for the
+	 *         given {@code rawName}
+	 *
+	 * @since 1.0
+	 * @see BPMNTaskSpecs
+	 */
+	private static String getAttributesDoc(String rawName) {
+		StringBuilder attributesDoc = new StringBuilder();
+		for (BPMNTaskSpecs spec : BPMNTaskSpecs.values()) {
+			attributesDoc.append(spec.formatSpec(rawName));
+		}
+		return attributesDoc.toString();
+	}
+
+	/**
+	 * Adds the given {@code attributesDoc} to the given {@code element}'s
+	 * documentation {@code Node}.
+	 *
+	 * @param element       element to add the given {@code attributesDoc}
+	 * @param attributesDoc documentation containing some attributes values.
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	private static void addAttributeDoc(Element element, String attributesDoc) {
+		if (attributesDoc.isBlank()) {
+			return;
+		}
+		NodeList docNodes = element.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
+		if (docNodes.getLength() == 0) {
+			mergeNodesTextContent(addDocumentationNode(element), attributesDoc);
+		} else {
+			Node docNode = docNodes.item(0);
+			XMLManager.mergeNodesTextContent(docNode, attributesDoc);
+		}
 	}
 
 	/**
