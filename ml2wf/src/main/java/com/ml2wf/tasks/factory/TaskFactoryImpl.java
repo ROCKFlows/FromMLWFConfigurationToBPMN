@@ -7,15 +7,14 @@ import java.util.Set;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
-import com.ml2wf.tasks.BPMNTask;
-import com.ml2wf.tasks.FMTask;
-import com.ml2wf.tasks.Task;
-import com.ml2wf.tasks.manager.TasksManager;
+import com.ml2wf.tasks.base.Task;
+import com.ml2wf.tasks.base.WFTask;
+import com.ml2wf.tasks.concretes.BPMNTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -42,27 +41,70 @@ public class TaskFactoryImpl implements TaskFactory {
 		// empty constructor
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Set<Task> createTasks(Node node) {
-		Set<Task> createdTasks = new HashSet<>();
+	public <T extends Task<?>> Set<T> createTasks(Node node) {
+		Set<T> createdTasks = new HashSet<>();
 		String tagName;
 		String nodeName;
-		Task createdTask;
+		T createdTask;
 		for (Node child : AbstractMerger.getNestedNodes(node)) {
 			tagName = child.getNodeName();
 			nodeName = XMLManager.getNodeName(child);
 			nodeName = XMLManager.sanitizeName(nodeName);
+			// TODO: change this if-elseif statement
 			if (FMNames.SELECTOR.isFMTask(tagName)) {
-				createdTask = new FMTask(nodeName, child, this.isAbstract(child));
+				createdTask = (T) this.createFMTask(nodeName, child);
 			} else if (BPMNNames.SELECTOR.isBPMNTask(tagName)) {
-				Optional<String> optRef = this.getReference(child);
-				createdTask = new BPMNTask(nodeName, optRef.orElse(""));
+				createdTask = (T) this.createWFTask(nodeName, child);
 			} else {
 				continue; // TODO: throw error
 			}
-			createdTasks.add(TasksManager.addTask(createdTask));
+			createdTasks.add(createdTask);
 		}
 		return createdTasks;
+	}
+
+	@Override
+	public FMTask convertWFtoFMTask(WFTask<?> task) {
+		FMTask createdFMTask = new FMTask(task, false);
+		createdFMTask.setNode(AbstractMerger.createFeatureNode(createdFMTask.getName(), createdFMTask.isAbstract()));
+		createdFMTask.addAllSpecs(task.getSpecs());
+		createdFMTask.applySpecs();
+		return createdFMTask;
+	}
+
+	/**
+	 * Creates and returns a new {@code FMTask} considering given arguments.
+	 *
+	 * @param name name of the new task
+	 * @param node node of the new task
+	 * @return a new {@code FMTask} considering given arguments
+	 *
+	 * @since 1.0
+	 * @see FMTask
+	 */
+	private FMTask createFMTask(String name, Node node) {
+		return new FMTask(name, node, this.isAbstract(node));
+	}
+
+	/**
+	 * Creates and returns a new {@code WFTask} considering given arguments.
+	 *
+	 * @param name name of the new task
+	 * @param node node of the new task
+	 * @return a new {@code WFTask} considering given arguments
+	 *
+	 * @since 1.0
+	 * @see WFTask
+	 */
+	private WFTask<?> createWFTask(String name, Node node) {
+		// TODO: change created type considering user convention (e.g. BPMN)
+		Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
+		BPMNTask createdFMTask = new BPMNTask(name, node, XMLManager.isMetaTask((Element) node),
+				optRef.orElse(""));
+		createdFMTask.applySpecs();
+		return createdFMTask;
 	}
 
 	/**
@@ -83,19 +125,4 @@ public class TaskFactoryImpl implements TaskFactory {
 		return (abstractAttr != null) && (abstractAttr.getNodeValue().equals(String.valueOf(true)));
 	}
 
-	/**
-	 * Returns an {@code Optional} containing the given {@code node} reference.
-	 *
-	 * @param node node containing a reference
-	 * @return an {@code Optional} containing the given {@code node} reference
-	 *
-	 * @since 1.0
-	 */
-	private Optional<String> getReference(Node node) {
-		Node docNode = ((Element) node).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
-		if (docNode != null) {
-			return Optional.of(docNode.getTextContent().replace(Notation.getReferenceVoc(), ""));
-		}
-		return Optional.empty();
-	}
 }

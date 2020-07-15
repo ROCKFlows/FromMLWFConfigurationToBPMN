@@ -27,6 +27,8 @@ public enum FMNames implements TaskTagsSelector {
 	// constraint tags
 	CONSTRAINTS("constraints"), RULE("rule"), IMPLIES("imp"), NOT("not"), EQUIVALENT("equ"), CONJ("conj"), DISJ("disj"),
 	VAR("var"),
+	// attribute tags
+	ATTRIBUTE("attribute"),
 	// reserved tags
 	SELECTOR("");
 

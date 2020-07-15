@@ -1,4 +1,4 @@
-package com.ml2wf.tasks;
+package com.ml2wf.tasks.concretes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,10 @@ import java.util.Optional;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.tasks.base.Task;
+import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.manager.TasksManager;
+import com.ml2wf.tasks.specs.FMTaskSpecs;
 
 /**
  * This class represents {@code Task} using the
@@ -24,16 +27,12 @@ import com.ml2wf.tasks.manager.TasksManager;
  * @see Task
  *
  */
-public class FMTask extends Task {
+public final class FMTask extends Task<FMTaskSpecs> {
 
 	/**
-	 * The task's {@code Node} instance.
+	 * Task's parent.
 	 */
-	private Node node;
-	/**
-	 * Abstract status.
-	 */
-	private boolean isAbstract;
+	private FMTask parent;
 
 	/**
 	 * {@code FMTask}'s full constructor.
@@ -48,10 +47,9 @@ public class FMTask extends Task {
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
 	 */
-	public FMTask(String name, Task parent, Node node, boolean isAbstract) {
-		super(name, parent);
-		this.node = node;
-		this.isAbstract = isAbstract;
+	public FMTask(String name, FMTask parent, Node node, boolean isAbstract) {
+		super(name, node, isAbstract);
+		this.parent = parent;
 	}
 
 	/**
@@ -67,34 +65,54 @@ public class FMTask extends Task {
 	 * @param isAbstract whether the task is abstract or not
 	 */
 	public FMTask(String name, Node node, boolean isAbstract) {
-		this(name, null, node, isAbstract);
+		super(name, node, isAbstract);
 	}
 
 	/**
-	 * Returns whether the current task {@link #isAbstract} or not.
+	 * {@code FMTask}'s constructor based on an existing {@code WFTask} instance.
 	 *
-	 * @return whether the current task is abstract or not
+	 * <p>
+	 *
+	 * It initializes a {@code FMTask} using the given {@code task} specs and
+	 * consider the given {@code task}'s parent if {@code saveParent} is
+	 * {@code true}.
+	 *
+	 * <p>
+	 *
+	 * It is equivalent to a {@code Task} convertion from {@code WFTask} to
+	 * {@code FMTask}.
+	 *
+	 * @param task       {@code WFTask} instance to be converted
+	 * @param saveParent whether the result task should save the given
+	 *                   {@code task}'s parent as its own parent or not.
+	 * @see WFTask
 	 */
-	public boolean isAbstract() {
-		return this.isAbstract;
+	public FMTask(WFTask<?> task, boolean saveParent) {
+		super(task.getName(), task.getNode(), task.isAbstract());
+		if (saveParent) {
+			Optional<FMTask> optReferredTask = TasksManager.getFMTaskWithName(task.getReference());
+			if (optReferredTask.isPresent()) {
+				this.parent = optReferredTask.get();
+			}
+		}
 	}
 
 	/**
-	 * Returns the current task's {@link #node}.
+	 * Returns the current task's {@code parent}.
 	 *
-	 * @return the current task's {@code node}
+	 * @return the current task's {@code parent}
 	 */
-	public Node getNode() {
-		return this.node;
+	public FMTask getParent() {
+		return this.parent;
 	}
 
 	/**
-	 * Sets the current task's {@link #node}.
+	 * Sets the current task's {@code parent}.
 	 *
-	 * @param the new task's {@code node}
+	 * @param parent the new task's {@code parent}
 	 */
-	public void setNode(Node node) {
-		this.node = node;
+	public void setParent(FMTask parent) {
+		this.parent = parent;
 	}
 
 	/**
@@ -113,7 +131,7 @@ public class FMTask extends Task {
 	 *
 	 * <p>
 	 *
-	 * <b>Note</b> that a {@code FMTask} can only have a unique {@code parent} but
+	 * <b>Note</b> that a {@code Task} can only have a unique {@code parent} but
 	 * multiple children.
 	 *
 	 * @param child task to append as child
@@ -122,10 +140,11 @@ public class FMTask extends Task {
 	 * @since 1.0
 	 * @see Node
 	 */
-	public FMTask appendChild(FMTask child) {
+	@Override
+	public FMTask appendChild(Task<FMTaskSpecs> child) {
 		child.setNode(this.node.appendChild(child.getNode()));
-		child.setParent(this);
-		return child;
+		((FMTask) child).setParent(this);
+		return (FMTask) child;
 	}
 
 	/**
@@ -156,13 +175,16 @@ public class FMTask extends Task {
 	 * @since 1.0
 	 * @see Node
 	 */
-	public Optional<FMTask> removeChild(FMTask oldChild) {
+	@Override
+	public Optional<Task<FMTaskSpecs>> removeChild(Task<FMTaskSpecs> oldChild) {
 		Node oldNode = oldChild.getNode();
 		Optional<FMTask> optTask = TasksManager.getFMTaskWithNode(oldNode);
 		if (optTask.isPresent()) {
 			this.node.removeChild(oldNode);
-			oldChild.setParent(null);
-			return optTask;
+			if (oldChild instanceof FMTask) {
+				((FMTask) oldChild).setParent(null);
+			}
+			return Optional.of(optTask.get());
 		}
 		return Optional.empty();
 	}
@@ -179,10 +201,10 @@ public class FMTask extends Task {
 	 * @param childName name of child to retrieve
 	 * @return an {@code Optional} containing the given {@code parent}'s child with
 	 *         the given {@code name} or an empty one if no suitable child was found
-	 * 
+	 *
 	 * @since 1.0
 	 */
-	private static Optional<FMTask> getChildWithName(Task parent, String childName) {
+	private static Optional<FMTask> getChildWithName(Task<FMTaskSpecs> parent, String childName) {
 		List<FMTask> childrenTasks = TasksManager.getFMTaskWithParent(parent);
 		Optional<FMTask> optChild;
 		for (FMTask child : childrenTasks) {
@@ -232,7 +254,7 @@ public class FMTask extends Task {
 		for (FMTask task : tasks) {
 			// for each node
 			parent = task;
-			while ((parent = (FMTask) parent.getParent()) != null) {
+			while ((parent = parent.getParent()) != null) {
 				// get all parents
 				nodeParents.add(parent);
 			}
@@ -246,11 +268,15 @@ public class FMTask extends Task {
 	}
 
 	@Override
+	public void applySpecs() {
+		FMTaskSpecs.values()[0].applyAll(this);
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
-		result = (prime * result) + (this.isAbstract ? 1231 : 1237);
-		result = (prime * result) + ((this.node == null) ? 0 : this.node.hashCode());
+		int result = 1;
+		result = (prime * result) + ((this.parent == null) ? 0 : this.parent.hashCode());
 		return result;
 	}
 
@@ -261,7 +287,7 @@ public class FMTask extends Task {
 
 	@Override
 	public String toString() {
-		return super.toString() + "\n\t[FMTask [node=" + this.node + ", isAbstract="
-				+ this.isAbstract + "]]";
+		return "FMTask : " + this.getName();
 	}
+
 }

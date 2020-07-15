@@ -3,7 +3,7 @@ package com.ml2wf.merge.concretes;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -11,18 +11,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.base.BaseMergerImpl;
-import com.ml2wf.tasks.BPMNTask;
-import com.ml2wf.tasks.FMTask;
-import com.ml2wf.tasks.manager.TasksManager;
+import com.ml2wf.tasks.base.WFTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
@@ -40,7 +37,7 @@ import com.ml2wf.util.XMLManager;
  * @see BaseMergerImpl
  *
  */
-public class WFInstanceMerger extends BaseMergerImpl {
+public final class WFInstanceMerger extends BaseMergerImpl {
 
 	/**
 	 * Instances default task tag name.
@@ -66,39 +63,9 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		super(file);
 	}
 
-	/**
-	 * Returns a suitable parent for the {@code Node task} according to its
-	 * specified <b>reference</b>.
-	 *
-	 * <p>
-	 *
-	 * Creates the referred parent node if not exists.
-	 *
-	 * <p>
-	 *
-	 * If there isn't any valid referenced parent, returns the first document node.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that each instantiated task <b>refers to a generic one presents
-	 * in the FeatureModel</B>.
-	 *
-	 * @param task task to get a suitable parent
-	 * @return a suitable parent for the {@code Node task} according to its
-	 *         specified reference
-	 *
-	 * @since 1.0
-	 */
 	@Override
-	public FMTask getSuitableParent(BPMNTask task) {
-		// retrieving the references parent
-		String reference = task.getReference();
-		if (!reference.isBlank()) {
-			// if contains a documentation node that can refer to a generic task
-			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);
-			return optRef.orElseGet(() -> this.createReferred(reference));
-		}
-		return unmanagedTask;
+	public FMTask getSuitableParent(WFTask<?> task) {
+		return this.getReferredFMTask(task, unmanagedTask);
 	}
 
 	@Override
@@ -123,11 +90,6 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		this.addReferences(wfDocument);
 	}
 
-	private FMTask createReferred(String reference) {
-		FMTask newParent = this.createFeatureWithName(reference);
-		return this.getGlobalFMTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
-	}
-
 	/**
 	 * Returns the referenced metaworkflow's name.
 	 *
@@ -137,13 +99,8 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	 * @since 1.0
 	 */
 	private String getMetaReferenced(Document wfDocument) {
-		NodeList docNodes = wfDocument.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
-		if (docNodes.getLength() > 0) {
-			Node docNode = docNodes.item(0);
-			// TODO: improve verification
-			return XMLManager.getReferredTask(docNode.getTextContent());
-		}
-		return null;
+		List<String> docContent = XMLManager.getAllBPMNDocContent(wfDocument.getDocumentElement());
+		return getReferredTask(docContent).orElse(UNMANAGED);
 	}
 
 	/**

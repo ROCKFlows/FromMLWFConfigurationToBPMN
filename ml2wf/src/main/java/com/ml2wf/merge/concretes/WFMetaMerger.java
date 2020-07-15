@@ -9,8 +9,8 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.merge.base.BaseMergerImpl;
-import com.ml2wf.tasks.BPMNTask;
-import com.ml2wf.tasks.FMTask;
+import com.ml2wf.tasks.base.WFTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.Pair;
 
 /**
@@ -27,7 +27,7 @@ import com.ml2wf.util.Pair;
  * @see BaseMergerImpl
  *
  */
-public class WFMetaMerger extends BaseMergerImpl {
+public final class WFMetaMerger extends BaseMergerImpl {
 
 	/**
 	 * Meta default task tag name.
@@ -51,8 +51,8 @@ public class WFMetaMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public FMTask getSuitableParent(BPMNTask child) {
-		return this.getGlobalFMTask(STEP_TASK);
+	public FMTask getSuitableParent(WFTask<?> task) {
+		return this.getReferredFMTask(task, this.getGlobalFMTask(STEP_TASK));
 	}
 
 	@Override

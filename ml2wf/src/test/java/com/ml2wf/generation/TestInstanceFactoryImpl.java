@@ -31,6 +31,7 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
+import com.ml2wf.merge.base.BaseMergerImpl;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -145,7 +146,7 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	 */
 	@ParameterizedTest
 	@MethodSource("instanceFiles")
-	@DisplayName("Verification of the nodes' structures")
+	@DisplayName("Verification of the nodes structure")
 	public void testNodesStructures(Path path) throws ParserConfigurationException, SAXException, IOException {
 		this.resultDocument = XMLManager.preprocess(path.toFile());
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
@@ -195,10 +196,13 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 		List<String> references = resultNodes.stream().map(Element.class::cast)
 				.map(e -> e.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())) // getting doc nodes
 				.map(n -> n.item(0).getTextContent()) // getting first doc node's content
-				.map(XMLManager::getReferredTask).collect(Collectors.toList()); // get referred task
+				.map(XMLManager::getReferredTask)
+				.map(r -> r.orElse(BaseMergerImpl.UNMANAGED))
+				.collect(Collectors.toList()); // get referred task
 		List<String> metaTasksNames = sourceNodes.stream().map(Node::getAttributes)
 				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map(XMLManager::getReferredTask).collect(Collectors.toList());
+				.map(XMLManager::sanitizeName)
+				.collect(Collectors.toList());
 		// comparing
 		assertTrue(references.containsAll(metaTasksNames)); // #1
 	}

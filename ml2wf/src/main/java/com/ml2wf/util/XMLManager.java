@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -321,29 +323,39 @@ public class XMLManager {
 	}
 
 	/**
+	 * Returns a formated documentation containing the reference declaration.
+	 *
+	 * @param content content containing the referred element
+	 * @return a formated documentation containing the reference declaration
+	 *
+	 * @since 1.0
+	 */
+	public static String getReferenceDocumentation(String content) {
+		return Notation.getReferenceVoc() + XMLManager.sanitizeName(content);
+	}
+
+	/**
 	 * Adds the documentation part to the given {@code node}.
 	 *
 	 * <p>
 	 *
-	 * The documentation contains informations about the task's ID and the referred
-	 * generic task.
+	 * The documentation will contain informations about the task's ID, the referred
+	 * generic task and some attributes values.
 	 *
 	 * @param node Node to add the documentation
+	 * @return the created documentation {@code Node}
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	public static void addDocumentationNode(Node node, String content) {
+	public static Node addDocumentationNode(Node node) {
 		Element documentation = node.getOwnerDocument().createElement(BPMNNames.DOCUMENTATION.getName());
 		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDoc());
 		documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
-		CDATASection refersTo = node.getOwnerDocument().createCDATASection(Notation.getReferenceVoc() + content);
-		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
-		logger.debug(logMsg);
+		CDATASection refersTo = node.getOwnerDocument().createCDATASection("");
 		documentation.appendChild(refersTo);
-		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
-		logger.debug(logMsg);
-		node.insertBefore(documentation, node.getFirstChild());
+		logger.debug("   Inserting node : {} before {}...", node, node.getFirstChild());
+		return node.insertBefore(documentation, node.getFirstChild());
 	}
 
 	/**
@@ -428,6 +440,22 @@ public class XMLManager {
 		// appending new positional node
 		planeNode.appendChild(shapeNode);
 		return shapeNode;
+	}
+
+	/**
+	 * Returns a {@code List<String>} containing all documentations' content for the
+	 * given BPMN {@code element}.
+	 *
+	 * @param node node to extract docuemntation content
+	 * @return a {@code List<String>} containing all documentations' content for the
+	 *         given BPMN {@code element}
+	 *
+	 * @since 1.0
+	 * @see Element
+	 */
+	public static List<String> getAllBPMNDocContent(Element element) {
+		return XMLManager.nodeListAsList(element.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())).stream()
+				.map(Node::getTextContent).collect(Collectors.toList());
 	}
 
 	/**
@@ -517,13 +545,50 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns the referred meta task from the given {@code reference} text.
+	 * Returns an {@code Optional} containing the referred meta task from the given
+	 * {@code reference} text.
 	 *
 	 * @param reference reference containing the referred meta task
-	 * @return the referred meta task from the given {@code reference} text
+	 * @return an {@code Optional} containing the referred meta task from the given
+	 *         {@code reference} text
+	 *
+	 * @since 1.0
 	 */
-	public static String getReferredTask(String reference) {
-		return reference.replace(Notation.getReferenceVoc(), "").replace(Notation.getGenericVoc(), "");
+	public static Optional<String> getReferredTask(String reference) {
+		String regex = String.format("%s(\\w*)", Notation.getReferenceVoc());
+		final Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(reference);
+		if (matcher.find()) {
+			return Optional.of(matcher.group(1));
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Returns an {@code Optional} containing the first referred meta task from the
+	 * given {@code references}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method calls the {@link #getReferredTask(String)}
+	 * method for each reference in {@code references} and returns the first non
+	 * empty result.
+	 *
+	 * @param references references containing the referred meta task
+	 * @return an {@code Optional} containing the first referred meta task from the
+	 *         given {@code reference} text
+	 *
+	 * @since 1.0
+	 */
+	public static Optional<String> getReferredTask(List<String> references) {
+		Optional<String> result = Optional.empty();
+		for (String reference : references) {
+			result = getReferredTask(reference);
+			if (result.isPresent()) {
+				return result;
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -576,23 +641,22 @@ public class XMLManager {
 	}
 
 	/**
-	 * returns whether the given {@code Element} is a meta-task or not.
+	 * Returns whether the given {@code element} is a meta-task or not.
 	 *
-	 * @param node node to check
-	 * @return whether the given {@code Element} is a meta-task or not
+	 * @param element element to check
+	 * @return whether the given {@code element} is a meta-task or not
 	 *
 	 * @since 1.0
+	 * @see Element
 	 */
-	public static boolean isMetaTask(Element node) {
-		String regex = String.format("%s+", Notation.getReferenceVoc());
-		final Pattern pattern = Pattern.compile(regex);
-		NodeList docNodes = node.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
-		for (int i = 0; i < docNodes.getLength(); i++) {
-			if (pattern.matcher(docNodes.item(i).getTextContent()).find()) {
+	public static boolean isMetaTask(Element element) {
+		for (String content : getAllBPMNDocContent(element)) {
+			if (getReferredTask(content).isPresent()) {
 				return false;
 			}
 		}
 		return true;
+
 	}
 
 	/**
@@ -606,7 +670,8 @@ public class XMLManager {
 		String contentA = nodeA.getTextContent().trim().replace("\\s+", " ");
 		String contentB = content.trim().replace("\\s+", " ");
 		contentA = contentA.replace(contentB, "");
-		nodeA.setTextContent(contentA + "\n" + contentB);
+		String result = contentA + "\n" + contentB;
+		nodeA.setTextContent(result.trim());
 		return true;
 	}
 
@@ -646,6 +711,7 @@ public class XMLManager {
 		}
 		name = name.replaceFirst(Notation.getDocumentationVoc(), "");
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
+		name = name.replace(Notation.getOptionality(), "");
 		name = name.trim();
 		return name.replace(" ", "_");
 	}
