@@ -32,22 +32,28 @@ ml2wf  Machine Learning problem to Workflow
 </pre>
 ##### SYNOPSIS
 
-<pre>
-ml2wf -g -i <ins>file</ins> -o <ins>directory</ins> [-v level]
-ml2wf -m -i <ins>file</ins> -o <ins>file</ins> [-v level]
-ml2wf -s -i <ins>file</ins> -o <ins>file</ins> [-b] [-v level]
-</pre>
+<pre>ml2wf generate -i <ins>file</ins> -o <ins>directory</ins> [-v level]
+ml2wf build -f <ins>FeatureModel</ins> -m <ins>metaDirectory</ins> -i <ins>instanceDirectory</ins> [-b] [-v level]
+ml2wf merge [--meta|--instance] -i <ins>file</ins> -o <ins>FeatureModel</ins> [-fb] [-v level]
+ml2wf save -i <ins>meta</ins> <ins>instance</ins> -o <ins>FeatureModel</ins> [-b] [-v level]</pre>
 
 ##### DESCRIPTION
 
-<pre> 
--g, --generate    generate a workflow
--m, --merge       import a worklow in a FeatureModel
--i, --input       input file location
--o, --output      output file or directory location
+###### Commands
+
+<pre>generate    generate a workflow
+build		build a FeatureModel from a set of workflows
+merge       import a worklow in a FeatureModel
+save		save a meta-workflow and its instance in a FeatureModel</pre>
+
+###### Arguments
+
+<pre>-i, --input       input path
+-o, --output      output path
 -b, --backup      backup the original FeatureModel file before any modification
--v, --verbose     verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL)
-</pre>
+-f, --full		  process a full merge (including meta/instance relationship)
+-v, --verbose     verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL)</pre>
+
 
 #### Configuration
 
