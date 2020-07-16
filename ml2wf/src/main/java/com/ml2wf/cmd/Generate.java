@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.ml2wf.generation.InstanceFactory;
 import com.ml2wf.generation.InstanceFactoryImpl;
+import com.ml2wf.util.XMLManager;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -62,6 +63,7 @@ public class Generate extends AbstractCommand {
 		try {
 			factory = new InstanceFactoryImpl(this.input);
 			factory.getWFInstance(this.output);
+			((XMLManager) factory).save(this.output);
 			LogManager.shutdown();
 		} catch (Exception e) {
 			logger.fatal(CANT_INSTANTIATE);

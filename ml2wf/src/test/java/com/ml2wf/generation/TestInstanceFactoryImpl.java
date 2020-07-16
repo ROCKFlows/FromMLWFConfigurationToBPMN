@@ -204,6 +204,9 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())).map(Node::getNodeValue)
 				.map(XMLManager::sanitizeName)
 				.collect(Collectors.toList());
+		references.forEach(System.out::println);
+		System.out.println("=".repeat(20));
+		metaTasksNames.forEach(System.out::println);
 		// comparing
 		assertTrue(references.containsAll(metaTasksNames)); // #1
 	}

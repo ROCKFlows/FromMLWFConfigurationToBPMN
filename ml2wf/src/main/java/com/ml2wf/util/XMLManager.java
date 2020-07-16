@@ -212,7 +212,7 @@ public class XMLManager {
 	}
 
 	/**
-	 * Saves the current {@code document} into the given {@code destFile}.
+	 * Saves the current {@code document} into the given {@code file} path.
 	 *
 	 * @param file the destination {@code File}
 	 * @throws TransformerException
@@ -220,8 +220,20 @@ public class XMLManager {
 	 *
 	 * @since 1.0
 	 */
+	public void save(File file) throws TransformerException, IOException {
+		FileHandler.saveDocument(file, document);
+	}
+
+	/**
+	 * Saves the current {@code document} into the {@link #getSourceFile()} path.
+	 *
+	 * @throws TransformerException
+	 * @throws IOException
+	 *
+	 * @since 1.0
+	 */
 	public void save() throws TransformerException, IOException {
-		FileHandler.saveDocument(this.getSourceFile(), document);
+		this.save(this.getSourceFile());
 	}
 
 	/**

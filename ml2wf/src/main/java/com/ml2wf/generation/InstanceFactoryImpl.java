@@ -20,7 +20,6 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
-import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -110,7 +109,6 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			this.instantiateNode(node);
 		}
 		logger.info("Instantiation finished.");
-		FileHandler.saveDocument(FileHandler.processFile(outputFile), getDocument());
 	}
 
 	/**
