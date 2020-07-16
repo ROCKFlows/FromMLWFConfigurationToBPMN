@@ -36,7 +36,6 @@ import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.FMTaskSpecs;
 import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.Pair;
-import com.ml2wf.util.XMLManager;
 
 public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerger {
 
@@ -192,16 +191,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * required.
 	 */
 	private void endProcessUnmanagedNode() {
-		System.out.println("END PROCESS");
-		System.out.println(unmanagedTask.getNode().hasChildNodes());
-		for (Node node : XMLManager.nodeListAsList(unmanagedTask.getNode().getChildNodes())) {
-			System.out.println("A CHILD : " + node + " | " + XMLManager.getNodeName(node) + " | " + node.getNodeName());
-		}
+		// cleaning the unmanaged node to eliminate useless children
+		unmanagedTask.setNode(cleanChildren(unmanagedTask.getNode()));
 		if (!unmanagedTask.getNode().hasChildNodes()) {
 			// removing the unmanaged node if not needed
 			Optional<Task<FMTaskSpecs>> opt = unmanagedTask.getParent().removeChild(unmanagedTask);
 			if (opt.isPresent()) {
-				System.out.println("removed : " + opt.get());
 				TasksManager.removeTask(opt.get());
 			}
 		}
@@ -264,7 +259,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see FMTask
 	 */
 	protected void processTask(WFTask<?> task) {
-		System.out.println(task);
 		String taskName = task.getName();
 		Optional<FMTask> optFMTask;
 		Optional<?> optTask;
@@ -348,7 +342,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see FMTask
 	 */
 	protected FMTask createGlobalFMTask(String globalNodeName) {
-		System.out.println("CREATING");
 		// create the node element
 		Element globalElement = getDocument().createElement(FMNames.FEATURE.getName());
 		globalElement.setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(true));
@@ -359,7 +352,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			FMTask globalTask = (FMTask) optGlobalTask.get();
 			Optional<FMTask> optRoot = TasksManager.getFMTaskWithName(ROOT); // get the root
 			if (optRoot.isPresent()) {
-				System.out.println("ADDING " + globalNodeName + " AS CHILD");
 				return optRoot.get().appendChild(globalTask);
 			}
 		}

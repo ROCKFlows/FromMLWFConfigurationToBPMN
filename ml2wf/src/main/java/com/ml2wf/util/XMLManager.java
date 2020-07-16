@@ -230,6 +230,32 @@ public class XMLManager {
 	}
 
 	/**
+	 * Removes useless children of the given {@code node}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this notion is subjective and in this case, a useless
+	 * children has no attributes, no child and its text content is black.
+	 *
+	 * @return the updated {@code Node}
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	public static Node cleanChildren(Node node) {
+		NodeList children = node.getChildNodes();
+		List<Node> toRemove = new ArrayList<>();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+			if (!child.hasAttributes() && !child.hasChildNodes() && child.getTextContent().isBlank()) {
+				toRemove.add(child);
+			}
+		}
+		toRemove.forEach(node::removeChild);
+		return node;
+	}
+
+	/**
 	 * Creates the global annotation {@code Node}.
 	 *
 	 * @param wfDocument document to get the global annotation node
