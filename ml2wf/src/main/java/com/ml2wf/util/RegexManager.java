@@ -32,6 +32,10 @@ public final class RegexManager {
 	private static final String CATEGORY = String.format("%s(\\w+)",
 			Notation.getQuotedNotation(Notation.getCategoryPrefixVoc()));
 	/**
+	 * Regular expression for the <b>digit</b> retrieval.
+	 */
+	private static final String DIGIT = "\\d+";
+	/**
 	 * {@code Pattern} corresponding of the {@link #REFERENCE} regex.
 	 */
 	private static Pattern referencePattern;
@@ -43,6 +47,10 @@ public final class RegexManager {
 	 * {@code Pattern} corresponding of the {@link #CATEGORY} regex.
 	 */
 	private static Pattern categoryPattern;
+	/**
+	 * {@code Pattern} corresponding of the {@link #DIGIT} regex.
+	 */
+	private static Pattern digitPattern;
 
 	/**
 	 * {@code RegexManager} empty constructor.
@@ -108,6 +116,21 @@ public final class RegexManager {
 			categoryPattern = getPatternOf(CATEGORY);
 		}
 		return categoryPattern;
+	}
+
+	/**
+	 * Returns the {@code Pattern} corresponding of the <b>digit</b> regex.
+	 *
+	 * @return the {@code Pattern} corresponding of the <b>digit</b> regex
+	 *
+	 * @since 1.0
+	 * @see Pattern
+	 */
+	public static Pattern getDigitPattern() {
+		if (digitPattern == null) {
+			digitPattern = getPatternOf(DIGIT);
+		}
+		return digitPattern;
 	}
 
 }

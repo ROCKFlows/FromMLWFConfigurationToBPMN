@@ -110,7 +110,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			this.instantiateNode(node);
 		}
 		logger.info("Instantiation finished.");
-		FileHandler.saveDocument(FileHandler.processResultFile(outputFile), getDocument());
+		FileHandler.saveDocument(FileHandler.processFile(outputFile), getDocument());
 	}
 
 	/**
