@@ -96,7 +96,7 @@ public class XMLManager {
 	 * @throws IOException
 	 */
 	public XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
-		this.sourceFile = file;
+		this.sourceFile = FileHandler.processFile(file);
 		this.path = file.getAbsolutePath();
 		XMLManager.updateDocument(this.sourceFile);
 	}
@@ -165,9 +165,9 @@ public class XMLManager {
 	 * @see Document
 	 */
 	public static void updateDocument(File sourceFile) throws ParserConfigurationException, SAXException, IOException {
-		if ((XMLManager.document == null)
-				|| !XMLManager.document.getBaseURI().equals(sourceFile.toURI().toString())) {
-			XMLManager.document = FileHandler.preprocess(sourceFile);
+		if ((document == null)
+				|| ((document.getBaseURI() != null) && !document.getBaseURI().equals(sourceFile.toURI().toString()))) {
+			document = FileHandler.preprocess(sourceFile);
 			docCount = 0;
 			TasksManager.clear();
 		}

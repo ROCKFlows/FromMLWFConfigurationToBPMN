@@ -12,7 +12,7 @@ package com.ml2wf.conventions.enums.fm;
  */
 public enum FMAttributes {
 
-	NAME("name"), ABSTRACT("abstract"), KEY("key"), VALUE("value"), TYPE("type");
+	NAME("name"), ABSTRACT("abstract"), MANDATORY("mandatory"), KEY("key"), VALUE("value"), TYPE("type");
 
 	/**
 	 * Tag name.
