@@ -85,6 +85,15 @@ public abstract class Task<T extends Spec<?>> {
 	}
 
 	/**
+	 * Sets whether the current task's is abstract or not.
+	 *
+	 * @param isAbstract the new task's abstract status
+	 */
+	public void setAbstract(boolean isAbstract) {
+		this.isAbstract = isAbstract;
+	}
+
+	/**
 	 * Returns the current task's {@link #node}.
 	 *
 	 * @return the current task's {@code node}
@@ -96,7 +105,7 @@ public abstract class Task<T extends Spec<?>> {
 	/**
 	 * Sets the current task's {@link #node}.
 	 *
-	 * @param the new task's {@code node}
+	 * @param node the new task's {@code node}
 	 */
 	public void setNode(Node node) {
 		this.node = node;
@@ -110,7 +119,6 @@ public abstract class Task<T extends Spec<?>> {
 	 * @since 1.0
 	 * @see Spec
 	 */
-
 	public Map<String, String> getSpecs() {
 		return this.specs;
 	}
