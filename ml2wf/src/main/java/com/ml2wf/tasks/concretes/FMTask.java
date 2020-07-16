@@ -180,17 +180,21 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 */
 	@Override
 	public Optional<Task<FMTaskSpecs>> removeChild(Task<FMTaskSpecs> oldChild) {
-		Node oldNode = oldChild.getNode();
-		Optional<FMTask> optTask = TasksManager.getFMTaskWithNode(oldNode);
-		if (optTask.isPresent()) {
-			this.node.removeChild(oldNode);
-			if (!this.node.hasChildNodes()) {
-				XMLManager.getDocument().renameNode(this.node, null, FMNames.FEATURE.getName());
-			}
-			if (oldChild instanceof FMTask) {
+		if (!(oldChild instanceof FMTask)) {
+			return Optional.empty();
+		}
+		// TODO: improve considering oldChild.getParent().equals(this) result
+		for (Node child : XMLManager.nodeListAsList(this.node.getChildNodes())) {
+			Node oldNode = oldChild.getNode();
+			if (child.equals(oldNode)) {
+				// if the oldChild is a child of this
+				this.node.removeChild(oldNode);
 				((FMTask) oldChild).setParent(null);
+				if (!this.node.hasChildNodes()) {
+					XMLManager.getDocument().renameNode(this.node, null, FMNames.FEATURE.getName());
+				}
+				return Optional.of(oldChild);
 			}
-			return Optional.of(optTask.get());
 		}
 		return Optional.empty();
 	}
