@@ -73,7 +73,7 @@ public class XMLManager {
 	 * This counter is used to number each documentation which is required for the
 	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
 	 */
-	private static int docCount = 0;
+	private static int docCount;
 	/**
 	 * Logger instance.
 	 *
@@ -162,22 +162,53 @@ public class XMLManager {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 *
+	 * @since 1.0
 	 * @see Document
 	 */
 	public static void updateDocument(File sourceFile) throws ParserConfigurationException, SAXException, IOException {
 		if ((document == null)
 				|| ((document.getBaseURI() != null) && !document.getBaseURI().equals(sourceFile.toURI().toString()))) {
 			document = FileHandler.preprocess(sourceFile);
-			docCount = 0;
+			docCount = countDocumentation();
 			TasksManager.clear();
 		}
 	}
 
 	/**
-	 * Increments the {@code docCount} and returns its previous value.
+	 * Returns the number of <b>documentation ids</b> in the document.
+	 *
+	 * <p>
+	 *
+	 * This allow to define the {@link #docCount} initial value to avoid duplicated
+	 * id.
+	 *
+	 * @return the number of <b>documentation ids</b> in the document.
+	 *
+	 * @since 1.0
 	 */
-	protected static int incrementDoc() {
-		return docCount++;
+	protected static int countDocumentation() {
+		int count = 0;
+		NodeList documentations = document.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
+		Pattern pattern = RegexManager.getDigitPattern();
+		for (int i = 0; i < documentations.getLength(); i++) {
+			Node docNode = documentations.item(i);
+			Node docIDNode = docNode.getAttributes().getNamedItem(BPMNAttributes.ID.getName());
+			Matcher matcher = pattern.matcher(docIDNode.getNodeValue());
+			if (matcher.find()) {
+				int currentID = Integer.parseInt(matcher.group());
+				count = Integer.max(count, currentID);
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * Increments the {@code docCount} and returns its incremented value.
+	 *
+	 * @return its incremented value
+	 */
+	protected static int incrementDocCount() {
+		return ++docCount;
 	}
 
 	/**
@@ -221,7 +252,7 @@ public class XMLManager {
 	 */
 	public static Node addDocumentationNode(Node node) {
 		Element documentation = node.getOwnerDocument().createElement(BPMNNames.DOCUMENTATION.getName());
-		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDoc());
+		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDocCount());
 		documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
 		CDATASection refersTo = node.getOwnerDocument().createCDATASection("");
 		documentation.appendChild(refersTo);
