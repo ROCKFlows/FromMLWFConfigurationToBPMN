@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
@@ -97,6 +99,12 @@ public final class FMTask extends Task<FMTaskSpecs> {
 				this.parent = optReferredTask.get();
 			}
 		}
+	}
+
+	@Override
+	public void setAbstract(boolean isAbstract) {
+		super.setAbstract(isAbstract);
+		((Element) this.node).setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(isAbstract));
 	}
 
 	/**

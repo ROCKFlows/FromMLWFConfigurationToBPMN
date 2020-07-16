@@ -397,7 +397,9 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		FMTask newParent = this.createFeatureWithName(task.getReference(), task.isAbstract());
 		Optional<WFTask<?>> opt = TasksManager.getWFTaskWithName(newParent.getName());
 		if (opt.isEmpty()) {
-			return this.getGlobalFMTask(WFMetaMerger.STEP_TASK); // TODO: check 132
+			FMTask globalTask = this.getGlobalFMTask(WFMetaMerger.STEP_TASK);
+			newParent.setAbstract(globalTask.isAbstract());
+			return globalTask.appendChild(newParent); // TODO: check 132
 		}
 		return this.getSuitableParent(opt.get()).appendChild(newParent);
 	}
