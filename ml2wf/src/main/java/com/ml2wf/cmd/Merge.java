@@ -86,6 +86,9 @@ public class Merge extends AbstractCommand {
 			"--backup" }, arity = "0", order = 4, description = "backup the original FeatureModel file before any modification")
 	boolean backUp;
 
+	/**
+	 * {@code BaseMerger}'s instance.
+	 */
 	private BaseMerger merger;
 
 	/**

@@ -45,9 +45,13 @@ public abstract class AbstractCommand implements Runnable {
 	 */
 	protected static final String CANT_MERGE = "Can't merge the Workflow with the FeatureModel.";
 	/**
-	 * Error message due to an error that occured during the instantiation process.
+	 * Error message due to an error that occured during the merging process.
 	 */
 	protected static final String CANT_INSTANTIATE = "Can't instantiate the WorkFlow.";
+	/**
+	 * Error message telling the user that the application exits.
+	 */
+	protected static final String EXITING = "Exiting...";
 
 	/**
 	 * Returns the {@code PACKAGE_NAME}.
@@ -93,6 +97,7 @@ public abstract class AbstractCommand implements Runnable {
 	protected static void logException(Logger logger, Exception exception) {
 		if (!exception.getMessage().isBlank()) {
 			logger.fatal(exception.getMessage());
+			logger.fatal(EXITING);
 		} else {
 			exception.printStackTrace(); // TODO: to replace by logger
 		}
