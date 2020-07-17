@@ -24,6 +24,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
+import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
@@ -99,6 +100,11 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected static void setUnmanagedTask(FMTask unmanagedTask) {
 		BaseMergerImpl.unmanagedTask = unmanagedTask;
+	}
+
+	@Override
+	protected TaskTagsSelector getSelector() {
+		return FMNames.SELECTOR;
 	}
 
 	@Override
