@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,6 +24,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
+import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
@@ -63,13 +66,20 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	public static final String UNMANAGED = "Unmanaged";
 	/**
-	 * Root's parent name.
-	 *
-	 * <p>
-	 *
-	 * Global nodes (e.g. Meta, Steps, Unmanaged...) will be placed under this one.
+	 * The default root name.
 	 */
-	private static final String ROOT = "AD";
+	public static final String DEFAULT_ROOT_NAME = "Root";
+	/**
+	 * The deeper default root name.
+	 */
+	public static final String DEEPER_DEFAULT_ROOT_NAME = "AD";
+	/**
+	 * Logger instance.
+	 *
+	 * @since 1.0
+	 * @see Logger
+	 */
+	private static final Logger logger = LogManager.getLogger(BaseMergerImpl.class);
 
 	/**
 	 * {@code BaseMergerImpl}'s default constructor.
@@ -92,6 +102,11 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected static void setUnmanagedTask(FMTask unmanagedTask) {
 		BaseMergerImpl.unmanagedTask = unmanagedTask;
+	}
+
+	@Override
+	protected TaskTagsSelector getSelector() {
+		return FMNames.SELECTOR;
 	}
 
 	@Override
@@ -352,7 +367,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		Optional<Task<?>> optGlobalTask = this.getTaskFactory().createTasks(globalElement).stream().findFirst();
 		if (optGlobalTask.isPresent()) {
 			FMTask globalTask = (FMTask) optGlobalTask.get();
-			Optional<FMTask> optRoot = TasksManager.getFMTaskWithName(ROOT); // get the root
+			Optional<FMTask> optRoot = TasksManager.getFMTaskWithName(DEEPER_DEFAULT_ROOT_NAME); // get the root
 			if (optRoot.isPresent()) {
 				return optRoot.get().appendChild(globalTask);
 			}
@@ -396,6 +411,8 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see FMTask
 	 */
 	protected FMTask createReferredFMTask(WFTask<?> task) {
+		logger.warn("The referenced task [{}] is missing in the FeatureModel.", task.getReference());
+		logger.warn("Creating the referenced task : {}", task.getReference());
 		FMTask newParent = this.createFeatureWithName(task.getReference(), task.isAbstract());
 		Optional<WFTask<?>> opt = TasksManager.getWFTaskWithName(newParent.getName());
 		if (opt.isEmpty()) {

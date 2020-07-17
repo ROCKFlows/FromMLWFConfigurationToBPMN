@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,7 +48,7 @@ import com.ml2wf.tasks.manager.TasksManager;
  * @version 1.0
  *
  */
-public class XMLManager {
+public abstract class XMLManager {
 
 	/**
 	 * Path to the XML file's directory.
@@ -73,7 +74,7 @@ public class XMLManager {
 	 * This counter is used to number each documentation which is required for the
 	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
 	 */
-	private static int docCount = 0;
+	private static int docCount;
 	/**
 	 * Logger instance.
 	 *
@@ -96,9 +97,10 @@ public class XMLManager {
 	 * @throws IOException
 	 */
 	public XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
-		this.sourceFile = file;
+		this.sourceFile = FileHandler.processFile(this, file);
 		this.path = file.getAbsolutePath();
 		XMLManager.updateDocument(this.sourceFile);
+		this.normalizeDocument();
 	}
 
 	/**
@@ -162,26 +164,57 @@ public class XMLManager {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 *
+	 * @since 1.0
 	 * @see Document
 	 */
 	public static void updateDocument(File sourceFile) throws ParserConfigurationException, SAXException, IOException {
-		if ((XMLManager.document == null)
-				|| !XMLManager.document.getBaseURI().equals(sourceFile.toURI().toString())) {
-			XMLManager.document = FileHandler.preprocess(sourceFile);
-			docCount = 0;
+		if ((document == null)
+				|| ((document.getBaseURI() != null) && !document.getBaseURI().equals(sourceFile.toURI().toString()))) {
+			document = FileHandler.preprocess(sourceFile);
+			docCount = countDocumentation();
 			TasksManager.clear();
 		}
 	}
 
 	/**
-	 * Increments the {@code docCount} and returns its previous value.
+	 * Returns the number of <b>documentation ids</b> in the document.
+	 *
+	 * <p>
+	 *
+	 * This allow to define the {@link #docCount} initial value to avoid duplicated
+	 * id.
+	 *
+	 * @return the number of <b>documentation ids</b> in the document.
+	 *
+	 * @since 1.0
 	 */
-	protected static int incrementDoc() {
-		return docCount++;
+	protected static int countDocumentation() {
+		int count = 0;
+		NodeList documentations = document.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
+		Pattern pattern = RegexManager.getDigitPattern();
+		for (int i = 0; i < documentations.getLength(); i++) {
+			Node docNode = documentations.item(i);
+			Node docIDNode = docNode.getAttributes().getNamedItem(BPMNAttributes.ID.getName());
+			Matcher matcher = pattern.matcher(docIDNode.getNodeValue());
+			if (matcher.find()) {
+				int currentID = Integer.parseInt(matcher.group());
+				count = Integer.max(count, currentID);
+			}
+		}
+		return count;
 	}
 
 	/**
-	 * Saves the current {@code document} into the given {@code destFile}.
+	 * Increments the {@code docCount} and returns its incremented value.
+	 *
+	 * @return its incremented value
+	 */
+	protected static int incrementDocCount() {
+		return ++docCount;
+	}
+
+	/**
+	 * Saves the current {@code document} into the given {@code file} path.
 	 *
 	 * @param file the destination {@code File}
 	 * @throws TransformerException
@@ -189,8 +222,46 @@ public class XMLManager {
 	 *
 	 * @since 1.0
 	 */
+	public void save(File file) throws TransformerException, IOException {
+		FileHandler.saveDocument(file, document);
+	}
+
+	/**
+	 * Saves the current {@code document} into the {@link #getSourceFile()} path.
+	 *
+	 * @throws TransformerException
+	 * @throws IOException
+	 *
+	 * @since 1.0
+	 */
 	public void save() throws TransformerException, IOException {
-		FileHandler.saveDocument(this.getSourceFile(), document);
+		this.save(this.getSourceFile());
+	}
+
+	/**
+	 * Returns the {@code TaskTagsSelector} according to the operation type.
+	 *
+	 * <p>
+	 *
+	 * e.g. {@literal <merge, FMNames.SELECTOR>, <generation, BPMNNames.SELECTOR>}
+	 *
+	 * @return the {@code TaskTagsSelector} according to the operation type
+	 *
+	 * @since 1.0
+	 * @see TaskTagsSelector}
+	 */
+	protected abstract TaskTagsSelector getSelector();
+
+	/**
+	 * Normalizes the document by applying the {@link Element#normalize()} method
+	 * and replacing all whitespaces by underscores.
+	 */
+	protected void normalizeDocument() {
+		getDocument().getDocumentElement().normalize();
+		List<Node> taskNodes = XMLManager.getTasksList(getDocument(), this.getSelector());
+		taskNodes.stream().map(t -> t.getAttributes().getNamedItem(FMAttributes.NAME.getName()))
+				.filter(Objects::nonNull)
+				.forEach(t -> t.setNodeValue(t.getNodeValue().trim().replace(" ", "_")));
 	}
 
 	/**
@@ -221,7 +292,7 @@ public class XMLManager {
 	 */
 	public static Node addDocumentationNode(Node node) {
 		Element documentation = node.getOwnerDocument().createElement(BPMNNames.DOCUMENTATION.getName());
-		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDoc());
+		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDocCount());
 		documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
 		CDATASection refersTo = node.getOwnerDocument().createCDATASection("");
 		documentation.appendChild(refersTo);

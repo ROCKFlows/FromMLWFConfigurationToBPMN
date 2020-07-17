@@ -86,6 +86,9 @@ public class Merge extends AbstractCommand {
 			"--backup" }, arity = "0", order = 4, description = "backup the original FeatureModel file before any modification")
 	boolean backUp;
 
+	/**
+	 * {@code BaseMerger}'s instance.
+	 */
 	private BaseMerger merger;
 
 	/**
@@ -102,13 +105,17 @@ public class Merge extends AbstractCommand {
 	}
 
 	@Override
+	protected String getDefaultMessage() {
+		return CANT_MERGE;
+	}
+
+	@Override
 	public void run() {
 		try {
 			this.merger = (this.exclusive.meta) ? new WFMetaMerger(this.output) : new WFInstanceMerger(this.output);
 			this.processMerge();
 		} catch (Exception e) {
-			logger.fatal("Can't merge the Workflow with the FeatureModel.");
-			e.printStackTrace(); // TODO: to replace by logger
+			this.logException(logger, e);
 		}
 
 	}

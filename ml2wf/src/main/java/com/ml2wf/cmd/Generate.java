@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.ml2wf.generation.InstanceFactory;
 import com.ml2wf.generation.InstanceFactoryImpl;
+import com.ml2wf.util.XMLManager;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -50,10 +51,10 @@ public class Generate extends AbstractCommand {
 	 */
 	private static final Logger logger = LogManager.getLogger(Generate.class);
 
-	/**
-	 * Error message due to an error that occured during the instantiation process.
-	 */
-	private static final String CANT_INSTANTIATE = "Can't instantiate the WorkFlow.";
+	@Override
+	protected String getDefaultMessage() {
+		return CANT_INSTANTIATE;
+	}
 
 	@Override
 	public void run() {
@@ -62,10 +63,10 @@ public class Generate extends AbstractCommand {
 		try {
 			factory = new InstanceFactoryImpl(this.input);
 			factory.getWFInstance(this.output);
+			((XMLManager) factory).save(this.output);
 			LogManager.shutdown();
 		} catch (Exception e) {
-			logger.fatal(CANT_INSTANTIATE);
-			e.printStackTrace();
+			this.logException(logger, e);
 		}
 	}
 

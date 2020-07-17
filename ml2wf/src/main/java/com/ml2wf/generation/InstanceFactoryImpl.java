@@ -18,9 +18,9 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
+import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
-import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -70,6 +70,18 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		super(file);
 	}
 
+	@Override
+	protected void normalizeDocument() {
+		getDocument().getDocumentElement().normalize();
+		List<Node> taskNodes = XMLManager.getTasksList(getDocument(), BPMNNames.SELECTOR);
+		for (Node taskNode : taskNodes) {
+			Node nameNode = taskNode.getAttributes().getNamedItem(BPMNAttributes.NAME.getName());
+			if (nameNode != null) {
+				nameNode.setNodeValue(nameNode.getNodeValue().replace(" ", "_"));
+			}
+		}
+	}
+
 	/**
 	 * Instantiates the given workflow and saves it using the {@link #save()}
 	 * method.
@@ -110,7 +122,6 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			this.instantiateNode(node);
 		}
 		logger.info("Instantiation finished.");
-		FileHandler.saveDocument(FileHandler.processResultFile(outputFile), getDocument());
 	}
 
 	/**
@@ -128,6 +139,11 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		this.getWFInstance(super.getSourceFile());
+	}
+
+	@Override
+	protected TaskTagsSelector getSelector() {
+		return BPMNNames.SELECTOR;
 	}
 
 	/**

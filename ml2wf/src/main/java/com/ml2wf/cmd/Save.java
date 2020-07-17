@@ -58,6 +58,11 @@ public class Save extends AbstractCommand {
 	private static final Logger logger = LogManager.getLogger(Save.class);
 
 	@Override
+	protected String getDefaultMessage() {
+		return CANT_MERGE;
+	}
+
+	@Override
 	public void run() {
 		BaseMerger merger;
 		try {
@@ -71,8 +76,7 @@ public class Save extends AbstractCommand {
 			((XMLManager) merger).save();
 			LogManager.shutdown();
 		} catch (Exception e) {
-			logger.fatal("Can't merge the Workflow with the FeatureModel.");
-			e.printStackTrace();
+			this.logException(logger, e);
 		}
 	}
 }
