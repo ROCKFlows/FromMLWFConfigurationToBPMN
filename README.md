@@ -41,10 +41,10 @@ ml2wf save -i <ins>meta</ins> <ins>instance</ins> -o <ins>FeatureModel</ins> [-b
 
 ###### Commands
 
-<pre>generate    generate a workflow
-build		build a FeatureModel from a set of workflows
-merge       import a worklow in a FeatureModel
-save		save a meta-workflow and its instance in a FeatureModel</pre>
+<pre>generate  generate a workflow
+build     build a FeatureModel from a set of workflows
+merge     import a worklow in a FeatureModel
+save      save a meta-workflow and its instance in a FeatureModel</pre>
 
 ###### Arguments
 
