@@ -3,11 +3,13 @@
 
 ## Overview
 
-The **ml2wf** project aims to help **Data Scientists** creating their workflows in the BPMN standard from a FeatureModel.
+The **ml2wf** project aims at helping **Data Scientists** to create their workflows in the BPMN standard from a FeatureModel and to capitalize on their knowledge from new BPMN workflows.
 
-You can define your own constraints easily by commenting your workflow using a predefined and customizable syntax.
+You can define your own **constraints** easily by commenting your workflow using a predefined and customizable syntax.
 
-Once created and modified, the data scientist can merge the workflow into the FeatureModel and reuse it later. Furthermore, this will allow data scientists to use **Meta-learning** and over time to automate the workflows creation.
+Once created and modified, the data scientist can merge the workflow into the FeatureModel and **reuse** it later.
+
+Furthermore, it will allow data scientists to reduce **meta-learning** space and, over time, **automate** the creation of workflows tailored to a given time series anomaly detection problem.
 
 ## Table of contents
 
