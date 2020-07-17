@@ -3,7 +3,6 @@ package com.ml2wf.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -13,8 +12,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,7 +19,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class WFHelper {
-	private static final Logger logger = LogManager.getLogger(FMHelper.class);
+	//private static final Logger logger = LogManager.getLogger(FMHelper.class);
 
 
 	private static final String TASK = "bpmn2:task";
@@ -38,7 +35,7 @@ public class WFHelper {
 	//TODO MANAGE CONSTRAINTS
 	//private List<String> constraintList = new ArrayList<>();
 
-	/*
+	/*TODO
 	 * public List<String> getConstraintList() { return new
 	 * ArrayList<>(constraintList); }
 	 */
@@ -63,7 +60,7 @@ public class WFHelper {
 		document = builder.parse(new File(path));
 		racine = document.getDocumentElement();
 		taskNameList = listTasks();
-		//constraintList = listConstraints();
+		//TODO constraintList = listConstraints();
 	}
 
 

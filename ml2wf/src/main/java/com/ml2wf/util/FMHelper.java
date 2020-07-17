@@ -7,13 +7,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
+
 
 import org.xml.sax.SAXException;
 
-import com.ml2wf.conventions.enums.TaskTagsSelector;
-import com.ml2wf.conventions.enums.fm.FMAttributes;
-import com.ml2wf.conventions.enums.fm.FMNames;
+
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -87,10 +85,8 @@ public class FMHelper {
 //DOING
 	private Collection<? extends String> listConstraints(Node n) {
 		List<String> list = new ArrayList<>();
-		switch (n.getNodeName()) {
-		case CONSTRAINTS:
+		if (n.getNodeName() .contentEquals(CONSTRAINTS)) {
 			list.addAll(readConstraints(n));
-			break;
 		}
 		return list;
 	}
@@ -110,12 +106,10 @@ public class FMHelper {
 		String rule = "";
 		for (Node child : iterable(ruleNode.getChildNodes())) {
 			if ( (child != null) 
-					&& (child.getNodeName() != null) )
-			{
-				if (child.getNodeName().equals("imp")) {
+					&& (child.getNodeName() != null) 
+					&& (child.getNodeName().equals("imp")) ) {
 					logger.debug("imp : {}",child);
 					rule = extractImply(child); 
-				}
 			}
 		}
 		return rule;
@@ -129,8 +123,9 @@ public class FMHelper {
 			rule += operands.get(0);
 			rule += IMPLY_NOTATION;
 			rule += operands.get(1);
-		} else
-			rule += "Unexpected operands for imply : " +operands;
+		} 		 
+		else
+			 rule += "Unexpected operands for imply : " +operands;
 		return rule;
 	}
 
@@ -140,11 +135,9 @@ public class FMHelper {
 		List<String> operands = new ArrayList<>();
 		for (Node child : iterable(node.getChildNodes())) {
 			if ( (child != null) 
-					&& (child.getNodeName() != null) )
-			{
-				if (child.getNodeName().equals("var")) {
+					&& (child.getNodeName() != null) 
+					&& (child.getNodeName().equals("var")) ) {
 						operands.add(child.getTextContent());
-				}
 			}
 		}
 		return operands;
@@ -185,9 +178,6 @@ public class FMHelper {
 		List<String> list = new ArrayList<>();
 		switch (n.getNodeName()) {
 		case FEATURE:
-			list.add(getFeatureName(n));
-			extractChildFeatures(n, list);
-			break;
 		case AND:
 			list.add(getFeatureName(n));
 			extractChildFeatures(n, list);

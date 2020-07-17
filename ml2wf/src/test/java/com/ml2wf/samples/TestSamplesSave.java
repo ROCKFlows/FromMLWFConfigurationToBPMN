@@ -71,22 +71,59 @@ public class TestSamplesSave {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter,Arrays.asList(metaWFPATH,instanceWFPATH));
 		//This test involves managing naming differences  using '_' in FM and BPMN
 		logger.debug("added features : %s ", afterList);
-		System.out.println(afterList);
+		//System.out.println(afterList);
 		
 		//Specific properties
 		//assertEquals(1, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
 		//TODO test abstract Features
-		
+		//TODO test generated constraints
+		//FIX
 		//Check idempotence
 		//TestHelper.checkIdempotence(copiedFM, command);
 		
 	}
 	
-	
+	@Test
+	@DisplayName("Test with a basic workflow adding one Step")
+	public void testBasicHierachieSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie.bpmn2";
+		String instanceWFPATH = "../BPMN-Models/instanceBasicHierarchieToFail.bpmn2";
+		String sourceFM="../samples/basicFM.xml";
+		//I make a copy for test
+		String copiedFM= FM_OUT_PATH +"basicFM_Hierarchie.xml";
+		File copiedFile = new File(copiedFM);
+		File sourceFile = new File(sourceFM);
+		FileUtils.copyFile(sourceFile, copiedFile);
+		File fin = new File(metaWFPATH);
+		assertTrue(fin.exists());
+		assertTrue(copiedFile.exists());
+		
+		FMHelper fmBefore = new FMHelper(copiedFM);
+		//Command
+		String[] command = new String[] {"save","-i ", metaWFPATH, instanceWFPATH, "-o ",copiedFM, "-v","7"};
+		com.ml2wf.App.main(command);
+		assertTrue(copiedFile.exists());
+		FMHelper fmAfter = new FMHelper(copiedFM);
+		
+		//General Properties to check
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter,Arrays.asList(metaWFPATH,instanceWFPATH));
+		//This test involves managing naming differences  using '_' in FM and BPMN
+		logger.debug("added features : %s ", afterList);
+		//System.out.println(afterList);
+		
+		//Specific properties
+		//assertEquals(1, afterList.size());
+		//TODO test abstract Features
+		//TODO test generated constraints
+		//FIX
+		//Check idempotence
+		//TestHelper.checkIdempotence(copiedFM, command);
+		
+	}
 
 }

@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +44,7 @@ public class TestSamplesMetaMerge {
 	
 	@BeforeEach
 	public void setUp() throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
-		logger.info("Hello Test Samples about Merge!");
+		logger.info("Hello Test Samples about meta Merge!");
 	}
 
 	@AfterEach
@@ -72,10 +73,9 @@ public class TestSamplesMetaMerge {
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
-		WFHelper wf = new WFHelper(metaWFPATH);
-		
+	
 		//General Properties to check
-		List<String> afterList =TestHelper.nothingLost(fmBefore, fmAfter, wf);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		//List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
 		logger.debug("added features : %s ", afterList);
 		
@@ -114,7 +114,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
 		
 		//Specific properties
@@ -150,7 +150,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
 		
 		//Specific properties
@@ -198,7 +198,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
 		
 		//Specific properties
@@ -239,7 +239,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
 		
 		//Specific properties
@@ -282,7 +282,7 @@ public class TestSamplesMetaMerge {
 
 		
 		//General Properties to check
-		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
 		
 		//Specific properties
@@ -333,7 +333,7 @@ public class TestSamplesMetaMerge {
 		//General Properties to check
 		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
 		logger.debug("added features : %s ", afterList);
-		System.out.println(afterList);
+		//System.out.println(afterList);
 		//Specific properties
 		//
 		//FIX ABstract they are false..

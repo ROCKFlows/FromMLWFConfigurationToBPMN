@@ -1,9 +1,11 @@
 package com.ml2wf;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,17 +33,56 @@ public class TestHelper {
 
 	private static List<String> normalize(List<String> list) {
 		List<String> listCopy= new ArrayList<>();
-			list.forEach(t  -> listCopy.add( t.replace(" ", "_")));
+		list.forEach(t  -> listCopy.add( t.replace(" ", "_")));
 			return listCopy;
 	}
 	
-	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, WFHelper wf){
-		List<String> afterList = normalize(fmAfter.getFeatureNameList());
-		List<String> tasks = wf.gettaskNameList();
-		List<String> lostTasks = lostTasks(tasks, afterList);
-		//System.out.println(" LOST : " + lostTasks);
-		assertTrue( lostTasks.isEmpty());
+	private static List<String> normalizeAllTasks(List<String> list) {
+		List<String> listCopy= normalize(list);
+		//System.out.println("taches a normaliser.." + listCopy);
+		List<String> results  = new ArrayList<>();
+		listCopy.forEach(t  -> 
+			results.addAll(Arrays.asList(t.split("#"))) );
+		results.removeAll(Arrays.asList(""));
+		//System.out.println("taches normalisées.." + results);
+		return results;
+	}
+	
+	private static List<String> normalizeOnlySubtasks(List<String> list) {
+		List<String> listCopy= normalize(list);
+		//System.out.println("taches a normaliser" + list);
+		list.forEach(t  -> {
+			String[] x = t.split("#");
+			listCopy.add(x[x.length - 1]);
+		} );
+		//System.out.println("taches normalisées" + listCopy);
+		return listCopy;
+	}
+	
+	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, List<String> wfs) throws ParserConfigurationException, SAXException, IOException {
 		
+		List<String> afterList = normalize(fmAfter.getFeatureNameList());
+		
+		for (String wfPATH : wfs) {
+			testTasksAgainstFeatures(afterList, wfPATH);
+		};
+		
+		afterList= normalize(noFeatureLost(fmBefore, fmAfter));
+		return afterList;
+	}
+
+	private static void testTasksAgainstFeatures(List<String> afterList, String wfPATH)
+			throws ParserConfigurationException, SAXException, IOException {
+		WFHelper wf = new WFHelper(wfPATH);
+		List<String> tasks = wf.gettaskNameList();
+		tasks = normalizeAllTasks(tasks);
+		List<String> lostTasks = lostTasks(tasks, afterList);
+		assertTrue( lostTasks.isEmpty());
+	}
+	
+	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, String wfPATH ) throws ParserConfigurationException, SAXException, IOException{
+		List<String> afterList = normalize(fmAfter.getFeatureNameList());
+		testTasksAgainstFeatures(afterList, wfPATH);
 		afterList= normalize(noFeatureLost(fmBefore, fmAfter));
 
 		return afterList;
@@ -61,12 +102,16 @@ public class TestHelper {
 			throws ParserConfigurationException, SAXException, IOException {
 		FMHelper fmBefore;
 		FMHelper fmAfter;
+		logger.debug("Test Idempotence {}");
 		List<String> afterList;
 		fmBefore = new FMHelper(fM);
+		//System.out.println("Before : " + fmBefore.getFeatureNameList());
 		com.ml2wf.App.main(command);
 		fmAfter = new FMHelper(fM);
+		//System.out.println("After : " + fmAfter.getFeatureNameList());
 		afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
 		logger.debug("AFTER should be empty : %s", afterList);
+		//System.out.println("AFTER should be empty : %s" + afterList);
 		assertTrue(afterList.isEmpty());
 	}
 
@@ -98,8 +143,21 @@ public class TestHelper {
 	public static List<String> lostTasks(List<String> tasks, List<String> features){
 		List<String> tasksTOSave = normalize(tasks);
 		List<String> featureList = normalize(features);
+		logger.debug("Features : %s ", featureList);
 		tasksTOSave.removeAll(featureList);
 		return tasksTOSave;
 		
 	}
+
+	public static void noLostTaskAtInstanciation(String wfInPath, String wfOutPath) throws ParserConfigurationException, SAXException, IOException {
+		WFHelper wfmeta = new WFHelper(wfInPath);
+		List<String> tasksMeta = wfmeta.gettaskNameList();
+		WFHelper wfinstance = new WFHelper(wfOutPath);
+		List<String> tasksInstance = wfinstance.gettaskNameList();
+		assertEquals(tasksMeta.size(), tasksInstance.size());
+	    //Todo manage references to meta in generated tasks
+		
+	}
+
+
 }

@@ -74,10 +74,5 @@ public class TestSamplesInstantiation {
 		this.factory = null;
 	}
 
-	@Test
-	@Disabled
-	@DisplayName("Test with a basic workflow")
-	public void testSamples() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		// TODO: this.factory.getWFInstance(RESULT_DIRECTORY);
-	}
+
 }

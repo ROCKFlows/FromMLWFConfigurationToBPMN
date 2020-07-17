@@ -24,7 +24,7 @@
     <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="Task_2" targetRef="Task_3"/>
     <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="Task_3" targetRef="EndEvent_1"/>
     <bpmn2:sequenceFlow id="SequenceFlow_4" sourceRef="StartEvent_1" targetRef="Task_4"/>
-    <bpmn2:task id="Task_4" name="Acquire Metadata ">
+    <bpmn2:task id="Task_4" name="Acquire Metadata">
       <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
     </bpmn2:task>
@@ -65,7 +65,7 @@
       <bpmndi:BPMNShape id="BPMNShape_Task_4" bpmnElement="Task_4" isExpanded="true">
         <dc:Bounds height="53.0" width="107.0" x="44.0" y="210.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_10" labelStyle="BPMNLabelStyle_1">
-          <dc:Bounds height="11.0" width="74.0" x="60.0" y="231.0"/>
+          <dc:Bounds height="11.0" width="71.0" x="62.0" y="231.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="BPMNShape_Task_1" targetElement="BPMNShape_Task_2">

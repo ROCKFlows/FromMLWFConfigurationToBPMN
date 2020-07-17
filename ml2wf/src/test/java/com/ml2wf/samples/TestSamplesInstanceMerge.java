@@ -86,7 +86,7 @@ public class TestSamplesInstanceMerge {
 
 
 		//TODO Improve to avoid double testing
-		List<String> afterList = TestHelper.checkNoFeaturesAreLost(fmAfter, fmBefore);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, instanceWFPATH);
 		logger.debug("added features : %s ", afterList);
 		//TODO  Test concrete and abstract features
 		
@@ -125,7 +125,7 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.noFeatureLost(fmBefore, fmAfter);
+		TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		
 
 		//FIX 

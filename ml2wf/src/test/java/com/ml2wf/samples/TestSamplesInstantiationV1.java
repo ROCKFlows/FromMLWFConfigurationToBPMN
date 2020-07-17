@@ -25,6 +25,7 @@ import org.xml.sax.SAXException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.ml2wf.TestHelper;
 import com.ml2wf.constraints.util.OperAssociation;
 import com.ml2wf.generation.InstanceFactoryImpl;
 
@@ -116,6 +117,7 @@ public class TestSamplesInstantiationV1 {
 		//assertTrue(fout.exists());
 		com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
 		assertTrue(fout.exists());
+		TestHelper.noLostTaskAtInstanciation(metaWFPATH,outputWFPATH);
 		//FIX
 		//fout.delete();
 	}
@@ -132,9 +134,63 @@ public class TestSamplesInstantiationV1 {
 		assertTrue(fin.exists());
 		com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
 		assertTrue(fout.exists());
+		TestHelper.noLostTaskAtInstanciation(metaWFPATH,outputWFPATH);
 		//FIX
 		//fout.delete();
 		
 	}
+	
+	
+	//todo: improve testing the content of the file.
+	@Test
+	@DisplayName("Test Generation with a meta workflow with composed tasks using command line")
+	public void testCommandLineGeneration4hierarchie() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+		String metaWFPATH =  WF_IN_PATH +"BasicMetaWFHierarchie.bpmn2";
+		String outputWFPATH = WF_OUT_PATH + "instanceBasicHierarchie.bpmn2";
+		File fin = new File(metaWFPATH);
+		File fout = new File(outputWFPATH);
+		assertTrue(fin.exists());
+		com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
+		assertTrue(fout.exists());
+		TestHelper.noLostTaskAtInstanciation(metaWFPATH,outputWFPATH);
+		//FIX
+		//fout.delete();
+		
+	}
+	
+	//todo: improve testing the content of the file.
+	@Test
+	@DisplayName("Test Generation with a meta workflow with composed tasks using command line")
+	public void testCommandLineGeneration4hierarchie2() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+		String metaWFPATH =  WF_IN_PATH +"BasicMetaWFHierarchie2.bpmn2";
+		String outputWFPATH = WF_OUT_PATH + "instanceBasicHierarchie2.bpmn2";
+		File fin = new File(metaWFPATH);
+		File fout = new File(outputWFPATH);
+		assertTrue(fin.exists());
+		com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
+		assertTrue(fout.exists());
+		TestHelper.noLostTaskAtInstanciation(metaWFPATH,outputWFPATH);
+		//FIX
+		//fout.delete();
+		
+	}
+	
+	//todo: improve testing the content of the file.
+		@Test
+		@DisplayName("Test Generation with a meta workflow with composed tasks using command line")
+		public void testCommandLineGeneration4hierarchie3() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+			String metaWFPATH =  WF_IN_PATH +"BasicMetaWFHierarchie3.bpmn2";
+			String outputWFPATH = WF_OUT_PATH + "instanceBasicHierarchie3.bpmn2";
+			File fin = new File(metaWFPATH);
+			File fout = new File(outputWFPATH);
+			assertTrue(fin.exists());
+			com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
+			assertTrue(fout.exists());
+			TestHelper.noLostTaskAtInstanciation(metaWFPATH,outputWFPATH);
+			//FIX
+			//fout.delete();
+			
+		}
+	
 	
 }
