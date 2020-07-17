@@ -52,6 +52,11 @@ public class Generate extends AbstractCommand {
 	private static final Logger logger = LogManager.getLogger(Generate.class);
 
 	@Override
+	protected String getDefaultMessage() {
+		return CANT_INSTANTIATE;
+	}
+
+	@Override
 	public void run() {
 
 		InstanceFactory factory;
@@ -61,8 +66,7 @@ public class Generate extends AbstractCommand {
 			((XMLManager) factory).save(this.output);
 			LogManager.shutdown();
 		} catch (Exception e) {
-			logger.fatal(CANT_INSTANTIATE);
-			logException(logger, e);
+			this.logException(logger, e);
 		}
 	}
 

@@ -100,6 +100,11 @@ public class Build extends AbstractCommand {
 	}
 
 	@Override
+	protected String getDefaultMessage() {
+		return CANT_MERGE;
+	}
+
+	@Override
 	public void run() {
 		logger.info("Processing using the FeatureModel : {}...", this.featureModel);
 		try {
@@ -111,8 +116,8 @@ public class Build extends AbstractCommand {
 			((XMLManager) this.merger).save();
 			LogManager.shutdown();
 		} catch (Exception e) {
-			logger.fatal(CANT_MERGE);
-			logException(logger, e);
+			this.logException(logger, e);
 		}
 	}
+
 }

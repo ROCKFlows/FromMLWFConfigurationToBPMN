@@ -63,6 +63,19 @@ public abstract class AbstractCommand implements Runnable {
 	}
 
 	/**
+	 * Returns the default message considering the command nature.
+	 *
+	 * <p>
+	 *
+	 * e.g. {@link #CANT_MERGE}, {@link #CANT_INSTANTIATE}
+	 *
+	 * @return the default message considering the command nature
+	 *
+	 * @since 1.0
+	 */
+	protected abstract String getDefaultMessage();
+
+	/**
 	 * Returns the verbosity {@code Level} according to the given {@code level}
 	 * integer.
 	 *
@@ -93,8 +106,13 @@ public abstract class AbstractCommand implements Runnable {
 	 *
 	 * @param logger    logger used to log the error
 	 * @param exception exception to log
+	 *
+	 * @since 1.0
+	 * @see Logger
 	 */
-	protected static void logException(Logger logger, Exception exception) {
+	protected void logException(Logger logger, Exception exception) {
+		this.processVerboseArg(1); // 1 = fatal
+		logger.fatal(this.getDefaultMessage());
 		if (!exception.getMessage().isBlank()) {
 			logger.fatal(exception.getMessage());
 			logger.fatal(EXITING);

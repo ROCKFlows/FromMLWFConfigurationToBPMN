@@ -105,13 +105,17 @@ public class Merge extends AbstractCommand {
 	}
 
 	@Override
+	protected String getDefaultMessage() {
+		return CANT_MERGE;
+	}
+
+	@Override
 	public void run() {
 		try {
 			this.merger = (this.exclusive.meta) ? new WFMetaMerger(this.output) : new WFInstanceMerger(this.output);
 			this.processMerge();
 		} catch (Exception e) {
-			logger.fatal(CANT_MERGE);
-			logException(logger, e);
+			this.logException(logger, e);
 		}
 
 	}
