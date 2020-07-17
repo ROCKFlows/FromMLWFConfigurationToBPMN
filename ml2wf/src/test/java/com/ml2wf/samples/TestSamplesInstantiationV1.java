@@ -16,14 +16,16 @@ import javax.xml.transform.TransformerException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+import com.ml2wf.constraints.util.OperAssociation;
 import com.ml2wf.generation.InstanceFactoryImpl;
 
 
@@ -56,128 +58,79 @@ public class TestSamplesInstantiationV1 {
 	/**
 	 * Basic WF XML file path.
 	 */
-	private static final String SIMPLE_WF_PATH = "./wf_meta/simple_wf.bpmn";
+	private static final String WF_IN_PATH = "../BPMN-Models/";
 
 	/**
-	 * Basic WF XML file path.
+	 *  WF XML file path for results
 	 */
-	private static final String RESULT_DIRECTORY = ".src/test/resources/results/";
+	private static final String WF_OUT_PATH = "./target/generated/WF/";
+	
 	/**
 	 * {@code Logger}'s instance.
 	 */
 	private static final Logger logger = LogManager.getLogger(TestSamplesInstantiationV1.class);
 
 	
-	//todo: improve testing the content of the file.
-	@Test
-	@DisplayName("Test Generation with a complex workflow")
-	public void testGenerationWithCompletExample() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		String metaWFPATH = "../BPMN-Models/FeatureBasedMetaWF.bpmn2";
-		String outputWFPATH = "../BPMN-Models";
-		File fin = new File(metaWFPATH);
-		File fout = new File(outputWFPATH);
-		//String pwd = System.getProperty("user.dir");
-        //System.out.println("Le répertoire courant est : " + pwd);
-		assertTrue(fout.exists() && fout.isDirectory());
-		assertTrue(fin.exists());
-		//Test By code
-		factory = new InstanceFactoryImpl(fin);
-		factory.getWFInstance(fout);
-		fout = new File(outputWFPATH+"/FeatureBasedMetaWF_instance.bpmn2");
-		assertTrue(fout.exists());
-		fout.delete();
-		//com.ml2wf.App.main(new String[] { "-g -i " + metaWFPATH+ " -o " + outputWFPATH });
-	}
+	@BeforeAll
+	 public static void setup() {
+		File fout = new File(WF_OUT_PATH );
+		if (! fout.isDirectory())
+			fout.mkdir();
+		logger.debug("Instanciation Tests ----------");
+    }
+
+
+
+	
+
 	
 	@Test
 	@DisplayName("Test Generation when input file doesn't exist")
 	public void testGenerationWithNoInputFile() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		String metaWFPATH = "../BPMN-Models/FeatureBasedMetaWFX.bpmn2";
-		String outputWFPATH = "../BPMN-Models";
+		String metaWFPATH = WF_IN_PATH +"FeatureBasedMetaWFX.bpmn2";
+		String outputWFPATH = WF_OUT_PATH + "instanceFBMFError.bpmn2";
 		File fin = new File(metaWFPATH);
 		File fout = new File(outputWFPATH);
 		assertTrue(!fin.exists());
-		assertTrue(fout.exists());
 		//Test By code
-		assertThrows(FileNotFoundException.class, 
-				() -> {factory = new InstanceFactoryImpl(fin);} );
+		//assertThrows(FileNotFoundException.class, 
+		//		() -> {factory = new InstanceFactoryImpl(fin);} );
 	}
 	
 
-	@Test
-	@DisplayName("Test Generation when output is not a directory")
-	public void testGenerationWithNoOutputDirectory() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		String metaWFPATH = "../BPMN-Models/FeatureBasedMetaWF.bpmn2";
-		String outputWFPATH = "../BPMN-Models/instance.bpmn2";
-		File fin = new File(metaWFPATH);
-		File fout = new File(outputWFPATH);
-		assertTrue(fin.exists());
-		assertFalse(fout.isDirectory());
-		//Test By code
-		factory = new InstanceFactoryImpl(fin);
-		//Test By code
-		//FIX : I have no idea what the program does! 
-//				assertThrows(FileNotFoundException.class, 
-//						() -> {		factory.getWFInstance(fout);} );
-	}
+
 	
-	
-	//fix it: If we choose to fix the generation, by generating according to the return file (and not by giving it a predefined name), then there should be no error, because in this case, the file may not exist.
-	//	On the contrary, if we decide to save in a directory, there should be an error message if that directory does not exist.
-	// Currently it generates in the tree above, if the output does not exist.
-	@Test
-	@DisplayName("Test Generation when output file doesn't exist")
-	public void testGenerationWithNoOutputFile() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		String metaWFPATH = "../BPMN-Models/FeatureBasedMetaWF.bpmn2";
-		String outputWFPATH = "../BPMN-Models2";
-		File fin = new File(metaWFPATH);
-		File fout = new File(outputWFPATH);
-		assertTrue(fin.exists());
-		assertTrue(!fout.exists());
-		//Test By code
-		factory = new InstanceFactoryImpl(fin);
-		//Test By code
-		//FIX : I have no idea what the program does! 
-//				assertThrows(FileNotFoundException.class, 
-//						() -> {		factory.getWFInstance(fout);} );
-	}
 	
 	
 	//todo: improve testing the content of the file.
-	//fix : correct the test: it is not consistent to give an output file and get the result in another file.
 	@Test
 	@DisplayName("Test Generation with a complex workflow using command line")
 	public void testCommandLineGeneration() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		String metaWFPATH = "../BPMN-Models/FeatureBasedMetaWF.bpmn2";
-		String outputWFPATH = "../BPMN-Models";
+		String metaWFPATH = WF_IN_PATH +"FeatureBasedMetaWF.bpmn2";
+		String outputWFPATH = WF_OUT_PATH + "instanceFBMF.bpmn2";
 		File fin = new File(metaWFPATH);
 		File fout = new File(outputWFPATH);
 		assertTrue(fin.exists());
+		//assertFalse(outputWFPATH.exists());
 		//FIX
-		assertTrue(fout.exists());
+		//assertTrue(fout.exists());
 		com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
-		fout = new File("../BPMN-Models/FeatureBasedMetaWF_instance.bpmn2");
 		assertTrue(fout.exists());
 		//FIX
 		//fout.delete();
-		
 	}
 	
 	
 	//todo: improve testing the content of the file.
-	//fix : correct the test: it is not consistent to give an output file and get the result in another file.
 	@Test
 	@DisplayName("Test Generation with a simple meta workflow using command line")
 	public void testSimpleCommandLineGeneration() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		String metaWFPATH = "../BPMN-Models/BasicMetaWF.bpmn2";
-		String outputWFPATH = "../BPMN-Models";
+		String metaWFPATH =  WF_IN_PATH +"BasicMetaWF.bpmn2";
+		String outputWFPATH = WF_OUT_PATH + "instanceBasic.bpmn2";
 		File fin = new File(metaWFPATH);
 		File fout = new File(outputWFPATH);
 		assertTrue(fin.exists());
-		//FIX
-		assertTrue(fout.exists());
 		com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
-		fout = new File("../BPMN-Models/BasicMetaWF_instance.bpmn2");
 		assertTrue(fout.exists());
 		//FIX
 		//fout.delete();

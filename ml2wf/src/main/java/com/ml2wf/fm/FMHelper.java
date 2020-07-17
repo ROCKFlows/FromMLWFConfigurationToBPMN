@@ -7,10 +7,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-
+import java.util.Objects;
 
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conventions.enums.TaskTagsSelector;
+import com.ml2wf.conventions.enums.fm.FMAttributes;
+import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.util.XMLManager;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,14 +59,19 @@ public class FMHelper {
 		return featureNameList.contains(name);
 	}
 
+
+	
 	public FMHelper(String path) throws ParserConfigurationException, SAXException, IOException {
+
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
 		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
+		
 		builder = factory.newDocumentBuilder();
 		document = builder.parse(new File(path));
 		racine = document.getDocumentElement();
 		featureNameList = listFeatures();
+		System.out.println("apres construction du FM " + featureNameList);
 		constraintList = listConstraints();
 	}
 

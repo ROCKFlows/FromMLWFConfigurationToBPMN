@@ -3,6 +3,7 @@ package com.ml2wf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,6 +26,15 @@ public class TestHelper {
 	 * Utility methods
 	 */
 
+	
+
+	private static List<String> normalize(List<String> list) {
+		List<String> listCopy= new ArrayList<>();
+			list.forEach(t  -> listCopy.add( t.replace(" ", "_")));
+			return listCopy;
+	}
+	
+	
 	
 	public static List<String> nothingIsLost(FMHelper fmBefore, FMHelper fmAfter) {
 		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
@@ -53,9 +63,17 @@ public class TestHelper {
 	public static List<String> checkNoFeaturesAreLost(FMHelper fmAfter, FMHelper fmBefore) {
 		List<String> beforeList = fmBefore.getFeatureNameList();
 		List<String> afterList = fmAfter.getFeatureNameList();
+		beforeList = normalize(beforeList);
+		afterList = normalize(afterList);
 		logger.debug("Before features : %s ", beforeList);
+		System.out.println("Before :" + beforeList);
 		logger.debug("after features : %s ", afterList);
-		assertTrue(fmAfter.getFeatureNameList().containsAll(beforeList));
+		System.out.println("After :" + afterList);
+		
+		List<String> x = new ArrayList<>(beforeList);
+		System.out.println(x.removeAll(afterList));
+		System.out.println("before - After :" + x);
+		assertTrue(afterList.containsAll(beforeList));
 		afterList.removeAll(beforeList);
 		return afterList;
 	}
