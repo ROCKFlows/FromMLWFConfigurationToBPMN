@@ -150,6 +150,8 @@ We can save the meta and instance relationship in the *FeatureModel* using the *
 java -jar ml2wf.jar save -i my_wf.bpmn2 result/my_wf_instance -o featureModel.xml
 ```
 
+> *Note that like any other command, unless the --backup (-b) argument is specified, the original FeatureModel will be modified without backing it up.*
+
 #### Step 2-C : Building
 
 We can build the *FeatureModel* using our existing workflows and the **build **command :
