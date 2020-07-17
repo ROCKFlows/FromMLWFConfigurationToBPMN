@@ -118,7 +118,7 @@ public abstract class AbstractCommand implements Runnable {
 			logger.fatal(exception.getMessage());
 			logger.fatal(EXITING);
 		} else {
-			exception.printStackTrace(); // TODO: to replace by logger
+			logger.fatal("Please refer to the following trace for more informations :", exception);
 		}
 	}
 
