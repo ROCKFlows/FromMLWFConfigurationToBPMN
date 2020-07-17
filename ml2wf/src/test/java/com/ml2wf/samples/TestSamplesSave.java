@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ml2wf.TestHelper;
-import com.ml2wf.fm.FMHelper;
+import com.ml2wf.util.FMHelper;
 
 
 /**
@@ -71,7 +71,7 @@ public class TestSamplesSave {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		List<String> afterList = TestHelper.nothingIsLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
 		//This test involves managing naming differences  using '_' in FM and BPMN
 		logger.debug("added features : %s ", afterList);
 		System.out.println(afterList);

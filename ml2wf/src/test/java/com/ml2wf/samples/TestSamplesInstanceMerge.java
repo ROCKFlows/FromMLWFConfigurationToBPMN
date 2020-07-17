@@ -30,10 +30,10 @@ import org.xml.sax.SAXException;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ml2wf.TestHelper;
-import com.ml2wf.fm.FMHelper;
 import com.ml2wf.generation.InstanceFactoryImpl;
 import com.ml2wf.merge.base.BaseMergerImpl;
 import com.ml2wf.merge.concretes.WFMetaMerger;
+import com.ml2wf.util.FMHelper;
 import com.ml2wf.util.Pair;
 
 
@@ -82,7 +82,7 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		TestHelper.noFeatureLost(fmBefore, fmAfter);
 
 
 		//TODO Improve to avoid double testing
@@ -125,7 +125,7 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		TestHelper.noFeatureLost(fmBefore, fmAfter);
 		
 
 		//FIX 
@@ -162,7 +162,7 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		TestHelper.noFeatureLost(fmBefore, fmAfter);
 		
 
 		//FIX 
@@ -209,7 +209,7 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		TestHelper.noFeatureLost(fmBefore, fmAfter);
 		
 		//FIX 
 		//assertEquals(2, afterList.size());
@@ -247,7 +247,7 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		TestHelper.noFeatureLost(fmBefore, fmAfter);
 				
 		//FIX 
 		//assertEquals(1, afterList.size());
@@ -290,7 +290,7 @@ public class TestSamplesInstanceMerge {
 
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		TestHelper.noFeatureLost(fmBefore, fmAfter);
 		
 		//
 		//FIX 
@@ -339,7 +339,7 @@ public class TestSamplesInstanceMerge {
 
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		TestHelper.noFeatureLost(fmBefore, fmAfter);
 		
 		//
 		//FIX 
@@ -445,7 +445,7 @@ public class TestSamplesInstanceMerge {
 
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		TestHelper.noFeatureLost(fmBefore, fmAfter);
 		
 		//TODO Improve to avoid double testing
 		List<String> afterList = TestHelper.checkNoFeaturesAreLost(fmAfter, fmBefore);

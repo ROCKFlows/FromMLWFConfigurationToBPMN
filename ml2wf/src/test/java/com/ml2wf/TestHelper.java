@@ -12,7 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import com.ml2wf.fm.FMHelper;
+import com.ml2wf.util.FMHelper;
+import com.ml2wf.util.WFHelper;
 
 public class TestHelper {
 	
@@ -34,9 +35,19 @@ public class TestHelper {
 			return listCopy;
 	}
 	
+	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, WFHelper wf){
+		List<String> afterList = normalize(fmAfter.getFeatureNameList());
+		List<String> tasks = wf.gettaskNameList();
+		List<String> lostTasks = lostTasks(tasks, afterList);
+		//System.out.println(" LOST : " + lostTasks);
+		assertTrue( lostTasks.isEmpty());
+		
+		afterList= normalize(noFeatureLost(fmBefore, fmAfter));
+
+		return afterList;
+	}
 	
-	
-	public static List<String> nothingIsLost(FMHelper fmBefore, FMHelper fmAfter) {
+	public static List<String> noFeatureLost(FMHelper fmBefore, FMHelper fmAfter) {
 		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
 		logger.debug("added features : %s ", afterList);
 		List<String> afterConstraints = checkNoConstraintsAreLost(fmAfter, fmBefore);
@@ -66,13 +77,9 @@ public class TestHelper {
 		beforeList = normalize(beforeList);
 		afterList = normalize(afterList);
 		logger.debug("Before features : %s ", beforeList);
-		System.out.println("Before :" + beforeList);
 		logger.debug("after features : %s ", afterList);
-		System.out.println("After :" + afterList);
 		
 		List<String> x = new ArrayList<>(beforeList);
-		System.out.println(x.removeAll(afterList));
-		System.out.println("before - After :" + x);
 		assertTrue(afterList.containsAll(beforeList));
 		afterList.removeAll(beforeList);
 		return afterList;
@@ -86,5 +93,13 @@ public class TestHelper {
 		assertTrue(afterList.containsAll(beforeList));
 		afterList.removeAll(beforeList);
 		return afterList;
+	}
+	
+	public static List<String> lostTasks(List<String> tasks, List<String> features){
+		List<String> tasksTOSave = normalize(tasks);
+		List<String> featureList = normalize(features);
+		tasksTOSave.removeAll(featureList);
+		return tasksTOSave;
+		
 	}
 }

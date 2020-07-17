@@ -1,4 +1,4 @@
-package com.ml2wf.fm;
+package com.ml2wf.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import org.xml.sax.SAXException;
 import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
-import com.ml2wf.util.XMLManager;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -71,7 +70,6 @@ public class FMHelper {
 		document = builder.parse(new File(path));
 		racine = document.getDocumentElement();
 		featureNameList = listFeatures();
-		System.out.println("apres construction du FM " + featureNameList);
 		constraintList = listConstraints();
 	}
 
@@ -118,9 +116,6 @@ public class FMHelper {
 					logger.debug("imp : {}",child);
 					rule = extractImply(child); 
 				}
-				//else {
-				//	rule = child.getNodeName() + " : " + child.getNodeValue();
-				//}
 			}
 		}
 		return rule;

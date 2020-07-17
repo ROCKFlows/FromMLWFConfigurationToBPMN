@@ -1,4 +1,4 @@
-package com.ml2wf.fm;
+package com.ml2wf.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +15,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import com.ml2wf.util.FMHelper;
 
 /**
  * Only usefull to develop FMHelper
