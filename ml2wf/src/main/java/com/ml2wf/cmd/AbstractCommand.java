@@ -113,7 +113,8 @@ public abstract class AbstractCommand implements Runnable {
 	protected void logException(Logger logger, Exception exception) {
 		this.processVerboseArg(1); // 1 = fatal
 		logger.fatal(this.getDefaultMessage());
-		if (!exception.getMessage().isBlank()) {
+		String msg = exception.getMessage();
+		if ((msg != null) && !msg.isBlank()) {
 			logger.fatal(exception.getMessage());
 			logger.fatal(EXITING);
 		} else {

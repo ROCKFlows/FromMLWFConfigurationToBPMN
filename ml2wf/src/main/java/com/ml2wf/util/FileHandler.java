@@ -81,6 +81,9 @@ public class FileHandler {
 	 * @since 1.0
 	 */
 	private static String getDefaultFileName() {
+		if (XMLManager.getDocument() == null) {
+			return DEFAULT_FNAME;
+		}
 		String documentURI = XMLManager.getDocument().getDocumentURI();
 		return (documentURI != null) ? FilenameUtils.getName(documentURI) : DEFAULT_FNAME;
 	}
@@ -108,13 +111,22 @@ public class FileHandler {
 	 * {@link #processExistingFile(File)} method if the given {@code outputFile}
 	 * exists, otherwise by calling the {@link #processMissingFile(File)} method.
 	 *
+	 * @param manager    the manager that will use the processed file. It is used to
+	 *                   adopt a strategy according to the given {@code outputFile}
+	 *                   type.
 	 * @param outputFile output file or directory
 	 * @return the processed {@code File} instance
 	 * @throws IOException
 	 *
 	 * @since 1.0
 	 */
-	public static File processFile(File outputFile) throws IOException {
+	public static File processFile(XMLManager manager, File outputFile) throws IOException {
+		// TODO: remove manager and access it through XMLManager#instance if singleton
+		if ((manager instanceof BaseMergerImpl) && isDirectory(outputFile)) {
+			String errorMsg = String.format("Can't process the given directory : %s", outputFile);
+			errorMsg += "\nA valid XML file was expected.";
+			throw new IOException(errorMsg);
+		}
 		return (outputFile.exists()) ? processExistingFile(outputFile) : processMissingFile(outputFile);
 	}
 
@@ -191,11 +203,9 @@ public class FileHandler {
 			String parentPath = FilenameUtils.getFullPath(fName);
 			return parentPath + name + content + EXTENSION_SEPARATOR + extension;
 		}
-		String logMsg = String.format("Error while renaming file : %s", fName);
-		logger.warn(logMsg);
+		logger.warn("Error while renaming file : {}", fName);
 		String errorfName = "BACKUP_ERROR.xml";
-		logMsg = String.format("Saving backup file as : %s", errorfName);
-		logger.warn(logMsg);
+		logger.warn("Saving backup file as : {}", errorfName);
 		return errorfName;
 	}
 
@@ -211,8 +221,7 @@ public class FileHandler {
 	 * @see Document
 	 */
 	public static Document preprocess(File file) throws ParserConfigurationException, SAXException, IOException {
-		String logMsg = String.format("Preprocessing file : %s...", file.getName());
-		logger.info(logMsg);
+		logger.info("Preprocessing file : {}...", file.getName());
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		// --- protection against XXE attacks
 		logger.debug("Protecting against XXE attacks");
@@ -259,7 +268,7 @@ public class FileHandler {
 	 * @since 1.0
 	 * @see Document
 	 */
-	public static Document createEmptyFM(DocumentBuilder docBuilder) throws ParserConfigurationException {
+	public static Document createEmptyFM(DocumentBuilder docBuilder) {
 		Document document = docBuilder.newDocument();
 		// adding the DOM structure
 		Element root = (Element) document.appendChild(document.createElement(FMNames.EXTENDEDFEATUREMODEL.getName()));
@@ -285,8 +294,7 @@ public class FileHandler {
 	 * @see Document
 	 */
 	public static void saveDocument(File destFile, Document document) throws TransformerException, IOException {
-		String logMsg = String.format("Saving file at location : %s...", destFile);
-		logger.info(logMsg);
+		logger.info("Saving file at location : {}...", destFile);
 		if (!destFile.createNewFile()) {
 			logger.debug("[SAVE] Destination file aldready exists.");
 			logger.debug("[SAVE] Overriding...");
@@ -334,6 +342,30 @@ public class FileHandler {
 		File destFile = new File(backUpPath);
 		FileHandler.saveDocument(destFile, document);
 		logger.info("Back up finished.");
+	}
+
+	/**
+	 * Returns whether the given {@code file} is a directory or not.
+	 *
+	 * <p>
+	 *
+	 * Unlike the {@link File#isDirectory()} method, this method will return true
+	 * for a non-existing file that looks like a directory.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method, in a context of XML files treatment, considers
+	 * a file without extension as a directory.
+	 *
+	 * @param file file to test
+	 * @return whether the given {@code file} is a directory or not
+	 *
+	 * @since 1.0
+	 * @see File
+	 * @see FilenameUtils
+	 */
+	private static boolean isDirectory(File file) {
+		return file.isDirectory() || FilenameUtils.getExtension(file.getName()).isBlank();
 	}
 
 }

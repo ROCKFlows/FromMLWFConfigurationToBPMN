@@ -96,7 +96,7 @@ public class XMLManager {
 	 * @throws IOException
 	 */
 	public XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
-		this.sourceFile = FileHandler.processFile(file);
+		this.sourceFile = FileHandler.processFile(this, file);
 		this.path = file.getAbsolutePath();
 		XMLManager.updateDocument(this.sourceFile);
 	}
