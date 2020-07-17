@@ -107,8 +107,8 @@ public class Merge extends AbstractCommand {
 			this.merger = (this.exclusive.meta) ? new WFMetaMerger(this.output) : new WFInstanceMerger(this.output);
 			this.processMerge();
 		} catch (Exception e) {
-			logger.fatal("Can't merge the Workflow with the FeatureModel.");
-			e.printStackTrace(); // TODO: to replace by logger
+			logger.fatal(CANT_MERGE);
+			logException(logger, e);
 		}
 
 	}

@@ -71,8 +71,8 @@ public class Save extends AbstractCommand {
 			((XMLManager) merger).save();
 			LogManager.shutdown();
 		} catch (Exception e) {
-			logger.fatal("Can't merge the Workflow with the FeatureModel.");
-			e.printStackTrace();
+			logger.fatal(CANT_MERGE);
+			logException(logger, e);
 		}
 	}
 }

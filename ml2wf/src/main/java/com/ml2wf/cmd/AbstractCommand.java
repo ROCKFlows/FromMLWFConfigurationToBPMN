@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import com.ml2wf.App;
@@ -39,6 +40,14 @@ public abstract class AbstractCommand implements Runnable {
 	 * Default verbosity {@code Level}.
 	 */
 	private static final Level DEFAULT_VERB_LEVEL = Level.INFO;
+	/**
+	 * Error message due to an error that occured during the instantiation process.
+	 */
+	protected static final String CANT_MERGE = "Can't merge the Workflow with the FeatureModel.";
+	/**
+	 * Error message due to an error that occured during the instantiation process.
+	 */
+	protected static final String CANT_INSTANTIATE = "Can't instantiate the WorkFlow.";
 
 	/**
 	 * Returns the {@code PACKAGE_NAME}.
@@ -71,6 +80,22 @@ public abstract class AbstractCommand implements Runnable {
 			return DEFAULT_VERB_LEVEL;
 		}
 		return DEFAULT_VERB_LEVEL;
+	}
+
+	/**
+	 * Logs the given {@code exception}'s error message if it is not blank using the
+	 * given {@code logger}. Otherwise, prints the given {@code exception}'s stack
+	 * trace.
+	 *
+	 * @param logger    logger used to log the error
+	 * @param exception exception to log
+	 */
+	protected static void logException(Logger logger, Exception exception) {
+		if (!exception.getMessage().isBlank()) {
+			logger.fatal(exception.getMessage());
+		} else {
+			exception.printStackTrace(); // TODO: to replace by logger
+		}
 	}
 
 }

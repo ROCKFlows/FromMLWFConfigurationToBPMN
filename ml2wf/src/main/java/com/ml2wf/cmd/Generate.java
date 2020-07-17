@@ -51,11 +51,6 @@ public class Generate extends AbstractCommand {
 	 */
 	private static final Logger logger = LogManager.getLogger(Generate.class);
 
-	/**
-	 * Error message due to an error that occured during the instantiation process.
-	 */
-	private static final String CANT_INSTANTIATE = "Can't instantiate the WorkFlow.";
-
 	@Override
 	public void run() {
 
@@ -67,7 +62,7 @@ public class Generate extends AbstractCommand {
 			LogManager.shutdown();
 		} catch (Exception e) {
 			logger.fatal(CANT_INSTANTIATE);
-			e.printStackTrace();
+			logException(logger, e);
 		}
 	}
 
