@@ -42,7 +42,7 @@
 					<graphics key="collapsed" value="false"/>
 					<and abstract="true" name="MLAlgorithm">
 						<graphics key="collapsed" value="false"/>
-						<and abstract="true" name=" BasedOnSimilarity">
+						<and abstract="true" name="BasedOnSimilarity">
 							<graphics key="collapsed" value="false"/>
 							<feature name="OC_SVM"/>
 						</and>

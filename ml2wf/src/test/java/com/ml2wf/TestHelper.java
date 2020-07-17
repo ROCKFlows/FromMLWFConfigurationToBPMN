@@ -26,12 +26,13 @@ public class TestHelper {
 	 */
 
 	
-	public static void nothingIsLost(FMHelper fmBefore, FMHelper fmAfter) {
+	public static List<String> nothingIsLost(FMHelper fmBefore, FMHelper fmAfter) {
 		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
 		logger.debug("added features : %s ", afterList);
-		afterList = checkNoConstraintsAreLost(fmAfter, fmBefore);
-		logger.debug("added Constraints : %s ", afterList);
+		List<String> afterConstraints = checkNoConstraintsAreLost(fmAfter, fmBefore);
+		logger.debug("added Constraints : %s ", afterConstraints);
 		//todo check that no tasks are lost
+		return afterList;
 	}
 	
 	//TODO add test on constraints

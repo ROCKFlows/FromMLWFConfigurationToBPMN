@@ -10,7 +10,7 @@
       <bpmn2:extensionElements>
         <ext:style ext:shapeBackground="#00f900"/>
       </bpmn2:extensionElements>
-      <bpmn2:documentation id="Documentation_1">refersTo: Preprocessing_step</bpmn2:documentation>
+      <bpmn2:documentation id="Documentation_1_1">refersTo: Preprocessing_step</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
     </bpmn2:task>

@@ -1,13 +1,8 @@
 package com.ml2wf.samples;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,36 +15,29 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ml2wf.TestHelper;
 import com.ml2wf.fm.FMHelper;
-import com.ml2wf.generation.InstanceFactoryImpl;
-import com.ml2wf.merge.base.BaseMergerImpl;
-import com.ml2wf.merge.concretes.WFMetaMerger;
-import com.ml2wf.util.Pair;
 
 
 /**
  * @author blay
  *
  */
-public class TestInstanceSamplesMerge {
+public class TestSamplesMetaMerge {
 
 	
 	/**
 	 * {@code Logger}'s instance.
 	 */
-	private static final Logger logger = LogManager.getLogger(TestInstanceSamplesMerge.class);
+	private static final Logger logger = LogManager.getLogger(TestSamplesMetaMerge.class);
 
-	private static final String FM_OUT_PATH = "./target/generated/FM_I/";
+	private static final String FM_OUT_PATH = "./target/generated/FM/";
 	
 	@BeforeEach
 	public void setUp() throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
@@ -63,42 +51,42 @@ public class TestInstanceSamplesMerge {
 	@Test
 	@DisplayName("Test with a basic workflow adding one Step")
 	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		String instanceWFPATH = "../BPMN-Models/BasicWF_instance00.bpmn2";
+		String metaWFPATH = "../BPMN-Models/BasicMetaWF.bpmn2";
 		String sourceFM="../samples/basicFM.xml";
 		//FIX avoid to make a copy
+		//../samples/basicFMCopy.xml";
 		String copiedFM= FM_OUT_PATH +"basicFMCopy.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
-		File fin = new File(instanceWFPATH);
+		File fin = new File(metaWFPATH);
 		assertTrue(fin.exists());
 		assertTrue(copiedFile.exists());
 		
 		FMHelper fmBefore = new FMHelper(copiedFM);
 		//Command
-		String[] command = new String[] {"merge","--instance", "-i ", instanceWFPATH, "-o ",copiedFM, "-v","7"};
+		String[] command = new String[] {"merge","--meta", "-i ", metaWFPATH, "-o ",copiedFM, "-v","7"};
 		com.ml2wf.App.main(command);
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
-		//TODO  Test concrete and abstract features
-
-		//FIX 
-		//assertEquals(1, afterList.size());
-		//assertTrue(fmAfter.isFeature("Evaluating_step"));
-		//assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
-		assertTrue(fmAfter.isFeature("Evaluating_10Fold"));
-		//assertTrue(fmAfter.isDirectChildOf("Evaluating_step", "Evaluation_10Fold"));
-		assertTrue(fmAfter.isDirectChildOf("Preprocessing_step","Normalize"));
+		List<String> afterList = TestHelper.nothingIsLost(fmBefore, fmAfter);
+		logger.debug("added features : %s ", afterList);
+		
+		//Specific properties
+		assertEquals(1, afterList.size());
+		assertTrue(fmAfter.isFeature("Evaluating_step"));
+		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
+		//TODO test abstract Features
+		
 		//Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
+		
 	}
 	
 	
 	@Test
-	@Disabled
 	@DisplayName("Test with a basic workflow adding one Step and one constraint")
 	public void testBasicWFWithOneConstraintUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFWithConstraint2.bpmn2";
@@ -120,11 +108,11 @@ public class TestInstanceSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingIsLost(fmBefore, fmAfter);
+		logger.debug("added features : %s ", afterList);
 		
-
-		//FIX 
-		//assertEquals(1, afterList.size());
+		//Specific properties
+		assertEquals(1, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
 
@@ -135,7 +123,6 @@ public class TestInstanceSamplesMerge {
 	}
 	
 	@Test
-	@Disabled
 	@DisplayName("Test with a basic workflow adding one Step, one criteria and one constraint")
 	public void testBasicWFWithOneContraintAddingACriteriaUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFWithConstraint.bpmn2";
@@ -157,15 +144,17 @@ public class TestInstanceSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingIsLost(fmBefore, fmAfter);
+		logger.debug("added features : %s ", afterList);
 		
-
+		//Specific properties
+		
 		//FIX 
 		//Evaluating_step  =>  Evaluation_criteria I was expecting Evaluation_criteria to be added as an unmanaged Feature
-		
-		//assertEquals(1, afterList.size());
+		//assertEquals(2, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
+		//assertTrue(fmAfter.isFeature("Evaluation_criteria"));
 		//FIX test constraint : Evaluating_step => Evaluation_criteria
 		//assertTrue(fmAfter.isFeature("Evaluation_criteria"));
 		//FIX Test position of criteria to be improved
@@ -182,7 +171,6 @@ public class TestInstanceSamplesMerge {
 	
 	
 	@Test
-	@Disabled
 	@DisplayName("Test with a basic workflow adding two Steps")
 	public void testAddingTwoStepsUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWF2.bpmn2";
@@ -204,10 +192,13 @@ public class TestInstanceSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingIsLost(fmBefore, fmAfter);
+		logger.debug("added features : %s ", afterList);
+		
+		//Specific properties
 		
 		//FIX 
-		//assertEquals(2, afterList.size());
+		assertEquals(2, afterList.size());
 		String f1 = "Evaluating_step";
 		String f2 = "Acquire_Metadata";
 		assertTrue(fmAfter.isFeature(f1));
@@ -217,10 +208,10 @@ public class TestInstanceSamplesMerge {
 		
 		//Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
+		
 	}
 	
 	@Test
-	@Disabled
 	@DisplayName("Test with a basic workflow adding One hierarchic Step")
 	public void testAddingOneHierarchicStepUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie.bpmn2";
@@ -242,10 +233,11 @@ public class TestInstanceSamplesMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
-				
-		//FIX 
-		//assertEquals(1, afterList.size());
+		List<String> afterList = TestHelper.nothingIsLost(fmBefore, fmAfter);
+		logger.debug("added features : %s ", afterList);
+		
+		//Specific properties
+		assertEquals(1, afterList.size());
 		String parent  = "Preprocessing_step";
 		String f1 = "Missing_Values";
 		assertTrue(fmBefore.isFeature(parent));
@@ -261,7 +253,6 @@ public class TestInstanceSamplesMerge {
 	}
 	
 	@Test
-	@Disabled
 	@DisplayName("Test with a basic workflow adding One hierarchic Step at two levels")
 	public void testAddingMultipleHierarchicStepUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie2.bpmn2";
@@ -285,11 +276,12 @@ public class TestInstanceSamplesMerge {
 
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
+		List<String> afterList = TestHelper.nothingIsLost(fmBefore, fmAfter);
+		logger.debug("added features : %s ", afterList);
 		
-		//
-		//FIX 
-		//assertEquals(1, afterList.size());
+		//Specific properties
+		 
+		assertEquals(3, afterList.size());
 		String otherParent = "Preprocess_data";
 		String f1 = "Missing_Values";
 		assertFalse(fmBefore.isFeature(f1));
@@ -310,7 +302,6 @@ public class TestInstanceSamplesMerge {
 
 	
 	@Test
-	@Disabled
 	@DisplayName("#Conflict : A same task as a subtask of several meta task ")
 	public void testConflict4aTaskclassifiedAtTwoDifferentPlacesUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie3.bpmn2";
@@ -334,11 +325,13 @@ public class TestInstanceSamplesMerge {
 
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
-		
+		List<String> afterList = TestHelper.nothingIsLost(fmBefore, fmAfter);
+		logger.debug("added features : %s ", afterList);
+		System.out.println(afterList);
+		//Specific properties
 		//
-		//FIX 
-		//assertEquals(1, afterList.size());
+		//FIX ABstract they are false..
+		assertEquals(3, afterList.size());
 		String parent  = "Preprocessing_step";
 		String otherParent = "Preprocess_data";
 		String f1 = "Missing_Values";
@@ -362,7 +355,6 @@ public class TestInstanceSamplesMerge {
 	
 
 	@Test
-	@Disabled
 	@DisplayName("Test Merge when input WF file doesn't exist")
 	public void testGenerationWithNoWFInputFile() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchieX.bpmn2";
@@ -372,7 +364,6 @@ public class TestInstanceSamplesMerge {
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
-		File fin = new File(metaWFPATH);
 		assertTrue(copiedFile.exists());
 		
 		
@@ -389,7 +380,6 @@ public class TestInstanceSamplesMerge {
 	}
 	
 	@Test
-	@Disabled
 	@DisplayName("Test Merge when input FM file doesn't exist")
 	public void testGenerationWithNoFMInputFile() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie.bpmn2";
@@ -416,7 +406,6 @@ public class TestInstanceSamplesMerge {
 	
 	//todo: improve testing the content of the file.
 	@Test
-	@Disabled
 	@DisplayName("Test Merge with a complex workflow")
 	public void testGenerationWithCompletExample() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH = "../BPMN-Models/FeatureBasedMetaWF.bpmn2";
@@ -440,11 +429,10 @@ public class TestInstanceSamplesMerge {
 
 		
 		//General Properties to check
-		TestHelper.nothingIsLost(fmBefore, fmAfter);
-		
-		//TODO Improve to avoid double testing
-		List<String> afterList = TestHelper.checkNoFeaturesAreLost(fmAfter, fmBefore);
+		List<String> afterList = TestHelper.nothingIsLost(fmBefore, fmAfter);
 		logger.debug("added features : %s ", afterList);
+		
+		//Specific properties
 		
 		//
 		//TODO : IMPROVE with a getTaskList
@@ -453,11 +441,10 @@ public class TestInstanceSamplesMerge {
 		System.out.println(afterList.size() + " : " + afterList);
 		logger.debug(afterList.size() + " : " + afterList);
 		List<String> featuresToAdd=new ArrayList<>(Arrays.asList("Check_Model_Stability", "Spread_observations", "Compute_features", "Filter_confirmed_observations_from_training_data_?","Anotate_observations", "Set_$ml_model_default_param", "Validate_model", "Preprocess_data", "Select_data_for_training", "Acquire_Metadata", "Train_$ml_model", "Solve_labeling_conflicts", "Spread_confirmed_observations", "Compute_similarities", "Select_observations_to_anotate", "Preprocess_features", "Detect_with_$ml_model", "Fine_Tune_$ml_model_hyper_parameters"));
-		//FIX removing Unmanaged
-		//assertEquals(afterList.size(),featuresToAdd.size());
+		assertEquals(afterList.size(),featuresToAdd.size());
 		afterList.removeAll(featuresToAdd);
-		//FIX
-		//assertTrue(afterList.isEmpty());
+
+		assertTrue(afterList.isEmpty());
 		System.out.println(afterList.size() + " : " + afterList);
 		//FIX
 		//Ensure all new Features corresponding to Tasks are Steps

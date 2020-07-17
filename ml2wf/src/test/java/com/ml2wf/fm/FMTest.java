@@ -30,12 +30,13 @@ class FMTest {
 		assertTrue(ffm.exists());
 		FMHelper fm = new FMHelper(sourceFM);
 		List<String> features = fm.getFeatureNameList();
+		//System.out.println(features);
 		assertTrue(fm.isFeature("Steps"));
 		Node n = fm.extractFeature("Steps") ;
 		assertTrue( n.getAttributes().getNamedItem("name").getNodeValue().contentEquals("Steps"));
 		assertTrue(fm.isDirectChildOf("Steps", "Training_step"));
 		assertFalse(fm.isDirectChildOf("Steps", "train OC_SVM"));
-		assertTrue(fm.isChildOf("Steps", "train OC_SVM"));
+		assertTrue(fm.isChildOf("Steps", "Train OC_SVM"));
 	}
 
 	@Test
