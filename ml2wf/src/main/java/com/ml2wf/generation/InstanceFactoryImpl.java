@@ -18,6 +18,7 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
+import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.util.XMLManager;
@@ -67,6 +68,18 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	public InstanceFactoryImpl(File file) throws ParserConfigurationException, SAXException, IOException {
 		super(file);
+	}
+
+	@Override
+	protected void normalizeDocument() {
+		getDocument().getDocumentElement().normalize();
+		List<Node> taskNodes = XMLManager.getTasksList(getDocument(), BPMNNames.SELECTOR);
+		for (Node taskNode : taskNodes) {
+			Node nameNode = taskNode.getAttributes().getNamedItem(BPMNAttributes.NAME.getName());
+			if (nameNode != null) {
+				nameNode.setNodeValue(nameNode.getNodeValue().replace(" ", "_"));
+			}
+		}
 	}
 
 	/**
@@ -126,6 +139,11 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		this.getWFInstance(super.getSourceFile());
+	}
+
+	@Override
+	protected TaskTagsSelector getSelector() {
+		return BPMNNames.SELECTOR;
 	}
 
 	/**

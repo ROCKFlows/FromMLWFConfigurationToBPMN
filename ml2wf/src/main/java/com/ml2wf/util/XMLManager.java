@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,7 +48,7 @@ import com.ml2wf.tasks.manager.TasksManager;
  * @version 1.0
  *
  */
-public class XMLManager {
+public abstract class XMLManager {
 
 	/**
 	 * Path to the XML file's directory.
@@ -99,6 +100,7 @@ public class XMLManager {
 		this.sourceFile = FileHandler.processFile(this, file);
 		this.path = file.getAbsolutePath();
 		XMLManager.updateDocument(this.sourceFile);
+		this.normalizeDocument();
 	}
 
 	/**
@@ -234,6 +236,32 @@ public class XMLManager {
 	 */
 	public void save() throws TransformerException, IOException {
 		this.save(this.getSourceFile());
+	}
+
+	/**
+	 * Returns the {@code TaskTagsSelector} according to the operation type.
+	 *
+	 * <p>
+	 *
+	 * e.g. {@literal <merge, FMNames.SELECTOR>, <generation, BPMNNames.SELECTOR>}
+	 *
+	 * @return the {@code TaskTagsSelector} according to the operation type
+	 *
+	 * @since 1.0
+	 * @see TaskTagsSelector}
+	 */
+	protected abstract TaskTagsSelector getSelector();
+
+	/**
+	 * Normalizes the document by applying the {@link Element#normalize()} method
+	 * and replacing all whitespaces by underscores.
+	 */
+	protected void normalizeDocument() {
+		getDocument().getDocumentElement().normalize();
+		List<Node> taskNodes = XMLManager.getTasksList(getDocument(), this.getSelector());
+		taskNodes.stream().map(t -> t.getAttributes().getNamedItem(FMAttributes.NAME.getName()))
+				.filter(Objects::nonNull)
+				.forEach(t -> t.setNodeValue(t.getNodeValue().trim().replace(" ", "_")));
 	}
 
 	/**
