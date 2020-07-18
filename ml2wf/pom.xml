@@ -17,6 +17,8 @@
         <version.shade.plugin>3.2.3</version.shade.plugin>
         <version.picocli>4.3.2</version.picocli>
         <version.log4j>2.13.3</version.log4j>
+        <version.commons-io>2.7</version.commons-io>
+        <version.jansi>1.18</version.jansi>
         <dependency.directory>dependency/</dependency.directory>
     </properties>
     <build>
@@ -64,7 +66,7 @@
                     <include>**/*.bpmn</include>
                     <include>**/*.bpmn2</include>
                     <include>**/*.xml</include>
-                    <include>log4j2.properties</include>
+                     <include>**/log4j2.xml</include>
                 </includes>
             </resource>
         </resources>
@@ -113,13 +115,13 @@
 		<dependency>
 		    <groupId>commons-io</groupId>
 		    <artifactId>commons-io</artifactId>
-		    <version>2.7</version>
+		    <version>${version.commons-io}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.jcabi/jcabi-log -->
+		<!-- https://mvnrepository.com/artifact/org.fusesource.jansi/jansi -->
 		<dependency>
-		    <groupId>com.jcabi</groupId>
-		    <artifactId>jcabi-log</artifactId>
-		    <version>0.18.1</version>
+		    <groupId>org.fusesource.jansi</groupId>
+		    <artifactId>jansi</artifactId>
+		    <version>${version.jansi}</version>
 		</dependency>
     </dependencies>
 </project>
