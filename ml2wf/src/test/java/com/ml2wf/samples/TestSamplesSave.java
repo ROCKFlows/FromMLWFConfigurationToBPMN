@@ -84,12 +84,18 @@ public class TestSamplesSave {
 		//TODO test generated constraints
 		//FIX
 		//Check idempotence
-		//TestHelper.checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 		
 	}
 	
+	/**
+	 * THis test leads to a valid FM because Missing_value is not abstract, and we don't forbid to select several algorithms in the same class.
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
 	@Test
-	@DisplayName("Test with a basic workflow adding one Step")
+	@DisplayName("Test with a hierarchic workflow adding one Step")
 	public void testBasicHierachieSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie.bpmn2";
 		String instanceWFPATH = "../BPMN-Models/instanceBasicHierarchieToFail.bpmn2";
@@ -122,8 +128,10 @@ public class TestSamplesSave {
 		//TODO test generated constraints
 		//FIX
 		//Check idempotence
-		//TestHelper.checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 		
 	}
 
+	
+	//TODO : Test with optional tasks present and absent in the WF instance; verify that the FM is still consistent.
 }

@@ -105,13 +105,13 @@ public class TestHelper {
 		logger.debug("Test Idempotence {}");
 		List<String> afterList;
 		fmBefore = new FMHelper(fM);
-		//System.out.println("Before : " + fmBefore.getFeatureNameList());
+		System.out.println("Before : " + fmBefore.getFeatureNameList());
 		com.ml2wf.App.main(command);
 		fmAfter = new FMHelper(fM);
-		//System.out.println("After : " + fmAfter.getFeatureNameList());
+		System.out.println("After : " + fmAfter.getFeatureNameList());
 		afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
 		logger.debug("AFTER should be empty : %s", afterList);
-		//System.out.println("AFTER should be empty : %s" + afterList);
+		System.out.println("AFTER should be empty : %s" + afterList);
 		assertTrue(afterList.isEmpty());
 	}
 

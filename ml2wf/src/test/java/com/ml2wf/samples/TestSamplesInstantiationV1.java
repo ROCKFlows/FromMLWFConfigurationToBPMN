@@ -192,5 +192,23 @@ public class TestSamplesInstantiationV1 {
 			
 		}
 	
-	
+		//todo: improve testing the content of the file.
+		@Test
+		@DisplayName("Test Generation with a meta workflow with constraints using command line")
+		public void testCommandLineGenerationwithConstraints() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+			String metaWFPATH =  WF_IN_PATH +"BasicMetaWFWithConstraint2.bpmn2";
+			String outputWFPATH = WF_OUT_PATH + "instanceBasicWFWithConstraint2.bpmn2";
+			File fin = new File(metaWFPATH);
+			File fout = new File(outputWFPATH);
+			assertTrue(fin.exists());
+			com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
+			assertTrue(fout.exists());
+			TestHelper.noLostTaskAtInstanciation(metaWFPATH,outputWFPATH);
+			//FIX
+			//fout.delete();
+			
+		}
+		
+		//todo test with optionnal task
+		
 }
