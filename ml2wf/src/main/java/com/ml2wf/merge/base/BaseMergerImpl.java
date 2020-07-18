@@ -299,8 +299,10 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		// retrieving a suitable parent
 		FMTask parentTask = this.getSuitableParent(task);
 		// inserting the new task
-		this.insertNewTask(parentTask, task);
-
+		FMTask insertedTask = this.insertNewTask(parentTask, task);
+		// updating abstract status
+		// must be true if it is a "meta merge"
+		insertedTask.setAbstract(insertedTask.isAbstract() || (this instanceof WFMetaMerger));
 	}
 
 	// TODO
