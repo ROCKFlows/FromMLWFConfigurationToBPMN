@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,7 +19,6 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.util.XMLManager;
@@ -74,12 +74,9 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	protected void normalizeDocument() {
 		getDocument().getDocumentElement().normalize();
 		List<Node> taskNodes = XMLManager.getTasksList(getDocument(), BPMNNames.SELECTOR);
-		for (Node taskNode : taskNodes) {
-			Node nameNode = taskNode.getAttributes().getNamedItem(BPMNAttributes.NAME.getName());
-			if (nameNode != null) {
-				nameNode.setNodeValue(nameNode.getNodeValue().replace(" ", "_"));
-			}
-		}
+		taskNodes.stream().map(t -> t.getAttributes().getNamedItem(BPMNAttributes.NAME.getName()))
+				.filter(Objects::nonNull)
+				.forEach(t -> t.setNodeValue(t.getNodeValue().trim().replace(" ", "_")));
 	}
 
 	/**
@@ -141,11 +138,6 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		this.getWFInstance(super.getSourceFile());
 	}
 
-	@Override
-	protected TaskTagsSelector getSelector() {
-		return BPMNNames.SELECTOR;
-	}
-
 	/**
 	 * Instantiates the given {@code node}.
 	 *
@@ -167,16 +159,15 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	private void instantiateNode(Node node) {
-		// documentation part
-		// TODO: factorize in method ?
 		String content = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName()).getNodeValue();
-		mergeNodesTextContent(addDocumentationNode(node), getReferenceDocumentation(content));
+		String[] splittedContent = content.split(Notation.getGeneratedPrefixVoc());
+		String currentRef = splittedContent[splittedContent.length - 1];
+		mergeNodesTextContent(addDocumentationNode(node), getReferenceDocumentation(currentRef));
 		// extension part
 		this.addExtensionNode(node);
 		// node renaming part
 		Node nodeAttrName = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName());
-		// TODO: update instance syntax
-		String nodeName = XMLManager.sanitizeName(nodeAttrName.getNodeValue()) + "_" + this.taskCounter++;
+		String nodeName = XMLManager.sanitizeName(currentRef) + "_" + this.taskCounter++;
 		nodeAttrName.setNodeValue(nodeName);
 	}
 
@@ -265,6 +256,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		Element style = getDocument().createElement(BPMNNames.STYLE.getName());
 		String logMsg = String.format("	Adding style %s to node %s", INSTANTIATE_COLOR, node);
 		logger.debug(logMsg);
+		// TODO: if optional then change BACKGROUND color
 		style.setAttribute(BPMNAttributes.BACKGROUND.getName(), INSTANTIATE_COLOR);
 		extension.appendChild(style);
 		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());

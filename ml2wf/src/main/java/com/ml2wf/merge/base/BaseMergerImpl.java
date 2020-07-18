@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,7 +25,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.constraints.InvalidConstraintException;
-import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
@@ -39,6 +39,7 @@ import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.FMTaskSpecs;
 import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.Pair;
+import com.ml2wf.util.XMLManager;
 
 public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerger {
 
@@ -103,11 +104,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	}
 
 	@Override
-	protected TaskTagsSelector getSelector() {
-		return FMNames.SELECTOR;
-	}
-
-	@Override
 	public void mergeWithWF(boolean backUp, boolean completeMerge, File wfFile) throws Exception {
 		if (backUp) {
 			FileHandler.backUp(this.getPath(), getDocument());
@@ -147,6 +143,15 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		for (File wfFile : wfFiles) {
 			this.mergeWithWF(backUp, completeMerge, wfFile);
 		}
+	}
+
+	@Override
+	protected void normalizeDocument() {
+		getDocument().getDocumentElement().normalize();
+		List<Node> taskNodes = XMLManager.getTasksList(getDocument(), FMNames.SELECTOR);
+		taskNodes.stream().map(t -> t.getAttributes().getNamedItem(FMAttributes.NAME.getName()))
+				.filter(Objects::nonNull)
+				.forEach(t -> t.setNodeValue(t.getNodeValue().trim().replace(" ", "_")));
 	}
 
 	/**
