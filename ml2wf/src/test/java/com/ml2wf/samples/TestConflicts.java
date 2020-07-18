@@ -118,7 +118,7 @@ public class TestConflicts {
 
 	//FIX exception null pointer is raised! 
 	@Test
-	@DisplayName("Conflict : F31 can't be in the same time child of F3 and F2")
+	@DisplayName("Conflict : F31 can't be in the same time child of F3 and F2 #81 #66")
 	public void testWF3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF3.bpmn2";
 		String sourceFM="../samples/FMA.xml";
@@ -247,5 +247,12 @@ public class TestConflicts {
 			//Check idempotence
 			TestHelper.checkIdempotence(copiedFM, command);
 		}
+		
+		//One feature is abstract and concret 
+		//e.g. a Meta declare Normalize and an instance uses also Normalize
+		//==> suggest user to specialize Normalize with a concrete task ?
+		//e.g. Normalize is said concrete in FM
+		//a Meta uses Normalize
+		//==> A warning is raised and Normalize becomes "abstract"?
 }
 

@@ -78,7 +78,8 @@ public class TestSamplesMetaMerge {
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		//List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
 		logger.debug("added features : %s ", afterList);
-		
+		//All added feature should be abstract
+		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 		//Specific properties
 		assertEquals(1, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
@@ -116,6 +117,7 @@ public class TestSamplesMetaMerge {
 		//General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
+		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 		
 		//Specific properties
 		assertEquals(1, afterList.size());
@@ -152,6 +154,7 @@ public class TestSamplesMetaMerge {
 		//General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
+		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 		
 		//Specific properties
 		
@@ -200,6 +203,7 @@ public class TestSamplesMetaMerge {
 		//General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
+		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 		
 		//Specific properties
 		
@@ -241,6 +245,8 @@ public class TestSamplesMetaMerge {
 		//General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
+		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
+		
 		
 		//Specific properties
 		assertEquals(1, afterList.size());
@@ -284,6 +290,7 @@ public class TestSamplesMetaMerge {
 		//General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		logger.debug("added features : %s ", afterList);
+		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 		
 		//Specific properties
 		 
@@ -333,6 +340,7 @@ public class TestSamplesMetaMerge {
 		//General Properties to check
 		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
 		logger.debug("added features : %s ", afterList);
+		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 		//System.out.println(afterList);
 		//Specific properties
 		//
@@ -438,6 +446,7 @@ public class TestSamplesMetaMerge {
 		//General Properties to check
 		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
 		logger.debug("added features : %s ", afterList);
+		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 		
 		//Specific properties
 		

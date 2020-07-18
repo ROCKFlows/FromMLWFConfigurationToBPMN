@@ -56,6 +56,13 @@ public class FMHelper {
 		return featureNameList.contains(name);
 	}
 
+	public boolean isAbstract(String name) {
+		if (featureNameList.contains(name)) {
+			Node n = extractFeature(name);
+			return isAbstract(n);
+		}
+		return false;
+	}
 
 	
 	public FMHelper(String path) throws ParserConfigurationException, SAXException, IOException {
@@ -240,7 +247,15 @@ public class FMHelper {
 		else return "";
 	}
 
-
+	private boolean isAbstract(Node node) { 
+		if ( (node != null) 
+				&& (node.getAttributes() != null)
+				&& (node.getAttributes().getNamedItem("abstract") != null) )
+		{
+			return (node.getAttributes().getNamedItem("abstract").getNodeValue().contentEquals("true")); 
+		}
+		else return false;
+	}
 
 
 	public boolean isDirectChildOf(String parent, String childName) {

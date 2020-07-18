@@ -16,8 +16,10 @@
     </bpmn2:task>
     <bpmn2:task id="Task_3" name="Evaluating_step">
       <bpmn2:extensionElements>
-        <ext:style ext:shapeBackground="#e2e7e2"/>
+        <ext:style ext:shapeBackground="#f6b291"/>
       </bpmn2:extensionElements>
+      <bpmn2:documentation id="Documentation_3"><![CDATA[@optionnal
+]]></bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
     </bpmn2:task>

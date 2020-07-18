@@ -40,6 +40,9 @@ public class WFHelper {
 	 * ArrayList<>(constraintList); }
 	 */
 
+	/**
+	 * @return List of task names without any treatment
+	 */
 	public List<String> gettaskNameList() {
 		return new ArrayList<>(taskNameList);
 	}

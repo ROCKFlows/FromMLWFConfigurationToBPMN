@@ -50,7 +50,8 @@ public class TestSamplesInstanceMerge {
 	private static final Logger logger = LogManager.getLogger(TestSamplesInstanceMerge.class);
 
 	private static final String FM_OUT_PATH = "./target/generated/FM_I/";
-	
+	private static final String FM_IN_PATH = "../samples/";
+	private static final String WF_IN_PATH = "../BPMN-Models/";
 	@BeforeEach
 	public void setUp() throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
 		logger.info("Hello Test Samples about Merge!");
@@ -63,8 +64,8 @@ public class TestSamplesInstanceMerge {
 	@Test
 	@DisplayName("Test with a basic workflow instance adding one Step")
 	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		String instanceWFPATH = "../BPMN-Models/BasicWF_instance00.bpmn2";
-		String sourceFM="../samples/basicFM.xml";
+		String instanceWFPATH = WF_IN_PATH + "BasicWF_instance00.bpmn2";
+		String sourceFM=FM_IN_PATH +"basicFM.xml";
 		//FIX avoid to make a copy
 		String copiedFM= FM_OUT_PATH +"basicFMCopy.xml";
 		File copiedFile = new File(copiedFM);
@@ -82,13 +83,12 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.noFeatureLost(fmBefore, fmAfter);
-
+		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		TestHelper.testAbstractAndConcreteFeatures(addedFeatures,instanceWFPATH, fmAfter);
 
 		//TODO Improve to avoid double testing
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, instanceWFPATH);
 		logger.debug("added features : %s ", afterList);
-		//TODO  Test concrete and abstract features
 		
 		//FIX : I woul like a warning for Evaluating_Step
 		assertEquals(3, afterList.size());
@@ -101,7 +101,8 @@ public class TestSamplesInstanceMerge {
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 	
-	
+
+
 	@Test
 	@Disabled
 	@DisplayName("Test with a basic workflow instance adding one Step and one constraint")
@@ -187,38 +188,39 @@ public class TestSamplesInstanceMerge {
 	
 	
 	@Test
-	@Disabled
-	@DisplayName("Test with a basic workflow instance adding two Steps and completing an optional metatask")
-	public void testAddingTwoStepsUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		String metaWFPATH = "../BPMN-Models/BasicMetaWF2.bpmn2";
-		String sourceFM="../samples/basicFM.xml";
+	@DisplayName("Test with a basic workflow instance adding 3 Steps ")
+	public void testAddingHierarchicStepsUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+		String instanceWFPATH = WF_IN_PATH + "instanceWF2.bpmn2";
+		String sourceFM=FM_IN_PATH +"basicFM.xml";
 		//FIX avoid to make a copy
-		String copiedFM=FM_OUT_PATH +"basicFMCopy_3.xml";
+		String copiedFM= FM_OUT_PATH +"FM2.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
-		File fin = new File(metaWFPATH);
+		File fin = new File(instanceWFPATH);
 		assertTrue(fin.exists());
 		assertTrue(copiedFile.exists());
 		
 		FMHelper fmBefore = new FMHelper(copiedFM);
 		//Command
-		String[] command = new String[] {"merge","--meta", "-i ", metaWFPATH, "-o ",copiedFM, "-v","7"};
+		String[] command = new String[] {"merge","--instance", "-i ", instanceWFPATH, "-o ",copiedFM, "-v","7"};
 		com.ml2wf.App.main(command);
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 		
 		//General Properties to check
-		TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
 		
+		//FIX
+		//TestHelper.testAbstractAndConcreteFeatures(addedFeatures,instanceWFPATH, fmAfter);
 		//FIX 
 		//assertEquals(2, afterList.size());
-		String f1 = "Evaluating_step";
-		String f2 = "Acquire_Metadata";
-		assertTrue(fmAfter.isFeature(f1));
-		assertTrue(fmAfter.isFeature(f2));
-		assertTrue(fmAfter.isDirectChildOf("Steps", f1));
-		assertTrue(fmAfter.isDirectChildOf("Steps", f2));
+		/*
+		 * String f1 = "Evaluating_step"; String f2 = "Acquire_Metadata";
+		 * assertTrue(fmAfter.isFeature(f1)); assertTrue(fmAfter.isFeature(f2));
+		 * assertTrue(fmAfter.isDirectChildOf("Steps", f1));
+		 * assertTrue(fmAfter.isDirectChildOf("Steps", f2));
+		 */
 		
 		//Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
@@ -267,9 +269,9 @@ public class TestSamplesInstanceMerge {
 	
 	@Test
 	@Disabled
-	@DisplayName("Test with a basic workflow adding One hierarchic Step at two levels")
+	@DisplayName("Test with a basic instance workflow adding One hierarchic Step at two levels")
 	public void testAddingMultipleHierarchicStepUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie2.bpmn2";
+		String metaWFPATH = "../BPMN-Models/instanceWF2.bpmn2.bpmn2";
 		String sourceFM="../samples/basicFM.xml";
 		//FIX avoid to make a copy
 		String copiedFM=FM_OUT_PATH +"basicFMCopy_5.xml";

@@ -210,5 +210,20 @@ public class TestSamplesInstantiationV1 {
 		}
 		
 		//todo test with optionnal task
-		
+		//todo: improve testing the content of the file.
+		@Test
+		@DisplayName("Test Generation with a meta workflow with optionnal Task using command line")
+		public void testCommandLineGenerationwithOptionnalTask() throws TransformerException, SAXException, IOException, ParserConfigurationException {
+			String metaWFPATH =  WF_IN_PATH +"BasicMetaWF3.bpmn2";
+			String outputWFPATH = WF_OUT_PATH + "instanceBasicWF3.bpmn2";
+			File fin = new File(metaWFPATH);
+			File fout = new File(outputWFPATH);
+			assertTrue(fin.exists());
+			com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
+			assertTrue(fout.exists());
+			TestHelper.noLostTaskAtInstanciation(metaWFPATH,outputWFPATH);
+			//FIX
+			//fout.delete();
+			
+		}
 }

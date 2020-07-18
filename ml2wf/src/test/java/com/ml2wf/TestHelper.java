@@ -1,6 +1,7 @@
 package com.ml2wf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -156,6 +157,31 @@ public class TestHelper {
 		List<String> tasksInstance = wfinstance.gettaskNameList();
 		assertEquals(tasksMeta.size(), tasksInstance.size());
 	    //Todo manage references to meta in generated tasks
+		
+	}
+
+	public static void allTheseFeaturesAreAbstract(List<String> afterList, FMHelper fmAfter) {
+		for (String s : afterList)
+			assertTrue(fmAfter.isAbstract(s));
+		
+	}
+	
+	public static void allTheseFeaturesAreConcret(List<String> afterList, FMHelper fmAfter) {
+		for (String s : afterList)
+			assertFalse(fmAfter.isAbstract(s));
+		
+	}
+
+	public static void testAbstractAndConcreteFeatures(List<String> addedFeatures, String instanceWFPATH, FMHelper fmAfter) throws ParserConfigurationException, SAXException, IOException {
+		WFHelper wfinstance = new WFHelper(instanceWFPATH);
+		List<String> taskNames = wfinstance.gettaskNameList();
+		List<String> subtasks = normalizeOnlySubtasks(taskNames);
+		List<String> allTasks = normalizeAllTasks(taskNames);
+		allTasks.removeAll(subtasks);
+		//all added subtasks should be concrete
+		allTheseFeaturesAreConcret(subtasks,fmAfter);
+		//all other tasks should be asbstract
+		allTheseFeaturesAreAbstract(allTasks,fmAfter);
 		
 	}
 

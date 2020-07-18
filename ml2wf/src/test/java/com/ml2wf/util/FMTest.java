@@ -52,4 +52,15 @@ class FMTest {
 		assertTrue(constraints.contains("Stability=>ensureStability"));
 		assertTrue(constraints.contains("Training_step=>MLAlgorithm"));
 	}
+	
+	@Test
+	void testIsAbstract() throws ParserConfigurationException, SAXException, IOException {
+		String sourceFM="../samples/basicFM.xml";
+		File ffm = new File(sourceFM);
+		assertTrue(ffm.exists());
+		FMHelper fm = new FMHelper(sourceFM);
+		//System.out.println(constraints);
+		assertTrue(fm.isAbstract("Steps"));
+		assertFalse(fm.isAbstract("Stability"));
+	}
 }
