@@ -103,8 +103,10 @@ public final class FMTask extends Task<FMTaskSpecs> {
 
 	@Override
 	public void setAbstract(boolean isAbstract) {
-		super.setAbstract(isAbstract);
-		((Element) this.node).setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(isAbstract));
+		if (this.isAbstract != isAbstract) {
+			super.setAbstract(isAbstract);
+			((Element) this.node).setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(isAbstract));
+		}
 	}
 
 	/**
