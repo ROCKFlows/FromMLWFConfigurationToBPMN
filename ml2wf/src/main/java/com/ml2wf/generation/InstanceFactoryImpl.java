@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,6 +22,8 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
+import com.ml2wf.tasks.specs.BPMNTaskSpecs;
+import com.ml2wf.util.RegexManager;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -42,9 +45,13 @@ import com.ml2wf.util.XMLManager;
 public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 
 	/**
-	 * Hexadecimal color code of instantiated elements.
+	 * Hexadecimal color code of instantiated mandatory elements.
 	 */
-	public static final String INSTANTIATE_COLOR = "#00f900";
+	public static final String MANDATORY_COLOR = "#00f900";
+	/**
+	 * Hexadecimal color code of instantiated optional elements.
+	 */
+	public static final String OPTIONAL_COLOR = "#835C3B";
 	/**
 	 * This {@code taskCounter} is incremented for each task. This allows other
 	 * methods to give an unique name to a given task.
@@ -159,10 +166,15 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	private void instantiateNode(Node node) {
+		// retrieving node name
 		String content = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName()).getNodeValue();
 		String[] splittedContent = content.split(Notation.getGeneratedPrefixVoc());
+		// getting the node's reference
 		String currentRef = splittedContent[splittedContent.length - 1];
-		mergeNodesTextContent(addDocumentationNode(node), getReferenceDocumentation(currentRef));
+		// adding a documentation node for the current node
+		Node docNode = addDocumentationNode(node);
+		mergeNodesTextContent(docNode, BPMNTaskSpecs.OPTIONAL.formatSpec(content));
+		mergeNodesTextContent(docNode, getReferenceDocumentation(currentRef));
 		// extension part
 		this.addExtensionNode(node);
 		// node renaming part
@@ -254,14 +266,30 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	private void addExtensionNode(Node node) {
 		Node extension = getDocument().createElement(BPMNNames.EXTENSION.getName());
 		Element style = getDocument().createElement(BPMNNames.STYLE.getName());
-		String logMsg = String.format("	Adding style %s to node %s", INSTANTIATE_COLOR, node);
-		logger.debug(logMsg);
-		// TODO: if optional then change BACKGROUND color
-		style.setAttribute(BPMNAttributes.BACKGROUND.getName(), INSTANTIATE_COLOR);
+		String backColor = (this.isOptionalElement((Element) node)) ? OPTIONAL_COLOR : MANDATORY_COLOR;
+		logger.debug("	Adding style {} to node {}", backColor, node);
+		style.setAttribute(BPMNAttributes.BACKGROUND.getName(), backColor);
 		extension.appendChild(style);
-		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
-		logger.debug(logMsg);
+		logger.debug("   Inserting node : {} before {}...", node, node.getFirstChild());
 		node.insertBefore(extension, node.getFirstChild());
+	}
+
+	/**
+	 * Returns whether the given {@code element} is optional or not.
+	 *
+	 * @param element element to get the optionality value
+	 * @return whether the given {@code element} is optional or not
+	 *
+	 * @since 1.0
+	 */
+	private boolean isOptionalElement(Element element) {
+		for (String documentation : XMLManager.getAllBPMNDocContent(element)) {
+			Matcher matcher = RegexManager.getOptionalityPattern().matcher(documentation.replace(" ", ""));
+			if (matcher.find() && (matcher.groupCount() > 0)) {
+				return Boolean.valueOf(matcher.group(1));
+			}
+		}
+		return false;
 	}
 
 }
