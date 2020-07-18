@@ -223,7 +223,7 @@ public abstract class XMLManager {
 	 * @since 1.0
 	 */
 	public void save(File file) throws TransformerException, IOException {
-		FileHandler.saveDocument(file, document);
+		FileHandler.saveDocument(FileHandler.processFile(this, file), document);
 	}
 
 	/**
