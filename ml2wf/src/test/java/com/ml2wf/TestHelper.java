@@ -91,9 +91,11 @@ public class TestHelper {
 	
 	public static List<String> noFeatureLost(FMHelper fmBefore, FMHelper fmAfter) {
 		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("added features : %s ", afterList);
+		String logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
 		List<String> afterConstraints = checkNoConstraintsAreLost(fmAfter, fmBefore);
-		logger.debug("added Constraints : %s ", afterConstraints);
+		logMsg = String.format("added Constraints : %s ", afterConstraints);
+		logger.debug(logMsg);
 		//todo check that no tasks are lost
 		return afterList;
 	}
@@ -106,13 +108,19 @@ public class TestHelper {
 		logger.debug("Test Idempotence {}");
 		List<String> afterList;
 		fmBefore = new FMHelper(fM);
-		System.out.println("Before : " + fmBefore.getFeatureNameList());
+		String logMsg = String.format("Before : %s" , fmBefore.getFeatureNameList());
+		logger.debug(logMsg);
+		//System.out.println("Before : " + fmBefore.getFeatureNameList());
 		com.ml2wf.App.main(command);
 		fmAfter = new FMHelper(fM);
-		System.out.println("After : " + fmAfter.getFeatureNameList());
+		logMsg = String.format("After : %s" , fmAfter.getFeatureNameList());
+		logger.debug(logMsg);
+		//System.out.println("After : " + fmAfter.getFeatureNameList());
 		afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		logger.debug("AFTER should be empty : %s", afterList);
-		System.out.println("AFTER should be empty : %s" + afterList);
+		logMsg = String.format("AFTER should be empty : %s", afterList);
+		logger.debug(logMsg);
+		//System.out.println("AFTER should be empty : %s" + afterList);
+		System.out.println(logMsg);
 		assertTrue(afterList.isEmpty());
 	}
 
@@ -122,12 +130,16 @@ public class TestHelper {
 		List<String> afterList = fmAfter.getFeatureNameList();
 		beforeList = normalize(beforeList);
 		afterList = normalize(afterList);
-		logger.debug("Before features : %s ", beforeList);
-		logger.debug("after features : %s ", afterList);
-		
+		logger.debug("No features are lost");
+		String logMsg = String.format("Before features : %s ", beforeList);
+		logger.debug(logMsg);
+		logMsg = String.format("After features : %s ", afterList);
+		logger.debug(logMsg);
 		List<String> x = new ArrayList<>(beforeList);
 		assertTrue(afterList.containsAll(beforeList));
 		afterList.removeAll(beforeList);
+		logMsg = String.format("All features are present and added features are: %s ", afterList);
+		logger.debug(logMsg);
 		return afterList;
 	}
 	

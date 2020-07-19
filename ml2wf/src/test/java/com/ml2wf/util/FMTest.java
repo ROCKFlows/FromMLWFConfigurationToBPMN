@@ -59,7 +59,6 @@ class FMTest {
 		File ffm = new File(sourceFM);
 		assertTrue(ffm.exists());
 		FMHelper fm = new FMHelper(sourceFM);
-		//System.out.println(constraints);
 		assertTrue(fm.isAbstract("Steps"));
 		assertFalse(fm.isAbstract("Stability"));
 	}

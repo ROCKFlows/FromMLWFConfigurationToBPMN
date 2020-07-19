@@ -94,7 +94,8 @@ public class TestSamplesSave {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	@Test
+	//FIX : AFTER should be empty : %s[Unmanaged] Only when applying idempotence
+	@Test 
 	@DisplayName("Test with a hierarchic workflow adding one Step")
 	public void testBasicHierachieSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = "../BPMN-Models/BasicMetaWFHierarchie.bpmn2";
