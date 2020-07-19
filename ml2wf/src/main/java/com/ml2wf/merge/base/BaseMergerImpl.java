@@ -301,10 +301,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		// retrieving a suitable parent
 		FMTask parentTask = this.getSuitableParent(task);
 		// inserting the new task
-		FMTask insertedTask = this.insertNewTask(parentTask, task);
-		// updating abstract status
-		// must be true if it is a "meta merge"
-		insertedTask.setAbstract(insertedTask.isAbstract() || (this instanceof WFMetaMerger));
+		this.insertNewTask(parentTask, task);
 	}
 
 	// TODO
@@ -376,7 +373,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			FMTask globalTask = (FMTask) optGlobalTask.get();
 			Optional<FMTask> optRoot = TasksManager.getFMTaskWithName(DEEPER_DEFAULT_ROOT_NAME); // get the root
 			if (optRoot.isPresent()) {
-				return optRoot.get().appendChild(globalTask);
+				return this.insertNewTask(optRoot.get(), globalTask);
 			}
 		}
 		return null;
@@ -420,13 +417,10 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	protected FMTask createReferredFMTask(WFTask<?> task) {
 		logger.warn("The referenced task [{}] is missing in the FeatureModel.", task.getReference());
 		logger.warn("Creating the referenced task : {}", task.getReference());
-		FMTask newParent = this.createFeatureWithName(task.getReference(), task.isAbstract());
+		FMTask newParent = this.createFeatureWithName(task.getReference(), true);
 		Optional<WFTask<?>> opt = TasksManager.getWFTaskWithName(newParent.getName());
-		if (opt.isEmpty()) {
-			FMTask globalTask = this.getGlobalFMTask(WFMetaMerger.STEP_TASK);
-			newParent.setAbstract(globalTask.isAbstract());
-			return globalTask.appendChild(newParent); // TODO: check 132
-		}
-		return this.getSuitableParent(opt.get()).appendChild(newParent);
+		FMTask globalTask = (opt.isEmpty()) ? this.getGlobalFMTask(WFMetaMerger.STEP_TASK)
+				: this.getSuitableParent(opt.get());
+		return this.insertNewTask(globalTask, newParent);
 	}
 }

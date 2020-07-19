@@ -588,25 +588,6 @@ public abstract class XMLManager {
 	}
 
 	/**
-	 * Returns whether the given {@code element} is a meta-task or not.
-	 *
-	 * @param element element to check
-	 * @return whether the given {@code element} is a meta-task or not
-	 *
-	 * @since 1.0
-	 * @see Element
-	 */
-	public static boolean isMetaTask(Element element) {
-		for (String content : getAllBPMNDocContent(element)) {
-			if (getReferredTask(content).isPresent()) {
-				return false;
-			}
-		}
-		return true;
-
-	}
-
-	/**
 	 * Merges {@code nodeA}'s text content with the given {@code content}.
 	 *
 	 * @param nodeA   first node
