@@ -33,6 +33,7 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
+import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.tasks.manager.TasksManager;
 
 /**
@@ -285,7 +286,7 @@ public abstract class XMLManager {
 	 * <p>
 	 *
 	 * <b>Note</b> that this notion is subjective and in this case, a useless
-	 * children has no attributes, no child and its text content is black.
+	 * children has no attributes, no child and its text content is blank.
 	 *
 	 * @return the updated {@code Node}
 	 *
@@ -489,6 +490,50 @@ public abstract class XMLManager {
 			return n.getNodeValue();
 		}
 		return "";
+	}
+
+	/**
+	 * Returns the given {@code node}'s level.
+	 *
+	 * @param node node to get the level
+	 * @return the given {@code node}'s level
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	public static int getNodeLevel(Node node) {
+		int i = 1;
+		Node parent;
+		while (((parent = node.getParentNode()) != null) && !getNodeName(parent).isBlank()) {
+			i++;
+			node = parent;
+		}
+		return i;
+	}
+
+	/**
+	 * Returns an {@code Optional} containing the first feature node at the given
+	 * {@code level} in the given {@code document}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that an {@code Optional#empty()} is returned if
+	 * {@code level <= 0}.
+	 *
+	 * @param document the document to retrieve the node
+	 * @param level    the nested level
+	 * @return an {@code Optional} containing the first feature node at the given
+	 *         {@code level} in the given {@code document}.
+	 *
+	 * @since 1.0
+	 * @see Document
+	 */
+	public static Optional<Node> getFeatureNodeAtLevel(Document document, int level) {
+		if (level <= 0) {
+			return Optional.empty();
+		}
+		return getTasksList(document, FMNames.SELECTOR).stream().filter(t -> XMLManager.getNodeLevel(t) == level)
+				.findFirst();
 	}
 
 	/**
