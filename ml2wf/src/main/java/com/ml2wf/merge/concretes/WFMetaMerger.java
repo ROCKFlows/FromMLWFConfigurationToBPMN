@@ -8,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.merge.MergeException;
 import com.ml2wf.merge.base.BaseMergerImpl;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
@@ -51,12 +52,12 @@ public final class WFMetaMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public FMTask getSuitableParent(WFTask<?> task) {
+	public FMTask getSuitableParent(WFTask<?> task) throws MergeException {
 		return this.getReferredFMTask(task, this.getGlobalFMTask(STEP_TASK));
 	}
 
 	@Override
-	public FMTask getRootParentNode() {
+	public FMTask getRootParentNode() throws MergeException {
 		return this.getGlobalFMTask(META_TASK);
 	}
 

@@ -26,6 +26,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
@@ -455,14 +456,15 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @see FMTask
 	 */
 	protected <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) {
-		// TODO: recurse for nested tasks
 		logger.debug("Inserting task : {}", task.getName());
 		// inserting the new node
-		if (task instanceof FMTask) {
-			return parentTask.appendChild((FMTask) task);
-		}
-		FMTask newFeature = this.taskFactory.convertWFtoFMTask((WFTask<?>) task);
-		return parentTask.appendChild(newFeature);
+		FMTask childTask = (task instanceof FMTask) ? (FMTask) task
+				: this.taskFactory.convertWFtoFMTask((WFTask<?>) task);
+		FMTask insertedTask = parentTask.appendChild(childTask);
+		// updating abstract status
+		// must be true if it is a "meta merge"
+		insertedTask.setAbstract(insertedTask.isAbstract() || (this instanceof WFMetaMerger));
+		return insertedTask;
 	}
 
 	/**

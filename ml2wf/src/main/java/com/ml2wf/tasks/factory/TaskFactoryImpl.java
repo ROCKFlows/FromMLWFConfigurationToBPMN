@@ -11,6 +11,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
+import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
@@ -68,18 +69,18 @@ public class TaskFactoryImpl implements TaskFactory {
 	@Override
 	public FMTask convertWFtoFMTask(WFTask<?> task) {
 		FMTask createdFMTask = new FMTask(task, false);
-		createdFMTask.setNode(AbstractMerger.createFeatureNode(createdFMTask.getName(), createdFMTask.isAbstract()));
+		createdFMTask.setNode(AbstractMerger.createFeatureNode(createdFMTask.getName(), task.isAbstract()));
 		createdFMTask.addAllSpecs(task.getSpecs());
 		createdFMTask.applySpecs();
 		return createdFMTask;
 	}
 
 	/**
-	 * Creates and returns a new {@code FMTask} considering given arguments.
+	 * Creates and returns a new {@code FMTask} considering the given arguments.
 	 *
 	 * @param name name of the new task
 	 * @param node node of the new task
-	 * @return a new {@code FMTask} considering given arguments
+	 * @return a new {@code FMTask} considering the given arguments
 	 *
 	 * @since 1.0
 	 * @see FMTask
@@ -89,11 +90,11 @@ public class TaskFactoryImpl implements TaskFactory {
 	}
 
 	/**
-	 * Creates and returns a new {@code WFTask} considering given arguments.
+	 * Creates and returns a new {@code WFTask} considering the given arguments.
 	 *
 	 * @param name name of the new task
 	 * @param node node of the new task
-	 * @return a new {@code WFTask} considering given arguments
+	 * @return a new {@code WFTask} considering the given arguments
 	 *
 	 * @since 1.0
 	 * @see WFTask
@@ -101,8 +102,8 @@ public class TaskFactoryImpl implements TaskFactory {
 	private WFTask<?> createWFTask(String name, Node node) {
 		// TODO: change created type considering user convention (e.g. BPMN)
 		Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
-		BPMNTask createdFMTask = new BPMNTask(name, node, XMLManager.isMetaTask((Element) node),
-				optRef.orElse(""));
+		BPMNTask createdFMTask = new BPMNTask(name, node,
+				optRef.isEmpty() || optRef.get().equals(WFMetaMerger.STEP_TASK), optRef.orElse(""));
 		createdFMTask.applySpecs();
 		return createdFMTask;
 	}
@@ -121,6 +122,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @see FMTask
 	 */
 	private boolean isAbstract(Node node) {
+		// TODO: bad method to be removed or corrected
 		Node abstractAttr = node.getAttributes().getNamedItem(FMAttributes.ABSTRACT.getName());
 		return (abstractAttr != null) && (abstractAttr.getNodeValue().equals(String.valueOf(true)));
 	}
