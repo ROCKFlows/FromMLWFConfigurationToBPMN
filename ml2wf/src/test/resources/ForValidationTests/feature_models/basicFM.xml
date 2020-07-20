@@ -22,7 +22,7 @@
 				</and>
 				<and mandatory="true" name="Criteria">
 					<graphics key="collapsed" value="false"/>
-					<and abstract="true" mandatory="true" name="DatasetCriteria">
+					<and abstract="true" name="DatasetCriteria">
 						<graphics key="collapsed" value="false"/>
 						<or abstract="true" name="AnomalieClassesCriteria">
 							<feature name="FewAnomaiyClasses"/>

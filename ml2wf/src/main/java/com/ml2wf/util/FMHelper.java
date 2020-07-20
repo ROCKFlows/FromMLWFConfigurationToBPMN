@@ -176,12 +176,12 @@ public class FMHelper {
 	private List<String> listFeatures() {
 		List<String> featureList = new ArrayList<>();
 		for (Node child : iterable(racine.getChildNodes())) {
-			featureList.addAll(listFeature(child));
+			featureList.addAll(listFeatures(child));
 		}
 		return featureList;
 	}
 
-	private List<String> listFeature(Node n) {
+	private List<String> listFeatures(Node n) {
 		List<String> list = new ArrayList<>();
 		switch (n.getNodeName()) {
 		case FEATURE:
@@ -197,10 +197,28 @@ public class FMHelper {
 	}
 
 	private void extractChildFeatures(Node n, List<String> list) {
+		if (n == null)
+			return;
 		for (Node child : iterable(n.getChildNodes())) {
-			list.addAll(listFeature(child));
+			list.addAll(listFeatures(child));
 		}
 	}
+	
+	public List<String> getChildren(String featureName) {
+		Node n = extractFeature(featureName);
+		List<String> list = new ArrayList<>();
+		extractChildFeatures(n, list);
+		List<String> copylist = new ArrayList<>();
+		//TODO IMPROVE !!!
+		for (String child : list) {
+			if (isDirectChildOf(featureName, child)) {
+				copylist.add(child);
+			}
+		}
+		return copylist;
+	}
+	
+
 	// todo improve it
 	private static Iterable<Node> iterable(final NodeList n) {
 		return new Iterable<Node>() {
