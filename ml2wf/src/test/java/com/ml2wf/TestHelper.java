@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.util.FMHelper;
@@ -31,10 +33,27 @@ public class TestHelper {
 	 */
 
 	
+	public static void logCurrentDirectory() {
+		String curDir = System.getProperty("user.dir");
+		String  logMsg = String.format("Current directory %s", curDir);
+	   // System.out.println (logMsg);
+	    logger.debug(logMsg);
+	}
+	
+	public static void testDirectory(String path, String file) {
+		String curDir = System.getProperty("user.dir");
+		String  logMsg = String.format("Current directory %s", curDir);
+	   // System.out.println (logMsg);
+	    logger.debug(logMsg);
+	    File f = new File(path);
+	    logMsg = String.format("Expected path %s",   f.getAbsolutePath());
+	    logger.debug(logMsg);
+	}
+	
 
 	private static List<String> normalize(List<String> list) {
 		List<String> listCopy= new ArrayList<>();
-		list.forEach(t  -> listCopy.add( t.replace(" ", "_")));
+		list.forEach(t  -> listCopy.add( t.trim().replace(" ", "_")));
 			return listCopy;
 	}
 	
@@ -78,6 +97,9 @@ public class TestHelper {
 		List<String> tasks = wf.gettaskNameList();
 		tasks = normalizeAllTasks(tasks);
 		List<String> lostTasks = lostTasks(tasks, afterList);
+		String logMsg = String.format("Lost Tasks: %s ", lostTasks);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
 		assertTrue( lostTasks.isEmpty());
 	}
 	
@@ -121,6 +143,7 @@ public class TestHelper {
 		logger.debug(logMsg);
 		//System.out.println("AFTER should be empty : %s" + afterList);
 		System.out.println(logMsg);
+		//FIX Unmanaged is generated
 		assertTrue(afterList.isEmpty());
 	}
 
@@ -195,6 +218,22 @@ public class TestHelper {
 		//all other tasks should be asbstract
 		allTheseFeaturesAreAbstract(allTasks,fmAfter);
 		
+	}
+
+	public static void compare(String resultingFM, String resultingFMBis) throws ParserConfigurationException, SAXException, IOException {
+		FMHelper fm1 = new FMHelper(resultingFM);
+		FMHelper fm2 = new FMHelper(resultingFMBis);
+		List<String> fm1FL = fm1.getFeatureNameList();
+		List<String> fm2FL = fm2.getFeatureNameList();
+		String logMsg = String.format("Compare : %s" , fm1FL);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		logMsg = String.format("With : %s" , fm2FL);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		assertTrue(fm1FL.containsAll(fm2FL));
+		assertTrue(fm2FL.containsAll(fm1FL));
+		//TODO tests same hierarchies and same constraints
 	}
 
 

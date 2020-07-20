@@ -59,7 +59,7 @@ public class TestSamplesInstantiationV1 {
 	/**
 	 * Basic WF XML file path.
 	 */
-	private static final String WF_IN_PATH = "../BPMN-Models/";
+	private static final String WF_IN_PATH = "./src/test/resources/ForValidationTests/wf_meta/";
 
 	/**
 	 *  WF XML file path for results
@@ -124,14 +124,19 @@ public class TestSamplesInstantiationV1 {
 	
 	
 	//todo: improve testing the content of the file.
+	// test : @related_to
 	@Test
-	@DisplayName("Test Generation with a simple meta workflow using command line")
+	@DisplayName("(1) Test Generation with a simple meta workflow using command line")
 	public void testSimpleCommandLineGeneration() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH =  WF_IN_PATH +"BasicMetaWF.bpmn2";
 		String outputWFPATH = WF_OUT_PATH + "instanceBasic.bpmn2";
 		File fin = new File(metaWFPATH);
 		File fout = new File(outputWFPATH);
-		assertTrue(fin.exists());
+		TestHelper.logCurrentDirectory();
+		String  logMsg = String.format("Reading Meta WF %s", metaWFPATH);
+		logger.debug(logMsg);		
+		TestHelper.testDirectory(WF_IN_PATH,metaWFPATH);
+		assertTrue(fin.exists(),metaWFPATH + "must exist" );
 		com.ml2wf.App.main(new String[] {"generate", "-i ", metaWFPATH, "-o ",outputWFPATH, "-v","7"});
 		assertTrue(fout.exists());
 		TestHelper.noLostTaskAtInstanciation(metaWFPATH,outputWFPATH);

@@ -50,8 +50,9 @@ public class TestSamplesInstanceMerge {
 	private static final Logger logger = LogManager.getLogger(TestSamplesInstanceMerge.class);
 
 	private static final String FM_OUT_PATH = "./target/generated/FM_I/";
-	private static final String FM_IN_PATH = "../samples/";
-	private static final String WF_IN_PATH = "../BPMN-Models/";
+	private static final String FM_IN_PATH = "./src/test/resources/ForValidationTests/feature_models/";
+	private static final String WF_IN_PATH = "./src/test/resources/ForValidationTests/wf_instances/";
+
 	@BeforeEach
 	public void setUp() throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
 		logger.info("Hello Test Samples about Merge!");
@@ -101,8 +102,42 @@ public class TestSamplesInstanceMerge {
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 	
+	@Test
+	@DisplayName("Test a merge that should do nothing")
+	public void testUselessMergeUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+		String instanceWFPATH = WF_IN_PATH + "BasicWF_instance00.bpmn2";
+		//THe FM results from a save.
+		String sourceFM=FM_IN_PATH +"basicFM_SAVE0.xml";
+		//FIX avoid to make a copy
+		String copiedFM= FM_OUT_PATH +"basicFM_SAVE_Idempotence_with_merge_intance.xml";
+		File copiedFile = new File(copiedFM);
+		File sourceFile = new File(sourceFM);
+		FileUtils.copyFile(sourceFile, copiedFile);
+		File fin = new File(instanceWFPATH);
+		assertTrue(fin.exists());
+		assertTrue(copiedFile.exists());
+		
+		FMHelper fmBefore = new FMHelper(copiedFM);
+		//Command
+		String[] command = new String[] {"merge","--instance", "-i ", instanceWFPATH, "-o ",copiedFM, "-v","7"};
+		com.ml2wf.App.main(command);
+		assertTrue(copiedFile.exists());
+		FMHelper fmAfter = new FMHelper(copiedFM);
+		
+		//General Properties to check
+		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		TestHelper.testAbstractAndConcreteFeatures(addedFeatures,instanceWFPATH, fmAfter);
 
+		//TODO Improve to avoid double testing
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, instanceWFPATH);
+		String logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		assertTrue(afterList.isEmpty());
+		TestHelper.checkIdempotence(copiedFM, command);
+	}
 
+	//TODO test adding one constraint
 	@Test
 	@Disabled
 	@DisplayName("Test with a basic workflow instance adding one Step and one constraint")
@@ -140,6 +175,7 @@ public class TestSamplesInstanceMerge {
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 	
+	//TODO Test adding one criteria etc.
 	@Test
 	@Disabled
 	@DisplayName("Test with a basic workflow instance adding one Step, one criteria and one constraint")
@@ -186,7 +222,8 @@ public class TestSamplesInstanceMerge {
 	}
 	
 	
-	
+	//FIX an error is raised...
+	//It should be solved managing hierarchies of tasks
 	@Test
 	@DisplayName("Test with a basic workflow instance adding 3 Steps ")
 	public void testAddingHierarchicStepsUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
@@ -479,6 +516,7 @@ public class TestSamplesInstanceMerge {
 	
 	}
 
-	
+	//TODO Test with tasks not related to meta tasks
+	//TODO test with tasks relatied to non existent metatasks
 
 }
