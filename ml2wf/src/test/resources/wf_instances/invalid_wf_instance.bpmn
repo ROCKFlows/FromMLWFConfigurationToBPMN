@@ -10,13 +10,23 @@
     <bpmn2:endEvent id="EndEvent_1" name="End Event 1">
       <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
     </bpmn2:endEvent>
-    <bpmn2:task id="Task_1" name="ts_resampling">
+    <bpmn2:task id="Task_1" name="ts resampling#sub resampling#deeper resampling">
       <bpmn2:extensionElements>
         <ext:style ext:shapeBackground="#00f900"/>
       </bpmn2:extensionElements>
       <bpmn2:documentation id="Documentation_1"><![CDATA[refersTo: Preprocessing_Step]]></bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="Task_1" targetRef="Task_3"/>
+    <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="Task_2" targetRef="EndEvent_1"/>
+    <bpmn2:task id="Task_3" name="construct rolling windows">
+      <bpmn2:extensionElements>
+        <ext:style ext:shapeBackground="#00f900"/>
+      </bpmn2:extensionElements>
+      <bpmn2:documentation id="Documentation_3"><![CDATA[refersTo: Preprocessing_Step]]></bpmn2:documentation>
+      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
     </bpmn2:task>
     <bpmn2:task id="Task_2" name="LSD">
       <bpmn2:extensionElements>
@@ -26,82 +36,113 @@
       <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
     </bpmn2:task>
-    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="Task_1" targetRef="Task_3"/>
-    <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="Task_2" targetRef="EndEvent_1"/>
-    <bpmn2:task id="Task_3" name="construct_rolling_windows">
-      <bpmn2:extensionElements>
-        <ext:style ext:shapeBackground="#00f900"/>
-      </bpmn2:extensionElements>
-      <bpmn2:documentation id="Documentation_3"><![CDATA[refersTo: Preprocessing_Step]]></bpmn2:documentation>
-      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
-      <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
-    </bpmn2:task>
     <bpmn2:sequenceFlow id="SequenceFlow_4" sourceRef="Task_3" targetRef="Task_2"/>
     <bpmn2:textAnnotation id="TextAnnotation_1">
-      <bpmn2:text>[[LSD => !drop_invalid_windows]]</bpmn2:text>
+      <bpmn2:text>We define 2 constraints on our workflow :&#xD;
+&#xD;
+[[LSD => !drop invalid windows]]&#xD;
+&#xD;
+The second one is refering a task that is not present in the current workflow but in the feature model :&#xD;
+&#xD;
+[[LSD => aLot]]&#xD;
+&#xD;
+And a third one which constrains missing tasks : &#xD;
+&#xD;
+[[LSD => missing]]</bpmn2:text>
+    </bpmn2:textAnnotation>
+    <bpmn2:textAnnotation id="Global_Annotation">
+      <bpmn2:text>Workflow's name {{}}.&#xD;
+Meta-Workflow : {{simple_wf}}.&#xD;
+Data : {{Invalid data}}.&#xD;
+Author/Article : {{Invalid article}}.</bpmn2:text>
+    </bpmn2:textAnnotation>
+    <bpmn2:textAnnotation id="TextAnnotation_2">
+      <bpmn2:text>Note : this node will create 3 nested tasks under the Preprocessing_Step one</bpmn2:text>
+    </bpmn2:textAnnotation>
+    <bpmn2:textAnnotation id="TextAnnotation_3">
+      <bpmn2:text>[[ts resampling >> construct rolling windows]]&#xD;
+[[construct rolling windows >> drop invalid windows]]</bpmn2:text>
     </bpmn2:textAnnotation>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Default Process Diagram">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="simple_wf">
       <bpmndi:BPMNShape id="BPMNShape_1" bpmnElement="StartEvent_1">
-        <dc:Bounds height="36.0" width="36.0" x="201.0" y="227.0"/>
+        <dc:Bounds height="36.0" width="36.0" x="250.0" y="227.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_1" labelStyle="BPMNLabelStyle_1">
-          <dc:Bounds height="15.0" width="68.0" x="185.0" y="263.0"/>
+          <dc:Bounds height="15.0" width="68.0" x="234.0" y="263.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_2" bpmnElement="EndEvent_1">
-        <dc:Bounds height="36.0" width="36.0" x="951.0" y="227.0"/>
+        <dc:Bounds height="36.0" width="36.0" x="970.0" y="227.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_3" labelStyle="BPMNLabelStyle_1">
-          <dc:Bounds height="15.0" width="65.0" x="937.0" y="263.0"/>
+          <dc:Bounds height="15.0" width="65.0" x="956.0" y="263.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_1" bpmnElement="Task_1" isExpanded="true">
-        <dc:Bounds height="50.0" width="191.0" x="320.0" y="220.0"/>
+        <dc:Bounds height="50.0" width="202.0" x="320.0" y="220.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_4" labelStyle="BPMNLabelStyle_1">
-          <dc:Bounds height="15.0" width="80.0" x="375.0" y="237.0"/>
+          <dc:Bounds height="30.0" width="184.0" x="329.0" y="230.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_2" bpmnElement="Task_2" isExpanded="true">
-        <dc:Bounds height="50.0" width="110.0" x="810.0" y="220.0"/>
+        <dc:Bounds height="50.0" width="131.0" x="800.0" y="220.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_5" labelStyle="BPMNLabelStyle_1">
           <dc:Bounds height="15.0" width="24.0" x="853.0" y="237.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_Task_3" bpmnElement="Task_3" isExpanded="true">
-        <dc:Bounds height="50.0" width="191.0" x="570.0" y="220.0"/>
-        <bpmndi:BPMNLabel id="BPMNLabel_8" labelStyle="BPMNLabelStyle_1">
-          <dc:Bounds height="15.0" width="147.0" x="592.0" y="237.0"/>
+      <bpmndi:BPMNShape id="BPMNShape_TextAnnotation_1" bpmnElement="TextAnnotation_1">
+        <dc:Bounds height="191.0" width="334.0" x="401.0" y="300.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_8">
+          <dc:Bounds height="185.0" width="322.0" x="407.0" y="300.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_TextAnnotation_1" bpmnElement="TextAnnotation_1">
-        <dc:Bounds height="50.0" width="331.0" x="470.0" y="300.0"/>
+      <bpmndi:BPMNShape id="BPMNShape_Global_Annotation" bpmnElement="Global_Annotation">
+        <dc:Bounds height="90.0" width="180.0" x="0.0" y="0.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_9">
-          <dc:Bounds height="44.0" width="319.0" x="476.0" y="300.0"/>
+          <dc:Bounds height="84.0" width="168.0" x="6.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_3" bpmnElement="Task_3" isExpanded="true">
+        <dc:Bounds height="50.0" width="202.0" x="559.0" y="220.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_10" labelStyle="BPMNLabelStyle_1">
+          <dc:Bounds height="15.0" width="139.0" x="590.0" y="237.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_TextAnnotation_2" bpmnElement="TextAnnotation_2">
+        <dc:Bounds height="50.0" width="322.0" x="310.0" y="150.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_12">
+          <dc:Bounds height="44.0" width="310.0" x="316.0" y="150.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_TextAnnotation_3" bpmnElement="TextAnnotation_3">
+        <dc:Bounds height="50.0" width="321.0" x="670.0" y="150.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_13">
+          <dc:Bounds height="44.0" width="309.0" x="676.0" y="150.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="BPMNShape_1" targetElement="BPMNShape_Task_1">
-        <di:waypoint xsi:type="dc:Point" x="237.0" y="245.0"/>
-        <di:waypoint xsi:type="dc:Point" x="278.0" y="245.0"/>
+        <di:waypoint xsi:type="dc:Point" x="286.0" y="245.0"/>
+        <di:waypoint xsi:type="dc:Point" x="303.0" y="245.0"/>
         <di:waypoint xsi:type="dc:Point" x="320.0" y="245.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_2"/>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="BPMNShape_Task_1">
-        <di:waypoint xsi:type="dc:Point" x="511.0" y="245.0"/>
-        <di:waypoint xsi:type="dc:Point" x="561.0" y="245.0"/>
-        <di:waypoint xsi:type="dc:Point" x="571.0" y="245.0"/>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="BPMNShape_Task_1" targetElement="BPMNShape_Task_3">
+        <di:waypoint xsi:type="dc:Point" x="522.0" y="245.0"/>
+        <di:waypoint xsi:type="dc:Point" x="540.0" y="245.0"/>
+        <di:waypoint xsi:type="dc:Point" x="559.0" y="245.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_6"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="BPMNShape_Task_2" targetElement="BPMNShape_2">
-        <di:waypoint xsi:type="dc:Point" x="920.0" y="245.0"/>
-        <di:waypoint xsi:type="dc:Point" x="935.0" y="245.0"/>
-        <di:waypoint xsi:type="dc:Point" x="951.0" y="245.0"/>
+        <di:waypoint xsi:type="dc:Point" x="931.0" y="245.0"/>
+        <di:waypoint xsi:type="dc:Point" x="950.0" y="245.0"/>
+        <di:waypoint xsi:type="dc:Point" x="970.0" y="245.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_7"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="BPMNShape_Task_3" targetElement="BPMNShape_Task_2">
         <di:waypoint xsi:type="dc:Point" x="761.0" y="245.0"/>
-        <di:waypoint xsi:type="dc:Point" x="785.0" y="245.0"/>
-        <di:waypoint xsi:type="dc:Point" x="810.0" y="245.0"/>
-        <bpmndi:BPMNLabel id="BPMNLabel_10"/>
+        <di:waypoint xsi:type="dc:Point" x="780.0" y="245.0"/>
+        <di:waypoint xsi:type="dc:Point" x="800.0" y="245.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_11"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
     <bpmndi:BPMNLabelStyle id="BPMNLabelStyle_1">
