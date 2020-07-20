@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -208,6 +209,7 @@ public class TestHelper {
 	}
 
 	public static void testAbstractAndConcreteFeatures(List<String> addedFeatures, String instanceWFPATH, FMHelper fmAfter) throws ParserConfigurationException, SAXException, IOException {
+		
 		WFHelper wfinstance = new WFHelper(instanceWFPATH);
 		List<String> taskNames = wfinstance.gettaskNameList();
 		List<String> subtasks = normalizeOnlySubtasks(taskNames);
@@ -221,19 +223,31 @@ public class TestHelper {
 	}
 
 	public static void compare(String resultingFM, String resultingFMBis) throws ParserConfigurationException, SAXException, IOException {
+		String logMsg = String.format("Compare two FM %s avec %s  ",resultingFM, resultingFMBis);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		
 		FMHelper fm1 = new FMHelper(resultingFM);
 		FMHelper fm2 = new FMHelper(resultingFMBis);
 		List<String> fm1FL = fm1.getFeatureNameList();
 		List<String> fm2FL = fm2.getFeatureNameList();
-		String logMsg = String.format("Compare : %s" , fm1FL);
+		logMsg = String.format("Compare feature lists: %s  With : %s" , fm1FL, fm2FL);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
-		logMsg = String.format("With : %s" , fm2FL);
-		logger.debug(logMsg);
-		System.out.println(logMsg);
-		assertTrue(fm1FL.containsAll(fm2FL));
-		assertTrue(fm2FL.containsAll(fm1FL));
+		compareEquals(fm2FL,fm1FL);
 		//TODO tests same hierarchies and same constraints
+		List<String> childrenInFM1 = fm1.getChildren("Steps");
+		List<String> childrenInFM2 = fm2.getChildren("Steps");
+		logMsg = String.format("Children of Steps : %s against %s" , childrenInFM1, childrenInFM2);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		compareEquals(childrenInFM1,childrenInFM2);
+	}
+ static void compareEquals(List<String> l1, List<String> l2) {
+		Collections.sort(l1);
+		Collections.sort(l2);
+		assertEquals(l1, l2);
+		
 	}
 
 

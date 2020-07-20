@@ -138,6 +138,7 @@ public class TestConflicts {
 		String[] command = new String[] {"merge","--meta", "-i ", wfPATH, "-o ",resultingFMBis, "-v","7"};
 		com.ml2wf.App.main(command);
 		assertTrue(copiedFileBis.exists());		
+		
 		TestHelper.compare(resultingFM,resultingFMBis);
 	}
 
