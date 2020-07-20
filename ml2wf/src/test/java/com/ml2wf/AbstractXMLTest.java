@@ -1,15 +1,22 @@
 package com.ml2wf;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
+import com.ml2wf.generation.InstanceFactoryImpl;
+import com.ml2wf.merge.AbstractMerger;
+import com.ml2wf.merge.base.BaseMergerImpl;
+import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -50,28 +57,86 @@ public abstract class AbstractXMLTest {
 	 */
 	protected static ClassLoader classLoader = AbstractXMLTest.class.getClassLoader();
 	/**
-	 * The BPMN extension used to filter files.
+	 * Meta workflows' directory.
 	 */
-	protected static final String BPMN_EXTENSION = ".bpmn";
+	protected static final String META_DIRECTORY = "./wf_meta/";
 	/**
 	 * Instance workflows' directory.
 	 */
 	protected static final String INSTANCES_DIRECTORY = "./wf_instances/";
 
 	/**
-	 * Returns all {@code Path}'s instances in the {@code INSTANCES_DIRECTORY}
-	 * directory.
+	 * Returns a {@code Stream} containing all meta-workflows located under the
+	 * {@link #META_DIRECTORY} directory.
 	 *
-	 * @return all {@code Path}'s instances in the {@code INSTANCES_DIRECTORY}
-	 *         directory
+	 * @return a {@code Stream} containing all meta-workflows located under the
+	 *         {@link #META_DIRECTORY} directory
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 *
 	 * @since 1.0
+	 * @see FileUtils
 	 */
-	protected static Stream<Path> instanceFiles() throws IOException, URISyntaxException {
-		URI uri = classLoader.getResource(INSTANCES_DIRECTORY).toURI();
-		Path myPath = Paths.get(uri);
-		return Files.walk(myPath, 1).filter(p -> p.toString().endsWith(BPMN_EXTENSION));
+	protected static Stream<File> metaFiles() throws IOException, URISyntaxException {
+		File instanceDir = new File(classLoader.getResource(META_DIRECTORY).toURI());
+		return new HashSet<>(FileUtils.listFiles(instanceDir, FileHandler.getWfExtensions(), true)).stream();
+	}
+
+	/**
+	 * Returns a {@code Stream} containing all instance-workflows located under the
+	 * {@link #INSTANCES_DIRECTORY} directory.
+	 *
+	 * @return a {@code Stream} containing all instance-workflows located under the
+	 *         {@link #INSTANCES_DIRECTORY} directory
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 *
+	 * @since 1.0
+	 * @see FileUtils
+	 */
+	protected static Stream<File> instanceFiles() throws IOException, URISyntaxException {
+		File instanceDir = new File(classLoader.getResource(INSTANCES_DIRECTORY).toURI());
+		return new HashSet<>(FileUtils.listFiles(instanceDir, FileHandler.getWfExtensions(), true)).stream();
+	}
+
+	/**
+	 * Retruns all references for the given {@code nodes}.
+	 *
+	 * @param nodes nodes to retrieve references
+	 * @return all references for the given {@code nodes}
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	protected static List<String> getReferences(List<Node> nodes) {
+		return nodes.stream().map(Element.class::cast)
+				.map(XMLManager::getAllBPMNDocContent)
+				.map(XMLManager::getReferredTask)
+				.map(r -> r.orElse(BaseMergerImpl.UNMANAGED))
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Retruns all names for the given {@code nodes}.
+	 *
+	 * @param nodes          nodes to retrieve names
+	 * @param tagName        the tag name used to retrieve the nodes' names
+	 * @param considerNested whether the result should contains the flatten nested
+	 *                       nodes or not
+	 * @return all names for the given {@code nodes}
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	protected static List<String> getNames(List<Node> nodes, String tagName, boolean considerNested) {
+		Stream<Node> nodesStream = (considerNested)
+				? nodes.stream().flatMap(n -> AbstractMerger.getNestedNodes(n).stream())
+				: nodes.stream();
+		Stream<String> namesStream = nodesStream.map(Node::getAttributes)
+				.map(a -> a.getNamedItem(tagName)).map(Node::getNodeValue);
+		if (!considerNested) {
+			namesStream = namesStream.map(InstanceFactoryImpl::getLastReference);
+		}
+		return namesStream.map(XMLManager::sanitizeName).collect(Collectors.toList());
 	}
 }

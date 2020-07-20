@@ -146,6 +146,25 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	}
 
 	/**
+	 * Returns the last reference from the given {@code content}.
+	 *
+	 * <p>
+	 *
+	 * e.g. A#B#C -> C
+	 *
+	 * @param content content to retrieve the last reference
+	 * @return the last reference from the given {@code content}
+	 *
+	 * @since 1.0
+	 */
+	public static String getLastReference(String content) {
+		// splitting references
+		String[] splittedContent = content.split(Notation.getGeneratedPrefixVoc());
+		// getting the last reference
+		return sanitizeName(splittedContent[splittedContent.length - 1]);
+	}
+
+	/**
 	 * Instantiates the given {@code node}.
 	 *
 	 * <p>
@@ -168,9 +187,8 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	private void instantiateNode(Node node) {
 		// retrieving node name
 		String content = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName()).getNodeValue();
-		String[] splittedContent = content.split(Notation.getGeneratedPrefixVoc());
 		// getting the node's reference
-		String currentRef = splittedContent[splittedContent.length - 1];
+		String currentRef = getLastReference(content);
 		// adding a documentation node for the current node
 		Node docNode = addDocumentationNode(node);
 		mergeNodesTextContent(docNode, BPMNTaskSpecs.OPTIONAL.formatSpec(content));

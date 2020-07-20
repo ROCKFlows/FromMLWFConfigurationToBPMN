@@ -508,6 +508,9 @@ public class TestSamplesMetaMerge {
 		//No Task are lost
 		TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 
+		String logMsg = String.format("No Features should be added : %s" ,afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
 		assertTrue(afterList.isEmpty());
 		//Ensure all new Features corresponding to Tasks are Steps
 		for (String f : afterList)

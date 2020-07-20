@@ -1,19 +1,12 @@
 package com.ml2wf.merge;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -28,12 +21,12 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.AbstractXMLTest;
 import com.ml2wf.constraints.InvalidConstraintException;
-import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.concretes.WFInstanceMerger;
+import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.XMLManager;
 
@@ -61,19 +54,21 @@ import com.ml2wf.util.XMLManager;
 public class TestWFInstanceMerger extends AbstractXMLTest {
 
 	/**
-	 * Back up path.
-	 */
-	private String backUpPath;
-	/**
 	 * Default XML filename.
 	 */
-	private static final String FM_FILE_PATH = "./src/test/resources/feature_models/model.xml";
+	private static final String FM_FILE_PATH = "./feature_models/model.xml";
+	/**
+	 * {@code ClassLoader}'s instance used to get resources.
+	 *
+	 * @see ClassLoader
+	 */
+	protected static ClassLoader classLoader = TestWFInstanceMerger.class.getClassLoader();
 
 	@BeforeEach
 	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
-			InvalidConstraintException {
-		// loading xml test file
-		this.testedClass = new WFInstanceMerger(new File(FM_FILE_PATH));
+			InvalidConstraintException, URISyntaxException {
+		// loading FM file
+		this.testedClass = new WFInstanceMerger(new File(classLoader.getResource(FM_FILE_PATH).toURI()));
 	}
 
 	@AfterEach
@@ -81,46 +76,8 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 		this.testedClass = null;
 		this.sourceDocument = null;
 		this.resultDocument = null;
-		// TODO; clean the test directory
-		// this.cleanTestDir();
-		// this.backUpPath = null;
-	}
-
-	/**
-	 * Updates the {@link #backUpPath}.
-	 *
-	 * @return the back up path.
-	 */
-	private String updateBackUpPath(String fm_source_file_path) {
-		SimpleDateFormat dateFormater = null;
-		Date backUpDate = new Date();
-		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
-		String[] splittedPath = fm_source_file_path.split("\\.");
-		this.backUpPath = splittedPath[0] + Notation.getBackupVoc() + dateFormater.format(backUpDate) + "."
-				+ splittedPath[1];
-		return this.backUpPath;
-	}
-
-	/**
-	 * Cleans the src/test/resources directory.
-	 *
-	 * <p>
-	 *
-	 * It allows other tests to be performed independently.
-	 *
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	private void cleanTestDir() throws IOException, URISyntaxException {
-		ClassLoader classLoader = this.getClass().getClassLoader();
-		// saving the modified FM file
-		URL url = classLoader.getResource(FM_FILE_PATH);
-		Path path = Paths.get(url.toURI());
-		Files.copy(path, path.resolveSibling(FM_FILE_PATH), StandardCopyOption.REPLACE_EXISTING);
-		// replacing the FM source file by the backed up one
-		url = classLoader.getResource(this.backUpPath);
-		path = Paths.get(url.toURI());
-		Files.move(path, path.resolveSibling(FM_FILE_PATH), StandardCopyOption.REPLACE_EXISTING);
+		TasksManager.clear();
+		XMLManager.removeDocument();
 	}
 
 	/**
@@ -131,6 +88,8 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 	 * More precisely, this method tests if :
 	 *
 	 * <ol>
+	 * <li>source tasks' names are <b>not blank</b>,</li>
+	 * <li>result tasks' names are <b>not blank</b>,</li>
 	 * <li>all WF's tasks are present in the result XML FM file.</li>
 	 * </ol>
 	 *
@@ -138,37 +97,32 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 	 *
 	 * <b>Note</b> that this is a {@link ParameterizedTest}.
 	 *
+	 * @param file the wf file
 	 * @throws Exception
 	 *
 	 * @since 1.0
-	 *
+	 * @see {@link #instanceFiles()}
 	 */
 	@ParameterizedTest
 	@MethodSource("instanceFiles")
 	@DisplayName("Test of merging feature")
-	public void testMergingStructure(Path path)
+	public void testMergingStructure(File file)
 			throws Exception {
-		((WFInstanceMerger) this.testedClass).mergeWithWF(false, true, new File(path.toUri()));
-		this.sourceDocument = FileHandler.preprocess(path.toFile());
+		System.out.println(file);
+		this.sourceDocument = FileHandler.preprocess(file);
+		((WFInstanceMerger) this.testedClass).mergeWithWF(false, true, file);
 		this.resultDocument = XMLManager.getDocument();
-		// getting WF's source task nodes
+		// retrieving task nodes
 		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
-		// List<Node> sourceNestedNodes = ;
-		// getting FM tasks
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FMNames.SELECTOR);
-		// getting tasks' names
-		List<String> sourceNodesNames = sourceNodes.stream()
-				.flatMap(n -> AbstractMerger.getNestedNodes(n).stream()) // flattening
-				.map(Node::getAttributes) // getting attributes
-				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())) // getting Name attribute
-				.map(Node::getNodeValue) // getting name value
-				.map((v) -> XMLManager.sanitizeName(v))
-				.collect(Collectors.toList());
-		List<String> resultNodesNames = resultNodes.stream().map(Node::getAttributes)
-				.map(a -> a.getNamedItem(FMAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
-		// testing
-		assertTrue(resultNodesNames.containsAll(sourceNodesNames)); // #1
+		// retrieving source nodes' names
+		List<String> sourceNodesNames = getNames(sourceNodes, BPMNAttributes.NAME.getName(), true);
+		assertFalse(sourceNodesNames.stream().anyMatch(String::isBlank)); // #1
+		// retrieving result nodes' names
+		List<String> resultNodesNames = getNames(resultNodes, FMAttributes.NAME.getName(), false);
+		assertFalse(resultNodesNames.stream().anyMatch(String::isBlank)); // #2
+		// comparing result nodes' names with source nodes' names
+		assertTrue(resultNodesNames.containsAll(sourceNodesNames)); // #3
 	}
 
 	// TODO: add a test checking that generated nodes are children of the right

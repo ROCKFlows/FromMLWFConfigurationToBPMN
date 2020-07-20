@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -113,22 +114,7 @@ public class TestConflicts {
 		File copiedFile = new File(resultingFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
 		
-		for (String wf : wfList) {
-			String wfPATH = WF_IN_PATH + wf +".bpmn2";
-			File fin = new File(wfPATH);
-			assertTrue(fin.exists());
-			assertTrue(copiedFile.exists());
-			//Command
-			String[] command = new String[] {"merge","--meta", "-i ", wfPATH, "-o ",resultingFM, "-v","7"};
-			com.ml2wf.App.main(command);
-			assertTrue(copiedFile.exists());
-			FMHelper fmAfter = new FMHelper(resultingFM);
-			//General Properties to check
-			List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter,wfPATH);
-			//This test involves managing naming differences  using '_' in FM and BPMN
-			//logger.debug("added features : %s ", afterList);
-			//TestHelper.checkIdempotence(resultingFM, command);
-		}
+		mergeMetaAWFList(wfList, fmBefore, resultingFM, copiedFile);
 		
 		//I make a copy for test
 		String resultingFMBis = FM_OUT_PATH +"FMA_TestBis"+testNumber+".xml";
@@ -140,6 +126,33 @@ public class TestConflicts {
 		assertTrue(copiedFileBis.exists());		
 		
 		TestHelper.compare(resultingFM,resultingFMBis);
+
+		Collections.shuffle(wfList);
+		resultingFM = FM_OUT_PATH +"FMA_TestOrderFree"+testNumber+".xml";
+		copiedFile = new File(resultingFM);
+		FileUtils.copyFile(sourceFile, copiedFile);
+		mergeMetaAWFList(wfList, fmBefore, resultingFM, copiedFile);
+		TestHelper.compare(resultingFM,resultingFMBis);
+	}
+
+	private void mergeMetaAWFList(List<String> wfList, FMHelper fmBefore, String resultingFM, File copiedFile)
+			throws ParserConfigurationException, SAXException, IOException {
+		for (String wf : wfList) {
+			String wfPATH = WF_IN_PATH + wf +".bpmn2";
+			File fin = new File(wfPATH);
+			assertTrue(fin.exists());
+			assertTrue(copiedFile.exists());
+			//Command
+			String[] command = new String[] {"merge","--meta", "-i ", wfPATH, "-o ",resultingFM, "-v","7"};
+			com.ml2wf.App.main(command);
+			assertTrue(copiedFile.exists());
+			FMHelper fmAfter = new FMHelper(resultingFM);
+			//General Properties to check
+			TestHelper.nothingLost(fmBefore, fmAfter,wfPATH);
+			//This test involves managing naming differences  using '_' in FM and BPMN
+			//logger.debug("added features : %s ", afterList);
+			//TestHelper.checkIdempotence(resultingFM, command);
+		}
 	}
 
 	@Test

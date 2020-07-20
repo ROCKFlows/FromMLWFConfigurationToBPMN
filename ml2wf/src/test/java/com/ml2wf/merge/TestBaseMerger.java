@@ -2,6 +2,6 @@ package com.ml2wf.merge;
 
 public class TestBaseMerger {
 
-	// TODO
+	// TODO: <=> test build command
 
 }

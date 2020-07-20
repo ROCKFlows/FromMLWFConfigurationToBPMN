@@ -155,6 +155,15 @@ public abstract class XMLManager {
 	}
 
 	/**
+	 * Removes the xml's {@code Document} instance
+	 *
+	 * @see Document
+	 */
+	public static void removeDocument() {
+		XMLManager.document = null;
+	}
+
+	/**
 	 * Updates the xml's {@code Document} instance if the {@code document} is
 	 * {@code null} or the given {@code sourceFile} is different from the
 	 * {@code document}'s source file.
