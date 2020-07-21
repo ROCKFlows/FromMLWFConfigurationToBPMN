@@ -54,6 +54,14 @@ public final class Notation {
 	 */
 	private static final String BPMN_SHAPE_VOC = "BPMNShape_";
 	/**
+	 * The <b>BPMN property</b> perfix.
+	 */
+	private static final String BPMN_PROPERTY_PREFIX = "Property_";
+	/**
+	 * The <b>BPMN "instance" property</b> notation.
+	 */
+	private static final String BPMN_PROPERTY_INSTANCE = "instance";
+	/**
 	 * The <b>back up</b> notation.
 	 */
 	private static final String BACKUP_VOC = "_save";
@@ -197,6 +205,28 @@ public final class Notation {
 	 */
 	public static String getBpmnShapeVoc() {
 		return BPMN_SHAPE_VOC;
+	}
+
+	/**
+	 * Returns the {@link #BPMN_PROPERTY_PREFIX} notation.
+	 *
+	 * @return the BPMN property prefix
+	 *
+	 * @since 1.0
+	 */
+	public static String getBpmnPropertyPrefix() {
+		return BPMN_PROPERTY_PREFIX;
+	}
+
+	/**
+	 * Returns the {@link #BPMN_PROPERTY_INSTANCE} notation.
+	 *
+	 * @return the BPMN "instance" property
+	 *
+	 * @since 1.0
+	 */
+	public static String getBpmnPropertyInstance() {
+		return BPMN_PROPERTY_INSTANCE;
 	}
 
 	/**
