@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Node;
@@ -249,6 +250,15 @@ public class TestHelper {
 		assertEquals(l1, l2);
 		
 	}
+ 
+ 
+public static void copyFM(String sourceFM,String copiedFM) throws IOException {
+	File copiedFile = new File(copiedFM);
+	File sourceFile = new File(sourceFM);
+	assertTrue(sourceFile.exists());
+	FileUtils.copyFile(sourceFile, copiedFile);
+	assertTrue(copiedFile.exists());
+}
 
 
 }
