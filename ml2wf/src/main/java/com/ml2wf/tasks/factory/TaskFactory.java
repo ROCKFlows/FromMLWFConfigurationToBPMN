@@ -1,7 +1,5 @@
 package com.ml2wf.tasks.factory;
 
-import java.util.Set;
-
 import org.w3c.dom.Node;
 
 import com.ml2wf.tasks.base.Task;
@@ -21,19 +19,17 @@ import com.ml2wf.tasks.concretes.FMTask;
 public interface TaskFactory {
 
 	/**
-	 * Creates and returns a {@code Set<T extends Task<?>>} containing all created
-	 * tasks corresponding to the given {@code node}.
+	 * Creates and returns the created task corresponding to the given {@code node}.
 	 *
 	 * @param <T>  Any {@code class} implementing the {@code Spec interface}
 	 * @param node {@code Node} to convert to {@code Task}
-	 * @return the {@code Set<T extends Task<?>>} containing all created
-	 *         {@code Task}
+	 * @return the created task corresponding to the given {@code node}
 	 *
 	 * @since 1.0
 	 * @see Task
 	 * @see Node
 	 */
-	public <T extends Task<?>> Set<T> createTasks(Node node);
+	public <T extends Task<?>> T createTasks(Node node);
 
 	/**
 	 * Converts a {@code WFTask} to a {@code FMTask}.

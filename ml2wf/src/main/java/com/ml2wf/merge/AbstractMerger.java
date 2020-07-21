@@ -26,6 +26,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.merge.concretes.WFInstanceMerger;
 import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
@@ -219,13 +220,13 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param name       name of the feature
 	 * @param isAbstract whether the wished created feature must be abstract or not
 	 * @return a new feature ({@code FMTask}) with the given {@code name}
+	 * @throws TaskFactoryException
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
 	protected FMTask createFeatureWithName(String name, boolean isAbstract) {
-		return (FMTask) this.taskFactory.createTasks(createFeatureNode(name, isAbstract)).stream().findFirst()
-				.orElse(null);
+		return (FMTask) this.taskFactory.createTasks(createFeatureNode(name, isAbstract));
 	}
 
 	/**
@@ -243,10 +244,14 @@ public abstract class AbstractMerger extends XMLManager {
 	 *
 	 * @since 1.0
 	 */
-	protected static Element createNestedNode(Element parent, String name) {
+	protected Element createNestedNode(Element parent, String name) {
 		Element created = parent.getOwnerDocument().createElement(parent.getNodeName());
 		created.setAttribute(BPMNAttributes.NAME.getName(), name);
-		mergeNodesTextContent(addDocumentationNode(created), getReferenceDocumentation(XMLManager.getNodeName(parent)));
+		String refContent = getReferenceDocumentation(XMLManager.getNodeName(parent));
+		if (this instanceof WFInstanceMerger) {
+			refContent += Notation.getReferenceSpecialEndchar(); // see notation
+		}
+		mergeNodesTextContent(addDocumentationNode(created), refContent);
 		return created;
 	}
 
@@ -287,7 +292,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 *
 	 * @since 1.0
 	 */
-	public static List<Node> getNestedNodes(Node node) {
+	public List<Node> getNestedNodes(Node node) {
 		List<Node> result = new ArrayList<>();
 		// retrieving attributes values
 		String rawName = XMLManager.getNodeName(node);
@@ -309,7 +314,7 @@ public abstract class AbstractMerger extends XMLManager {
 		result.add(parentNode);
 		// foreach nested node's name
 		for (String name : names) {
-			parentNode = createNestedNode(parentNode, name);
+			parentNode = this.createNestedNode(parentNode, name);
 			addAttributeDoc(parentNode, attributesDoc); // add the attributesDoc to the docNode text content
 			result.add(parentNode);
 		}
