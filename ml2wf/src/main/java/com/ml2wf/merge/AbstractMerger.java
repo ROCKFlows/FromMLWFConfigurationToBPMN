@@ -28,6 +28,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.concretes.WFMetaMerger;
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
@@ -220,12 +221,13 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param name       name of the feature
 	 * @param isAbstract whether the wished created feature must be abstract or not
 	 * @return a new feature ({@code FMTask}) with the given {@code name}
+	 * @throws InvalidTaskException
 	 * @throws TaskFactoryException
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	protected FMTask createFeatureWithName(String name, boolean isAbstract) {
+	protected FMTask createFeatureWithName(String name, boolean isAbstract) throws InvalidTaskException {
 		return (FMTask) this.taskFactory.createTasks(createFeatureNode(name, isAbstract));
 	}
 
@@ -472,12 +474,13 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param parentTask Parent task
 	 * @param task       task to insert
 	 * @return the added child
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see Task
 	 * @see FMTask
 	 */
-	protected <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) {
+	protected <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) throws InvalidTaskException {
 		logger.debug("Inserting task : {}", task.getName());
 		// inserting the new node
 		FMTask childTask = (task instanceof FMTask) ? (FMTask) task

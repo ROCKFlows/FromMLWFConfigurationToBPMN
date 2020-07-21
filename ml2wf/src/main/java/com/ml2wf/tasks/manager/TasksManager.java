@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Node;
 
 import com.ml2wf.tasks.base.Task;
@@ -48,6 +50,13 @@ public final class TasksManager {
 	 * {@code Set} containing all {@code WFTask}.
 	 */
 	private static Set<WFTask<?>> wfTasks = new HashSet<>();
+	/**
+	 * Logger instance.
+	 *
+	 * @since 1.0
+	 * @see Logger
+	 */
+	private static final Logger logger = LogManager.getLogger(TasksManager.class);
 
 	/**
 	 * {@code TasksManager}'s default constructor.
@@ -236,10 +245,21 @@ public final class TasksManager {
 			if (task instanceof FMTask) {
 				fmTasks.add((FMTask) task);
 			} else {
-				// removing if a task with the same name and a blank reference is already
-				// contained to keep most precise tasks
-				wfTasks.removeIf(
-						t -> (t.getName() != null) && t.getName().equals(task.getName()) && t.getReference().isBlank());
+				// removing if a task with the same name :
+				// - has a blank reference
+				// or
+				// - is abstract and the new one is not (prioritizing concretes (ref : #148))
+				if (!wfTasks.removeIf(t -> t.getName().equals(task.getName()) && (t.getReference().isBlank()))
+						&& wfTasks.removeIf(
+								t -> t.getName().equals(task.getName()) && (t.isAbstract() && !task.isAbstract()))) {
+					// we have to update the corresponding FMTask's abstract status
+					Optional<FMTask> optFmTask = TasksManager.getFMTaskWithName(task.getName());
+					if (optFmTask.isPresent()) {
+						FMTask fmTask = optFmTask.get();
+						logger.info("Changing {}'s abstract status from true to false", fmTask);
+						fmTask.setAbstract(false);
+					}
+				}
 				wfTasks.add((WFTask<?>) task);
 			}
 		}
