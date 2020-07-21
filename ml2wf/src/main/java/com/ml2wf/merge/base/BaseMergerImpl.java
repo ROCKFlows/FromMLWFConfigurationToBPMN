@@ -122,7 +122,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			}
 			Document wfDocument = wfInfo.getValue();
 			// create associated tasks
-			tasks = getTasksList(wfDocument, BPMNNames.SELECTOR).stream().map(this::getNestedNodes)
+			tasks = getTasksList(wfDocument, BPMNNames.SELECTOR).stream().map(AbstractMerger::getNestedNodes)
 					.flatMap(Collection::stream).map(this.getTaskFactory()::createTasks).map(t -> (WFTask<?>) t)
 					.collect(Collectors.toSet());
 			annotations.addAll(this.getAnnotations(wfDocument));
