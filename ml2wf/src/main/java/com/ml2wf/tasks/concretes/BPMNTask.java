@@ -35,9 +35,9 @@ public final class BPMNTask extends WFTask<BPMNTaskSpecs> {
 	 * {@code reference}.
 	 *
 	 * @param name       name of the task
-	 * @param reference  reference of the task
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
+	 * @param reference  reference of the task
 	 */
 	public BPMNTask(String name, Node node, boolean isAbstract, String reference) {
 		super(name, node, isAbstract, reference);

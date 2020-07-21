@@ -101,6 +101,15 @@ public final class Notation {
 	 * The <b>category prefix</b> notation.
 	 */
 	private static final String CATEGORY_PREFIX_VOC = "$";
+	/**
+	 * The <b>reference special ending character</b> notation.
+	 *
+	 * <p>
+	 *
+	 * This character specify that even if the task has a reference, it is a
+	 * concrete task.
+	 */
+	private static final String REFERENCE_SPECIAL_ENDCHAR = "-";
 
 	/**
 	 * {@code Notation's} default constructor.
@@ -320,6 +329,17 @@ public final class Notation {
 	 */
 	public static String getCategoryPrefixVoc() {
 		return CATEGORY_PREFIX_VOC;
+	}
+
+	/**
+	 * Returns the {@link #REFERENCE_SPECIAL_ENDCHAR} keyword notation.
+	 *
+	 * @return the reference special ending character notation
+	 *
+	 * @since 1.0
+	 */
+	public static String getReferenceSpecialEndchar() {
+		return REFERENCE_SPECIAL_ENDCHAR;
 	}
 
 	/**

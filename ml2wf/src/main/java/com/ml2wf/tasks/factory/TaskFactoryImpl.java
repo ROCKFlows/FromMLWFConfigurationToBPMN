@@ -1,17 +1,14 @@
 package com.ml2wf.tasks.factory;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.ml2wf.conventions.enums.bpmn.BPMNNames;
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
-import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
@@ -44,26 +41,12 @@ public class TaskFactoryImpl implements TaskFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Task<?>> Set<T> createTasks(Node node) {
-		Set<T> createdTasks = new HashSet<>();
-		String tagName;
-		String nodeName;
-		T createdTask;
-		for (Node child : AbstractMerger.getNestedNodes(node)) {
-			tagName = child.getNodeName();
-			nodeName = XMLManager.getNodeName(child);
-			nodeName = XMLManager.sanitizeName(nodeName);
-			// TODO: change this if-elseif statement
-			if (FMNames.SELECTOR.isFMTask(tagName)) {
-				createdTask = (T) this.createFMTask(nodeName, child);
-			} else if (BPMNNames.SELECTOR.isBPMNTask(tagName)) {
-				createdTask = (T) this.createWFTask(nodeName, child);
-			} else {
-				continue; // TODO: throw error
-			}
-			createdTasks.add(createdTask);
-		}
-		return createdTasks;
+	public <T extends Task<?>> T createTasks(Node node) {
+		String tagName = node.getNodeName();
+		String nodeName = XMLManager.getNodeName(node);
+		nodeName = XMLManager.sanitizeName(nodeName);
+		return (FMNames.SELECTOR.isFMTask(tagName)) ? (T) this.createFMTask(nodeName, node)
+				: (T) this.createWFTask(nodeName, node);
 	}
 
 	@Override
@@ -86,6 +69,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @see FMTask
 	 */
 	private FMTask createFMTask(String name, Node node) {
+		// TODO: improve abstract definition
 		return new FMTask(name, node, this.isAbstract(node));
 	}
 
@@ -95,15 +79,20 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @param name name of the new task
 	 * @param node node of the new task
 	 * @return a new {@code WFTask} considering the given arguments
+	 * @throws TaskFactoryException
 	 *
 	 * @since 1.0
 	 * @see WFTask
 	 */
 	private WFTask<?> createWFTask(String name, Node node) {
 		// TODO: change created type considering user convention (e.g. BPMN)
-		Optional<String> optRef = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
-		BPMNTask createdFMTask = new BPMNTask(name, node,
-				optRef.isEmpty() || optRef.get().equals(WFMetaMerger.STEP_TASK), optRef.orElse(""));
+		Optional<String> optRefName = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
+		boolean isAbstract = optRefName.isEmpty() || optRefName.get().endsWith(Notation.getReferenceSpecialEndchar());
+		String reference = optRefName.orElse("");
+		if (reference.endsWith(Notation.getReferenceSpecialEndchar())) {
+			reference = reference.substring(0, reference.length() - 1);
+		}
+		BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract, reference);
 		createdFMTask.applySpecs();
 		return createdFMTask;
 	}

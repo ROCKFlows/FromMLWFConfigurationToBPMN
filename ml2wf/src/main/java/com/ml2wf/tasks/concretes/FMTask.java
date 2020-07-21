@@ -125,6 +125,7 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param parent the new task's {@code parent}
 	 */
 	public void setParent(FMTask parent) {
+
 		this.parent = parent;
 	}
 

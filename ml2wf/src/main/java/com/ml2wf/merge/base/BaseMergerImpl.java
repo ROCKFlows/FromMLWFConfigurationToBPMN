@@ -120,13 +120,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		for (File file : files) {
 			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
 			if (wfInfo.isEmpty()) {
-				// TODO: add logs
-				return;
+				continue;
 			}
 			Document wfDocument = wfInfo.getValue();
 			// create associated tasks
-			tasks = getTasksList(wfDocument, BPMNNames.SELECTOR).stream()
-					.map(this.getTaskFactory()::createTasks).flatMap(Collection::stream).map(t -> (WFTask<?>) t)
+			tasks = getTasksList(wfDocument, BPMNNames.SELECTOR).stream().map(this::getNestedNodes)
+					.flatMap(Collection::stream).map(this.getTaskFactory()::createTasks).map(t -> (WFTask<?>) t)
 					.collect(Collectors.toSet());
 			annotations.addAll(this.getAnnotations(wfDocument));
 			if (completeMerge) {
@@ -139,6 +138,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		for (WFTask<?> wfTask : TasksManager.getWFTasks()) {
 			this.processTask(wfTask);
 		}
+		TasksManager.updateFMParents(TasksManager.getFMTasks());
 		this.processAnnotations(annotations);
 		this.endProcessUnmanagedNode();
 	}
@@ -201,7 +201,9 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	private void createFMTasks() throws MergeException {
 		List<Node> fmTasksList = getTasksList(getDocument(), FMNames.SELECTOR);
 		// create fm tasks foreach task node
-		fmTasksList.stream().forEach(this.getTaskFactory()::createTasks);
+		for (Node taskNode : fmTasksList) {
+			this.getTaskFactory().createTasks(taskNode);
+		}
 		// get the unmanaged global task
 		setUnmanagedTask(this.getGlobalFMTask(UNMANAGED));
 		// update created tasks' parents
@@ -290,26 +292,67 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected void processTask(WFTask<?> task) throws MergeException {
 		String taskName = task.getName();
-		Optional<FMTask> optFMTask;
-		Optional<?> optTask;
-		if (TasksManager.existsinFM(taskName)) {
+		if (TasksManager.existsinFM(taskName) && !this.processDuplicatedTask(task)) {
 			// if task is already in the FM
-			optFMTask = unmanagedTask.getChildWithName(taskName);
-			if (optFMTask.isEmpty()) {
-				// if it is not under the unmanaged node
-				return;
-			}
-			optTask = unmanagedTask.removeChild(optFMTask.get());
-			if (optTask.isEmpty()) {
-				return; // TODO: throw error
-			}
-			FMTask duplicatedTask = (FMTask) optTask.get();
-			// task = this.mergeNodes(task, duplicatedTask); // TODO: to modify
+			// and no further operation is needed
+			return;
 		}
 		// retrieving a suitable parent
 		FMTask parentTask = this.getSuitableParent(task);
 		// inserting the new task
 		this.insertNewTask(parentTask, task);
+	}
+
+	/**
+	 * Processes the given {@code task} as a duplicated {@code Task}.
+	 *
+	 * <p>
+	 *
+	 * A duplicated task is a task already contained in the FeatureModel.
+	 *
+	 * <p>
+	 *
+	 * The following operations can be applied to a duplicated task depending of the
+	 * situation :
+	 *
+	 * <p>
+	 *
+	 * <ul>
+	 * <li>changing its <b>abstract status</b> from {@code true} to
+	 * {@code false} (ref : #148),</li>
+	 * <li>removing the duplicated task from the {@link #unmanagedTask},</li>
+	 * <li>merging the original task's node with the duplicated's one.</li>
+	 * </ul>
+	 *
+	 *
+	 *
+	 * @param task task to process
+	 * @return whether further operations are needed or not
+	 * @throws MergeException
+	 *
+	 * @since 1.0
+	 */
+	private boolean processDuplicatedTask(WFTask<?> task) throws MergeException {
+		String taskName = task.getName();
+		Optional<FMTask> optFMTask = unmanagedTask.getChildWithName(taskName);
+		if (optFMTask.isEmpty()) {
+			// if it is not under the unmanaged node
+			optFMTask = TasksManager.getFMTaskWithName(taskName);
+			System.out.println("MANAGING DUPLICATED : " + task + " // IS ABSTRACT : " + task.isAbstract());
+			if (optFMTask.isPresent() && !task.isAbstract()) {
+				// priority to concrete (ref : #148)
+				logger.debug("Setting {} concrete.", task);
+				// TODO: manage following comments
+				// System.out.println("Setting " + task + " concrete.");
+				// optFMTask.get().setAbstract(false);
+			}
+			return false;
+		}
+		Optional<?> optTask = unmanagedTask.removeChild(optFMTask.get());
+		FMTask duplicatedTask = (FMTask) optTask
+				.orElseThrow(() -> new MergeException("Can't process the task : " + task));
+		// task = this.mergeNodes(task, duplicatedTask); // TODO: to modify
+		return true;
 	}
 
 	// TODO
@@ -381,10 +424,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		globalElement.setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(true));
 		globalElement.setAttribute(FMAttributes.NAME.getName(), globalNodeName);
 		// create the global task
-		Optional<Task<?>> optGlobalTask = this.getTaskFactory().createTasks(globalElement).stream().findFirst();
-		if (optGlobalTask.isEmpty()) {
-			throw new MergeException("Can't create the global task : " + globalNodeName);
-		}
+		FMTask globalTask = this.getTaskFactory().createTasks(globalElement);
 		// get the root node
 		Optional<Node> optRoot = getFeatureNodeAtLevel(getDocument(), 2);
 		Node rootNode = optRoot.orElseThrow(() -> new MergeException("Invalid FeatureModel structure."));
@@ -393,7 +433,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		Optional<FMTask> optRootTask = TasksManager.getFMTaskWithName(rootNodeName);
 		return optRootTask
 				.orElseThrow(() -> new MergeException("Can't retrieve the global task with name : " + rootNodeName))
-				.appendChild((FMTask) optGlobalTask.get());
+				.appendChild(globalTask);
 	}
 
 	/**
