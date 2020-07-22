@@ -67,7 +67,7 @@ public final class WFInstanceMerger extends BaseMergerImpl {
 
 	@Override
 	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, InvalidTaskException {
-		return this.getReferredFMTask(task, unmanagedTask);
+		return this.getReferredFMTask(task, unmanagedTasks.get(UNMANAGED_TASKS));
 	}
 
 	@Override

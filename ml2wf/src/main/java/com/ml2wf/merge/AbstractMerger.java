@@ -228,7 +228,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @see FMTask
 	 */
 	protected FMTask createFeatureWithName(String name, boolean isAbstract) throws InvalidTaskException {
-		return (FMTask) this.taskFactory.createTasks(createFeatureNode(name, isAbstract));
+		return (FMTask) this.taskFactory.createTask(createFeatureNode(name, isAbstract));
 	}
 
 	/**

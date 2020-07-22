@@ -52,7 +52,7 @@ public class TaskFactoryImpl implements TaskFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Task<?>> T createTasks(Node node) throws InvalidTaskException {
+	public <T extends Task<?>> T createTask(Node node) throws InvalidTaskException {
 		String tagName = node.getNodeName();
 		String nodeName = XMLManager.getNodeName(node);
 		nodeName = XMLManager.sanitizeName(nodeName);
