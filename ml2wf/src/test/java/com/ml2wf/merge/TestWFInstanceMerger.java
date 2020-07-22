@@ -115,23 +115,6 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 		// retrieving task nodes
 		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FMNames.SELECTOR);
-<<<<<<< HEAD
-
-		// getting tasks' names
-		List<String> sourceNodesNames = sourceNodes.stream()
-				.flatMap(n -> ((AbstractMerger) this.testedClass).getNestedNodes(n).stream()) // flattening
-				.map(Node::getAttributes) // getting attributes
-				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())) // getting Name attribute
-				.map(Node::getNodeValue) // getting name value
-				.map((v) -> XMLManager.sanitizeName(v))
-				.collect(Collectors.toList());
-		List<String> resultNodesNames = resultNodes.stream().map(Node::getAttributes)
-				.map(a -> a.getNamedItem(FMAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
-		// testing
-		assertTrue(resultNodesNames.containsAll(sourceNodesNames)); // #1
-
-=======
 		// retrieving source nodes' names
 		List<String> sourceNodesNames = getNames(sourceNodes, BPMNAttributes.NAME.getName(), true);
 		assertFalse(sourceNodesNames.stream().anyMatch(String::isBlank)); // #1
@@ -140,7 +123,6 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 		assertFalse(resultNodesNames.stream().anyMatch(String::isBlank)); // #2
 		// comparing result nodes' names with source nodes' names
 		assertTrue(resultNodesNames.containsAll(sourceNodesNames)); // #3
->>>>>>> 731e9ffc7e180667642a12a3ee4e13abf8cb9786
 	}
 
 	// TODO: add a test checking that generated nodes are children of the right

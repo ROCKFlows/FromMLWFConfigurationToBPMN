@@ -113,18 +113,8 @@ public class TestWFMetaMerger extends AbstractXMLTest {
 		// getting FM tasks
 		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FMNames.SELECTOR);
 		// getting tasks' names
-
-		List<String> sourceNodesNames = sourceNodes.stream()
-				.flatMap(n -> ((AbstractMerger) this.testedClass).getNestedNodes(n).stream()) // flattening
-				.map(Node::getAttributes) // getting attributes
-				.map(a -> a.getNamedItem(BPMNAttributes.NAME.getName())) // getting Name attribute
-				.map(Node::getNodeValue) // getting name value
-				.map((v) -> XMLManager.sanitizeName(v))
-				.collect(Collectors.toList());
-		List<String> resultNodesNames = resultNodes.stream().map(Node::getAttributes)
-				.map(a -> a.getNamedItem(FMAttributes.NAME.getName())).map(Node::getNodeValue)
-				.map((v) -> XMLManager.sanitizeName(v)).collect(Collectors.toList());
-
+		List<String> sourceNodesNames = getNames(sourceNodes, BPMNAttributes.NAME.getName(), true);
+		List<String> resultNodesNames = getNames(resultNodes, FMAttributes.NAME.getName(), false);
 		// testing
 		assertTrue(resultNodesNames.containsAll(sourceNodesNames)); // #1
 	}
