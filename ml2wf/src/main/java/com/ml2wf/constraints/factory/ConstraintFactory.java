@@ -5,6 +5,7 @@ import java.util.List;
 import org.w3c.dom.Node;
 
 import com.ml2wf.constraints.InvalidConstraintException;
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.Pair;
 
@@ -26,11 +27,12 @@ public interface ConstraintFactory {
 	 * @param constraintText text containing constraints
 	 * @return a {@code List} of generated constraint nodes
 	 * @throws InvalidConstraintException
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException;
+	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException, InvalidTaskException;
 
 	/**
 	 * Returns a {@code List} of {@code Pair} containing the LCA {@code FMTask} as
@@ -44,4 +46,20 @@ public interface ConstraintFactory {
 	 * @see Pair
 	 */
 	public List<Pair<FMTask, Node>> getOrderNodes(String constraintText);
+
+	/**
+	 * Returns an <b>implication</b> association of the {@code globalTask} with the
+	 * {@code tasksNames}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method returns this association using the
+	 * {@code DefaultConfig}'s symbols.
+	 *
+	 * @param globalTask global task
+	 * @param tasksNames tasks implied by the {@code global task}
+	 * @return an implication association of the {@code globalTask} with the
+	 *         {@code tasksNames}
+	 */
+	public String getAssociationConstraint(String globalTask, List<String> tasksNames);
 }

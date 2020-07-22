@@ -63,7 +63,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	@Override
 	public FMTask convertWFtoFMTask(WFTask<?> task) throws InvalidTaskException {
 		FMTask createdFMTask = new FMTask(task, false);
-		createdFMTask.setNode(AbstractMerger.createFeatureNode(createdFMTask.getName(), task.isAbstract()));
+		createdFMTask.setNode(AbstractMerger.createFeatureWithAbstract(createdFMTask.getName(), task.isAbstract()));
 		createdFMTask.addAllSpecs(task.getSpecs());
 		createdFMTask.applySpecs();
 		return createdFMTask;
@@ -81,7 +81,6 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @see FMTask
 	 */
 	private FMTask createFMTask(String name, Node node) throws InvalidTaskException {
-		// TODO: improve abstract definition
 		return new FMTask(name, node, isFMAbstract(node));
 	}
 

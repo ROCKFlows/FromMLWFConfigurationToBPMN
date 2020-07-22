@@ -27,7 +27,6 @@ import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
-import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
@@ -76,7 +75,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 *
 	 * @see TaskFactory
 	 */
-	private TaskFactory taskFactory;
+	private static TaskFactory taskFactory;
 	/**
 	 * {@code ConstraintFactory}'s instance that will generate constraint nodes.
 	 *
@@ -102,7 +101,7 @@ public abstract class AbstractMerger extends XMLManager {
 	public AbstractMerger(File file) throws ParserConfigurationException, SAXException, IOException {
 		super(file);
 		this.constraintFactory = new ConstraintFactoryImpl(getDocument());
-		this.taskFactory = new TaskFactoryImpl();
+		setTaskFactory(new TaskFactoryImpl());
 	}
 
 	/**
@@ -112,8 +111,19 @@ public abstract class AbstractMerger extends XMLManager {
 	 *
 	 * @see TaskFactory
 	 */
-	public TaskFactory getTaskFactory() {
-		return this.taskFactory;
+	private static void setTaskFactory(TaskFactory taskFactory) {
+		AbstractMerger.taskFactory = taskFactory;
+	}
+
+	/**
+	 * Returns the {@code TaskFactory}'s instance.
+	 *
+	 * @return the {@code TaskFactory}'s instance
+	 *
+	 * @see TaskFactory
+	 */
+	public static TaskFactory getTaskFactory() {
+		return taskFactory;
 	}
 
 	/**
@@ -176,6 +186,21 @@ public abstract class AbstractMerger extends XMLManager {
 	}
 
 	/**
+	 * Creates and returns a new feature with the given {@code name}.
+	 *
+	 * @param name name of the feature attribute
+	 * @return a new feature attribute {@code Element} with the given {@code name}
+	 *
+	 * @since 1.0
+	 * @see Element
+	 */
+	public static Element createFeature(String name) {
+		Element feature = getDocument().createElement(FMNames.FEATURE.getName());
+		feature.setAttribute(FMAttributes.NAME.getName(), name);
+		return feature;
+	}
+
+	/**
 	 * Creates and returns a new feature attribute {@code Element} with the given
 	 * {@code name}.
 	 *
@@ -197,7 +222,7 @@ public abstract class AbstractMerger extends XMLManager {
 
 	/**
 	 * Creates and returns a new feature {@code Element} with the given
-	 * {@code name}.
+	 * {@code name} and the given {@code isAbstract} status.
 	 *
 	 * @param name       name of the feature
 	 * @param isAbstract whether the wished created feature {@code Element} must be
@@ -207,9 +232,8 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 * @see Element
 	 */
-	public static Element createFeatureNode(String name, boolean isAbstract) {
-		Element feature = getDocument().createElement(FMNames.FEATURE.getName());
-		feature.setAttribute(FMAttributes.NAME.getName(), name);
+	public static Element createFeatureWithAbstract(String name, boolean isAbstract) {
+		Element feature = createFeature(name);
 		feature.setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(isAbstract));
 		return feature;
 	}
@@ -227,8 +251,8 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	protected FMTask createFeatureWithName(String name, boolean isAbstract) throws InvalidTaskException {
-		return (FMTask) this.taskFactory.createTask(createFeatureNode(name, isAbstract));
+	protected static FMTask createFMTaskWithName(String name, boolean isAbstract) throws InvalidTaskException {
+		return (FMTask) taskFactory.createTask(createFeatureWithAbstract(name, isAbstract));
 	}
 
 	/**
@@ -481,16 +505,12 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @see Task
 	 * @see FMTask
 	 */
-	protected <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) throws InvalidTaskException {
+	public static <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) throws InvalidTaskException {
 		logger.debug("Inserting task : {}", task.getName());
 		// inserting the new node
 		FMTask childTask = (task instanceof FMTask) ? (FMTask) task
-				: this.taskFactory.convertWFtoFMTask((WFTask<?>) task);
-		FMTask insertedTask = parentTask.appendChild(childTask);
-		// updating abstract status
-		// must be true if it is a "meta merge"
-		insertedTask.setAbstract(insertedTask.isAbstract() || (this instanceof WFMetaMerger));
-		return insertedTask;
+				: taskFactory.convertWFtoFMTask((WFTask<?>) task);
+		return parentTask.appendChild(childTask);
 	}
 
 	/**
@@ -515,11 +535,12 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param wfDocument Workflow {@code Document}'s instance containing
 	 *                   annotations.
 	 * @throws InvalidConstraintException
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see ConstraintFactory
 	 */
-	protected void processAnnotations(List<Node> annotations) throws InvalidConstraintException {
+	protected void processAnnotations(List<Node> annotations) throws InvalidConstraintException, InvalidTaskException {
 		logger.info("Processing annotations...");
 		List<Pair<FMTask, Node>> orderPairs; // pair that will contain order constraint data
 		for (Node annotation : annotations) {
@@ -553,11 +574,12 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param wfName workflow's name
 	 * @param tasks  {@code Set<Task>} containing all workflow's tasks
 	 * @throws InvalidConstraintException
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 */
 	protected <T extends Task<?>> void processAssocConstraints(String wfName, Set<T> tasks)
-			throws InvalidConstraintException {
+			throws InvalidConstraintException, InvalidTaskException {
 		String logMsg;
 		logger.debug("Retrieving all FM document tasks...");
 		List<String> tasksNames = tasks.stream().map(Task::getName)

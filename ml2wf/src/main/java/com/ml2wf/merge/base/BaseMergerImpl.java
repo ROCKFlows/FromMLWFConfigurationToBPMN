@@ -81,7 +81,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	/**
 	 * {@code HashMap} that contains all global unmanaged tasks.
 	 */
-	protected static Map<String, FMTask> unmanagedTasks = new HashMap<>();
+	protected static Map<String, FMTask> unmanagedGlobalTasks = new HashMap<>();
 	/**
 	 * The default root name.
 	 */
@@ -110,6 +110,16 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		super(file);
 	}
 
+	/**
+	 * Returns the unmanaged global task with the given {@code name}.
+	 *
+	 * @param name name of the requested unmanaged global task
+	 * @return
+	 */
+	public static FMTask getUnmanagedGlobalTask(String name) {
+		return unmanagedGlobalTasks.get(name);
+	}
+
 	@Override
 	public void mergeWithWF(boolean backUp, boolean completeMerge, File wfFile) throws Exception {
 		if (backUp) {
@@ -134,7 +144,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 					.flatMap(Collection::stream).collect(Collectors.toSet());
 			// creating associated tasks
 			for (Node node : nodes) {
-				tasks.add(this.getTaskFactory().createTask(node));
+				tasks.add(getTaskFactory().createTask(node));
 			}
 			// saving annotations
 			annotations.addAll(this.getAnnotations(wfDocument));
@@ -150,7 +160,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		}
 		TasksManager.updateFMParents(TasksManager.getFMTasks());
 		this.processAnnotations(annotations);
-		// endProcessUnmanagedNodes();
+		endProcessUnmanagedNodes();
 	}
 
 	@Override
@@ -214,7 +224,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			List<Node> fmTasksList = getTasksList(getDocument(), FMNames.SELECTOR);
 			// create fm tasks foreach task node
 			for (Node taskNode : fmTasksList) {
-				this.getTaskFactory().createTask(taskNode);
+				getTaskFactory().createTask(taskNode);
 			}
 		}
 		// creating required unmanaged parent nodes
@@ -238,11 +248,11 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	private void startProcessUnmanagedNodes() throws MergeException, InvalidTaskException {
 		// get the unmanaged global task
 		FMTask unmanagedTask = this.getGlobalFMTask(UNMANAGED);
-		unmanagedTasks.put(UNMANAGED, unmanagedTask);
+		unmanagedGlobalTasks.put(UNMANAGED, unmanagedTask);
 		// creating the unmanaged tasks global task
-		unmanagedTasks.put(UNMANAGED_TASKS, unmanagedTask.appendChild(this.getUnmanaged(UNMANAGED_TASKS)));
+		unmanagedGlobalTasks.put(UNMANAGED_TASKS, unmanagedTask.appendChild(this.getUnmanaged(UNMANAGED_TASKS)));
 		// creating the unmanaged features global task
-		unmanagedTasks.put(UNMANAGED_FEATURES, unmanagedTask.appendChild(this.getUnmanaged(UNMANAGED_FEATURES)));
+		unmanagedGlobalTasks.put(UNMANAGED_FEATURES, unmanagedTask.appendChild(this.getUnmanaged(UNMANAGED_FEATURES)));
 	}
 
 	/**
@@ -261,8 +271,8 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		if (opt.isPresent()) {
 			return opt.get();
 		}
-		Element unmanagedTasksElement = createFeatureNode(name, true);
-		return this.getTaskFactory().createTask(unmanagedTasksElement);
+		Element unmanagedTasksElement = createFeatureWithAbstract(name, true);
+		return getTaskFactory().createTask(unmanagedTasksElement);
 	}
 
 	/**
@@ -279,8 +289,8 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	private static void endProcessUnmanagedNodes() {
 		// processing children first
-		FMTask unmanagedTask = unmanagedTasks.remove(UNMANAGED);
-		unmanagedTasks.values().forEach(BaseMergerImpl::removeUnusedGlobalTask);
+		FMTask unmanagedTask = unmanagedGlobalTasks.remove(UNMANAGED);
+		unmanagedGlobalTasks.values().forEach(BaseMergerImpl::removeUnusedGlobalTask);
 		// processing the parent at the end
 		removeUnusedGlobalTask(unmanagedTask);
 	}
@@ -333,9 +343,9 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	private void processCompleteMerge(String wfName, Set<WFTask<?>> tasks)
 			throws InvalidConstraintException, MergeException, InvalidTaskException {
-		this.createdWFTask = this.createFeatureWithName(wfName, this instanceof WFMetaMerger);
+		this.createdWFTask = createFMTaskWithName(wfName, this instanceof WFMetaMerger);
 		FMTask root = this.getRootParentNode();
-		this.createdWFTask = this.insertNewTask(root, this.createdWFTask);
+		this.createdWFTask = insertNewTask(root, this.createdWFTask);
 		this.processAssocConstraints(wfName, tasks);
 	}
 
@@ -376,7 +386,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		// retrieving a suitable parent
 		FMTask parentTask = this.getSuitableParent(task);
 		// inserting the new task
-		this.insertNewTask(parentTask, task);
+		insertNewTask(parentTask, task);
 	}
 
 	/**
@@ -410,7 +420,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	private boolean processDuplicatedTask(WFTask<?> task) throws MergeException {
 		String taskName = task.getName();
-		FMTask unmanagedTask = unmanagedTasks.get(UNMANAGED_TASKS);
+		FMTask unmanagedTask = unmanagedGlobalTasks.get(UNMANAGED_TASKS);
 		Optional<FMTask> optFMTask = unmanagedTask.getChildWithName(taskName);
 		if (optFMTask.isEmpty()) {
 			return false;
@@ -489,9 +499,9 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected FMTask createGlobalFMTask(String globalNodeName) throws MergeException, InvalidTaskException {
 		// create the node element
-		Element globalElement = createFeatureNode(globalNodeName, true);
+		Element globalElement = createFeatureWithAbstract(globalNodeName, true);
 		// create the global task
-		FMTask globalTask = this.getTaskFactory().createTask(globalElement);
+		FMTask globalTask = getTaskFactory().createTask(globalElement);
 		// get the root node
 		Optional<Node> optRoot = getFeatureNodeAtLevel(getDocument(), 2);
 		Node rootNode = optRoot.orElseThrow(() -> new MergeException("Invalid FeatureModel structure."));
@@ -554,11 +564,11 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			task = opt.get();
 		}
 		opt = TasksManager.getWFTaskWithName(task.getReference());
-		FMTask newParent = this.createFeatureWithName(task.getReference(),
+		FMTask newParent = createFMTaskWithName(task.getReference(),
 				(opt.isPresent()) ? opt.get().isAbstract() : opt.isEmpty());
 		opt = TasksManager.getWFTaskWithName(newParent.getName());
 		FMTask globalTask = (opt.isEmpty()) ? this.getGlobalFMTask(WFMetaMerger.STEP_TASK)
 				: this.getSuitableParent(opt.get());
-		return this.insertNewTask(globalTask, newParent);
+		return insertNewTask(globalTask, newParent);
 	}
 }
