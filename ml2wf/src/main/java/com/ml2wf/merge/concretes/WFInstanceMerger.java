@@ -67,7 +67,7 @@ public final class WFInstanceMerger extends BaseMergerImpl {
 
 	@Override
 	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, InvalidTaskException {
-		return this.getReferredFMTask(task, unmanagedTask);
+		return this.getReferredFMTask(task, unmanagedGlobalTasks.get(UNMANAGED_TASKS));
 	}
 
 	@Override
@@ -76,7 +76,8 @@ public final class WFInstanceMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public void processSpecificNeeds(Pair<String, Document> wfInfo) throws InvalidConstraintException {
+	public void processSpecificNeeds(Pair<String, Document> wfInfo)
+			throws InvalidConstraintException, InvalidTaskException {
 		Document wfDocument = wfInfo.getValue();
 		logger.debug("Specific need : meta reference.");
 		String metaReferrence = this.getMetaReferenced(wfDocument);
