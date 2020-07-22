@@ -252,7 +252,7 @@ public abstract class AbstractMerger extends XMLManager {
 		String refContent = getReferenceDocumentation(XMLManager.getNodeName(parent));
 		Optional<Node> optProperty = getProperty(parent, BPMNNames.PROPERTY.getName());
 		if (optProperty.isPresent()) {
-			created.appendChild(optProperty.get());
+			created.appendChild(optProperty.get().cloneNode(true));
 		}
 		mergeNodesTextContent(addDocumentationNode(created), refContent);
 		return created;
@@ -328,7 +328,8 @@ public abstract class AbstractMerger extends XMLManager {
 		}
 		// Manage the parentNode
 		Element parentNode = (Element) node.cloneNode(true);
-		parentNode.setAttribute(BPMNAttributes.NAME.getName(), names.remove(0));
+		String parentName = names.remove(0);
+		parentNode.setAttribute(BPMNAttributes.NAME.getName(), parentName);
 		addAttributeDoc(parentNode, attributesDoc); // add the attributesDoc to the docNode text content
 		result.add(parentNode);
 		// foreach nested node's name
