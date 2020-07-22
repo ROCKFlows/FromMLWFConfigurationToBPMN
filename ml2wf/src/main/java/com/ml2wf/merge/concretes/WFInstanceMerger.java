@@ -19,6 +19,7 @@ import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.MergeException;
 import com.ml2wf.merge.base.BaseMergerImpl;
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.Pair;
@@ -65,12 +66,12 @@ public final class WFInstanceMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public FMTask getSuitableParent(WFTask<?> task) throws MergeException {
+	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, InvalidTaskException {
 		return this.getReferredFMTask(task, unmanagedTask);
 	}
 
 	@Override
-	public FMTask getRootParentNode() throws MergeException {
+	public FMTask getRootParentNode() throws MergeException, InvalidTaskException {
 		return this.getGlobalFMTask(INSTANCES_TASK);
 	}
 

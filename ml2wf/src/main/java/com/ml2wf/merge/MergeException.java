@@ -18,6 +18,11 @@ public class MergeException extends Exception {
 	 */
 	private static final long serialVersionUID = -6338472968929435621L;
 
+	/**
+	 * {@code MergeException}'s default constructor.
+	 *
+	 * @param arg0 exception explanation
+	 */
 	public MergeException(String arg0) {
 		super(arg0);
 	}

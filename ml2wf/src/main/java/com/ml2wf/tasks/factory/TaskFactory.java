@@ -2,6 +2,7 @@ package com.ml2wf.tasks.factory;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
@@ -24,12 +25,13 @@ public interface TaskFactory {
 	 * @param <T>  Any {@code class} implementing the {@code Spec interface}
 	 * @param node {@code Node} to convert to {@code Task}
 	 * @return the created task corresponding to the given {@code node}
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see Task
 	 * @see Node
 	 */
-	public <T extends Task<?>> T createTasks(Node node);
+	public <T extends Task<?>> T createTasks(Node node) throws InvalidTaskException;
 
 	/**
 	 * Converts a {@code WFTask} to a {@code FMTask}.
@@ -41,6 +43,7 @@ public interface TaskFactory {
 	 *
 	 * @param task task to convert
 	 * @return the converted task
+	 * @throws InvalidTaskException
 	 */
-	public FMTask convertWFtoFMTask(WFTask<?> task);
+	public FMTask convertWFtoFMTask(WFTask<?> task) throws InvalidTaskException;
 }

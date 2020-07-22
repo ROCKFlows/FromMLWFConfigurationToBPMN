@@ -54,6 +54,14 @@ public final class Notation {
 	 */
 	private static final String BPMN_SHAPE_VOC = "BPMNShape_";
 	/**
+	 * The <b>BPMN property</b> perfix.
+	 */
+	private static final String BPMN_PROPERTY_PREFIX = "Property_";
+	/**
+	 * The <b>BPMN "instance" property</b> notation.
+	 */
+	private static final String BPMN_PROPERTY_INSTANCE = "instance";
+	/**
 	 * The <b>back up</b> notation.
 	 */
 	private static final String BACKUP_VOC = "_save";
@@ -101,15 +109,6 @@ public final class Notation {
 	 * The <b>category prefix</b> notation.
 	 */
 	private static final String CATEGORY_PREFIX_VOC = "$";
-	/**
-	 * The <b>reference special ending character</b> notation.
-	 *
-	 * <p>
-	 *
-	 * This character specify that even if the task has a reference, it is a
-	 * concrete task.
-	 */
-	private static final String REFERENCE_SPECIAL_ENDCHAR = "-";
 
 	/**
 	 * {@code Notation's} default constructor.
@@ -197,6 +196,28 @@ public final class Notation {
 	 */
 	public static String getBpmnShapeVoc() {
 		return BPMN_SHAPE_VOC;
+	}
+
+	/**
+	 * Returns the {@link #BPMN_PROPERTY_PREFIX} notation.
+	 *
+	 * @return the BPMN property prefix
+	 *
+	 * @since 1.0
+	 */
+	public static String getBpmnPropertyPrefix() {
+		return BPMN_PROPERTY_PREFIX;
+	}
+
+	/**
+	 * Returns the {@link #BPMN_PROPERTY_INSTANCE} notation.
+	 *
+	 * @return the BPMN "instance" property
+	 *
+	 * @since 1.0
+	 */
+	public static String getBpmnPropertyInstance() {
+		return BPMN_PROPERTY_INSTANCE;
 	}
 
 	/**
@@ -329,17 +350,6 @@ public final class Notation {
 	 */
 	public static String getCategoryPrefixVoc() {
 		return CATEGORY_PREFIX_VOC;
-	}
-
-	/**
-	 * Returns the {@link #REFERENCE_SPECIAL_ENDCHAR} keyword notation.
-	 *
-	 * @return the reference special ending character notation
-	 *
-	 * @since 1.0
-	 */
-	public static String getReferenceSpecialEndchar() {
-		return REFERENCE_SPECIAL_ENDCHAR;
 	}
 
 	/**
