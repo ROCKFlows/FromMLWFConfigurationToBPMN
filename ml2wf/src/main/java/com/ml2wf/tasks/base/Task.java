@@ -72,6 +72,29 @@ public abstract class Task<T extends Spec<?>> {
 	}
 
 	/**
+	 * {@code Task}'s partial constructor.
+	 *
+	 * <p>
+	 *
+	 * It initializes a {@code Task} specifying its {@code name}, {@code parent} and
+	 * {@code node}.
+	 *
+	 * @param name name of the task
+	 * @param node node of the task
+	 * @throws InvalidTaskException
+	 */
+	public Task(String name, Node node) throws InvalidTaskException {
+		if (name == null) {
+			throw new InvalidTaskException("Can't create a task with a nullable name");
+		}
+		this.name = name;
+		this.node = node;
+		this.isAbstract = false;
+		this.specs = new HashMap<>();
+		TasksManager.addTask(this); // add the new task to the manager
+	}
+
+	/**
 	 * Returns the current task's {@code name}.
 	 *
 	 * @return the current task's {@code name}

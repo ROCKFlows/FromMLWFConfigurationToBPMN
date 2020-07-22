@@ -2,6 +2,8 @@ package com.ml2wf.tasks.factory;
 
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -32,6 +34,14 @@ import com.ml2wf.util.XMLManager;
  *
  */
 public class TaskFactoryImpl implements TaskFactory {
+
+	/**
+	 * Logger instance.
+	 *
+	 * @since 1.0
+	 * @see Logger
+	 */
+	private static final Logger logger = LogManager.getLogger(TaskFactoryImpl.class);
 
 	/**
 	 * {@code TaskFactoryImpl}'s empty constructor.
@@ -72,7 +82,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	 */
 	private FMTask createFMTask(String name, Node node) throws InvalidTaskException {
 		// TODO: improve abstract definition
-		return new FMTask(name, node, this.isAbstract(node));
+		return new FMTask(name, node, isFMAbstract(node));
 	}
 
 	/**
@@ -109,10 +119,14 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	private boolean isAbstract(Node node) {
-		// TODO: bad method to be removed or corrected
+	private static boolean isFMAbstract(Node node) {
 		Node abstractAttr = node.getAttributes().getNamedItem(FMAttributes.ABSTRACT.getName());
-		return (abstractAttr != null) && (abstractAttr.getNodeValue().equals(String.valueOf(true)));
+		if (abstractAttr == null) {
+			logger.warn("Can't get the abstract status for the node : {}. Considering it as a concrete one.",
+					XMLManager.getNodeName(node));
+			return false;
+		}
+		return Boolean.valueOf(abstractAttr.getNodeValue());
 	}
 
 }

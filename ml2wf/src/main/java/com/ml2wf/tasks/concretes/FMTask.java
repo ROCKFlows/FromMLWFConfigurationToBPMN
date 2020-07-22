@@ -55,8 +55,9 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @throws InvalidTaskException
 	 */
 	public FMTask(String name, FMTask parent, Node node, boolean isAbstract) throws InvalidTaskException {
-		super(name, node, isAbstract);
+		super(name, node);
 		this.parent = parent;
+		this.setAbstract(isAbstract);
 	}
 
 	/**
@@ -73,7 +74,8 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @throws InvalidTaskException
 	 */
 	public FMTask(String name, Node node, boolean isAbstract) throws InvalidTaskException {
-		super(name, node, isAbstract);
+		super(name, node);
+		this.setAbstract(isAbstract);
 	}
 
 	/**
@@ -97,7 +99,8 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @see WFTask
 	 */
 	public FMTask(WFTask<?> task, boolean saveParent) throws InvalidTaskException {
-		super(task.getName(), task.getNode(), task.isAbstract());
+		super(task.getName(), task.getNode());
+		this.setAbstract(task.isAbstract());
 		if (saveParent) {
 			Optional<FMTask> optReferredTask = TasksManager.getFMTaskWithName(task.getReference());
 			if (optReferredTask.isPresent()) {
@@ -108,10 +111,8 @@ public final class FMTask extends Task<FMTaskSpecs> {
 
 	@Override
 	public void setAbstract(boolean isAbstract) {
-		if (this.isAbstract != isAbstract) {
-			super.setAbstract(isAbstract);
-			((Element) this.node).setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(isAbstract));
-		}
+		super.setAbstract(isAbstract);
+		((Element) this.node).setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(isAbstract));
 	}
 
 	/**

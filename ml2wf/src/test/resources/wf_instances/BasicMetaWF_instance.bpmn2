@@ -6,16 +6,16 @@
     <bpmn2:task id="Task_1" name="Preprocessing_Step_0"><bpmn2:extensionElements><ext:style ext:shapeBackground="#00f900"/></bpmn2:extensionElements><bpmn2:documentation id="Documentation_3">refersTo: Preprocessing_Step</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
-    </bpmn2:task>
+    <bpmn2:property id="Property_0" name="instance"/></bpmn2:task>
     <bpmn2:task id="Task_2" name="Training_Step_1"><bpmn2:extensionElements><ext:style ext:shapeBackground="#00f900"/></bpmn2:extensionElements><bpmn2:documentation id="Documentation_4">refersTo: Training_Step</bpmn2:documentation>
       <bpmn2:documentation id="Documentation_1">Training_step =&gt; MLAlgorithm</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
-    </bpmn2:task>
+    <bpmn2:property id="Property_1" name="instance"/></bpmn2:task>
     <bpmn2:task id="Task_3" name="Evaluating_Step_2"><bpmn2:extensionElements><ext:style ext:shapeBackground="#00f900"/></bpmn2:extensionElements><bpmn2:documentation id="Documentation_5">refersTo: Evaluating_Step</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
-    </bpmn2:task>
+    <bpmn2:property id="Property_2" name="instance"/></bpmn2:task>
     <bpmn2:endEvent id="EndEvent_1" name="End Event 1">
       <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
     </bpmn2:endEvent>

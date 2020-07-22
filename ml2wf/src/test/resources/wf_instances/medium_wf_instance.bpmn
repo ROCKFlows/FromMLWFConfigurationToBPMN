@@ -17,6 +17,7 @@
       <bpmn2:documentation id="Documentation_1"><![CDATA[refersTo: Preprocessing_Step]]></bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_8</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+      <bpmn2:property id="Property_2" name="instance"/>
     </bpmn2:task>
     <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="Task_1" targetRef="Task_3"/>
     <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="Task_2" targetRef="EndEvent_1"/>
@@ -27,6 +28,7 @@
       <bpmn2:documentation id="Documentation_3"><![CDATA[refersTo: Preprocessing_Step]]></bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
+      <bpmn2:property id="Property_3" name="instance"/>
     </bpmn2:task>
     <bpmn2:sequenceFlow id="SequenceFlow_4" sourceRef="Task_3" targetRef="Task_4"/>
     <bpmn2:task id="Task_4" name="drop invalid windows">
@@ -36,6 +38,7 @@
       <bpmn2:documentation id="Documentation_4"><![CDATA[refersTo: Preprocessing_Step]]></bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
+      <bpmn2:property id="Property_4" name="instance"/>
     </bpmn2:task>
     <bpmn2:task id="Task_2" name="LSD">
       <bpmn2:extensionElements>
@@ -44,6 +47,7 @@
       <bpmn2:documentation id="Documentation_2"><![CDATA[refersTo: Training_Step]]></bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_5</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+      <bpmn2:property id="Property_5" name="instance"/>
     </bpmn2:task>
     <bpmn2:sequenceFlow id="SequenceFlow_5" sourceRef="Task_4" targetRef="Task_2"/>
     <bpmn2:task id="Task_5" name="Sensor data acquisition">
@@ -53,6 +57,7 @@
       <bpmn2:documentation id="Documentation_5"><![CDATA[refersTo: Collecting_Step]]></bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_8</bpmn2:outgoing>
+      <bpmn2:property id="Property_1" name="instance"/>
     </bpmn2:task>
     <bpmn2:sequenceFlow id="SequenceFlow_8" sourceRef="Task_5" targetRef="Task_1"/>
     <bpmn2:textAnnotation id="TextAnnotation_1">

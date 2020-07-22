@@ -208,10 +208,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see FMTask
 	 */
 	private void createFMTasks() throws MergeException, InvalidTaskException {
-		List<Node> fmTasksList = getTasksList(getDocument(), FMNames.SELECTOR);
-		// create fm tasks foreach task node
-		for (Node taskNode : fmTasksList) {
-			this.getTaskFactory().createTasks(taskNode);
+		if (TasksManager.getFMTasks().isEmpty()) {
+			List<Node> fmTasksList = getTasksList(getDocument(), FMNames.SELECTOR);
+			// create fm tasks foreach task node
+			for (Node taskNode : fmTasksList) {
+				this.getTaskFactory().createTasks(taskNode);
+			}
 		}
 		// get the unmanaged global task
 		setUnmanagedTask(this.getGlobalFMTask(UNMANAGED));
@@ -347,16 +349,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		String taskName = task.getName();
 		Optional<FMTask> optFMTask = unmanagedTask.getChildWithName(taskName);
 		if (optFMTask.isEmpty()) {
-			// if it is not under the unmanaged node
-			/*-optFMTask = TasksManager.getFMTaskWithName(taskName);
-			System.out.println("MANAGING DUPLICATED : " + task + " // IS ABSTRACT : " + task.isAbstract());
-			if (optFMTask.isPresent() && !task.isAbstract()) {
-				// priority to concrete
-				logger.debug("Setting {} concrete.", task);
-				// TODO: manage following comments
-				// System.out.println("Setting " + task + " concrete.");
-				// optFMTask.get().setAbstract(false);
-			}*/
 			return false;
 		}
 		Optional<?> optTask = unmanagedTask.removeChild(optFMTask.get());
@@ -494,8 +486,15 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	protected FMTask createReferredFMTask(WFTask<?> task) throws MergeException, InvalidTaskException {
 		logger.warn("The referenced task [{}] is missing in the FeatureModel.", task.getReference());
 		logger.warn("Creating the referenced task : {}", task.getReference());
-		FMTask newParent = this.createFeatureWithName(task.getReference(), true);
-		Optional<WFTask<?>> opt = TasksManager.getWFTaskWithName(newParent.getName());
+		// checking if a WFTask doesn't already exists with the given task's name
+		Optional<WFTask<?>> opt = TasksManager.getWFTaskWithName(task.getName());
+		if (opt.isPresent() && !opt.get().isAbstract()) {
+			task = opt.get();
+		}
+		opt = TasksManager.getWFTaskWithName(task.getReference());
+		FMTask newParent = this.createFeatureWithName(task.getReference(),
+				(opt.isPresent()) ? opt.get().isAbstract() : opt.isEmpty());
+		opt = TasksManager.getWFTaskWithName(newParent.getName());
 		FMTask globalTask = (opt.isEmpty()) ? this.getGlobalFMTask(WFMetaMerger.STEP_TASK)
 				: this.getSuitableParent(opt.get());
 		return this.insertNewTask(globalTask, newParent);
