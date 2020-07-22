@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.manager.TasksManager;
@@ -51,8 +52,9 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param parent     parent of the task
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
+	 * @throws InvalidTaskException
 	 */
-	public FMTask(String name, FMTask parent, Node node, boolean isAbstract) {
+	public FMTask(String name, FMTask parent, Node node, boolean isAbstract) throws InvalidTaskException {
 		super(name, node, isAbstract);
 		this.parent = parent;
 	}
@@ -68,8 +70,9 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param name       name of the task
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
+	 * @throws InvalidTaskException
 	 */
-	public FMTask(String name, Node node, boolean isAbstract) {
+	public FMTask(String name, Node node, boolean isAbstract) throws InvalidTaskException {
 		super(name, node, isAbstract);
 	}
 
@@ -90,9 +93,10 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param task       {@code WFTask} instance to be converted
 	 * @param saveParent whether the result task should save the given
 	 *                   {@code task}'s parent as its own parent or not.
+	 * @throws InvalidTaskException
 	 * @see WFTask
 	 */
-	public FMTask(WFTask<?> task, boolean saveParent) {
+	public FMTask(WFTask<?> task, boolean saveParent) throws InvalidTaskException {
 		super(task.getName(), task.getNode(), task.isAbstract());
 		if (saveParent) {
 			Optional<FMTask> optReferredTask = TasksManager.getFMTaskWithName(task.getReference());

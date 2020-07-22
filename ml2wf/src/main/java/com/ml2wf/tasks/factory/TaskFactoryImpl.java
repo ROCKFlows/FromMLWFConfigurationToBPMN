@@ -5,10 +5,11 @@ import java.util.Optional;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.ml2wf.conventions.Notation;
+import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
@@ -41,7 +42,7 @@ public class TaskFactoryImpl implements TaskFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Task<?>> T createTasks(Node node) {
+	public <T extends Task<?>> T createTasks(Node node) throws InvalidTaskException {
 		String tagName = node.getNodeName();
 		String nodeName = XMLManager.getNodeName(node);
 		nodeName = XMLManager.sanitizeName(nodeName);
@@ -50,7 +51,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	}
 
 	@Override
-	public FMTask convertWFtoFMTask(WFTask<?> task) {
+	public FMTask convertWFtoFMTask(WFTask<?> task) throws InvalidTaskException {
 		FMTask createdFMTask = new FMTask(task, false);
 		createdFMTask.setNode(AbstractMerger.createFeatureNode(createdFMTask.getName(), task.isAbstract()));
 		createdFMTask.addAllSpecs(task.getSpecs());
@@ -64,11 +65,12 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @param name name of the new task
 	 * @param node node of the new task
 	 * @return a new {@code FMTask} considering the given arguments
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	private FMTask createFMTask(String name, Node node) {
+	private FMTask createFMTask(String name, Node node) throws InvalidTaskException {
 		// TODO: improve abstract definition
 		return new FMTask(name, node, this.isAbstract(node));
 	}
@@ -79,20 +81,17 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @param name name of the new task
 	 * @param node node of the new task
 	 * @return a new {@code WFTask} considering the given arguments
+	 * @throws InvalidTaskException
 	 * @throws TaskFactoryException
 	 *
 	 * @since 1.0
 	 * @see WFTask
 	 */
-	private WFTask<?> createWFTask(String name, Node node) {
+	private WFTask<?> createWFTask(String name, Node node) throws InvalidTaskException {
 		// TODO: change created type considering user convention (e.g. BPMN)
 		Optional<String> optRefName = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
-		boolean isAbstract = optRefName.isEmpty() || optRefName.get().endsWith(Notation.getReferenceSpecialEndchar());
-		String reference = optRefName.orElse("");
-		if (reference.endsWith(Notation.getReferenceSpecialEndchar())) {
-			reference = reference.substring(0, reference.length() - 1);
-		}
-		BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract, reference);
+		boolean isAbstract = AbstractMerger.getProperty((Element) node, BPMNNames.PROPERTY.getName()).isEmpty();
+		BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract, optRefName.orElse(""));
 		createdFMTask.applySpecs();
 		return createdFMTask;
 	}

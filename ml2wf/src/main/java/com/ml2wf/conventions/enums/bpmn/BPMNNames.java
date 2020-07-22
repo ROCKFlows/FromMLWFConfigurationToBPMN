@@ -21,6 +21,7 @@ public enum BPMNNames implements TaskTagsSelector {
 	PROCESS("bpmn2:process"), INCOMING("bpmn2:incoming"), OUTGOING("bpmn2:outgoing"),
 	EXTENSION("bpmn2:extensionElements"), STYLE("ext:style"), DOCUMENTATION("bpmn2:documentation"),
 	ANNOTATION("bpmn2:textAnnotation"), TEXT("bpmn2:text"), DIAGRAM("bpmndi:BPMNDiagram"), PLANE("bpmndi:BPMNPlane"),
+	PROPERTY("bpmn2:property"),
 	// task tags
 	TASK("bpmn2:task"), USERTASK("bpmn2:userTask"), SERVICETASK("bpmn2:serviceTask"),
 	// positional tags

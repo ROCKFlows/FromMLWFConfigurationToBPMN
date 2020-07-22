@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,6 +32,7 @@ import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.merge.MergeException;
 import com.ml2wf.merge.concretes.WFMetaMerger;
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
@@ -116,17 +118,23 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		// create existing FM tasks + unmanagedTask
 		this.createFMTasks();
 		// process files
-		Set<WFTask<?>> tasks;
+		Set<Node> nodes;
+		Set<WFTask<?>> tasks = new HashSet<>();
 		for (File file : files) {
+			// retrieving document informations
 			Pair<String, Document> wfInfo = this.getWFDocInfoFromFile(file);
 			if (wfInfo.isEmpty()) {
 				continue;
 			}
 			Document wfDocument = wfInfo.getValue();
-			// create associated tasks
-			tasks = getTasksList(wfDocument, BPMNNames.SELECTOR).stream().map(this::getNestedNodes)
-					.flatMap(Collection::stream).map(this.getTaskFactory()::createTasks).map(t -> (WFTask<?>) t)
-					.collect(Collectors.toSet());
+			// retrieving all WF's nodes
+			nodes = getTasksList(wfDocument, BPMNNames.SELECTOR).stream().map(AbstractMerger::getNestedNodes)
+					.flatMap(Collection::stream).collect(Collectors.toSet());
+			// creating associated tasks
+			for (Node node : nodes) {
+				tasks.add(this.getTaskFactory().createTasks(node));
+			}
+			// saving annotations
 			annotations.addAll(this.getAnnotations(wfDocument));
 			if (completeMerge) {
 				this.processCompleteMerge(wfInfo.getKey(), tasks);
@@ -193,12 +201,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * using the {@link TasksManager#updateFMParents(Set)} method.
 	 *
 	 * @throws MergeException
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see TaskFactory
 	 * @see FMTask
 	 */
-	private void createFMTasks() throws MergeException {
+	private void createFMTasks() throws MergeException, InvalidTaskException {
 		List<Node> fmTasksList = getTasksList(getDocument(), FMNames.SELECTOR);
 		// create fm tasks foreach task node
 		for (Node taskNode : fmTasksList) {
@@ -253,11 +262,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @param wfInfo workflow's informations
 	 * @throws InvalidConstraintException
 	 * @throws MergeException
+	 * @throws InvalidTaskException
 	 *
 	 * @see Pair
 	 */
 	private void processCompleteMerge(String wfName, Set<WFTask<?>> tasks)
-			throws InvalidConstraintException, MergeException {
+			throws InvalidConstraintException, MergeException, InvalidTaskException {
 		this.createdWFTask = this.createFeatureWithName(wfName, this instanceof WFMetaMerger);
 		FMTask root = this.getRootParentNode();
 		this.createdWFTask = this.insertNewTask(root, this.createdWFTask);
@@ -285,12 +295,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *
 	 * @param task task to process
 	 * @throws MergeException
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected void processTask(WFTask<?> task) throws MergeException {
+	protected void processTask(WFTask<?> task) throws MergeException, InvalidTaskException {
 		String taskName = task.getName();
 		if (TasksManager.existsinFM(taskName) && !this.processDuplicatedTask(task)) {
 			// if task is already in the FM
@@ -337,15 +348,15 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		Optional<FMTask> optFMTask = unmanagedTask.getChildWithName(taskName);
 		if (optFMTask.isEmpty()) {
 			// if it is not under the unmanaged node
-			optFMTask = TasksManager.getFMTaskWithName(taskName);
+			/*-optFMTask = TasksManager.getFMTaskWithName(taskName);
 			System.out.println("MANAGING DUPLICATED : " + task + " // IS ABSTRACT : " + task.isAbstract());
 			if (optFMTask.isPresent() && !task.isAbstract()) {
-				// priority to concrete (ref : #148)
+				// priority to concrete
 				logger.debug("Setting {} concrete.", task);
 				// TODO: manage following comments
 				// System.out.println("Setting " + task + " concrete.");
 				// optFMTask.get().setAbstract(false);
-			}
+			}*/
 			return false;
 		}
 		Optional<?> optTask = unmanagedTask.removeChild(optFMTask.get());
@@ -395,11 +406,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *                       {@code globalNodeName}
 	 * @return the global {@code Task}
 	 * @throws MergeException
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see Task
 	 */
-	protected FMTask getGlobalFMTask(String globalNodeName) throws MergeException {
+	protected FMTask getGlobalFMTask(String globalNodeName) throws MergeException, InvalidTaskException {
 		Optional<FMTask> optGlobalTask = TasksManager.getFMTaskWithName(globalNodeName);
 		if (optGlobalTask.isEmpty()) {
 			return this.createGlobalFMTask(globalNodeName);
@@ -414,11 +426,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @param globalNodeName the global node name
 	 * @return the created global {@code FMTask} instance
 	 * @throws MergeException
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	protected FMTask createGlobalFMTask(String globalNodeName) throws MergeException {
+	protected FMTask createGlobalFMTask(String globalNodeName) throws MergeException, InvalidTaskException {
 		// create the node element
 		Element globalElement = getDocument().createElement(FMNames.FEATURE.getName());
 		globalElement.setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(true));
@@ -445,12 +458,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @return the given {@code task}'s referred {@code FMTask} or the given
 	 *         {@code defaultTask} if no valid reference was found
 	 * @throws MergeException
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected FMTask getReferredFMTask(WFTask<?> task, FMTask defaultTask) throws MergeException {
+	protected FMTask getReferredFMTask(WFTask<?> task, FMTask defaultTask) throws MergeException, InvalidTaskException {
 		String reference = task.getReference();
 		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
@@ -471,12 +485,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @return a {@code FMTask} specified by the given
 	 *         {@code task}'s reference
 	 * @throws MergeException
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected FMTask createReferredFMTask(WFTask<?> task) throws MergeException {
+	protected FMTask createReferredFMTask(WFTask<?> task) throws MergeException, InvalidTaskException {
 		logger.warn("The referenced task [{}] is missing in the FeatureModel.", task.getReference());
 		logger.warn("Creating the referenced task : {}", task.getReference());
 		FMTask newParent = this.createFeatureWithName(task.getReference(), true);

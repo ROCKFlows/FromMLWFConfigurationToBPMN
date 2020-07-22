@@ -58,6 +58,12 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	private int taskCounter = 0;
 	/**
+	 * This {@code propertyCounter} is incremented for each property added in the
+	 * current workflow. This allows other methods to give a unique ID to a given
+	 * property.
+	 */
+	private int propertyCounter = 0;
+	/**
 	 * Logger instance.
 	 *
 	 * @since 1.0
@@ -193,12 +199,29 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		Node docNode = addDocumentationNode(node);
 		mergeNodesTextContent(docNode, BPMNTaskSpecs.OPTIONAL.formatSpec(content));
 		mergeNodesTextContent(docNode, getReferenceDocumentation(currentRef));
-		// extension part
+		// property/extension part
+		this.addProperty(node, Notation.getBpmnPropertyInstance());
 		this.addExtensionNode(node);
 		// node renaming part
 		Node nodeAttrName = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName());
 		String nodeName = XMLManager.sanitizeName(currentRef) + "_" + this.taskCounter++;
 		nodeAttrName.setNodeValue(nodeName);
+	}
+
+	/**
+	 * Adds the given {@code propertyValue} to the given {@code node}.
+	 *
+	 * @param node node to add the property
+	 *
+	 * @since 1.0
+	 */
+	private void addProperty(Node node, String propertyValue) {
+		Element propertyAttr = getDocument().createElement(BPMNNames.PROPERTY.getName());
+		String propertyId = Notation.getBpmnPropertyPrefix() + this.propertyCounter++;
+		propertyAttr.setAttribute(BPMNAttributes.ID.getName(), propertyId);
+		propertyAttr.setIdAttribute(BPMNAttributes.ID.getName(), true);
+		propertyAttr.setAttribute(BPMNAttributes.NAME.getName(), propertyValue);
+		node.appendChild(propertyAttr);
 	}
 
 	/**
