@@ -140,12 +140,13 @@ public class TestConflictsInstanceMerge {
 		// Specific properties
 		// No features are added
 		assertEquals(0, afterList.size());
+		//FIX
 		assertFalse(fmAfter.isAbstract("F31"));
 	}
 
 	// Todo : test the presence of a warning
 	@Test
-	@DisplayName("Unmanaged : A task not refered to is stored in the FM")
+	@DisplayName("Unmanaged : an unreferenced task is stored in the FM")
 	public void testWFInstance3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF3_instance.bpmn2";
 		File fin = new File(wfPATH);
@@ -169,13 +170,12 @@ public class TestConflictsInstanceMerge {
 		// This test involves managing naming differences using '_' in FM and BPMN
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
-		System.out.println(logMsg);
 
 		// Specific properties
-		// No features are added
-		assertEquals(2, afterList.size());
+		// Unmanaged, Unmanaged_Tasks and F32 are added
+		assertEquals(3, afterList.size());
 		// FIX
-		// assertFalse(fmAfter.isAbstract("F32"));
+		assertFalse(fmAfter.isAbstract("F32"));
 		assertTrue(fmAfter.isChildOf("Unmanaged", "F32"));
 
 	}

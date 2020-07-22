@@ -198,6 +198,9 @@ public class TestHelper {
 	}
 
 	public static void allTheseFeaturesAreAbstract(List<String> afterList, FMHelper fmAfter) {
+		String logMsg = String.format("These features should be abstract : %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
 		for (String s : afterList)
 			assertTrue(fmAfter.isAbstract(s));
 		

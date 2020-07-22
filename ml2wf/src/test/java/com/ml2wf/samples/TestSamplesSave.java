@@ -86,7 +86,7 @@ public class TestSamplesSave {
 		// FIX
 		// Check idempotence
 		// FIX Unmanaged is generated
-		// TestHelper.checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 
 	}
 
@@ -136,7 +136,7 @@ public class TestSamplesSave {
 		// TODO test generated constraints
 		// FIX
 		// Check idempotence
-		// TestHelper.checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 
 	}
 

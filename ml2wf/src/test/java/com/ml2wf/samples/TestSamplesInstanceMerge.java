@@ -123,7 +123,7 @@ public class TestSamplesInstanceMerge {
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		// FIX
-		// assertTrue(afterList.isEmpty());
+		assertTrue(afterList.isEmpty());
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
@@ -155,7 +155,7 @@ public class TestSamplesInstanceMerge {
 		TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 
 		// FIX
-		// assertEquals(1, afterList.size());
+		//assertEquals(1, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
 

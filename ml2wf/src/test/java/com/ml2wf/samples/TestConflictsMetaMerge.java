@@ -58,7 +58,7 @@ public class TestConflictsMetaMerge {
 		// merge t1, then t2 then t1t2 results in the same FM than t1t2 and the same in
 		// any order
 		// FIX
-		// mergeMeta(1,Arrays.asList( "WFT1","WFT2","WFT1T2"), "WFT1T2" );
+		 mergeMeta(1,Arrays.asList( "WFT1","WFT2","WFT1T2"), "WFT1T2" );
 
 	}
 
@@ -82,7 +82,7 @@ public class TestConflictsMetaMerge {
 	public void test4UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// FIX
-		// mergeMeta(4, Arrays.asList( "WFT2T3", "WFT1T2T3"), "WFT1T2T3" );
+		mergeMeta(4, Arrays.asList( "WFT2T3", "WFT1T2T3"), "WFT1T2T3" );
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class TestConflictsMetaMerge {
 	public void test5UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// FIX
-		// mergeMeta(5, Arrays.asList( "WFT2T3", "WFT1T2"), "WFT1T2T3" );
+		mergeMeta(5, Arrays.asList( "WFT2T3", "WFT1T2"), "WFT1T2T3" );
 
 	}
 
@@ -100,7 +100,7 @@ public class TestConflictsMetaMerge {
 	public void test6UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// FIX
-		// mergeMeta(6, Arrays.asList( "WFT2T3", "WFT1T3"), "FAIL" );
+		mergeMeta(6, Arrays.asList( "WFT2T3", "WFT1T3"), "FAIL" );
 	}
 
 	private void mergeMeta(int testNumber, List<String> wfList, String globalWF)
