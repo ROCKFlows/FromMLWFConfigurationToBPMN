@@ -31,7 +31,7 @@ public interface TaskFactory {
 	 * @see Task
 	 * @see Node
 	 */
-	public <T extends Task<?>> T createTasks(Node node) throws InvalidTaskException;
+	public <T extends Task<?>> T createTask(Node node) throws InvalidTaskException;
 
 	/**
 	 * Converts a {@code WFTask} to a {@code FMTask}.
