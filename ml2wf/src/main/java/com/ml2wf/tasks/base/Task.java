@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.Spec;
 
@@ -57,11 +58,38 @@ public abstract class Task<T extends Spec<?>> {
 	 * @param name       name of the task
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
+	 * @throws InvalidTaskException
 	 */
-	public Task(String name, Node node, boolean isAbstract) {
+	public Task(String name, Node node, boolean isAbstract) throws InvalidTaskException {
+		if (name == null) {
+			throw new InvalidTaskException("Can't create a task with a nullable name");
+		}
 		this.name = name;
 		this.node = node;
 		this.isAbstract = isAbstract;
+		this.specs = new HashMap<>();
+		TasksManager.addTask(this); // add the new task to the manager
+	}
+
+	/**
+	 * {@code Task}'s partial constructor.
+	 *
+	 * <p>
+	 *
+	 * It initializes a {@code Task} specifying its {@code name}, {@code parent} and
+	 * {@code node}.
+	 *
+	 * @param name name of the task
+	 * @param node node of the task
+	 * @throws InvalidTaskException
+	 */
+	public Task(String name, Node node) throws InvalidTaskException {
+		if (name == null) {
+			throw new InvalidTaskException("Can't create a task with a nullable name");
+		}
+		this.name = name;
+		this.node = node;
+		this.isAbstract = false;
 		this.specs = new HashMap<>();
 		TasksManager.addTask(this); // add the new task to the manager
 	}

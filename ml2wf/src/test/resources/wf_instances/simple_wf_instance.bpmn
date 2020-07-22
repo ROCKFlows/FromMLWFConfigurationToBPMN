@@ -10,11 +10,11 @@
     <bpmn2:task id="Task_1" name="Missing_Values_0"><bpmn2:extensionElements><ext:style ext:shapeBackground="#00f900"/></bpmn2:extensionElements><bpmn2:documentation id="Documentation_2">refersTo: Missing_Values</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
-    </bpmn2:task>
+    <bpmn2:property id="Property_0" name="instance"/></bpmn2:task>
     <bpmn2:task id="Task_2" name="Training_Step_1"><bpmn2:extensionElements><ext:style ext:shapeBackground="#00f900"/></bpmn2:extensionElements><bpmn2:documentation id="Documentation_3">refersTo: Training_Step</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
-    </bpmn2:task>
+    <bpmn2:property id="Property_1" name="instance"/></bpmn2:task>
     <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="Task_1" targetRef="Task_2"/>
     <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="Task_2" targetRef="EndEvent_1"/>
     <bpmn2:textAnnotation id="TextAnnotation_1">

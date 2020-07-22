@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.concretes.WFMetaMerger;
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
@@ -219,13 +221,14 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param name       name of the feature
 	 * @param isAbstract whether the wished created feature must be abstract or not
 	 * @return a new feature ({@code FMTask}) with the given {@code name}
+	 * @throws InvalidTaskException
+	 * @throws TaskFactoryException
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	protected FMTask createFeatureWithName(String name, boolean isAbstract) {
-		return (FMTask) this.taskFactory.createTasks(createFeatureNode(name, isAbstract)).stream().findFirst()
-				.orElse(null);
+	protected FMTask createFeatureWithName(String name, boolean isAbstract) throws InvalidTaskException {
+		return (FMTask) this.taskFactory.createTasks(createFeatureNode(name, isAbstract));
 	}
 
 	/**
@@ -246,8 +249,29 @@ public abstract class AbstractMerger extends XMLManager {
 	protected static Element createNestedNode(Element parent, String name) {
 		Element created = parent.getOwnerDocument().createElement(parent.getNodeName());
 		created.setAttribute(BPMNAttributes.NAME.getName(), name);
-		mergeNodesTextContent(addDocumentationNode(created), getReferenceDocumentation(XMLManager.getNodeName(parent)));
+		String refContent = getReferenceDocumentation(XMLManager.getNodeName(parent));
+		Optional<Node> optProperty = getProperty(parent, BPMNNames.PROPERTY.getName());
+		if (optProperty.isPresent()) {
+			created.appendChild(optProperty.get().cloneNode(true));
+		}
+		mergeNodesTextContent(addDocumentationNode(created), refContent);
 		return created;
+	}
+
+	/**
+	 * Returns an {@code Optional} that contains the given {@code element}'s
+	 * property with name {@code propertyName}.
+	 *
+	 * @param element      element to retrieve the property
+	 * @param propertyName the property name
+	 * @return an {@code Optional} that contains the given {@code element}'s
+	 *         property with name {@code propertyName}
+	 *
+	 * @since 1.0
+	 */
+	public static Optional<Node> getProperty(Element element, String propertyName) {
+		NodeList properties = element.getElementsByTagName(propertyName);
+		return (properties.getLength() > 0) ? Optional.of(properties.item(0)) : Optional.empty();
 	}
 
 	/**
@@ -304,7 +328,8 @@ public abstract class AbstractMerger extends XMLManager {
 		}
 		// Manage the parentNode
 		Element parentNode = (Element) node.cloneNode(true);
-		parentNode.setAttribute(BPMNAttributes.NAME.getName(), names.remove(0));
+		String parentName = names.remove(0);
+		parentNode.setAttribute(BPMNAttributes.NAME.getName(), parentName);
 		addAttributeDoc(parentNode, attributesDoc); // add the attributesDoc to the docNode text content
 		result.add(parentNode);
 		// foreach nested node's name
@@ -450,12 +475,13 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param parentTask Parent task
 	 * @param task       task to insert
 	 * @return the added child
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see Task
 	 * @see FMTask
 	 */
-	protected <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) {
+	protected <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) throws InvalidTaskException {
 		logger.debug("Inserting task : {}", task.getName());
 		// inserting the new node
 		FMTask childTask = (task instanceof FMTask) ? (FMTask) task

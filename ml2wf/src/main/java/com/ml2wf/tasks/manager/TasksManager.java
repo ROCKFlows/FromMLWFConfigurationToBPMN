@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Node;
 
 import com.ml2wf.tasks.base.Task;
@@ -48,6 +50,13 @@ public final class TasksManager {
 	 * {@code Set} containing all {@code WFTask}.
 	 */
 	private static Set<WFTask<?>> wfTasks = new HashSet<>();
+	/**
+	 * Logger instance.
+	 *
+	 * @since 1.0
+	 * @see Logger
+	 */
+	private static final Logger logger = LogManager.getLogger(TasksManager.class);
 
 	/**
 	 * {@code TasksManager}'s default constructor.
@@ -220,30 +229,87 @@ public final class TasksManager {
 	// adder
 
 	/**
-	 * Adds the given {@code task} to the right {@code Set} according to its nature
-	 * and returns it.
+	 * Adds the given {@code task} to the right {@code Set} according to its nature.
 	 *
 	 * @param <T>  Any {@code class} extending the {@code Task class}
 	 * @param task task to add
 	 *
-	 * @return the added {@code task}
+	 * @return if the {@code TasksManager} did not already contain the given
+	 *         {@code task}
 	 *
 	 * @since 1.0
 	 * @see Task
 	 */
-	public static <T extends Task<?>> T addTask(T task) {
-		if (task != null) {
-			if (task instanceof FMTask) {
-				fmTasks.add((FMTask) task);
-			} else {
-				// removing if a task with the same name and a blank reference is already
-				// contained to keep most precise tasks
-				wfTasks.removeIf(
-						t -> (t.getName() != null) && t.getName().equals(task.getName()) && t.getReference().isBlank());
-				wfTasks.add((WFTask<?>) task);
-			}
+	public static <T extends Task<?>> boolean addTask(T task) {
+		if (task == null) {
+			return false;
 		}
-		return task;
+		if (task instanceof FMTask) {
+			return fmTasks.add((FMTask) task);
+		} else {
+			// applying filters
+			if (!removeIfEmptyRef((WFTask<?>) task) && removeIfPrioritizeConcrete((WFTask<?>) task)) {
+				// we have to update the corresponding FMTask's abstract status
+				Optional<FMTask> optFmTask = TasksManager.getFMTaskWithName(task.getName());
+				if (optFmTask.isPresent()) {
+					FMTask fmTask = optFmTask.get();
+					logger.info("Changing {}'s abstract status from true to false", fmTask);
+					fmTask.setAbstract(false);
+				}
+			}
+			return wfTasks.add((WFTask<?>) task);
+		}
+	}
+
+	// filter
+
+	/**
+	 * Removes any task from the {@link #wfTasks} collection that :
+	 *
+	 * <p>
+	 *
+	 * <ul>
+	 * <li>is equals to the given {@code WFTask},</li>
+	 * <li>contains a <b>blank reference</b>.</li>
+	 * </ul>
+	 *
+	 * @param task task to compare
+	 * @return if any elements were removed
+	 *
+	 * @since 1.0
+	 * @see WFTask
+	 */
+	public static boolean removeIfEmptyRef(WFTask<?> task) {
+		return wfTasks.removeIf(t -> t.equals(task) && (t.getReference().isBlank()));
+	}
+
+	/**
+	 * Removes any task from the {@link #wfTasks} collection that :
+	 *
+	 * <p>
+	 *
+	 * <ul>
+	 * <li>is equals to the given {@code WFTask},</li>
+	 * <li>matches the <b>"concrete priority" rule</b>.</li>
+	 * </ul>
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that the "concrete priority" rule is defined by the issue
+	 * <a href=
+	 * "https://github.com/MireilleBF/FromMLWFConfigurationToBPMN/issues/148">#148</a>.
+	 *
+	 *
+	 *
+	 * @param task task to compare
+	 * @return if any elements were removed
+	 *
+	 * @since 1.0
+	 * @see WFTask
+	 */
+	public static boolean removeIfPrioritizeConcrete(WFTask<?> task) {
+		return wfTasks.removeIf(
+				t -> t.equals(task) && (t.isAbstract() && !task.isAbstract()));
 	}
 
 	// remover

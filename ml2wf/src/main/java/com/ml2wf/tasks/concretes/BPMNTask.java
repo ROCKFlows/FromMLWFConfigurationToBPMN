@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.manager.TasksManager;
@@ -35,11 +36,12 @@ public final class BPMNTask extends WFTask<BPMNTaskSpecs> {
 	 * {@code reference}.
 	 *
 	 * @param name       name of the task
-	 * @param reference  reference of the task
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
+	 * @param reference  reference of the task
+	 * @throws InvalidTaskException
 	 */
-	public BPMNTask(String name, Node node, boolean isAbstract, String reference) {
+	public BPMNTask(String name, Node node, boolean isAbstract, String reference) throws InvalidTaskException {
 		super(name, node, isAbstract, reference);
 	}
 

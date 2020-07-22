@@ -18,6 +18,7 @@
 refersTo: First_option</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+      <bpmn2:property id="Property_0" name="instance"/>
     </bpmn2:task>
     <bpmn2:task id="Task_2" name="Training_Step_1">
       <bpmn2:extensionElements>
@@ -26,14 +27,15 @@ refersTo: First_option</bpmn2:documentation>
       <bpmn2:documentation id="Documentation_3">refersTo: Training_Step</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+      <bpmn2:property id="Property_1" name="instance"/>
     </bpmn2:task>
     <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="Task_1" targetRef="Task_2"/>
     <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="Task_2" targetRef="EndEvent_1"/>
     <bpmn2:textAnnotation id="Global_Annotation">
-      <bpmn2:text>Workflow's name {{Optionality_wf}}.&#xD;
-Meta-Workflow : {{optional_wf}}.&#xD;
-Data : {{Optional data}}.&#xD;
-Author/Article : {{Optional article}}.</bpmn2:text>
+      <bpmn2:text>Workflow's name {{}}.
+Meta-Workflow : {{optional_wf}}.
+Data : {{}}.
+Author/Article : {{}}.</bpmn2:text>
     </bpmn2:textAnnotation>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Default Process Diagram">
@@ -63,9 +65,9 @@ Author/Article : {{Optional article}}.</bpmn2:text>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Global_Annotation" bpmnElement="Global_Annotation">
-        <dc:Bounds height="111.0" width="231.0" x="0.0" y="0.0"/>
+        <dc:Bounds height="90.0" width="180.0" x="0.0" y="0.0"/>
         <bpmndi:BPMNLabel id="BPMNLabel_8">
-          <dc:Bounds height="105.0" width="219.0" x="6.0" y="0.0"/>
+          <dc:Bounds height="84.0" width="168.0" x="6.0" y="3.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="BPMNShape_1" targetElement="BPMNShape_Task_1">
