@@ -123,8 +123,7 @@ public class TestConflictsMetaMerge {
 		File copiedFileBis = new File(resultingFMBis);
 
 		String wfPATH = WF_IN_PATH + globalWF + ".bpmn2";
-		String[] command = new String[] { "merge", "--meta", "-i ", wfPATH, "-o ", resultingFMBis, "-v", "7" };
-		com.ml2wf.App.main(command);
+		String[] command = commandMetaMerge(wfPATH, resultingFMBis);
 		assertTrue(copiedFileBis.exists());
 
 		TestHelper.compare(resultingFM, resultingFMBis);
@@ -144,9 +143,7 @@ public class TestConflictsMetaMerge {
 			File fin = new File(wfPATH);
 			assertTrue(fin.exists());
 			assertTrue(copiedFile.exists());
-			// Command
-			String[] command = new String[] { "merge", "--meta", "-i ", wfPATH, "-o ", resultingFM, "-v", "7" };
-			com.ml2wf.App.main(command);
+			String[] command = commandMetaMerge(wfPATH, resultingFM);
 			assertTrue(copiedFile.exists());
 			FMHelper fmAfter = new FMHelper(resultingFM);
 			// General Properties to check
@@ -202,9 +199,7 @@ public class TestConflictsMetaMerge {
 		assertTrue(copiedFile.exists());
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
-		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", wfPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
+		String[] command = commandMetaMerge(wfPATH, copiedFM);
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -236,9 +231,7 @@ public class TestConflictsMetaMerge {
 		assertTrue(copiedFile.exists());
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
-		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", wfPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
+		String[] command = commandMetaMerge(wfPATH, copiedFM);
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -268,9 +261,7 @@ public class TestConflictsMetaMerge {
 		assertTrue(copiedFile.exists());
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
-		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", wfPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
+		String[] command = commandMetaMerge(wfPATH, copiedFM);
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -306,9 +297,7 @@ public class TestConflictsMetaMerge {
 		assertTrue(copiedFile.exists());
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
-		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", wfPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
+		String[] command = commandMetaMerge(wfPATH, copiedFM);
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -340,9 +329,7 @@ public class TestConflictsMetaMerge {
 		assertTrue(copiedFile.exists());
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
-		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", wfPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
+		String[] command = commandMetaMerge(wfPATH, copiedFM);
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -357,6 +344,95 @@ public class TestConflictsMetaMerge {
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
+	
+	
+
+	@Test
+	@DisplayName(" W7 and WFT1 : ensure that an unmanaged feature disappears when defined in any order")
+	public void testWF7UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+		String wf7PATH = WF_IN_PATH + "WF7.bpmn2";
+		File finWF7 = new File(wf7PATH);
+		assertTrue(finWF7.exists());
+		
+		String sourceFM = DEFAULT_IN_FM;
+		// I make a copy for test
+		String w7FMPath = FM_OUT_PATH + "FMA_WF7.xml";
+		File w7FMFile = new File(w7FMPath);
+		File sourceFile = new File(sourceFM);
+		FileUtils.copyFile(sourceFile, w7FMFile);
+		assertTrue(w7FMFile.exists());
+		
+		
+		String wfT1PATH = WF_IN_PATH + "WFT1.bpmn2";
+		File finWFT1 = new File(wfT1PATH);
+		assertTrue(finWFT1.exists());
+		
+
+		FMHelper fmBefore = new FMHelper(w7FMPath);
+		// Command
+		String[] command = commandMetaMerge(wf7PATH, w7FMPath);
+
+		FMHelper fmAfterWF7 = new FMHelper(w7FMPath);
+
+		// General Properties to check
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfterWF7, wf7PATH);
+		
+		String logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		//MT1, MT2, MT3, T1, UnManaged, Unmanaged Feature
+		assertEquals(6, afterList.size());
+		//[[ MT1 => T1]]
+		List<String> constraints = fmAfterWF7.getConstraintList();
+		logMsg = String.format("added constraints : %s ", constraints);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		assertEquals(1, constraints.size());
+		// Check idempotence
+		TestHelper.checkIdempotence(w7FMPath, command);
+		
+		//Merge now with WFT1 in the resulting FM
+		// I make a copy for test		
+		String wF7_T1_FMPath = FM_OUT_PATH + "FMA_WF7T1.xml";
+		File wF7T1FMFile = new File(wF7_T1_FMPath);
+		FileUtils.copyFile(w7FMFile, wF7T1FMFile);
+		assertTrue(wF7T1FMFile.exists());
+		
+		
+		command = commandMetaMerge(wfT1PATH, wF7_T1_FMPath);
+		FMHelper fmAfter_WF7_T1 = new FMHelper(wF7_T1_FMPath);
+		//Be careful because some unmanaged should be lost !
+		afterList = TestHelper.nothingLost(fmAfterWF7, fmAfter_WF7_T1, wfT1PATH);
+		logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		//Nothing
+		assertEquals(0, afterList.size());
+
+		//
+		constraints = fmAfter_WF7_T1.getConstraintList();
+		logMsg = String.format("set of constraints : %s ", constraints);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		assertEquals(1, constraints.size());
+		// Check idempotence
+		TestHelper.checkIdempotence(wF7_T1_FMPath, command);
+		//FIX
+		// fmAfter_WF7_T1.
+		//TODO
+		//Merge T1 then merge F7
+		//We expect equivalent FM
+		
+
+	}
+
+	private String[] commandMetaMerge(String wfPATH, String copiedFM) {
+		String[] command = new String[] { "merge", "--meta", "-i ", wfPATH, "-o ", copiedFM, "-v", "7" };
+		com.ml2wf.App.main(command);
+		return command;
+	}
+	
+	
 
 	// One feature is abstract and concret
 	// e.g. a Meta declare Normalize and an instance uses also Normalize
