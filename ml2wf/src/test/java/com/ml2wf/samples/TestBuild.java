@@ -44,6 +44,7 @@ public class TestBuild {
 		return command;
 	}
 	
+	//TODO : Automate tests
 	@Test
 	@DisplayName("Build0 ")
 	public void testBuild0UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
@@ -72,7 +73,6 @@ public class TestBuild {
 		List<String> afterListMeta = TestHelper.nothingLost(fmBefore, fmAfter, metaDirectory);
 		//List<String> afterListInstance = 
 				TestHelper.nothingLost(fmBefore, fmAfter, instanceDirectory);
-		// This test involves managing naming differences using '_' in FM and BPMN
 		//F31, F2, exist
 		//F311 (WF4), T1 (WFT1), T2(WFT1T2)
 		//Meta Instances
@@ -93,6 +93,54 @@ public class TestBuild {
 		//TODO
 
 	}
+	
+	
+	//TODO : Automate tests
+		@Test
+		@DisplayName("Build1 ")
+		public void testBuild1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+			String root = SAMPLE_PATH + "build1/";
+			
+			String metaDirectory = root + "wf_meta";
+			File dInMeta = new File(metaDirectory);
+			assertTrue(dInMeta.exists() && dInMeta.isDirectory());
+
+			String instanceDirectory = root + "wf_instance";
+			File dInInstance = new File(instanceDirectory);
+			assertTrue(dInInstance.exists() && dInInstance.isDirectory());
+			
+			String sourceFM = FM_IN_PATH + "basicFM.xml";
+			// I make a copy for test
+			String copiedFM = FM_OUT_PATH + "FMA_B1.xml";
+			TestHelper.copyFM(sourceFM, copiedFM);
+
+			FMHelper fmBefore = new FMHelper(sourceFM);
+			String[] command = commandBuild(metaDirectory, instanceDirectory, copiedFM);
+			FMHelper fmAfter = new FMHelper(copiedFM);
+
+			// General Properties to check
+			List<String> afterListMeta = TestHelper.nothingLost(fmBefore, fmAfter, metaDirectory);
+			//List<String> afterListInstance = 
+			TestHelper.nothingLost(fmBefore, fmAfter, instanceDirectory);
+			//F31, F2, exist
+			//F311 (WF4), T1 (WFT1), T2(WFT1T2)
+			//Meta Instances
+			//5 meta + 
+			// instance
+			//F31_0 sous F31
+			//F31 devient concrete (WF2); F32 sans references(WF3); 
+			//WF5 => 2 contraintes + F31_1 et F31_2
+					
+					
+			String logMsg = String.format("added features : %s ", afterListMeta);
+			logger.debug(logMsg);
+			System.out.println(logMsg);
+
+			
+
+			// Specific properties
+			//TODO
+		}
 	
 	
 }

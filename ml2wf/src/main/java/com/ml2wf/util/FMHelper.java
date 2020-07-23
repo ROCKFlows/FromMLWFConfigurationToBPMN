@@ -35,7 +35,7 @@ public class FMHelper {
 	private static final String AND = "and";
 	private static final String CONSTRAINTS = "constraints";
 	private static final String RULE = "rule";
-	private static final String IMPLY_NOTATION = "=>";
+	public static final String IMPLY_NOTATION = "=>";
 	
 	private DocumentBuilder builder;
 	private Document document;
@@ -131,8 +131,19 @@ public class FMHelper {
 			rule += IMPLY_NOTATION;
 			rule += operands.get(1);
 		} 		 
-		else
-			 rule += "Unexpected operands for imply : " +operands;
+		else {
+			if ((operands.size() > 2 ) ) {
+				rule += operands.get(0);
+				rule += IMPLY_NOTATION;
+				rule += "AND ";
+				operands.remove(0);
+				for( String op : operands ) {
+					rule += op + " ";
+				}
+			}
+			else
+				rule += "Unexpected operands for imply : " +operands;
+		}
 		return rule;
 	}
 
@@ -142,9 +153,16 @@ public class FMHelper {
 		List<String> operands = new ArrayList<>();
 		for (Node child : iterable(node.getChildNodes())) {
 			if ( (child != null) 
-					&& (child.getNodeName() != null) 
-					&& (child.getNodeName().equals("var")) ) {
-						operands.add(child.getTextContent());
+					&& (child.getNodeName() != null) ) {
+				if (child.getNodeName().equals("var")) {
+					operands.add(child.getTextContent());
+				}
+				else {
+					if (child.getNodeName().equals("conj")) {
+						operands.addAll(readOperands(child));
+					}
+				}
+					
 			}
 		}
 		return operands;

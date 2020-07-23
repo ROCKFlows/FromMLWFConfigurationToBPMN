@@ -384,7 +384,7 @@ public class TestSamplesMetaMerge {
 	// ToFIX: The generated FM is corrupted
 	// 
 	@Test
-	@DisplayName("ToFIX:T8 : Test Merge when input FM file doesn't exist")
+	@DisplayName("T8 : Test Merge when input FM file doesn't exist")
 	public void testGenerationWithNoFMInputFile()
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFHierarchie2.bpmn2";
@@ -394,8 +394,8 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_8.xml";
 
 		// Command
-		commandMerge(metaWFPATH, copiedFM);
-
+		String[] command = commandMerge(metaWFPATH, copiedFM);
+		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
 	@Test

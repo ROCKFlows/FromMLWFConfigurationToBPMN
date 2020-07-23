@@ -23,7 +23,7 @@ import com.ml2wf.util.FMHelper;
 import com.ml2wf.util.WFHelper;
 
 public class TestHelper {
-	
+
 	/**
 	 * {@code Logger}'s instance.
 	 */
@@ -33,46 +33,46 @@ public class TestHelper {
 	 * 
 	 * Utility methods
 	 */
-	
+
 	public static final String  STEPS = "Steps";
 	public static final String  UNMANAGED_TASKS = "Unmanaged_Tasks";
 	public static final String  UNMANAGED_FEATURES ="Unmanaged_Features";
-	
+
 	public static void logCurrentDirectory() {
 		String curDir = System.getProperty("user.dir");
 		String  logMsg = String.format("Current directory %s", curDir);
-	   // System.out.println (logMsg);
-	    logger.debug(logMsg);
+		// System.out.println (logMsg);
+		logger.debug(logMsg);
 	}
-	
+
 	public static void testDirectory(String path, String file) {
 		String curDir = System.getProperty("user.dir");
 		String  logMsg = String.format("Current directory %s", curDir);
-	   // System.out.println (logMsg);
-	    logger.debug(logMsg);
-	    File f = new File(path);
-	    logMsg = String.format("Expected path %s",   f.getAbsolutePath());
-	    logger.debug(logMsg);
+		// System.out.println (logMsg);
+		logger.debug(logMsg);
+		File f = new File(path);
+		logMsg = String.format("Expected path %s",   f.getAbsolutePath());
+		logger.debug(logMsg);
 	}
-	
+
 
 	private static List<String> normalize(List<String> list) {
 		List<String> listCopy= new ArrayList<>();
 		list.forEach(t  -> listCopy.add( t.trim().replace(" ", "_")));
-			return listCopy;
+		return listCopy;
 	}
-	
+
 	private static List<String> normalizeAllTasks(List<String> list) {
 		List<String> listCopy= normalize(list);
 		//System.out.println("taches a normaliser.." + listCopy);
 		List<String> results  = new ArrayList<>();
 		listCopy.forEach(t  -> 
-			results.addAll(Arrays.asList(t.split("#"))) );
+		results.addAll(Arrays.asList(t.split("#"))) );
 		results.removeAll(Arrays.asList(""));
 		//System.out.println("taches normalisées.." + results);
 		return results;
 	}
-	
+
 	private static List<String> normalizeOnlySubtasks(List<String> list) {
 		List<String> listCopy= normalize(list);
 		//System.out.println("taches a normaliser" + list);
@@ -83,15 +83,15 @@ public class TestHelper {
 		//System.out.println("taches normalisées" + listCopy);
 		return listCopy;
 	}
-	
+
 	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, List<String> wfs) throws ParserConfigurationException, SAXException, IOException {
-		
+
 		List<String> afterList = normalize(fmAfter.getFeatureNameList());
-		
+
 		for (String wfPATH : wfs) {
 			testTasksAgainstFeatures(afterList, wfPATH);
 		};
-		
+
 		afterList= normalize(noFeatureLost(fmBefore, fmAfter));
 		return afterList;
 	}
@@ -109,9 +109,9 @@ public class TestHelper {
 				System.out.println(logMsg);
 				return;
 			}
-			
+
 		}
-			
+
 		WFHelper wf = new WFHelper(wfPATH);
 		List<String> tasks = wf.gettaskNameList();
 		tasks = normalizeAllTasks(tasks);
@@ -121,7 +121,7 @@ public class TestHelper {
 		System.out.println(logMsg);
 		assertTrue( lostTasks.isEmpty());
 	}
-	
+
 	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, String wfPATH ) throws ParserConfigurationException, SAXException, IOException{
 		List<String> afterList = normalize(fmAfter.getFeatureNameList());
 		testTasksAgainstFeatures(afterList, wfPATH);
@@ -129,7 +129,7 @@ public class TestHelper {
 
 		return afterList;
 	}
-	
+
 	public static List<String> noFeatureLost(FMHelper fmBefore, FMHelper fmAfter) {
 		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
 		String logMsg = String.format("added features : %s ", afterList);
@@ -140,7 +140,7 @@ public class TestHelper {
 		//todo check that no tasks are lost
 		return afterList;
 	}
-	
+
 	//TODO add test on constraints
 	public static void checkIdempotence(String fM, String[] command)
 			throws ParserConfigurationException, SAXException, IOException {
@@ -166,7 +166,7 @@ public class TestHelper {
 		assertTrue(afterList.isEmpty());
 	}
 
-	
+
 	public static List<String> checkNoFeaturesAreLost(FMHelper fmAfter, FMHelper fmBefore) {
 		List<String> beforeList = fmBefore.getFeatureNameList();
 		List<String> afterList = fmAfter.getFeatureNameList();
@@ -184,7 +184,7 @@ public class TestHelper {
 		logger.debug(logMsg);
 		return afterList;
 	}
-	
+
 	public static List<String> checkNoConstraintsAreLost(FMHelper fmAfter, FMHelper fmBefore) {
 		List<String> beforeList = fmBefore.getConstraintList();
 		List<String> afterList = fmAfter.getConstraintList();
@@ -194,14 +194,14 @@ public class TestHelper {
 		afterList.removeAll(beforeList);
 		return afterList;
 	}
-	
+
 	public static List<String> lostTasks(List<String> tasks, List<String> features){
 		List<String> tasksTOSave = normalize(tasks);
 		List<String> featureList = normalize(features);
 		logger.debug("Features : %s ", featureList);
 		tasksTOSave.removeAll(featureList);
 		return tasksTOSave;
-		
+
 	}
 
 	public static void noLostTaskAtInstanciation(String wfInPath, String wfOutPath) throws ParserConfigurationException, SAXException, IOException {
@@ -210,8 +210,8 @@ public class TestHelper {
 		WFHelper wfinstance = new WFHelper(wfOutPath);
 		List<String> tasksInstance = wfinstance.gettaskNameList();
 		assertEquals(tasksMeta.size(), tasksInstance.size());
-	    //Todo manage references to meta in generated tasks
-		
+		//Todo manage references to meta in generated tasks
+
 	}
 
 	public static void allTheseFeaturesAreAbstract(List<String> afterList, FMHelper fmAfter) {
@@ -220,9 +220,9 @@ public class TestHelper {
 		System.out.println(logMsg);
 		for (String s : afterList)
 			assertTrue(fmAfter.isAbstract(s));
-		
+
 	}
-	
+
 	//TODO add a test for this method
 	public static List<String> getTasks(List<String> afterList, FMHelper fmAfter) {
 		List<String> tasks = new ArrayList<String>();
@@ -233,15 +233,15 @@ public class TestHelper {
 		}
 		return tasks;
 	}
-	
+
 	public static void allTheseFeaturesAreConcret(List<String> afterList, FMHelper fmAfter) {
 		for (String s : afterList)
 			assertFalse(fmAfter.isAbstract(s));
-		
+
 	}
 
 	public static void testAbstractAndConcreteFeatures(List<String> addedFeatures, String instanceWFPATH, FMHelper fmAfter) throws ParserConfigurationException, SAXException, IOException {
-		
+
 		WFHelper wfinstance = new WFHelper(instanceWFPATH);
 		List<String> taskNames = wfinstance.gettaskNameList();
 		List<String> subtasks = normalizeOnlySubtasks(taskNames);
@@ -251,14 +251,14 @@ public class TestHelper {
 		allTheseFeaturesAreConcret(subtasks,fmAfter);
 		//all other tasks should be asbstract
 		allTheseFeaturesAreAbstract(allTasks,fmAfter);
-		
+
 	}
 
 	public static void compare(String resultingFM, String resultingFMBis) throws ParserConfigurationException, SAXException, IOException {
 		String logMsg = String.format("Compare two FM %s avec %s  ",resultingFM, resultingFMBis);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
-		
+
 		FMHelper fm1 = new FMHelper(resultingFM);
 		FMHelper fm2 = new FMHelper(resultingFMBis);
 		List<String> fm1FL = fm1.getFeatureNameList();
@@ -275,21 +275,51 @@ public class TestHelper {
 		System.out.println(logMsg);
 		compareEquals(childrenInFM1,childrenInFM2);
 	}
- static void compareEquals(List<String> l1, List<String> l2) {
+	static void compareEquals(List<String> l1, List<String> l2) {
 		Collections.sort(l1);
 		Collections.sort(l2);
 		assertEquals(l1, l2);
-		
+
 	}
- 
- 
-public static void copyFM(String sourceFM,String copiedFM) throws IOException {
-	File copiedFile = new File(copiedFM);
-	File sourceFile = new File(sourceFM);
-	assertTrue(sourceFile.exists());
-	FileUtils.copyFile(sourceFile, copiedFile);
-	assertTrue(copiedFile.exists());
-}
+
+
+	public static void copyFM(String sourceFM,String copiedFM) throws IOException {
+		File copiedFile = new File(copiedFM);
+		File sourceFile = new File(sourceFM);
+		assertTrue(sourceFile.exists());
+		FileUtils.copyFile(sourceFile, copiedFile);
+		assertTrue(copiedFile.exists());
+	}
+
+	public static boolean testConstraintImpliesAnd(List<String> constraints, String leftFeature, List<String> featureList) {
+		for (String constraint : constraints) {
+			constraint = constraint.trim();
+			String[] compose = constraint.split(FMHelper.IMPLY_NOTATION);
+			if ( (compose != null ) && compose.length == 2) {
+				String left = compose[0];
+				if (left.equals(leftFeature)) {
+					System.out.println("Found : " + left);
+					if (testConstraintAnd(compose[1],featureList) ) 
+						return true;//TODO
+				}
+			}
+		}
+		return false;
+	}
+
+	private static boolean testConstraintAnd(String elements, List<String> featureList) {
+		String[] compose = elements.split(" ");
+		if ( (compose != null ) && compose.length>0) {
+		 for (String f : compose) {
+			 f = f.trim();
+		 	 if (featureList.contains(f))
+		 		 featureList.remove(f);
+		 	 else return false;
+		 }
+		 return featureList.isEmpty();
+		 }
+		return false;
+	}
 
 
 }

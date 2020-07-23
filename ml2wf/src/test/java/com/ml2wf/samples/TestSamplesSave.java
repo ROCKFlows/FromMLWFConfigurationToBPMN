@@ -1,5 +1,6 @@
 package com.ml2wf.samples;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -48,46 +49,112 @@ public class TestSamplesSave {
 	public void clean() {
 	}
 
-	// FIX Unmanaged
 	@Test
-	@DisplayName("Test with a basic workflow adding one Step")
-	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+	@DisplayName("T0 : Test with only one basic meta workflow adding one Step")
+	public void testT0UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF.bpmn2";
-		String instanceWFPATH = instanceWF_IN_PATH + "BasicWF_instance00.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFM.xml";
-		// I make a copy for test
-		String copiedFM = FM_OUT_PATH + "basicFM_SAVE0.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		
+		String instanceWFPATH = instanceWF_IN_PATH + "BasicWF_instance00.bpmn2";
+		
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_0.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
-		String[] command = new String[] { "save", "-i ", metaWFPATH, instanceWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
+		String[] command = commandSave(metaWFPATH, instanceWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, Arrays.asList(metaWFPATH, instanceWFPATH));
-		// This test involves managing naming differences using '_' in FM and BPMN
-		logger.debug("added features : %s ", afterList);
-		// System.out.println(afterList);
-
+		String logMsg = String.format("added features in SAV : %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		
 		// Specific properties
 		// assertEquals(1, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
+		
+		assertTrue(fmAfter.isFeature("Meta"));
+		assertTrue(fmAfter.isFeature("BasicMetaWF"));
+		assertTrue(fmAfter.isDirectChildOf("Meta", "BasicMetaWF"));
+		
+		assertTrue(fmAfter.isFeature("Instances"));
+		assertTrue(fmAfter.isFeature("BasicWF_instance00"));
+		assertTrue(fmAfter.isDirectChildOf("Instances", "BasicWF_instance00"));
+		
+		
+		/*
+		 * List<String> constraints = fmAfter.getConstraintList(); logMsg =
+		 * String.format("Constraints : %s ", constraints); logger.debug(logMsg);
+		 * System.out.println(logMsg);
+		 * TestHelper.testConstraintImpliesAnd(constraints,"BasicMetaWF",Arrays.asList(
+		 * "Training_step", "Evaluating_step", "Preprocessing_step"));
+		 */
 		// TODO test abstract Features
 		// TODO test generated constraints
 		// FIX
 		// Check idempotence
 		// FIX Unmanaged is generated
+		//TODO test relations and constraints
+		//Don't forget to test optionnal; empty instances; empty meta; ect.
 		TestHelper.checkIdempotence(copiedFM, command);
 
+	}
+	
+	// FIX Unmanaged
+		@Test
+		@DisplayName("T1 : Test with a basic workflow adding one Step")
+		public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+			String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF.bpmn2";
+			File fin = new File(metaWFPATH);
+			assertTrue(fin.exists());
+			
+			String instanceWFPATH = instanceWF_IN_PATH + "BasicWF_instance00.bpmn2";
+			
+			String sourceFM = FM_IN_PATH + "basicFM.xml";
+			String copiedFM = FM_OUT_PATH + "basicFM_0.xml";
+			TestHelper.copyFM(sourceFM, copiedFM);
+
+
+
+			FMHelper fmBefore = new FMHelper(sourceFM);
+			// Command
+			String[] command = commandSave(metaWFPATH, instanceWFPATH, copiedFM);
+			FMHelper fmAfter = new FMHelper(copiedFM);
+
+			// General Properties to check
+			List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, Arrays.asList(metaWFPATH, instanceWFPATH));
+			String logMsg = String.format("added features : %s ", afterList);
+			logger.debug(logMsg);
+			System.out.println(logMsg);
+			
+
+			// Specific properties
+			// assertEquals(1, afterList.size());
+			assertTrue(fmAfter.isFeature("Evaluating_step"));
+			assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
+			// TODO test abstract Features
+			// TODO test generated constraints
+			// FIX
+			// Check idempotence
+			// FIX Unmanaged is generated
+			//TODO test relations and constraints
+			//Don't forget to test optionnal; empty instances; empty meta; ect.
+			TestHelper.checkIdempotence(copiedFM, command);
+
+		}
+		
+
+	private String[] commandSave(String metaWFPATH, String instanceWFPATH, String copiedFM) {
+		String[] command = new String[] { "save", "-i ", metaWFPATH, instanceWFPATH, "-o ", copiedFM, "-v", "7" };
+		com.ml2wf.App.main(command);
+		return command;
 	}
 
 	/**
@@ -118,9 +185,7 @@ public class TestSamplesSave {
 		assertTrue(copiedFile.exists());
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
-		// Command
-		String[] command = new String[] { "save", "-i ", metaWFPATH, instanceWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
+		String[] command = commandSave(metaWFPATH, instanceWFPATH, copiedFM);
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -139,6 +204,11 @@ public class TestSamplesSave {
 		TestHelper.checkIdempotence(copiedFM, command);
 
 	}
+	
+	
+	//TODO : save sans instance = merge --meta -f (si je ne dis pas de bêtise)
+			
+			
 
 	// TODO : Test with optional tasks present and absent in the WF instance; verify
 	// that the FM is still consistent.
