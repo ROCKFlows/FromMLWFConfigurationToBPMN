@@ -17,11 +17,11 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.fm.FMNames;
-import com.ml2wf.merge.MergeException;
 import com.ml2wf.merge.base.BaseMergerImpl;
-import com.ml2wf.tasks.InvalidTaskException;
+import com.ml2wf.merge.exceptions.MergeException;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 

@@ -4,10 +4,10 @@ import java.io.File;
 
 import org.w3c.dom.Document;
 
-import com.ml2wf.merge.MergeException;
-import com.ml2wf.tasks.InvalidTaskException;
+import com.ml2wf.merge.exceptions.MergeException;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.util.Pair;
 
 /**

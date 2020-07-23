@@ -2,7 +2,7 @@ package com.ml2wf.tasks.base;
 
 import org.w3c.dom.Node;
 
-import com.ml2wf.tasks.InvalidTaskException;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.specs.Spec;
 
 /**

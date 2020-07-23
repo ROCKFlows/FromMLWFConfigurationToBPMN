@@ -32,13 +32,13 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
-import com.ml2wf.merge.MergeException;
 import com.ml2wf.merge.concretes.WFMetaMerger;
-import com.ml2wf.tasks.InvalidTaskException;
+import com.ml2wf.merge.exceptions.MergeException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
 import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.FMTaskSpecs;
@@ -192,6 +192,9 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see File
 	 */
 	private Set<File> getFiles(File file) throws IOException {
+		if (!file.exists()) {
+			throw new IOException(String.format("The given workflow file does not exist (%s)", file));
+		}
 		Set<File> files;
 		try (Stream<Path> stream = Files.walk(file.toPath())) {
 			files = stream.parallel().map(Path::toFile).filter(File::isFile)
@@ -268,7 +271,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *
 	 * @since 1.0
 	 */
-	private FMTask getUnmanaged(String name) throws InvalidTaskException, MergeException {
+	private FMTask getUnmanaged(String name) throws InvalidTaskException {
 		Optional<FMTask> opt = TasksManager.getFMTaskWithName(name);
 		if (opt.isPresent()) {
 			return opt.get();
