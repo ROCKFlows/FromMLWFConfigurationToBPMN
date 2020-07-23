@@ -161,6 +161,8 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		TasksManager.updateFMParents(TasksManager.getFMTasks());
 		this.processAnnotations(annotations);
 		endProcessUnmanagedNodes();
+		TasksManager.clearWFTasks();
+
 	}
 
 	@Override
@@ -378,19 +380,20 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected void processTask(WFTask<?> task) throws MergeException, InvalidTaskException {
 		String taskName = task.getName();
-		if (TasksManager.existsinFM(taskName) && !this.processDuplicatedTask(task)) {
+		if (TasksManager.existsinFM(taskName) && !this.processDuplicatedTask(taskName)) {
 			// if task is already in the FM
 			// and no further operation is needed
 			return;
 		}
 		// retrieving a suitable parent
 		FMTask parentTask = this.getSuitableParent(task);
+		TasksManager.addTask(parentTask);
 		// inserting the new task
 		insertNewTask(parentTask, task);
 	}
 
 	/**
-	 * Processes the given {@code task} as a duplicated {@code Task}.
+	 * Processes the given {@code taskName} as a duplicated {@code Task}'s name.
 	 *
 	 * <p>
 	 *
@@ -404,30 +407,29 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * <p>
 	 *
 	 * <ul>
-	 * <li>changing its <b>abstract status</b> from {@code true} to
-	 * {@code false} (ref : #148),</li>
 	 * <li>removing the duplicated task from the {@link #unmanagedTask},</li>
 	 * <li>merging the original task's node with the duplicated's one.</li>
 	 * </ul>
 	 *
 	 *
 	 *
-	 * @param task task to process
+	 * @param taskName the duplicated task's name
 	 * @return whether further operations are needed or not
 	 * @throws MergeException
 	 *
 	 * @since 1.0
 	 */
-	private boolean processDuplicatedTask(WFTask<?> task) throws MergeException {
-		String taskName = task.getName();
+	private boolean processDuplicatedTask(String taskName) throws MergeException {
 		FMTask unmanagedTask = unmanagedGlobalTasks.get(UNMANAGED_TASKS);
 		Optional<FMTask> optFMTask = unmanagedTask.getChildWithName(taskName);
 		if (optFMTask.isEmpty()) {
+			// TODO: manage
+			// if it is not under the unmanaged_tasks node
 			return false;
 		}
 		Optional<?> optTask = unmanagedTask.removeChild(optFMTask.get());
 		FMTask duplicatedTask = (FMTask) optTask
-				.orElseThrow(() -> new MergeException("Can't process the task : " + task));
+				.orElseThrow(() -> new MergeException("Can't process the task : " + taskName));
 		// task = this.mergeNodes(task, duplicatedTask); // TODO: to modify
 		return true;
 	}
@@ -533,7 +535,8 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
 			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);
-			if (optRef.isEmpty()) {
+			if (optRef.isEmpty() || ((optRef.get().getParent() != null)
+					&& optRef.get().getParent().getName().equals(UNMANAGED_TASKS))) {
 				return this.createReferredFMTask(task);
 			}
 			return optRef.get();
@@ -556,15 +559,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see FMTask
 	 */
 	protected FMTask createReferredFMTask(WFTask<?> task) throws MergeException, InvalidTaskException {
-		logger.warn("The referenced task [{}] is missing in the FeatureModel.", task.getReference());
-		logger.warn("Creating the referenced task : {}", task.getReference());
-		// checking if a WFTask doesn't already exists with the given task's name
-		Optional<WFTask<?>> opt = TasksManager.getWFTaskWithName(task.getName());
-		if (opt.isPresent() && !opt.get().isAbstract()) {
-			task = opt.get();
-		}
-		opt = TasksManager.getWFTaskWithName(task.getReference());
-		FMTask newParent = createFMTaskWithName(task.getReference(),
+		String reference = task.getReference();
+		logger.warn("The referenced task [{}] is missing in the FeatureModel.", reference);
+		logger.warn("Creating the referenced task : {}", reference);
+		// removing the reference from the unmanaged node if it is present
+		this.processDuplicatedTask(reference);
+		Optional<WFTask<?>> opt = TasksManager.getWFTaskWithName(reference);
+		FMTask newParent = createFMTaskWithName(reference,
 				(opt.isPresent()) ? opt.get().isAbstract() : opt.isEmpty());
 		opt = TasksManager.getWFTaskWithName(newParent.getName());
 		FMTask globalTask = (opt.isEmpty()) ? this.getGlobalFMTask(WFMetaMerger.STEP_TASK)
