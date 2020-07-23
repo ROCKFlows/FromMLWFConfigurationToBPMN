@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.w3c.dom.Document;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.merge.exceptions.MergeException;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
@@ -66,12 +67,14 @@ public interface BaseMerger {
 	 * @return a suitable parent {@code FMTask} for the given {@code WFTask}
 	 * @throws MergeException
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 * @see WFTask
 	 */
-	public abstract FMTask getSuitableParent(WFTask<?> child) throws MergeException, InvalidTaskException;
+	public abstract FMTask getSuitableParent(WFTask<?> child)
+			throws MergeException, InvalidTaskException, UnresolvedConflict;
 
 	/**
 	 * Returns the root parent {@code FMTask} according to the workflow's type (meta

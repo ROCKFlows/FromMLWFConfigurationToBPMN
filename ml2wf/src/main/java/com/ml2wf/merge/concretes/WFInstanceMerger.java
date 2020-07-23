@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
@@ -66,7 +67,7 @@ public final class WFInstanceMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, InvalidTaskException {
+	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, InvalidTaskException, UnresolvedConflict {
 		return this.getReferredFMTask(task, unmanagedGlobalTasks.get(UNMANAGED_TASKS));
 	}
 

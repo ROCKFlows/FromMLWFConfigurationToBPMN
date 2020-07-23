@@ -24,9 +24,7 @@ public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolv
 
 	@Override
 	public T solve(FMTask fmTask, T wfTask) throws InvalidTaskException, UnresolvedConflict {
-		if (!this.areInConflict(fmTask, wfTask)) {
-			return wfTask;
-		}
+		this.checkRequirements(fmTask, wfTask);
 		logger.warn("Conflict detected implying {} (in FM) and {} (in WF) : They have different parents.", fmTask,
 				wfTask);
 		throw new UnresolvedConflict(
@@ -42,11 +40,11 @@ public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolv
 	private void checkRequirements(FMTask fmTask, T wfTask) throws InvalidTaskException {
 		if (fmTask.getParent() == null) {
 			throw new InvalidTaskException(
-					String.format("Can't solve a conflict involving a FMTask (%s) without parent.", fmTask));
+					String.format("Can't resolve a conflict involving a FMTask (%s) without parent.", fmTask));
 		}
 		if (wfTask.getReference().isBlank()) {
 			throw new InvalidTaskException(
-					String.format("Can't solve a conflict involving a WFTask (%s) without reference.", wfTask));
+					String.format("Can't resolve a conflict involving a WFTask (%s) without reference.", wfTask));
 		}
 	}
 

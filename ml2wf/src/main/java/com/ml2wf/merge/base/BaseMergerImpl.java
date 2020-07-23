@@ -24,9 +24,9 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
@@ -376,12 +376,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @param task task to process
 	 * @throws MergeException
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected void processTask(WFTask<?> task) throws MergeException, InvalidTaskException {
+	protected void processTask(WFTask<?> task) throws MergeException, InvalidTaskException, UnresolvedConflict {
 		String taskName = task.getName();
 		if (TasksManager.existsinFM(taskName) && !this.processDuplicatedTask(taskName)) {
 			// if task is already in the FM
@@ -419,10 +420,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @param taskName the duplicated task's name
 	 * @return whether further operations are needed or not
 	 * @throws MergeException
+	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 */
-	private boolean processDuplicatedTask(String taskName) throws MergeException {
+	private boolean processDuplicatedTask(String taskName) throws MergeException, InvalidTaskException {
 		FMTask unmanagedTask = unmanagedGlobalTasks.get(UNMANAGED_TASKS);
 		Optional<FMTask> optFMTask = unmanagedTask.getChildWithName(taskName);
 		if (optFMTask.isEmpty()) {
@@ -433,33 +436,21 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		Optional<?> optTask = unmanagedTask.removeChild(optFMTask.get());
 		FMTask duplicatedTask = (FMTask) optTask
 				.orElseThrow(() -> new MergeException("Can't process the task : " + taskName));
-		// task = this.mergeNodes(task, duplicatedTask); // TODO: to modify
+		optTask = TasksManager.getWFTaskWithName(taskName);
+		if (optTask.isPresent()) {
+			WFTask<?> wfTask = (WFTask<?>) optTask.get();
+			System.out.println("UNRESOLVED CONTEXT : duplicatedTask : " + duplicatedTask + " : " + wfTask);
+			if (this.conflictManager.areInConflict(duplicatedTask, wfTask)) {
+				try {
+					wfTask = this.conflictManager.solve(duplicatedTask, wfTask);
+				} catch (UnresolvedConflict e) {
+					logger.error(e.getMessage());
+					return false;
+				}
+				// TODO: manage changed wfTask
+			}
+		}
 		return true;
-	}
-
-	// TODO
-	protected <T extends Task<?>> T mergeNodes(T taskA, T taskB) {
-		// TODO: to change according to recent changes in task OOC
-		// TODO: improve considering conflicts (e.g same child & different levels)
-		/*-NodeList nodeBChildren = nodeB.getChildNodes();
-		for (int i = 0; i < nodeBChildren.getLength(); i++) {
-			nodeA.appendChild(nodeBChildren.item(i));
-		}
-		return nodeA;*/
-
-		// TODO: STEPS :
-		// foreach child of taskB, get child's FMTask
-		// append child to taskA
-		return null;
-	}
-
-	protected Node mergeNodes(Node nodeA, Node nodeB) {
-		// TODO: improve considering conflicts (e.g same child & different levels)
-		NodeList nodeBChildren = nodeB.getChildNodes();
-		for (int i = 0; i < nodeBChildren.getLength(); i++) {
-			nodeA.appendChild(nodeBChildren.item(i));
-		}
-		return nodeA;
 	}
 
 	/**
@@ -528,12 +519,14 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *         {@code defaultTask} if no valid reference was found
 	 * @throws MergeException
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected FMTask getReferredFMTask(WFTask<?> task, FMTask defaultTask) throws MergeException, InvalidTaskException {
+	protected FMTask getReferredFMTask(WFTask<?> task, FMTask defaultTask)
+			throws MergeException, InvalidTaskException, UnresolvedConflict {
 		String reference = task.getReference();
 		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
@@ -556,12 +549,14 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *         {@code task}'s reference
 	 * @throws MergeException
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected FMTask createReferredFMTask(WFTask<?> task) throws MergeException, InvalidTaskException {
+	protected FMTask createReferredFMTask(WFTask<?> task)
+			throws MergeException, InvalidTaskException, UnresolvedConflict {
 		String reference = task.getReference();
 		logger.warn("The referenced task [{}] is missing in the FeatureModel.", reference);
 		logger.warn("Creating the referenced task : {}", reference);
