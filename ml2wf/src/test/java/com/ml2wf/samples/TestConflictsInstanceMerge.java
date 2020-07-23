@@ -33,7 +33,7 @@ public class TestConflictsInstanceMerge {
 	 */
 	private static final Logger logger = LogManager.getLogger(TestConflictsInstanceMerge.class);
 
-	private static final String CONFLICT_SAMPLE_PATH = "./src/test/resources/ForValidationTests/ForBuild/";
+	private static final String CONFLICT_SAMPLE_PATH = "./src/test/resources/ForValidationTests/onConflicts/";
 	private static final String FM_IN_PATH = CONFLICT_SAMPLE_PATH + "feature_models/";
 	private static final String DEFAULT_IN_FM = FM_IN_PATH + "FMA.xml";
 	private static final String FM_OUT_PATH = "./target/generated/FM_CI/";

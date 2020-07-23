@@ -89,13 +89,18 @@ public class TestSamplesSave {
 		assertTrue(fmAfter.isDirectChildOf("Instances", "BasicWF_instance00"));
 		
 		
-		/*
-		 * List<String> constraints = fmAfter.getConstraintList(); logMsg =
-		 * String.format("Constraints : %s ", constraints); logger.debug(logMsg);
-		 * System.out.println(logMsg);
-		 * TestHelper.testConstraintImpliesAnd(constraints,"BasicMetaWF",Arrays.asList(
-		 * "Training_step", "Evaluating_step", "Preprocessing_step"));
-		 */
+		  List<String> constraints = fmAfter.getConstraintList(); logMsg =
+		  String.format("Constraints : %s ", constraints); logger.debug(logMsg);
+		  System.out.println(logMsg);
+		  TestHelper.testConstraintImpliesAnd(constraints,"BasicMetaWF",Arrays.asList(
+		  "Training_step", "Evaluating_step", "Preprocessing_step"));
+
+		  TestHelper.testConstraintImpliesAnd(constraints,"BasicWF_instance00",Arrays.asList(
+				  "Normalize", "Train_OC_SVM", "Evaluating_10Fold"));
+		  //TODO improve my test
+		 // TestHelper.testConstraintImpliesAnd(constraints,"BasicWF_instance00",Arrays.asList(
+		//		  "BasicMetaWF"));	 
+				  
 		// TODO test abstract Features
 		// TODO test generated constraints
 		// FIX
