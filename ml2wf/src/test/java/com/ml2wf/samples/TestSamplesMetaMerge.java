@@ -50,25 +50,21 @@ public class TestSamplesMetaMerge {
 	}
 
 	@Test
-	@DisplayName("Test with a basic workflow adding one Step")
+	@DisplayName("T0 : Test with a basic workflow adding one Step")
 	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFM.xml";
-		// FIX avoid to make a copy
-		// ../samples/basicFMCopy.xml";
-		String copiedFM = FM_OUT_PATH + "basicFMCopy.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_0.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
+		String[] command = commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
@@ -88,27 +84,30 @@ public class TestSamplesMetaMerge {
 
 	}
 
-	@Test
-	@Disabled
-	@DisplayName("Test with a basic workflow adding one Step and one constraint")
-	public void testBasicWFWithOneConstraintUsingCommandLine()
-			throws ParserConfigurationException, SAXException, IOException {
-		String metaWFPATH = metaWF_IN_PATH + "BBasicMetaWFWithConstraint2.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFM.xml";
-		// FIX avoid to make a copy
-		String copiedFM = FM_OUT_PATH + "basicFMCopy_1.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
-		File fin = new File(metaWFPATH);
-		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
-
-		FMHelper fmBefore = new FMHelper(copiedFM);
-		// Command
+	private String[] commandMerge(String metaWFPATH, String copiedFM) {
 		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
 		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
+		return command;
+	}
+
+	@Test
+	@DisplayName("T1 : Test with a basic workflow adding one Step and one constraint")
+	public void testBasicWFWithOneConstraintUsingCommandLine()
+			throws ParserConfigurationException, SAXException, IOException {
+		
+		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFWithConstraint2.bpmn2";
+		File fin = new File(metaWFPATH);
+		assertTrue(fin.exists());
+		
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_1.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
+
+
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
+		// Command
+		String[] command = commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
@@ -117,6 +116,7 @@ public class TestSamplesMetaMerge {
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 
 		// Specific properties
+		//Evaluating_Step
 		assertEquals(1, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
@@ -128,79 +128,70 @@ public class TestSamplesMetaMerge {
 	}
 
 	@Test
-	@DisplayName("Test with a basic workflow adding one Step, one criteria and one constraint")
+	@DisplayName("T2 : Test with a basic workflow adding one Step, one criteria and one constraint")
 	public void testBasicWFWithOneContraintAddingACriteriaUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
+		
+		
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFWithConstraint.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFM.xml";
-		// FIX avoid to make a copy
-		String copiedFM = FM_OUT_PATH + "basicFMCopy_2.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
-		TestHelper.testDirectory(metaWF_IN_PATH, metaWFPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_2.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
+		String[] command = commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
+		
 
 		// General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
-		logger.debug("added features : %s ", afterList);
-		//FIX
-		//TODO remove criteria that can be concrete
-		//TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
+		String logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		List<String> tasks = TestHelper.getTasks(afterList,fmAfter);
+		TestHelper.allTheseFeaturesAreAbstract(tasks, fmAfter);
 
 		// Specific properties
-
-		// FIX
+		//Evaluation_criteria and Unmanaged and Unmanaged_features
+		assertEquals(4, afterList.size());
+		assertEquals(1, tasks.size());
 		// Evaluating_step => Evaluation_criteria I was expecting Evaluation_criteria to
 		// be added as an unmanaged Feature
 		// assertEquals(2, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
-		// assertTrue(fmAfter.isFeature("Evaluation_criteria"));
-		// FIX test constraint : Evaluating_step => Evaluation_criteria
-		// assertTrue(fmAfter.isFeature("Evaluation_criteria"));
-		// FIX Test position of criteria to be improved
-		// assertTrue(fmAfter.isChildOf("criteria", "Evaluation_criteria"));
-		// assertTrue(fmAfter.getConstraintList().contains("Evaluating_step=>Evaluation_criteria"));
+		assertTrue(fmAfter.isFeature("Evaluation_criteria"));
+		// TODO Test position of criteria to be improved
+		assertTrue(fmAfter.isChildOf(TestHelper.UNMANAGED_FEATURES, "Evaluation_criteria"));
+		assertTrue(fmAfter.getConstraintList().contains("Evaluating_step=>Evaluation_criteria"));
 
-		// FIX
-		// Ensure a new feature has been added
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
-		// FIX Constraint is duplicated (check it) Evaluating_step =>
-		// Evaluation_criteria
 	}
 
 	@Test
-	@DisplayName("Test with a basic workflow adding two Steps")
+	@DisplayName("T3 : Test with a basic workflow adding two Steps")
 	public void testAddingTwoStepsUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
+		
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF2.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFM.xml";
-
-		// FIX avoid to make a copy
-		String copiedFM = FM_OUT_PATH + "basicFMCopy_3.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_3.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
+		String[] command = commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
+
 
 		// General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
@@ -209,7 +200,6 @@ public class TestSamplesMetaMerge {
 
 		// Specific properties
 
-		// FIX
 		assertEquals(2, afterList.size());
 		String f1 = "Evaluating_step";
 		String f2 = "Acquire_Metadata";
@@ -224,30 +214,29 @@ public class TestSamplesMetaMerge {
 	}
 
 	@Test
-	@DisplayName("Test with a basic workflow adding One hierarchic Step")
+	@DisplayName("T4 : Test with a basic workflow adding One hierarchic Step")
 	public void testAddingOneHierarchicStepUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFHierarchie.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFM.xml";
-		// FIX avoid to make a copy
-		String copiedFM = FM_OUT_PATH + "basicFMCopy_4.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_4.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
+		String[] command = commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
+		
 
 		// General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
-		logger.debug("added features : %s ", afterList);
+		String logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		//System.out.println(logMsg);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 
 		// Specific properties
@@ -267,32 +256,33 @@ public class TestSamplesMetaMerge {
 	}
 
 	@Test
-	@DisplayName("Test with a basic workflow adding One hierarchic Step at two levels")
+	@DisplayName("T5 : Test with a basic workflow adding One hierarchic Step at two levels")
 	public void testAddingMultipleHierarchicStepUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFHierarchie2.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFM.xml";
-		// FIX avoid to make a copy
-		String copiedFM = FM_OUT_PATH + "basicFMCopy_5.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_5.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
-
+		String[] command = commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
+		
 
 		// General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
-		logger.debug("added features : %s ", afterList);
+		String logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		//System.out.println(logMsg);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
+		
+		
+	
 
 		// Specific properties
 
@@ -303,7 +293,7 @@ public class TestSamplesMetaMerge {
 		assertFalse(fmBefore.isFeature(otherParent));
 		assertTrue(fmAfter.isFeature(f1));
 		assertTrue(fmAfter.isFeature(otherParent));
-		// FIX
+
 		assertFalse(fmAfter.isDirectChildOf("Steps", f1));
 		assertTrue(fmAfter.isChildOf("Steps", f1));
 		assertTrue(fmAfter.isChildOf("Steps", otherParent));
@@ -313,37 +303,37 @@ public class TestSamplesMetaMerge {
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
+
+	//ToFIX:  A clearer error message is expected
 	@Test
-	@DisplayName("#Conflict : A same task as a subtask of several meta task ")
+	@DisplayName("ToFIX:T6#Conflict : A same task as a subtask of several meta task ")
 	public void testConflict4aTaskclassifiedAtTwoDifferentPlacesUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
+		
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFHierarchie3.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFM.xml";
-		// FIX avoid to make a copy
-		String copiedFM = FM_OUT_PATH + "basicFMCopy_6.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_6.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
-
+		String[] command = commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
+		
 
 		// General Properties to check
-		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
-		logger.debug("added features : %s ", afterList);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		String logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
-		// System.out.println(afterList);
+		
 		// Specific properties
-		//
-		// FIX ABstract they are false..
+	
 		assertEquals(3, afterList.size());
 		String parent = "Preprocessing_step";
 		String otherParent = "Preprocess_data";
@@ -354,97 +344,87 @@ public class TestSamplesMetaMerge {
 		assertTrue(fmAfter.isFeature(f1));
 		assertTrue(fmAfter.isFeature(otherParent));
 		// FIX
-		assertFalse(fmAfter.isDirectChildOf("Steps", f1));
-		assertTrue(fmAfter.isChildOf("Steps", f1));
-		assertTrue(fmAfter.isChildOf("Steps", otherParent));
-		assertTrue(fmAfter.isChildOf(parent, f1));
+		// AN error should be raised. 
+		//f1 can't be a child of parent and other parent and we have no ways to choose
+		//assertFalse(fmAfter.isDirectChildOf("Steps", f1));
+		//assertTrue(fmAfter.isChildOf("Steps", f1));
+		//assertTrue(fmAfter.isChildOf("Steps", otherParent));
+		//assertTrue(fmAfter.isChildOf(parent, f1));
 		// assertTrue(fmAfter.isChildOf(otherParent, f1));
 		// Not SURE for this one
 		// assertTrue(fmAfter.isChildOf(parent, otherParent));
 
 		// Check idempotence
-		TestHelper.checkIdempotence(copiedFM, command);
+		//TestHelper.checkIdempotence(copiedFM, command);
 	}
 
-	// TODO IMPROVE
+	// ToFIX:  A clearer error message is expected
 	@Test
-	@DisplayName("Test Merge when input WF file doesn't exist")
+	@DisplayName("ToFIX: T7 : Test Merge when input WF file doesn't exist")
 	public void testGenerationWithNoWFInputFile()
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
+		
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFHierarchieX.bpmn2";
+		File fin = new File(metaWFPATH);
+		assertFalse(fin.exists());
+		
 		String sourceFM = FM_IN_PATH + "basicFM.xml";
-		// FIX avoid to make a copy
-		String copiedFM = FM_OUT_PATH + "basicFMCopy_7.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
-		assertTrue(copiedFile.exists());
+		String copiedFM = FM_OUT_PATH + "basicFM_7.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-
+		String[] command = commandMerge(metaWFPATH, copiedFM);
+		
 		// Check idempotence : nothing's happening
-		// TestHelper.checkIdempotence(copiedFM, command);
+		 TestHelper.checkIdempotence(copiedFM, command);
 
-		// com.ml2wf.App.main(command);
-		// FIX there is one exception but it's catch...
-		// assertThrows(NoSuchFileException.class,
-		// () -> {com.ml2wf.App.main(command);} );
 	}
 
-	// TODO IMPROVE
+	// ToFIX:  An error message is expected
+	// ToFIX: The generated FM is corrupted
+	// 
 	@Test
-	@DisplayName("Test Merge when input FM file doesn't exist")
+	@DisplayName("ToFIX:T8 : Test Merge when input FM file doesn't exist")
 	public void testGenerationWithNoFMInputFile()
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFHierarchie2.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFMX.xml";
-		// FIX avoid to make a copy
-		String copiedFM = sourceFM;
 		File fin = new File(metaWFPATH);
-		File copiedFile = new File(copiedFM);
 		assertTrue(fin.exists());
-		// assertFalse(copiedFile.exists());
+		
+		String copiedFM = FM_OUT_PATH + "basicFM_8.xml";
 
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-
-		// FIX there is one exception but it's catch...
-		// assertThrows(NoSuchFileException.class,
-		// () -> {com.ml2wf.App.main(command);} );
+		commandMerge(metaWFPATH, copiedFM);
 
 	}
 
-	// todo: improve testing the content of the file.
 	@Test
-	@DisplayName("Test Merge with a complex workflow")
+	@DisplayName("T9 : Test Merge with a complex workflow")
 	public void testGenerationWithCompletExample()
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
+		
 		String metaWFPATH = metaWF_IN_PATH + "FeatureBasedMetaWF.bpmn2";
-		String sourceFM = FM_IN_PATH + "basicFMX.xml";
-
-		// FIX avoid to make a copy
-		String copiedFM = FM_OUT_PATH + "basicFMComplex.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_9.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
-
+		String[] command = commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
+		
 
 		// General Properties to check
-		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
-		logger.debug("added features : %s ", afterList);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		String logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		//System.out.println(logMsg);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
+		
 
 		// No Task are lost
 		TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
@@ -452,7 +432,6 @@ public class TestSamplesMetaMerge {
 		// Ensure all new Features corresponding to Tasks are Steps
 		for (String f : afterList) {
 			assertTrue(fmAfter.isChildOf("Steps", f));
-			// TODO Manage constraints
 		}
 
 		// Check idempotence
@@ -460,52 +439,42 @@ public class TestSamplesMetaMerge {
 
 	}
 
-	// todo: improve testing the content of the file.
 	@Test
-	@DisplayName("Test Merge that should do nothing")
+	@DisplayName("T10 : Test Merge that should do nothing")
 	public void testUselessMerge()
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
+		
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF.bpmn2";
-		// THe FM results from a save.
-		String sourceFM = FM_IN_PATH + "basicFM_SAVE0.xml";
-
-		// FIX avoid to make a copy
-		String copiedFM = FM_OUT_PATH + "uselessMerge.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
 		File fin = new File(metaWFPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		
+		String sourceFM = FM_IN_PATH + "basicFM_SAVE0.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_10.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", metaWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(copiedFile.exists());
-
+		String[] command = commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
+		
 
 		// General Properties to check
-		List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
-		logger.debug("added features : %s ", afterList);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		String logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		//System.out.println(logMsg);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
+		
 
 		// No Task are lost
 		TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 
-		String logMsg = String.format("No Features should be added : %s", afterList);
+		logMsg = String.format("No Features should be added : %s", afterList);
 		logger.debug(logMsg);
-		System.out.println(logMsg);
-		// FIX
-		// assertTrue(afterList.isEmpty());
-		// Ensure all new Features corresponding to Tasks are Steps
-		// FIX
-		/*
-		 * for (String f : afterList) assertTrue(fmAfter.isChildOf("Steps", f)); //TODO
-		 * Manage constraints
-		 * //Check idempotence TestHelper.checkIdempotence(copiedFM, command);
-		 */
+		//System.out.println(logMsg);
+		assertTrue(afterList.isEmpty());
+		
 
 	}
 

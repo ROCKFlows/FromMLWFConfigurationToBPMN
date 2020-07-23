@@ -33,7 +33,10 @@ public class TestHelper {
 	 * 
 	 * Utility methods
 	 */
-
+	
+	public static final String  STEPS = "Steps";
+	public static final String  UNMANAGED_TASKS = "Unmanaged_Tasks";
+	public static final String  UNMANAGED_FEATURES ="Unmanaged_Features";
 	
 	public static void logCurrentDirectory() {
 		String curDir = System.getProperty("user.dir");
@@ -218,6 +221,17 @@ public class TestHelper {
 		for (String s : afterList)
 			assertTrue(fmAfter.isAbstract(s));
 		
+	}
+	
+	//TODO add a test for this method
+	public static List<String> getTasks(List<String> afterList, FMHelper fmAfter) {
+		List<String> tasks = new ArrayList<String>();
+		for (String s : afterList)
+		{
+			if ( (fmAfter.isChildOf(STEPS, s)) || (fmAfter.isChildOf(UNMANAGED_TASKS, s)) )
+				tasks.add(s);
+		}
+		return tasks;
 	}
 	
 	public static void allTheseFeaturesAreConcret(List<String> afterList, FMHelper fmAfter) {

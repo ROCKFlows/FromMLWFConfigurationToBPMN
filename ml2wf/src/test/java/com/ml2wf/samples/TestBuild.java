@@ -73,8 +73,16 @@ public class TestBuild {
 		//List<String> afterListInstance = 
 				TestHelper.nothingLost(fmBefore, fmAfter, instanceDirectory);
 		// This test involves managing naming differences using '_' in FM and BPMN
-		//F31, F2, 
+		//F31, F2, exist
 		//F311 (WF4), T1 (WFT1), T2(WFT1T2)
+		//Meta Instances
+		//5 meta + 
+		// instance
+		//F31_0 sous F31
+		//F31 devient concrete (WF2); F32 sans references(WF3); 
+		//WF5 => 2 contraintes + F31_1 et F31_2
+				
+				
 		String logMsg = String.format("added features : %s ", afterListMeta);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
