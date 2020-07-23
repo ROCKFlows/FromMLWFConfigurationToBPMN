@@ -245,6 +245,7 @@ public final class TasksManager {
 			return false;
 		}
 		if (task instanceof FMTask) {
+			removeIfNullParent((FMTask) task);
 			return fmTasks.add((FMTask) task);
 		} else {
 			// applying filters
@@ -262,6 +263,26 @@ public final class TasksManager {
 	}
 
 	// filter
+
+	/**
+	 * Removes any task from the {@link #fmTasks} collection that :
+	 *
+	 * <p>
+	 *
+	 * <ul>
+	 * <li>is equals to the given {@code WFTask},</li>
+	 * <li>has a {@code null} parent</b>.</li>
+	 * </ul>
+	 *
+	 * @param task task to compare
+	 * @return if any elements were removed
+	 *
+	 * @since 1.0
+	 * @see WFTask
+	 */
+	public static boolean removeIfNullParent(FMTask task) {
+		return fmTasks.removeIf(t -> t.equals(task) && (t.getParent() == null));
+	}
 
 	/**
 	 * Removes any task from the {@link #wfTasks} collection that :

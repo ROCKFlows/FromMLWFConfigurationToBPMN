@@ -26,9 +26,9 @@ import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.merge.base.BaseMergerImpl;
-import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
 

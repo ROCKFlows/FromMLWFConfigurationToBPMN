@@ -2,10 +2,10 @@ package com.ml2wf.tasks.factory;
 
 import org.w3c.dom.Node;
 
-import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
 
 /**
  * This interface provides a method for the <b>creation of {@code Task}'s
