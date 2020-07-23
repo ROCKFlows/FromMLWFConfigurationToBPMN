@@ -106,51 +106,50 @@ public class TestConflictsMetaMerge {
 	private void mergeMeta(int testNumber, List<String> wfList, String globalWF)
 			throws ParserConfigurationException, SAXException, IOException {
 		String sourceFM = DEFAULT_IN_FM;
-		File sourceFile = new File(sourceFM);
 		FMHelper fmBefore = new FMHelper(sourceFM);
 
-		// I make a copy for test
+		//Step 1 :  I merge all the WF inside the same FM in sequence
 		String resultingFM = FM_OUT_PATH + "FMA_Test" + testNumber + ".xml";
 		TestHelper.copyFM(sourceFM, resultingFM);
-		File copiedFile = new File(resultingFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
+		   String logMsg = String.format("Step 1 : merge in %s all the WF %s",resultingFM,  wfList);
+		   logger.debug(logMsg);
 
-		this.mergeMetaAWFList(wfList, fmBefore, resultingFM, copiedFile);
+		this.mergeMetaAWFList(wfList, fmBefore, resultingFM);
 
-		// I make a copy for test
+		//Step 2 : I want to prove equivalence with the globaWF
 		String resultingFMBis = FM_OUT_PATH + "FMA_TestBis" + testNumber + ".xml";
 		TestHelper.copyFM(sourceFM, resultingFMBis);
-		File copiedFileBis = new File(resultingFMBis);
 
 		String wfPATH = WF_IN_PATH + globalWF + ".bpmn2";
-		String[] command = commandMetaMerge(wfPATH, resultingFMBis);
-		assertTrue(copiedFileBis.exists());
+		commandMetaMerge(wfPATH, resultingFMBis);
+		
 
 		TestHelper.compare(resultingFM, resultingFMBis);
 
+		
+		// Step 3: I want to prove order independance
 		Collections.shuffle(wfList);
 		resultingFM = FM_OUT_PATH + "FMA_TestOrderFree" + testNumber + ".xml";
-		copiedFile = new File(resultingFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
-		this.mergeMetaAWFList(wfList, fmBefore, resultingFM, copiedFile);
+		TestHelper.copyFM(sourceFM, resultingFM);
+		this.mergeMetaAWFList(wfList, fmBefore, resultingFM);
 		TestHelper.compare(resultingFM, resultingFMBis);
 	}
 
-	private void mergeMetaAWFList(List<String> wfList, FMHelper fmBefore, String resultingFM, File copiedFile)
+	private void mergeMetaAWFList(List<String> wfList, FMHelper fmBefore, String resultingFM) 
 			throws ParserConfigurationException, SAXException, IOException {
+		
 		for (String wf : wfList) {
 			String wfPATH = WF_IN_PATH + wf + ".bpmn2";
 			File fin = new File(wfPATH);
 			assertTrue(fin.exists());
-			assertTrue(copiedFile.exists());
-			String[] command = commandMetaMerge(wfPATH, resultingFM);
-			assertTrue(copiedFile.exists());
+			String logMsg = String.format(" merge WF %s in %s",wf, resultingFM);
+			logger.debug(logMsg);
+					
+			commandMetaMerge(wfPATH, resultingFM);
 			FMHelper fmAfter = new FMHelper(resultingFM);
+			
 			// General Properties to check
 			TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
-			// This test involves managing naming differences using '_' in FM and BPMN
-			// logger.debug("added features : %s ", afterList);
-			// TestHelper.checkIdempotence(resultingFM, command);
 		}
 	}
 

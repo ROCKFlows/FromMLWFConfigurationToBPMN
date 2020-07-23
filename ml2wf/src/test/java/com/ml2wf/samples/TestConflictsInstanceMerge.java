@@ -48,8 +48,9 @@ public class TestConflictsInstanceMerge {
 	public void clean() {
 	}
 
+	
 	@Test
-	@DisplayName("No Conflict : just to ensure equivalence between refersTo and #")
+	@DisplayName("ToFix T1 : just to ensure equivalence between refersTo and #")
 	public void testWFInstance1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		//Get the wf instance
 		String wfPATH = WF_IN_PATH + "WF1_instance.bpmn2";
@@ -152,7 +153,7 @@ public class TestConflictsInstanceMerge {
 
 	// Todo : test the presence of a warning
 	@Test
-	@DisplayName("Unmanaged : an unreferenced task is stored in the FM")
+	@DisplayName("ToFIX: T3 : an unreferenced task is stored in the FM")
 	public void testWFInstance3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF3_instance.bpmn2";
 		File fin = new File(wfPATH);
@@ -160,14 +161,14 @@ public class TestConflictsInstanceMerge {
 
 		String sourceFM = DEFAULT_IN_FM;
 		// I make a copy for test
-		String copiedFM = FM_OUT_PATH + "FMA_WF3_i.xml";
-		TestHelper.copyFM(sourceFM, copiedFM);
+		String copiedFMPath = FM_OUT_PATH + "FMA_WF3_i.xml";
+		TestHelper.copyFM(sourceFM, copiedFMPath);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
-		String[] command = commandMergeInstance(wfPATH, copiedFM);
+		FMHelper fmBefore = new FMHelper(copiedFMPath);
+		String[] command = commandMergeInstance(wfPATH, copiedFMPath);
 
-		assertTrue(new File(copiedFM).exists());
-		FMHelper fmAfter = new FMHelper(copiedFM);
+		assertTrue(new File(copiedFMPath).exists());
+		FMHelper fmAfter = new FMHelper(copiedFMPath);
 
 		// General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
@@ -181,7 +182,8 @@ public class TestConflictsInstanceMerge {
 		// FIX
 		assertFalse(fmAfter.isAbstract("F32"));
 		assertTrue(fmAfter.isChildOf("Unmanaged", "F32"));
-
+		// Check idempotence
+		TestHelper.checkIdempotence(copiedFMPath, command);
 	}
 	
 	@Test
