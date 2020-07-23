@@ -46,7 +46,7 @@ public class TestBuild {
 	
 	//TODO : Automate tests
 	@Test
-	@DisplayName("Build0 ")
+	@DisplayName("TODO : Build0 ")
 	public void testBuild0UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String root = SAMPLE_PATH + "build0/";
 		
@@ -97,7 +97,7 @@ public class TestBuild {
 	
 	//TODO : Automate tests
 		@Test
-		@DisplayName("Build1 ")
+		@DisplayName("TODO : Build1 ")
 		public void testBuild1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 			String root = SAMPLE_PATH + "build1/";
 			

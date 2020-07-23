@@ -50,7 +50,7 @@ public class TestConflictsInstanceMerge {
 
 	
 	@Test
-	@DisplayName("ToFix T1 : just to ensure equivalence between refersTo and #")
+	@DisplayName("T1 : just to ensure equivalence between refersTo and #")
 	public void testWFInstance1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		//Get the wf instance
 		String wfPATH = WF_IN_PATH + "WF1_instance.bpmn2";
@@ -151,7 +151,7 @@ public class TestConflictsInstanceMerge {
 		assertFalse(fmAfter.isAbstract("F31"));
 	}
 
-	// Todo : test the presence of a warning
+	// ToFIX : F32 should be concrete
 	@Test
 	@DisplayName("ToFIX: T3 : an unreferenced task is stored in the FM")
 	public void testWFInstance3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {

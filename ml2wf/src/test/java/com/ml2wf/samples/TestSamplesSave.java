@@ -49,8 +49,10 @@ public class TestSamplesSave {
 	public void clean() {
 	}
 
+	
+	//Add test on abstract and concrete Features
 	@Test
-	@DisplayName("T0 : Test with only one basic meta workflow adding one Step")
+	@DisplayName("ToFIX : T0 : Test with only one basic meta workflow and one instance wf adding one Step")
 	public void testT0UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF.bpmn2";
 		File fin = new File(metaWFPATH);
@@ -97,33 +99,31 @@ public class TestSamplesSave {
 
 		  TestHelper.testConstraintImpliesAnd(constraints,"BasicWF_instance00",Arrays.asList(
 				  "Normalize", "Train_OC_SVM", "Evaluating_10Fold"));
-		  //TODO improve my test
-		 // TestHelper.testConstraintImpliesAnd(constraints,"BasicWF_instance00",Arrays.asList(
-		//		  "BasicMetaWF"));	 
 				  
 		// TODO test abstract Features
 		// TODO test generated constraints
-		// FIX
-		// Check idempotence
-		// FIX Unmanaged is generated
-		//TODO test relations and constraints
-		//Don't forget to test optionnal; empty instances; empty meta; ect.
+
 		TestHelper.checkIdempotence(copiedFM, command);
 
 	}
 	
-	// FIX Unmanaged
+	
+	//TODO Don't forget to test optionnal; empty instances; empty meta; ect.
+	
+	
+      	// ToFIX Unmanaged is generated
+	    //Non consistent FM is generated
 		@Test
-		@DisplayName("T1 : Test with a basic workflow adding one Step")
+		@DisplayName("ToFIX : T1 : Test with a basic workflow adding one Step")
 		public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-			String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF.bpmn2";
+			String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF2.bpmn2";
 			File fin = new File(metaWFPATH);
 			assertTrue(fin.exists());
 			
 			String instanceWFPATH = instanceWF_IN_PATH + "BasicWF_instance00.bpmn2";
 			
 			String sourceFM = FM_IN_PATH + "basicFM.xml";
-			String copiedFM = FM_OUT_PATH + "basicFM_0.xml";
+			String copiedFM = FM_OUT_PATH + "basicFM_1.xml";
 			TestHelper.copyFM(sourceFM, copiedFM);
 
 
@@ -172,7 +172,7 @@ public class TestSamplesSave {
 	 */
 	// FIX : AFTER should be empty : %s[Unmanaged] Only when applying idempotence
 	@Test
-	@DisplayName("Test with a hierarchic workflow adding one Step")
+	@DisplayName("TODO : Test with a hierarchic workflow adding one Step")
 	public void testBasicHierachieSampleUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
 

@@ -381,8 +381,6 @@ public class TestSamplesMetaMerge {
 	}
 
 	// ToFIX:  An error message is expected
-	// ToFIX: The generated FM is corrupted
-	// 
 	@Test
 	@DisplayName("T8 : Test Merge when input FM file doesn't exist")
 	public void testGenerationWithNoFMInputFile()

@@ -30,6 +30,8 @@ import com.ml2wf.util.FMHelper;
  */
 public class TestConflictsMetaMerge {
 
+	private static final String FAIL = "FAIL";
+
 	/**
 	 * {@code Logger}'s instance.
 	 */
@@ -50,9 +52,10 @@ public class TestConflictsMetaMerge {
 	public void clean() {
 	}
 
-	// FIX FAILS when looking inside the hierarchy is not the good one
+	// TOFIX FAILS when looking inside the hierarchy is not the good one
+	//T2 should become a subfeature of T1 
 	@Test
-	@DisplayName("Test 1 in #147 : #f1 + #f2 + #f1#f2 = #f1#f2 in any order")
+	@DisplayName("ToFIX : Test 1 in #147 : #f1 + #f2 + #f1#f2 = #f1#f2 in any order")
 	public void test11UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// merge t1, then t2 then t1t2 results in the same FM than t1t2 and the same in
@@ -77,16 +80,16 @@ public class TestConflictsMetaMerge {
 		this.mergeMeta(3, Arrays.asList("WFT1T3", "WFT1T2T3"), "WFT1T2T3");
 	}
 
+	//ToFIX : We are expecting T2 to be a subtask of T1
 	@Test
-	@DisplayName("Test 4 in #147 : #f2#f3 + #f1#f2#f3 = #f1#f2#f3 in any order")
+	@DisplayName("ToFIX : Test 4 in #147 : #f2#f3 + #f1#f2#f3 = #f1#f2#f3 in any order")
 	public void test4UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-
-		// FIX
 		mergeMeta(4, Arrays.asList( "WFT2T3", "WFT1T2T3"), "WFT1T2T3" );
 	}
 
+	//WWhen we have the information #T1#T2, we expect the system to add T1 over T2
 	@Test
-	@DisplayName("Test 5 in #147 : #f2#f3 + #f1#f2 = #f1#f2#f3 in any order")
+	@DisplayName("ToFIX : Test 5 in #147 : #f2#f3 + #f1#f2 = #f1#f2#f3 in any order")
 	public void test5UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// FIX
@@ -94,15 +97,18 @@ public class TestConflictsMetaMerge {
 
 	}
 
-	// TODO Manage this case
+	// We're waiting for a warning because this merge can't be completed...
+	//But we don't have to fix this way
 	@Test
-	@DisplayName("Test 6 in #147 : #f2#f3 + #f1#f3 fails because we don't know the order between f2 and f1 ")
+	@DisplayName("ToFIx Test 6 in #147 : #f2#f3 + #f1#f3 fails because we don't know the order between f2 and f1 ")
 	public void test6UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// FIX
-		mergeMeta(6, Arrays.asList( "WFT2T3", "WFT1T3"), "FAIL" );
+		mergeMeta(6, Arrays.asList( "WFT2T3", "WFT1T3"), FAIL );
 	}
 
+	
+	
 	private void mergeMeta(int testNumber, List<String> wfList, String globalWF)
 			throws ParserConfigurationException, SAXException, IOException {
 		String sourceFM = DEFAULT_IN_FM;
@@ -117,6 +123,12 @@ public class TestConflictsMetaMerge {
 		this.mergeMetaAWFList(wfList, fmBefore, resultingFM);
 
 		//Step 2 : I want to prove equivalence with the globaWF
+		if (globalWF.equals(FAIL)){
+			logMsg = String.format("Step 2 : We were expecting a failure in the first step.",resultingFM,  wfList);
+			logger.debug(logMsg);
+			return;
+		}
+				
 		String resultingFMBis = FM_OUT_PATH + "FMA_TestBis" + testNumber + ".xml";
 		TestHelper.copyFM(sourceFM, resultingFMBis);
 
@@ -154,7 +166,7 @@ public class TestConflictsMetaMerge {
 	}
 
 	@Test
-	@DisplayName("Test referencing a feature omiting one : Steps#F31")
+	@DisplayName("WF1 : Test referencing a feature omiting one : Steps#F31")
 	public void testWF1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF1.bpmn2";
 		File fin = new File(wfPATH);
@@ -167,16 +179,12 @@ public class TestConflictsMetaMerge {
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
 		// Command
-		String[] command = new String[] { "merge", "--meta", "-i ", wfPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		assertTrue(new File(copiedFM).exists());
+		String[] command = commandMetaMerge(wfPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
-		// This test involves managing naming differences using '_' in FM and BPMN
 		logger.debug("added features : %s ", afterList);
-		// System.out.println(afterList);
 		assertEquals(0, afterList.size());
 		// No warning is expected
 		// Check idempotence
@@ -184,7 +192,7 @@ public class TestConflictsMetaMerge {
 	}
 
 	@Test
-	@DisplayName("No Conflict : just to ensure that everything is OK")
+	@DisplayName("WF2 : No Conflict : just to ensure that everything is OK")
 	public void testWF2UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF2.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
@@ -199,7 +207,6 @@ public class TestConflictsMetaMerge {
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
 		String[] command = commandMetaMerge(wfPATH, copiedFM);
-		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
@@ -215,8 +222,9 @@ public class TestConflictsMetaMerge {
 
 	// FIX a warning should be raised
 	// Pas signalé
+	//#F2#F31 is impossible because F31 is already a subfeature if F3
 	@Test
-	@DisplayName("Conflict : F31 can't be in the same time child of F3 and F2 #81 #66")
+	@DisplayName("ToFIX : Conflict : F31 can't be in the same time child of F3 and F2 #81 #66")
 	public void testWF3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF3.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
@@ -246,7 +254,7 @@ public class TestConflictsMetaMerge {
 	}
 
 	@Test
-	@DisplayName("No Conflict : Add 1 Algo at thrird level F3#F31#F311 ")
+	@DisplayName("WF4 :  Add 1 Algo at thrird level F3#F31#F311 ")
 	public void testWF4UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF4.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
@@ -277,12 +285,11 @@ public class TestConflictsMetaMerge {
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
-	// FIX a warning is expected
-	// FA is added but I can't see it ! The FM is probably probably poorly formed
-	// If FA is Added... At least one constraint? or an intermediate node?
+	// FIX a warning is at least expected
+	//We expect FA as a subfeature of F3 and a super feature of F31
 	// Pas signalé
 	@Test
-	@DisplayName("No Conflict : Add  an intermediate step #F3#FA#F31")
+	@DisplayName("ToFIX : WF5 : No Conflict : Add  an intermediate step #F3#FA#F31")
 	public void testWF5UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF5.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
@@ -307,14 +314,15 @@ public class TestConflictsMetaMerge {
 		System.out.println(afterList);
 		assertEquals(1, afterList.size());
 		assertTrue(afterList.contains("FA"));
+		assertTrue(fmAfter.isChildOf("F3","FA"));
+		assertTrue(fmAfter.isChildOf("FA","F31"));
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
-	// FIX FA is lost... Is it the good solution?
-	// Pas signalé.
+	// ToFIX with a warning 
 	@Test
-	@DisplayName(" Conflict? : Add  an intermediate step silently  #FA#F31")
+	@DisplayName(" ToFIX : WF6  a Warning is needed many solution are possible, we cannot choose  #FA#F31")
 	public void testWF6UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF6.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
@@ -345,9 +353,11 @@ public class TestConflictsMetaMerge {
 	}
 	
 	
-
+	//ToFIX : a constraint on a new task (t1 in WF7 [[ MT1 => T1]]) 
+	//that is not in the WF (T1 is nor in the FM, nor in WF7)
+	//and referenced later in another WF (WFT1), should become a known task.
 	@Test
-	@DisplayName(" W7 and WFT1 : ensure that an unmanaged feature disappears when defined in any order")
+	@DisplayName("ToFIX: W7 and WFT1 : ensure that an unmanaged feature disappears when defined in any order")
 	public void testWF7UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wf7PATH = WF_IN_PATH + "WF7.bpmn2";
 		File finWF7 = new File(wf7PATH);
