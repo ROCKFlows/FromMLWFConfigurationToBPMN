@@ -354,13 +354,12 @@ public class TestConflictsMetaMerge {
 		File finWF7 = new File(wf7PATH);
 		assertTrue(finWF7.exists());
 		
-		String sourceFM = DEFAULT_IN_FM;
-		// I make a copy for test
+		String sourceFMPath = DEFAULT_IN_FM;
 		String w7FMPath = FM_OUT_PATH + "FMA_WF7.xml";
-		File w7FMFile = new File(w7FMPath);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, w7FMFile);
-		assertTrue(w7FMFile.exists());
+
+		// I make a copy for test
+		//File w7FMFile = 
+		copyFM(sourceFMPath, w7FMPath);
 		
 		
 		String wfT1PATH = WF_IN_PATH + "WFT1.bpmn2";
@@ -368,7 +367,7 @@ public class TestConflictsMetaMerge {
 		assertTrue(finWFT1.exists());
 		
 
-		FMHelper fmBefore = new FMHelper(w7FMPath);
+		FMHelper fmBefore = new FMHelper(sourceFMPath);
 		// Command
 		String[] command = commandMetaMerge(wf7PATH, w7FMPath);
 
@@ -394,9 +393,8 @@ public class TestConflictsMetaMerge {
 		//Merge now with WFT1 in the resulting FM
 		// I make a copy for test		
 		String wF7_T1_FMPath = FM_OUT_PATH + "FMA_WF7T1.xml";
-		File wF7T1FMFile = new File(wF7_T1_FMPath);
-		FileUtils.copyFile(w7FMFile, wF7T1FMFile);
-		assertTrue(wF7T1FMFile.exists());
+		//File wF7T1FMFile = 
+		copyFM(w7FMPath, wF7_T1_FMPath);
 		
 		
 		command = commandMetaMerge(wfT1PATH, wF7_T1_FMPath);
@@ -418,12 +416,65 @@ public class TestConflictsMetaMerge {
 		// Check idempotence
 		TestHelper.checkIdempotence(wF7_T1_FMPath, command);
 		//FIX
-		// fmAfter_WF7_T1.
+		assertTrue(fmAfter_WF7_T1.isChildOf("Steps", "T1"));
+	
+		
+		
+		
 		//TODO
+		logMsg = String.format("-------NOW MERGE T1 then WF7 ");
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		
 		//Merge T1 then merge F7
+		
 		//We expect equivalent FM
+		String wT1FMPath = FM_OUT_PATH + "FMA_WFT1.xml";
+		copyFM(sourceFMPath, wT1FMPath);
+		
+		command = commandMetaMerge(wfT1PATH, wT1FMPath);
+		FMHelper fmAfterWFT1 = new FMHelper(wT1FMPath);
+
+		// General Properties to check
+		afterList = TestHelper.nothingLost(fmBefore, fmAfterWFT1, wT1FMPath);
+		logMsg = String.format("added features : %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		//T1
+		assertEquals(1, afterList.size());
 		
 
+		String wT1_7FMPath = FM_OUT_PATH + "FMA_WFT1_7.xml";
+		copyFM(wT1FMPath, wT1_7FMPath);
+		command = commandMetaMerge(wf7PATH, wT1_7FMPath);
+		FMHelper fmAfterWFT1_7 = new FMHelper(wT1_7FMPath);
+		
+		// General Properties to check
+		afterList = TestHelper.nothingLost(fmAfterWFT1, fmAfterWFT1_7, wf7PATH);
+		logMsg = String.format("added features after adding W7 in FMA_T1: %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		//MT1, MT2, MT3,
+		assertEquals(3, afterList.size());
+		//[[ MT1 => T1]]
+		 constraints = fmAfterWFT1_7 .getConstraintList();
+		logMsg = String.format("added constraints : %s ", constraints);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		assertEquals(1, constraints.size());
+	
+				
+		// FIX
+		TestHelper.compare(wF7_T1_FMPath, wT1_7FMPath);
+
+	}
+
+	private File copyFM(String sourceFMPath, String targetFMPath) throws IOException {
+		File w7FMFile = new File(targetFMPath);
+		File sourceFile = new File(sourceFMPath);
+		FileUtils.copyFile(sourceFile, w7FMFile);
+		assertTrue(w7FMFile.exists());
+		return w7FMFile;
 	}
 
 	private String[] commandMetaMerge(String wfPATH, String copiedFM) {

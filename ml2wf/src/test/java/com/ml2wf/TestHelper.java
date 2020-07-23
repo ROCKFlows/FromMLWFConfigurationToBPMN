@@ -95,6 +95,20 @@ public class TestHelper {
 
 	private static void testTasksAgainstFeatures(List<String> afterList, String wfPATH)
 			throws ParserConfigurationException, SAXException, IOException {
+		File wfFile = new File(wfPATH);
+		//TODO improve error managmenet
+		if (! wfFile.exists())
+			throw new IOException("Unexpected to check task against feature in a non-existing WF");
+		else {
+			if (wfFile.isDirectory()) {
+				String logMsg = String.format("TODO Checks in a directory %s ", wfPATH);
+				logger.debug(logMsg);
+				System.out.println(logMsg);
+				return;
+			}
+			
+		}
+			
 		WFHelper wf = new WFHelper(wfPATH);
 		List<String> tasks = wf.gettaskNameList();
 		tasks = normalizeAllTasks(tasks);

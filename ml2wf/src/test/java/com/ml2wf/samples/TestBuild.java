@@ -47,7 +47,7 @@ public class TestBuild {
 	@Test
 	@DisplayName("Build0 ")
 	public void testBuild0UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		String root = SAMPLE_PATH + "build0";
+		String root = SAMPLE_PATH + "build0/";
 		
 		String metaDirectory = root + "wf_meta";
 		File dInMeta = new File(metaDirectory);
@@ -70,19 +70,15 @@ public class TestBuild {
 
 		// General Properties to check
 		List<String> afterListMeta = TestHelper.nothingLost(fmBefore, fmAfter, metaDirectory);
-		List<String> afterListInstance = TestHelper.nothingLost(fmBefore, fmAfter, instanceDirectory);
+		//List<String> afterListInstance = 
+				TestHelper.nothingLost(fmBefore, fmAfter, instanceDirectory);
 		// This test involves managing naming differences using '_' in FM and BPMN
 		//F31, F2, 
 		//F311 (WF4), T1 (WFT1), T2(WFT1T2)
-		String logMsg = String.format("added meta features : %s ", afterListMeta);
-		logMsg = String.format("added meta feature : %s ", afterListMeta);
+		String logMsg = String.format("added features : %s ", afterListMeta);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
-		
-		logMsg = String.format("added instance features : %s ", afterListInstance);
-		logMsg = String.format("added meta feature : %s ", afterListInstance);
-		logger.debug(logMsg);
-		System.out.println(logMsg);
+
 		
 
 		// Specific properties
