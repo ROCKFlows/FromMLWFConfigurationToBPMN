@@ -13,9 +13,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Node;
 
+import com.ml2wf.conflicts.ConflictSolver;
+import com.ml2wf.conflicts.ConflictsManager;
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -50,6 +54,10 @@ public final class TasksManager {
 	 * {@code Set} containing all {@code WFTask}.
 	 */
 	private static Set<WFTask<?>> wfTasks = new HashSet<>();
+	/**
+	 * The manager dedicated to the conflict resolution.
+	 */
+	private static ConflictSolver<WFTask<?>> conflictManager = new ConflictsManager<>();
 	/**
 	 * Logger instance.
 	 *
@@ -236,29 +244,38 @@ public final class TasksManager {
 	 *
 	 * @return if the {@code TasksManager} did not already contain the given
 	 *         {@code task}
+	 * @throws UnresolvedConflict
+	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see Task
 	 */
-	public static <T extends Task<?>> boolean addTask(T task) {
+	public static <T extends Task<?>> boolean addTask(T task) throws InvalidTaskException, UnresolvedConflict {
 		if (task == null) {
 			return false;
 		}
+		String taskName = task.getName();
 		if (task instanceof FMTask) {
 			removeIfNullParent((FMTask) task);
 			return fmTasks.add((FMTask) task);
 		} else {
+			WFTask<?> wfTask = (WFTask<?>) task;
 			// applying filters
-			if (!removeIfEmptyRef((WFTask<?>) task) && removeIfPrioritizeConcrete((WFTask<?>) task)) {
+			if (!removeIfEmptyRef(wfTask) && removeIfPrioritizeConcrete(wfTask)) {
 				// we have to update the corresponding FMTask's abstract status
-				Optional<FMTask> optFmTask = TasksManager.getFMTaskWithName(task.getName());
+				Optional<FMTask> optFmTask = TasksManager.getFMTaskWithName(taskName);
 				if (optFmTask.isPresent()) {
 					FMTask fmTask = optFmTask.get();
 					logger.info("Changing {}'s abstract status from true to false", fmTask);
 					fmTask.setAbstract(false);
 				}
 			}
-			return wfTasks.add((WFTask<?>) task);
+			// detecting and resolving conflicts
+			Optional<WFTask<?>> existingWFTask = getWFTaskWithName(taskName);
+			if (existingWFTask.isPresent() && conflictManager.areInConflict(existingWFTask.get(), wfTask)) {
+				wfTask = conflictManager.solve(existingWFTask.get(), wfTask);
+			}
+			return wfTasks.add(wfTask);
 		}
 	}
 

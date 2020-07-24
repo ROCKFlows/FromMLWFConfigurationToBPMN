@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
@@ -66,18 +67,18 @@ public final class WFInstanceMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, InvalidTaskException {
+	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, InvalidTaskException, UnresolvedConflict {
 		return this.getReferredFMTask(task, unmanagedGlobalTasks.get(UNMANAGED_TASKS));
 	}
 
 	@Override
-	public FMTask getRootParentNode() throws MergeException, InvalidTaskException {
+	public FMTask getRootParentNode() throws MergeException, InvalidTaskException, UnresolvedConflict {
 		return this.getGlobalFMTask(INSTANCES_TASK);
 	}
 
 	@Override
 	public void processSpecificNeeds(Pair<String, Document> wfInfo)
-			throws InvalidConstraintException, InvalidTaskException {
+			throws InvalidConstraintException, InvalidTaskException, UnresolvedConflict {
 		Document wfDocument = wfInfo.getValue();
 		logger.debug("Specific need : meta reference.");
 		String metaReferrence = this.getMetaReferenced(wfDocument);

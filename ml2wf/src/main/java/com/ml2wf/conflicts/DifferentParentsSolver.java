@@ -5,10 +5,12 @@ import org.apache.logging.log4j.Logger;
 
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.tasks.base.WFTask;
-import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.tasks.exceptions.InvalidTaskException;
 
 public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolver<T> {
+
+	private static final String NO_REF_ERROR = "Can't resolve a conflict involving a WFTask (%s) without reference.";
+	private static final String NO_SOLUTION_ERROR = "Can't find a solution for %s (parent=%s) and %s (parent=%s) having different parents.";
 
 	/**
 	 * Logger instance.
@@ -23,30 +25,30 @@ public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolv
 	}
 
 	@Override
-	public T solve(FMTask fmTask, T wfTask) throws InvalidTaskException, UnresolvedConflict {
-		if (!this.areInConflict(fmTask, wfTask)) {
-			return wfTask;
-		}
-		logger.warn("Conflict detected implying {} (in FM) and {} (in WF) : They have different parents.", fmTask,
-				wfTask);
+	public T solve(T taskA, T taskB) throws InvalidTaskException, UnresolvedConflict {
+		this.checkRequirements(taskA, taskB);
+		logger.warn("Conflict detected implying {} (parent={}) and {} (parent={}) : They have different parents.",
+				taskA, taskA.getReference(), taskB, taskB.getReference());
 		throw new UnresolvedConflict(
-				String.format("Can't find a solution for %s and %s having different parents.", fmTask, wfTask));
+				String.format(NO_SOLUTION_ERROR, taskA, taskA.getReference(), taskB, taskB.getReference()));
 	}
 
 	@Override
-	public boolean areInConflict(FMTask fmTask, T wfTask) throws InvalidTaskException {
-		this.checkRequirements(fmTask, wfTask);
-		return !fmTask.getParent().getName().equals(wfTask.getReference());
+	public boolean areInConflict(T taskA, T taskB) throws InvalidTaskException {
+		this.checkRequirements(taskA, taskB);
+		return !taskA.getReference().equals(taskB.getReference());
 	}
 
-	private void checkRequirements(FMTask fmTask, T wfTask) throws InvalidTaskException {
-		if (fmTask.getParent() == null) {
+	private void checkRequirements(T taskA, T taskB) throws InvalidTaskException {
+		String taskARef = taskA.getReference();
+		if ((taskARef == null) || taskARef.isBlank()) {
 			throw new InvalidTaskException(
-					String.format("Can't solve a conflict involving a FMTask (%s) without parent.", fmTask));
+					String.format(NO_REF_ERROR, taskA));
 		}
-		if (wfTask.getReference().isBlank()) {
+		String taskBRef = taskB.getReference();
+		if ((taskBRef == null) || taskBRef.isBlank()) {
 			throw new InvalidTaskException(
-					String.format("Can't solve a conflict involving a WFTask (%s) without reference.", wfTask));
+					String.format(NO_REF_ERROR, taskB));
 		}
 	}
 

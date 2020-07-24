@@ -7,10 +7,13 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
+import com.ml2wf.merge.base.BaseMergerImpl;
+import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
@@ -52,7 +55,7 @@ public class TaskFactoryImpl implements TaskFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Task<?>> T createTask(Node node) throws InvalidTaskException {
+	public <T extends Task<?>> T createTask(Node node) throws InvalidTaskException, UnresolvedConflict {
 		String tagName = node.getNodeName();
 		String nodeName = XMLManager.getNodeName(node);
 		nodeName = XMLManager.sanitizeName(nodeName);
@@ -61,7 +64,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	}
 
 	@Override
-	public FMTask convertWFtoFMTask(WFTask<?> task) throws InvalidTaskException {
+	public FMTask convertWFtoFMTask(WFTask<?> task) throws InvalidTaskException, UnresolvedConflict {
 		FMTask createdFMTask = new FMTask(task, false);
 		createdFMTask.setNode(AbstractMerger.createFeatureWithAbstract(createdFMTask.getName(), task.isAbstract()));
 		createdFMTask.addAllSpecs(task.getSpecs());
@@ -76,11 +79,12 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @param node node of the new task
 	 * @return a new {@code FMTask} considering the given arguments
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	private FMTask createFMTask(String name, Node node) throws InvalidTaskException {
+	private FMTask createFMTask(String name, Node node) throws InvalidTaskException, UnresolvedConflict {
 		return new FMTask(name, node, isFMAbstract(node));
 	}
 
@@ -91,16 +95,18 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @param node node of the new task
 	 * @return a new {@code WFTask} considering the given arguments
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 * @throws TaskFactoryException
 	 *
 	 * @since 1.0
 	 * @see WFTask
 	 */
-	private WFTask<?> createWFTask(String name, Node node) throws InvalidTaskException {
+	private WFTask<?> createWFTask(String name, Node node) throws InvalidTaskException, UnresolvedConflict {
 		// TODO: change created type considering user convention (e.g. BPMN)
 		Optional<String> optRefName = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
 		boolean isAbstract = AbstractMerger.getProperty((Element) node, BPMNNames.PROPERTY.getName()).isEmpty();
-		BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract, optRefName.orElse(""));
+		BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract,
+				optRefName.orElse((isAbstract) ? WFMetaMerger.STEP_TASK : BaseMergerImpl.UNMANAGED_TASKS));
 		createdFMTask.applySpecs();
 		return createdFMTask;
 	}
