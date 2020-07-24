@@ -518,7 +518,6 @@ public abstract class AbstractMerger extends XMLManager {
 	public static <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task)
 			throws InvalidTaskException, UnresolvedConflict {
 		logger.debug("Inserting task : {}", task.getName());
-		System.out.println("Inserting task : " + task.getName() + " under : " + parentTask.getName());
 		// inserting the new node
 		FMTask childTask = (task instanceof FMTask) ? (FMTask) task
 				: taskFactory.convertWFtoFMTask((WFTask<?>) task);
