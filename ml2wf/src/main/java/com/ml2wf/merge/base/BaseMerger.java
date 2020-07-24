@@ -67,7 +67,6 @@ public interface BaseMerger {
 	 * @return a suitable parent {@code FMTask} for the given {@code WFTask}
 	 * @throws MergeException
 	 * @throws InvalidTaskException
-	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see FMTask
@@ -89,11 +88,12 @@ public interface BaseMerger {
 	 *         or instance)
 	 * @throws MergeException
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	public abstract FMTask getRootParentNode() throws MergeException, InvalidTaskException;
+	public abstract FMTask getRootParentNode() throws MergeException, InvalidTaskException, UnresolvedConflict;
 
 	/**
 	 * Processes specific needs to complete the merge operation.

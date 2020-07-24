@@ -59,7 +59,7 @@ public final class WFMetaMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public FMTask getRootParentNode() throws MergeException, InvalidTaskException {
+	public FMTask getRootParentNode() throws MergeException, InvalidTaskException, UnresolvedConflict {
 		return this.getGlobalFMTask(META_TASK);
 	}
 

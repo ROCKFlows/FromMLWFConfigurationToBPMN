@@ -1,14 +1,13 @@
 package com.ml2wf.conflicts;
 
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
-import com.ml2wf.tasks.base.WFTask;
-import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.exceptions.InvalidTaskException;
 
-public interface ConflictSolver<T extends WFTask<?>> {
+public interface ConflictSolver<T extends Task<?>> {
 
-	public T solve(FMTask fmTask, T wfTask) throws InvalidTaskException, UnresolvedConflict;
+	public T solve(T taskA, T taskB) throws InvalidTaskException, UnresolvedConflict;
 
-	public boolean areInConflict(FMTask fmTask, T wfTask) throws InvalidTaskException;
+	public boolean areInConflict(T taskA, T taskB) throws InvalidTaskException;
 
 }

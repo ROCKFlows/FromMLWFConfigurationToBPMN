@@ -16,6 +16,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.config.ConfigImpl;
 import com.ml2wf.constraints.config.DefaultConfig;
@@ -180,12 +181,14 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @return a generated {@code Node} containing all constraints nodes
 	 * @throws InvalidConstraintException
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
 	@Override
-	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException, InvalidTaskException {
+	public List<Node> getRuleNodes(String constraintText)
+			throws InvalidConstraintException, InvalidTaskException, UnresolvedConflict {
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 		for (BinaryTree<String> tree : trees) {
@@ -227,10 +230,11 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 *
 	 * @param tree tree to manage missing criterias
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 */
-	private void managedMissingCriterias(BinaryTree<String> tree) throws InvalidTaskException {
+	private void managedMissingCriterias(BinaryTree<String> tree) throws InvalidTaskException, UnresolvedConflict {
 		Set<String> taskNames = TasksManager.getTasks().stream().map(Task::getName).collect(Collectors.toSet());
 		List<String> treeNodes = tree.getAllNodes().stream().filter(n -> (n != null) && !this.config.isAnOperator(n))
 				.collect(Collectors.toList());

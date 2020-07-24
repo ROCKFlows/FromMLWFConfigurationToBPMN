@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,6 +20,7 @@ import org.xml.sax.SAXException;
 
 import com.ml2wf.conflicts.ConflictSolver;
 import com.ml2wf.conflicts.ConflictsManager;
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactory;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
@@ -253,12 +253,14 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param isAbstract whether the wished created feature must be abstract or not
 	 * @return a new feature ({@code FMTask}) with the given {@code name}
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 * @throws TaskFactoryException
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	protected static FMTask createFMTaskWithName(String name, boolean isAbstract) throws InvalidTaskException {
+	protected static FMTask createFMTaskWithName(String name, boolean isAbstract)
+			throws InvalidTaskException, UnresolvedConflict {
 		return (FMTask) taskFactory.createTask(createFeatureWithAbstract(name, isAbstract));
 	}
 
@@ -507,13 +509,16 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param task       task to insert
 	 * @return the added child
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see Task
 	 * @see FMTask
 	 */
-	public static <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) throws InvalidTaskException {
+	public static <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task)
+			throws InvalidTaskException, UnresolvedConflict {
 		logger.debug("Inserting task : {}", task.getName());
+		System.out.println("Inserting task : " + task.getName() + " under : " + parentTask.getName());
 		// inserting the new node
 		FMTask childTask = (task instanceof FMTask) ? (FMTask) task
 				: taskFactory.convertWFtoFMTask((WFTask<?>) task);
@@ -543,11 +548,13 @@ public abstract class AbstractMerger extends XMLManager {
 	 *                   annotations.
 	 * @throws InvalidConstraintException
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see ConstraintFactory
 	 */
-	protected void processAnnotations(List<Node> annotations) throws InvalidConstraintException, InvalidTaskException {
+	protected void processAnnotations(List<Node> annotations)
+			throws InvalidConstraintException, InvalidTaskException, UnresolvedConflict {
 		logger.info("Processing annotations...");
 		List<Pair<FMTask, Node>> orderPairs; // pair that will contain order constraint data
 		for (Node annotation : annotations) {
@@ -582,11 +589,12 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param tasks  {@code Set<Task>} containing all workflow's tasks
 	 * @throws InvalidConstraintException
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 */
-	protected <T extends Task<?>> void processAssocConstraints(String wfName, Set<T> tasks)
-			throws InvalidConstraintException, InvalidTaskException {
+	protected <T extends Task<?>> void processAssocConstraints(String wfName, List<T> tasks)
+			throws InvalidConstraintException, InvalidTaskException, UnresolvedConflict {
 		String logMsg;
 		logger.debug("Retrieving all FM document tasks...");
 		List<String> tasksNames = tasks.stream().map(Task::getName)

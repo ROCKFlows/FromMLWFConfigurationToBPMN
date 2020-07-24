@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.tasks.base.Task;
@@ -52,11 +53,14 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 */
-	public FMTask(String name, FMTask parent, Node node, boolean isAbstract) throws InvalidTaskException {
+	public FMTask(String name, FMTask parent, Node node, boolean isAbstract)
+			throws InvalidTaskException, UnresolvedConflict {
 		super(name, node);
 		this.parent = parent;
 		this.setAbstract(isAbstract);
+		TasksManager.addTask(this); // add the new task to the manager
 	}
 
 	/**
@@ -71,10 +75,12 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 */
-	public FMTask(String name, Node node, boolean isAbstract) throws InvalidTaskException {
+	public FMTask(String name, Node node, boolean isAbstract) throws InvalidTaskException, UnresolvedConflict {
 		super(name, node);
 		this.setAbstract(isAbstract);
+		TasksManager.addTask(this); // add the new task to the manager
 	}
 
 	/**
@@ -95,9 +101,10 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param saveParent whether the result task should save the given
 	 *                   {@code task}'s parent as its own parent or not.
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 * @see WFTask
 	 */
-	public FMTask(WFTask<?> task, boolean saveParent) throws InvalidTaskException {
+	public FMTask(WFTask<?> task, boolean saveParent) throws InvalidTaskException, UnresolvedConflict {
 		super(task.getName(), task.getNode());
 		this.setAbstract(task.isAbstract());
 		if (saveParent) {
