@@ -164,7 +164,8 @@ public class TestSamplesInstanceMerge {
 		String logMsg = String.format("addedFeatures: %s ", addedFeatures);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
-
+		//Just to already fail 
+		 assertTrue(addedFeatures.size()>5);
 		// Preprocessing_step0 refersTo: Preprocessing_step
 		// #Preprocess_data#Missing_value#Mean refersTo:Preprocessing STep
 		// Training_step_1 refersTo: Training_step

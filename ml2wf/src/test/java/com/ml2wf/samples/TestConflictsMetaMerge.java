@@ -100,7 +100,7 @@ public class TestConflictsMetaMerge {
 	// We're waiting for a warning because this merge can't be completed...
 	// But we don't have to fix this way
 	@Test
-	@DisplayName("ToFIx still warning Test 6 in #147 : #f2#f3 + #f1#f3 fails because we don't know the order between f2 and f1 ")
+	@DisplayName("ToFIxX still warning Test 6 in #147 : #f2#f3 + #f1#f3 fails because we don't know the order between f2 and f1 ")
 	public void test6UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// FIX
@@ -220,7 +220,7 @@ public class TestConflictsMetaMerge {
 	// Pas signalé
 	// #F2#F31 is impossible because F31 is already a subfeature if F3
 	@Test
-	@DisplayName("ToFIX still no Warning: Conflict : F31 can't be in the same time child of F3 and F2 #81 #66")
+	@DisplayName("ToFIXX still no Warning: Conflict : T3 :  F31 can't be in the same time child of F3 and F2 #81 #66")
 	public void testWF3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF3.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
