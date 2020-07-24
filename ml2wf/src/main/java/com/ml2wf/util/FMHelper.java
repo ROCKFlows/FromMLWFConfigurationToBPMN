@@ -316,5 +316,74 @@ public class FMHelper {
 		return document;
 	}
 
+	//To think about
+	//Precondition : The root already exists in the FM
+	private boolean addRelatedFeatures(String feature, String newParent, String root) {
+		if (isFeature(newParent)) {
+			if (isFeature(feature)) {
+				return bothFeaturesExist(feature, newParent);
+			}
+			else { //feature is a new feature
+				addFeature(feature, newParent);
+				return true;
+				}
+		}
+		else {//Parent Feature is new
+			if (isFeature(feature)) {
+				if (isDirectChildOf(root, feature)) {
+					//we can have #root#newParent#Feature
+					addFeature(newParent, root);
+					moveTo(feature,newParent);
+					return true;
+				}
+				else { 
+					//Between # CurrentParent and parent there is no order relationship
+					//suggest to add an order relationship
+					return false;
+				}
+			}
+			else { //Both feature are new
+				addFeature(newParent, root);
+				addFeature(feature, newParent);
+				return true;
+			}
+		}
+	}
+	
+				
+
+
+	private boolean bothFeaturesExist(String feature, String newParent) {
+		//newParent#Feature is valid => newParent#currentParent is valid
+		if (isChildOf(newParent, feature))
+			return true;
+		
+		String currentParent = getParent(feature);
+		//parent#newParent is valid but not yet newParent#Feature : we can move
+		if (isChildOf(currentParent, newParent)) {
+			moveTo(feature,newParent);
+			return true;
+		}
+		else { //parent#newparent is non valid, we can't move 
+			//suggest to define an order relation between newParent and parent
+			return false;
+		}
+
+	}
+
+	private void addFeature(String feature2, String newParent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void moveTo(String feature2, String newParent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private String getParent(String feature2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

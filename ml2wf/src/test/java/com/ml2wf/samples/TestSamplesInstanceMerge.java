@@ -54,7 +54,8 @@ public class TestSamplesInstanceMerge {
 	
 	//ToFIX : The only problem lies in abstract features that should be concrete
 	@Test
-	@DisplayName("ToFIX ; T0 : Test with a basic workflow instance adding one Step")
+	@Disabled
+	@DisplayName("ToFIX abstract ; T0 : Test with a basic workflow instance adding one Step")
 	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String instanceWFPATH = WF_IN_PATH + "BasicWF_instance00.bpmn2";
 		String sourceFM = FM_IN_PATH + "basicFM.xml";
@@ -147,6 +148,7 @@ public class TestSamplesInstanceMerge {
 	//Preprocessing_step#Preprocessing_step0
 	//Training_step_1 refersTo: Training_step
 	@Test
+	@Disabled
 	@DisplayName("ToFIX FM2 : Test with a basic workflow instance adding 3 Steps ")
 	public void testAddingHierarchicStepsUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {

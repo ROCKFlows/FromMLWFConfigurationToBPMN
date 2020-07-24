@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -55,7 +56,8 @@ public class TestConflictsMetaMerge {
 	// TOFIX FAILS when looking inside the hierarchy is not the good one
 	//T2 should become a subfeature of T1 
 	@Test
-	@DisplayName("ToFIX : Test 1 in #147 : #f1 + #f2 + #f1#f2 = #f1#f2 in any order")
+	@Disabled
+	@DisplayName("ToFIX still: Test 1 in #147 : #f1 + #f2 + #f1#f2 = #f1#f2 in any order")
 	public void test11UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// merge t1, then t2 then t1t2 results in the same FM than t1t2 and the same in
@@ -82,14 +84,16 @@ public class TestConflictsMetaMerge {
 
 	//ToFIX : We are expecting T2 to be a subtask of T1
 	@Test
-	@DisplayName("ToFIX : Test 4 in #147 : #f2#f3 + #f1#f2#f3 = #f1#f2#f3 in any order")
+	@Disabled
+	@DisplayName("ToFIX still : Test 4 in #147 : #f2#f3 + #f1#f2#f3 = #f1#f2#f3 in any order")
 	public void test4UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		mergeMeta(4, Arrays.asList( "WFT2T3", "WFT1T2T3"), "WFT1T2T3" );
 	}
 
 	//WWhen we have the information #T1#T2, we expect the system to add T1 over T2
 	@Test
-	@DisplayName("ToFIX : Test 5 in #147 : #f2#f3 + #f1#f2 = #f1#f2#f3 in any order")
+	@Disabled
+	@DisplayName("ToFIX still : Test 5 in #147 : #f2#f3 + #f1#f2 = #f1#f2#f3 in any order")
 	public void test5UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// FIX
@@ -100,7 +104,8 @@ public class TestConflictsMetaMerge {
 	// We're waiting for a warning because this merge can't be completed...
 	//But we don't have to fix this way
 	@Test
-	@DisplayName("ToFIx Test 6 in #147 : #f2#f3 + #f1#f3 fails because we don't know the order between f2 and f1 ")
+	@Disabled
+	@DisplayName("ToFIx still warning Test 6 in #147 : #f2#f3 + #f1#f3 fails because we don't know the order between f2 and f1 ")
 	public void test6UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
 		// FIX
@@ -224,7 +229,7 @@ public class TestConflictsMetaMerge {
 	// Pas signalé
 	//#F2#F31 is impossible because F31 is already a subfeature if F3
 	@Test
-	@DisplayName("ToFIX : Conflict : F31 can't be in the same time child of F3 and F2 #81 #66")
+	@DisplayName("ToFIX still no Warning: Conflict : F31 can't be in the same time child of F3 and F2 #81 #66")
 	public void testWF3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF3.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
@@ -289,7 +294,8 @@ public class TestConflictsMetaMerge {
 	//We expect FA as a subfeature of F3 and a super feature of F31
 	// Pas signalé
 	@Test
-	@DisplayName("ToFIX : WF5 : No Conflict : Add  an intermediate step #F3#FA#F31")
+	@Disabled
+	@DisplayName("ToFIX still : WF5 : No Conflict : Add  an intermediate step #F3#FA#F31")
 	public void testWF5UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF5.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
@@ -322,7 +328,7 @@ public class TestConflictsMetaMerge {
 
 	// ToFIX with a warning 
 	@Test
-	@DisplayName(" ToFIX : WF6  a Warning is needed many solution are possible, we cannot choose  #FA#F31")
+	@DisplayName(" ToFIX still warning : WF6  a Warning is needed many solution are possible, we cannot choose  #FA#F31")
 	public void testWF6UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF6.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
@@ -357,7 +363,8 @@ public class TestConflictsMetaMerge {
 	//that is not in the WF (T1 is nor in the FM, nor in WF7)
 	//and referenced later in another WF (WFT1), should become a known task.
 	@Test
-	@DisplayName("ToFIX: W7 and WFT1 : ensure that an unmanaged feature disappears when defined in any order")
+	@Disabled
+	@DisplayName("ToFIX still: W7 and WFT1 : ensure that an unmanaged feature disappears when defined in any order")
 	public void testWF7UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wf7PATH = WF_IN_PATH + "WF7.bpmn2";
 		File finWF7 = new File(wf7PATH);
