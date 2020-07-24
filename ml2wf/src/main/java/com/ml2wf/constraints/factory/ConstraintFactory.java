@@ -52,7 +52,7 @@ public interface ConstraintFactory {
 
 	/**
 	 * Returns an <b>implication</b> association of the {@code globalTask} with the
-	 * {@code tasksNames}.
+	 * {@code tasks}.
 	 *
 	 * <p>
 	 *
@@ -60,7 +60,7 @@ public interface ConstraintFactory {
 	 * {@code DefaultConfig}'s symbols.
 	 *
 	 * @param globalTask global task
-	 * @param tasksNames tasks implied by the {@code global task}
+	 * @param tasksNames names of the implied tasks by the {@code global task}
 	 * @return an implication association of the {@code globalTask} with the
 	 *         {@code tasksNames}
 	 */
