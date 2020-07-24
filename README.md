@@ -144,7 +144,7 @@ java -jar ml2wf.jar merge --instance -f -i result/my_wf_instance.bpmn2 -o featur
 > *Note that the -f argument will merge the meta/instance relationship*
 
 > *Beware a merge-instance only works properly if you use a generated workflow.
-Indeed in the XML (and not directly visible) _<bpmn2:property id="Property_1" name="instance"/></bpmn2:task>_ gives information about the fact that the task must be considered as an instance, which will transform it into a concrete Feature.*
+Indeed in the XML (and not directly visible) _<bpmn2:property id="Property_1" name="instance"/></bpmn2:task>_ gives information about the fact that the task must be considered as an instance, which will transform it into a concrete Feature. You can see the properties of a task by double-clicking on it.*
 
 
 
