@@ -15,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -49,30 +48,28 @@ public class TestConflictsInstanceMerge {
 	public void clean() {
 	}
 
-	
 	@Test
 	@DisplayName("T1 : just to ensure equivalence between refersTo and #")
 	public void testWFInstance1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		//Get the wf instance
+		// Get the wf instance
 		String wfPATH = WF_IN_PATH + "WF1_instance.bpmn2";
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
 
-		// Copy  the initial FM for test
+		// Copy the initial FM for test
 		String sourceFM = DEFAULT_IN_FM;
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF1_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
 		FMHelper fmBefore = new FMHelper(copiedFMPath);
 
-		//Call the merge
-		String[] command = commandMergeInstance(wfPATH, copiedFMPath);
-		
-		
+		// Call the merge
+		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
+
 		FMHelper fmAfter = new FMHelper(copiedFMPath);
 
 		// General Properties to check
-		
+
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
@@ -121,7 +118,6 @@ public class TestConflictsInstanceMerge {
 
 	// Todo : test the presence of a warning
 	@Test
-	@Disabled
 	@DisplayName("ToFIXAbstract Warning : refer to a task known as abstract")
 	public void testWFInstance2UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF2_instance.bpmn2";
@@ -134,7 +130,7 @@ public class TestConflictsInstanceMerge {
 		TestHelper.copyFM(sourceFM, copiedFM);
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
-		String[] command = commandMergeInstance(wfPATH, copiedFM);
+		String[] command = this.commandMergeInstance(wfPATH, copiedFM);
 
 		assertTrue(new File(copiedFM).exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -149,13 +145,12 @@ public class TestConflictsInstanceMerge {
 		// Specific properties
 		// No features are added
 		assertEquals(0, afterList.size());
-		//FIX
+		// FIX
 		assertFalse(fmAfter.isAbstract("F31"));
 	}
 
 	// ToFIX : F32 should be concrete
 	@Test
-	@Disabled
 	@DisplayName("ToFIXAbstract: T3 : an unreferenced task is stored in the FM")
 	public void testWFInstance3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF3_instance.bpmn2";
@@ -168,7 +163,7 @@ public class TestConflictsInstanceMerge {
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
 		FMHelper fmBefore = new FMHelper(copiedFMPath);
-		String[] command = commandMergeInstance(wfPATH, copiedFMPath);
+		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
 
 		assertTrue(new File(copiedFMPath).exists());
 		FMHelper fmAfter = new FMHelper(copiedFMPath);
@@ -188,196 +183,193 @@ public class TestConflictsInstanceMerge {
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFMPath, command);
 	}
-	
+
 	@Test
 	@DisplayName("WF4 : to test introduction of a new criteria : F31_0 => criteria31_0 ")
 	public void testWF4nstance1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		//Get the wf instance
+		// Get the wf instance
 		String wfPATH = WF_IN_PATH + "WF4_instance.bpmn2";
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
 
-		// Copy  the initial FM for test
+		// Copy the initial FM for test
 		String sourceFM = DEFAULT_IN_FM;
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF4_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
 		FMHelper fmBefore = new FMHelper(copiedFMPath);
 
-		//Call the merge
-		String[] command = commandMergeInstance(wfPATH, copiedFMPath);
-		
-		
+		// Call the merge
+		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
+
 		FMHelper fmAfter = new FMHelper(copiedFMPath);
 
 		// General Properties to check
-		
+
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 
 		// Specific properties
-		//F31_0, Unmanaged, unmanagedCriteria, criteria
+		// F31_0, Unmanaged, unmanagedCriteria, criteria
 		assertEquals(4, afterList.size());
 		assertTrue(fmAfter.isChildOf("F31", "F31_0"));
-		//Test constraints
+		// Test constraints
 		List<String> constraints = fmAfter.getConstraintList();
 		logMsg = String.format("constraints: %s ", constraints);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		assertEquals(1, constraints.size());
-		//TODO : improve tests
-		
+		// TODO : improve tests
+
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFMPath, command);
 	}
-	
-	
+
 	@Test
 	@DisplayName("WF5 : to test introduction of a set of tasks refering to the same meta-task and a set of constraints between them : F31_0 => F31_1 and F31_1 => F31_2; ")
 	public void testWF5nstance1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		//Get the wf instance
+		// Get the wf instance
 		String wfPATH = WF_IN_PATH + "WF5_instance.bpmn2";
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
 
-		// Copy  the initial FM for test
+		// Copy the initial FM for test
 		String sourceFM = DEFAULT_IN_FM;
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF5_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
 		FMHelper fmBefore = new FMHelper(copiedFMPath);
 
-		//Call the merge
-		String[] command = commandMergeInstance(wfPATH, copiedFMPath);
-		
-		
+		// Call the merge
+		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
+
 		FMHelper fmAfter = new FMHelper(copiedFMPath);
 
 		// General Properties to check
-		
+
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 
 		// Specific properties
-		//F31_0 1 and 2
+		// F31_0 1 and 2
 		assertEquals(3, afterList.size());
 		assertTrue(fmAfter.isChildOf("F31", "F31_0"));
 		assertTrue(fmAfter.isChildOf("F31", "F31_1"));
 		assertTrue(fmAfter.isChildOf("F31", "F31_2"));
-		//Test constraints
+		// Test constraints
 		List<String> constraints = fmAfter.getConstraintList();
 		logMsg = String.format("constraints: %s ", constraints);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		assertEquals(2, constraints.size());
-		//TODO : improve tests
-		
+		// TODO : improve tests
+
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFMPath, command);
 	}
-	
+
 	@Test
-	/*[[  F31_0 => F31_1 ]]
-			[[   F31_0 => F31_2 ]]
-			[[   F32_0 => criteria32 ]]
-			[[   criteria33 => F33_0 ]]
-	*/
+	/*
+	 * [[ F31_0 => F31_1 ]]
+	 * [[ F31_0 => F31_2 ]]
+	 * [[ F32_0 => criteria32 ]]
+	 * [[ criteria33 => F33_0 ]]
+	 */
 	@DisplayName("WF6 : to test constraints between non existing features ")
 	public void testWF6nstance1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		//Get the wf instance
+		// Get the wf instance
 		String wfPATH = WF_IN_PATH + "WF6_instance.bpmn2";
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
 
-		// Copy  the initial FM for test
+		// Copy the initial FM for test
 		String sourceFM = DEFAULT_IN_FM;
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF6_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
 		FMHelper fmBefore = new FMHelper(copiedFMPath);
 
-		//Call the merge
-		String[] command = commandMergeInstance(wfPATH, copiedFMPath);
-		
-		
+		// Call the merge
+		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
+
 		FMHelper fmAfter = new FMHelper(copiedFMPath);
 
 		// General Properties to check
-		
+
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 
 		// Specific properties
-		//F31_0 1 and 2 + + F32_0 + F33_0 criteria32 criteria33 and then unmanaged and unmanaged_features 
+		// F31_0 1 and 2 + + F32_0 + F33_0 criteria32 criteria33 and then unmanaged and
+		// unmanaged_features
 		assertEquals(9, afterList.size());
 		assertTrue(fmAfter.isChildOf("F31", "F31_0"));
 		assertTrue(fmAfter.isChildOf("F31", "F31_1"));
 		assertTrue(fmAfter.isChildOf("F31", "F31_2"));
-		//Test constraints
+		// Test constraints
 		List<String> constraints = fmAfter.getConstraintList();
 		logMsg = String.format("constraints: %s ", constraints);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		assertEquals(4, constraints.size());
-		//TODO : improve tests
-		
+		// TODO : improve tests
+
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFMPath, command);
 	}
-	
+
 	@Test
 	@DisplayName("WF7 : to test a constraint appying on a task that doesn't exist: F31_0 => F31_4 (not exist) and F31_1 => F31_2; ")
 	public void testWF7nstance1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
-		//Get the wf instance
+		// Get the wf instance
 		String wfPATH = WF_IN_PATH + "WF7_instance.bpmn2";
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
 
-		// Copy  the initial FM for test
+		// Copy the initial FM for test
 		String sourceFM = DEFAULT_IN_FM;
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF7_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
 		FMHelper fmBefore = new FMHelper(copiedFMPath);
 
-		//Call the merge
-		String[] command = commandMergeInstance(wfPATH, copiedFMPath);
-		
-		
+		// Call the merge
+		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
+
 		FMHelper fmAfter = new FMHelper(copiedFMPath);
 
 		// General Properties to check
-		
+
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 
 		// Specific properties
-		//F31_0 1 and 2 + 4 ? then unmanaged and unmanaged_features (the system can't guess it was a task for me ! )
+		// F31_0 1 and 2 + 4 ? then unmanaged and unmanaged_features (the system can't
+		// guess it was a task for me ! )
 		assertEquals(6, afterList.size());
 		assertTrue(fmAfter.isChildOf("F31", "F31_0"));
 		assertTrue(fmAfter.isChildOf("F31", "F31_1"));
 		assertTrue(fmAfter.isChildOf("F31", "F31_2"));
-		//Test constraints
+		// Test constraints
 		List<String> constraints = fmAfter.getConstraintList();
 		logMsg = String.format("constraints: %s ", constraints);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		assertEquals(2, constraints.size());
-		//TODO : improve tests
-		
+		// TODO : improve tests
+
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFMPath, command);
 	}
-	
-	
+
 	// One feature is abstract and concret
 	// e.g. a Meta declare Normalize and an instance uses also Normalize
 	// ==> suggest user to specialize Normalize with a concrete task ?

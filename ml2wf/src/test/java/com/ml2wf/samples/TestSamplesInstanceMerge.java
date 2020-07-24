@@ -1,25 +1,20 @@
 package com.ml2wf.samples;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -51,10 +46,8 @@ public class TestSamplesInstanceMerge {
 	public void clean() {
 	}
 
-	
-	//ToFIX : The only problem lies in abstract features that should be concrete
+	// ToFIX : The only problem lies in abstract features that should be concrete
 	@Test
-	@Disabled
 	@DisplayName("ToFIX abstract ; T0 : Test with a basic workflow instance adding one Step")
 	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String instanceWFPATH = WF_IN_PATH + "BasicWF_instance00.bpmn2";
@@ -70,8 +63,8 @@ public class TestSamplesInstanceMerge {
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
 		// Command
-		String[] command = mergeInstance(instanceWFPATH, copiedFM);
-	
+		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
+
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
@@ -115,7 +108,7 @@ public class TestSamplesInstanceMerge {
 		assertTrue(copiedFile.exists());
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
-		String[] command = mergeInstance(instanceWFPATH, copiedFM);
+		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
 		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -133,22 +126,20 @@ public class TestSamplesInstanceMerge {
 	}
 
 	// TODO test adding one constraint
-	
+
 	// TODO Test adding one criteria etc.
 
 	// TODO Test with tasks not related to meta tasks
-	
+
 	// TODO test with tasks relatied to non existent metatasks
-	
-	
+
 	// FIX an error is raised...
 	// It should be solved managing hierarchies of tasks
-	// I expect :  
-	//Preprocessing_step#Preprocess_data#Missing_value#Mean
-	//Preprocessing_step#Preprocessing_step0
-	//Training_step_1 refersTo: Training_step
+	// I expect :
+	// Preprocessing_step#Preprocess_data#Missing_value#Mean
+	// Preprocessing_step#Preprocessing_step0
+	// Training_step_1 refersTo: Training_step
 	@Test
-	@Disabled
 	@DisplayName("ToFIX FM2 : Test with a basic workflow instance adding 3 Steps ")
 	public void testAddingHierarchicStepsUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
@@ -164,20 +155,19 @@ public class TestSamplesInstanceMerge {
 		assertTrue(copiedFile.exists());
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
-		String[] command = mergeInstance(instanceWFPATH, copiedFM);
+		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
-		
 		// General Properties to check
 		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
 
 		String logMsg = String.format("addedFeatures: %s ", addedFeatures);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
-		
-		//Preprocessing_step0 refersTo: Preprocessing_step
-		//#Preprocess_data#Missing_value#Mean refersTo:Preprocessing STep
-		//Training_step_1 refersTo: Training_step
+
+		// Preprocessing_step0 refersTo: Preprocessing_step
+		// #Preprocess_data#Missing_value#Mean refersTo:Preprocessing STep
+		// Training_step_1 refersTo: Training_step
 		// TOFIX
 		// TestHelper.testAbstractAndConcreteFeatures(addedFeatures,instanceWFPATH,
 		// fmAfter);
@@ -194,7 +184,5 @@ public class TestSamplesInstanceMerge {
 		// TOFIX
 		// TestHelper.checkIdempotence(copiedFM, command);
 	}
-
-
 
 }
