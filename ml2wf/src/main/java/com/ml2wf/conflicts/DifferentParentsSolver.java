@@ -29,6 +29,9 @@ public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolv
 		this.checkRequirements(taskA, taskB);
 		logger.warn("Conflict detected implying {} (parent={}) and {} (parent={}) : They have different parents.",
 				taskA, taskA.getReference(), taskB, taskB.getReference());
+		System.out.println(String.format(
+				"Conflict detected implying %s (parent=%s) and %s (parent=%s) : They have different parents.",
+				taskA, taskA.getReference(), taskB, taskB.getReference()));
 		throw new UnresolvedConflict(
 				String.format(NO_SOLUTION_ERROR, taskA, taskA.getReference(), taskB, taskB.getReference()));
 	}
