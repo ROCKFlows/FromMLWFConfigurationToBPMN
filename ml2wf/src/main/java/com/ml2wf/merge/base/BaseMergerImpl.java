@@ -37,7 +37,6 @@ import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
 import com.ml2wf.tasks.concretes.FMTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.FMTaskSpecs;
@@ -221,14 +220,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * using the {@link TasksManager#updateFMParents(Set)} method.
 	 *
 	 * @throws MergeException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see TaskFactory
 	 * @see FMTask
 	 */
-	private void createFMTasks() throws MergeException, InvalidTaskException, UnresolvedConflict {
+	private void createFMTasks() throws MergeException, UnresolvedConflict {
 		if (TasksManager.getFMTasks().isEmpty()) {
 			List<Node> fmTasksList = getTasksList(getDocument(), FMNames.SELECTOR);
 			// create fm tasks foreach task node
@@ -256,7 +254,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *
 	 * @since 1.0
 	 */
-	private void startProcessUnmanagedNodes() throws MergeException, InvalidTaskException, UnresolvedConflict {
+	private void startProcessUnmanagedNodes() throws MergeException, UnresolvedConflict {
 		// get the unmanaged global task
 		FMTask unmanagedTask = this.getGlobalFMTask(UNMANAGED);
 		unmanagedGlobalTasks.put(UNMANAGED, unmanagedTask);
@@ -272,13 +270,11 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *
 	 * @param name name of the wished unmanaged node
 	 * @return the unmanaged node with the given {@code name}
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
-	 * @throws MergeException$
 	 *
 	 * @since 1.0
 	 */
-	private FMTask getUnmanaged(String name) throws InvalidTaskException, UnresolvedConflict {
+	private FMTask getUnmanaged(String name) throws UnresolvedConflict {
 		Optional<FMTask> opt = TasksManager.getFMTaskWithName(name);
 		if (opt.isPresent()) {
 			return opt.get();
@@ -349,13 +345,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @param wfInfo workflow's informations
 	 * @throws InvalidConstraintException
 	 * @throws MergeException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @see Pair
 	 */
 	private void processCompleteMerge(String wfName, List<WFTask<?>> tasks)
-			throws InvalidConstraintException, MergeException, InvalidTaskException, UnresolvedConflict {
+			throws InvalidConstraintException, MergeException, UnresolvedConflict {
 		this.createdWFTask = createFMTaskWithName(wfName, this instanceof WFMetaMerger);
 		FMTask root = this.getRootParentNode();
 		this.createdWFTask = insertNewTask(root, this.createdWFTask);
@@ -383,14 +378,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *
 	 * @param task task to process
 	 * @throws MergeException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected void processTask(WFTask<?> task) throws MergeException, InvalidTaskException, UnresolvedConflict {
+	protected void processTask(WFTask<?> task) throws MergeException, UnresolvedConflict {
 		String taskName = task.getName();
 		if (TasksManager.existsinFM(taskName) && !this.processDuplicatedTask(taskName)) {
 			// if task is already in the FM
@@ -456,14 +450,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 *                       {@code globalNodeName}
 	 * @return the global {@code Task}
 	 * @throws MergeException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see Task
 	 */
 	protected FMTask getGlobalFMTask(String globalNodeName)
-			throws MergeException, InvalidTaskException, UnresolvedConflict {
+			throws MergeException, UnresolvedConflict {
 		Optional<FMTask> optGlobalTask = TasksManager.getFMTaskWithName(globalNodeName);
 		if (optGlobalTask.isEmpty()) {
 			return this.createGlobalFMTask(globalNodeName);
@@ -478,14 +471,13 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @param globalNodeName the global node name
 	 * @return the created global {@code FMTask} instance
 	 * @throws MergeException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
 	protected FMTask createGlobalFMTask(String globalNodeName)
-			throws MergeException, InvalidTaskException, UnresolvedConflict {
+			throws MergeException, UnresolvedConflict {
 		// create the node element
 		Element globalElement = createFeatureWithAbstract(globalNodeName, true);
 		// create the global task
@@ -510,7 +502,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @return the given {@code task}'s referred {@code FMTask} or the given
 	 *         {@code defaultTask} if no valid reference was found
 	 * @throws MergeException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
@@ -518,7 +509,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see FMTask
 	 */
 	protected FMTask getReferredFMTask(WFTask<?> task, FMTask defaultTask)
-			throws MergeException, InvalidTaskException, UnresolvedConflict {
+			throws MergeException, UnresolvedConflict {
 		String reference = task.getReference();
 		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
@@ -543,7 +534,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @return a {@code FMTask} specified by the given
 	 *         {@code task}'s reference
 	 * @throws MergeException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
@@ -551,7 +541,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see FMTask
 	 */
 	protected FMTask createReferredFMTask(WFTask<?> task)
-			throws MergeException, InvalidTaskException, UnresolvedConflict {
+			throws MergeException, UnresolvedConflict {
 		String reference = task.getReference();
 		logger.warn("The referenced task [{}] is missing in the FeatureModel.", reference);
 		logger.warn("Creating the referenced task : {}", reference);

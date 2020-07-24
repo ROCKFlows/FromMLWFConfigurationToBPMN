@@ -7,7 +7,6 @@ import org.w3c.dom.Node;
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.BPMNTaskSpecs;
 
@@ -40,11 +39,9 @@ public final class BPMNTask extends WFTask<BPMNTaskSpecs> {
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
 	 * @param reference  reference of the task
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 */
-	public BPMNTask(String name, Node node, boolean isAbstract, String reference)
-			throws InvalidTaskException, UnresolvedConflict {
+	public BPMNTask(String name, Node node, boolean isAbstract, String reference) throws UnresolvedConflict {
 		super(name, node, isAbstract, reference);
 	}
 
