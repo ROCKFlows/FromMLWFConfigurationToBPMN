@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
-import com.ml2wf.tasks.InvalidTaskException;
 import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.util.Pair;
 
 /**
@@ -28,11 +29,13 @@ public interface ConstraintFactory {
 	 * @return a {@code List} of generated constraint nodes
 	 * @throws InvalidConstraintException
 	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException, InvalidTaskException;
+	public List<Node> getRuleNodes(String constraintText)
+			throws InvalidConstraintException, InvalidTaskException, UnresolvedConflict;
 
 	/**
 	 * Returns a {@code List} of {@code Pair} containing the LCA {@code FMTask} as

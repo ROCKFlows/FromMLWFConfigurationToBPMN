@@ -1,4 +1,4 @@
-package com.ml2wf.tasks;
+package com.ml2wf.tasks.exceptions;
 
 /**
  * This exception is thrown when a fatal error occurs during a {@code Task}

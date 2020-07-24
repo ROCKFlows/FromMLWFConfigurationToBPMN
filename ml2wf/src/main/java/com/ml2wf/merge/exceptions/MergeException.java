@@ -1,4 +1,4 @@
-package com.ml2wf.merge;
+package com.ml2wf.merge.exceptions;
 
 import com.ml2wf.merge.base.BaseMerger;
 
