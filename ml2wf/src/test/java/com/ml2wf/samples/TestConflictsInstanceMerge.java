@@ -117,8 +117,9 @@ public class TestConflictsInstanceMerge {
 	}
 
 	// Todo : test the presence of a warning
+	//ToFIX no conflict Detected
 	@Test
-	@DisplayName("ToFIXAbstract Warning : refer to a task known as abstract")
+	@DisplayName("ToFIX still Abstract +  Warning : refer to a task known as abstract")
 	public void testWFInstance2UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF2_instance.bpmn2";
 		File fin = new File(wfPATH);
@@ -150,8 +151,9 @@ public class TestConflictsInstanceMerge {
 	}
 
 	// ToFIX : F32 should be concrete
+	//ToFIX a new Bug
 	@Test
-	@DisplayName("ToFIXAbstract: T3 : an unreferenced task is stored in the FM")
+	@DisplayName("ToFIX: still T3 : an unreferenced task is stored in the FM under Unmanaged")
 	public void testWFInstance3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF3_instance.bpmn2";
 		File fin = new File(wfPATH);

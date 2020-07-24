@@ -285,9 +285,9 @@ public class TestSamplesMetaMerge {
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
-	// ToFIX: A clearer error message is expected
+	// BPMNTask : Missing_Values (parent=Preprocessing_step) and BPMNTask : Missing_Values (parent=Preprocess_data) : They have different parents.
 	@Test
-	@DisplayName("ToFIX:T6#Conflict : A same task as a subtask of several meta task ")
+	@DisplayName("T6#Conflict : a warning is raised. A same task as a subtask of several meta task ")
 	public void testConflict4aTaskclassifiedAtTwoDifferentPlacesUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
 
@@ -339,7 +339,7 @@ public class TestSamplesMetaMerge {
 
 	// ToFIX: A clearer error message is expected
 	@Test
-	@DisplayName("ToFIX: T7 : Test Merge when input WF file doesn't exist")
+	@DisplayName("ToFIX no error Message: T7 : Test Merge when input WF file doesn't exist")
 	public void testGenerationWithNoWFInputFile()
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 
