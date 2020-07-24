@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conflicts.ConflictsManager;
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
@@ -431,26 +432,37 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		if (optFMTask.isEmpty()) {
 			// TODO: manage
 			// if it is not under the unmanaged_tasks node
+			this.processConflict(taskName);
 			return false;
 		}
-		Optional<?> optTask = unmanagedTask.removeChild(optFMTask.get());
-		FMTask duplicatedTask = (FMTask) optTask
-				.orElseThrow(() -> new MergeException("Can't process the task : " + taskName));
-		optTask = TasksManager.getWFTaskWithName(taskName);
-		if (optTask.isPresent()) {
-			WFTask<?> wfTask = (WFTask<?>) optTask.get();
-			System.out.println("UNRESOLVED CONTEXT : duplicatedTask : " + duplicatedTask + " : " + wfTask);
-			if (this.conflictManager.areInConflict(duplicatedTask, wfTask)) {
-				try {
-					wfTask = this.conflictManager.solve(duplicatedTask, wfTask);
-				} catch (UnresolvedConflict e) {
-					logger.error(e.getMessage());
-					return false;
-				}
-				// TODO: manage changed wfTask
-			}
-		}
+		unmanagedTask.removeChild(optFMTask.get());
 		return true;
+	}
+
+	/**
+	 * Check if the given {@code taskName} implies tasks in conflict. If so, solves
+	 * it using the conflict manager.
+	 *
+	 * @param taskName the task implying a {@code FMTask} and a {@code WFTask}
+	 * @throws MergeException
+	 * @throws InvalidTaskException
+	 *
+	 * @since 1.0
+	 * @see ConflictsManager
+	 */
+	private void processConflict(String taskName) throws MergeException, InvalidTaskException {
+		FMTask fmTask = TasksManager.getFMTaskWithName(taskName)
+				.orElseThrow(() -> new MergeException(String.format("Can't retrieve the FMTask : %s", taskName)));
+		WFTask<?> wfTask = TasksManager.getWFTaskWithName(taskName)
+				.orElseThrow(() -> new MergeException(String.format("Can't retrieve the WFTask : %s", taskName)));
+		if (this.conflictManager.areInConflict(fmTask, wfTask)) {
+			try {
+				wfTask = this.conflictManager.solve(fmTask, wfTask);
+			} catch (UnresolvedConflict e) {
+				logger.error(e.getMessage());
+			}
+			// TODO: manage changed wfTask
+		}
 	}
 
 	/**
@@ -531,9 +543,12 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
 			Optional<FMTask> optRef = TasksManager.getFMTaskWithName(reference);
-			if (optRef.isEmpty() || ((optRef.get().getParent() != null)
-					&& optRef.get().getParent().getName().equals(UNMANAGED_TASKS))) {
+			if (optRef.isEmpty()) {
 				return this.createReferredFMTask(task);
+			} else if ((optRef.get().getParent() != null)
+					&& optRef.get().getParent().getName().equals(UNMANAGED_TASKS)) {
+				// removing the reference from the unmanaged node if it is present
+				this.processDuplicatedTask(reference);
 			}
 			return optRef.get();
 		}
@@ -560,8 +575,6 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		String reference = task.getReference();
 		logger.warn("The referenced task [{}] is missing in the FeatureModel.", reference);
 		logger.warn("Creating the referenced task : {}", reference);
-		// removing the reference from the unmanaged node if it is present
-		this.processDuplicatedTask(reference);
 		Optional<WFTask<?>> opt = TasksManager.getWFTaskWithName(reference);
 		FMTask newParent = createFMTaskWithName(reference,
 				(opt.isPresent()) ? opt.get().isAbstract() : opt.isEmpty());

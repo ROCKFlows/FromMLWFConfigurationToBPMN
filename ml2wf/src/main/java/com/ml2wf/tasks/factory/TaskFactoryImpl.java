@@ -11,6 +11,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.AbstractMerger;
+import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
@@ -100,7 +101,8 @@ public class TaskFactoryImpl implements TaskFactory {
 		// TODO: change created type considering user convention (e.g. BPMN)
 		Optional<String> optRefName = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
 		boolean isAbstract = AbstractMerger.getProperty((Element) node, BPMNNames.PROPERTY.getName()).isEmpty();
-		BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract, optRefName.orElse(""));
+		BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract,
+				optRefName.orElse((isAbstract) ? WFMetaMerger.STEP_TASK : ""));
 		createdFMTask.applySpecs();
 		return createdFMTask;
 	}
