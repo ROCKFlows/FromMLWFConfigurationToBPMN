@@ -18,8 +18,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.ml2wf.conflicts.ConflictSolver;
-import com.ml2wf.conflicts.ConflictsManager;
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactory;
@@ -84,10 +82,6 @@ public abstract class AbstractMerger extends XMLManager {
 	 */
 	protected ConstraintFactory constraintFactory;
 	/**
-	 * The manager dedicated to the conflict resolution.
-	 */
-	protected ConflictSolver<WFTask<?>> conflictManager;
-	/**
 	 * Logger instance.
 	 *
 	 * @since 1.0
@@ -107,7 +101,6 @@ public abstract class AbstractMerger extends XMLManager {
 		super(file);
 		this.constraintFactory = new ConstraintFactoryImpl(getDocument());
 		setTaskFactory(new TaskFactoryImpl());
-		this.conflictManager = new ConflictsManager<>();
 	}
 
 	/**

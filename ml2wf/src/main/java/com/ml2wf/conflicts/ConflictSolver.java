@@ -3,10 +3,10 @@ package com.ml2wf.conflicts;
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.tasks.base.Task;
 
-public interface ConflictSolver<T extends Task<?>> {
+public interface ConflictSolver {
 
-	public T solve(T taskA, T taskB) throws UnresolvedConflict;
+	public <T extends Task<?>> T solve(T taskA, T taskB) throws UnresolvedConflict;
 
-	public boolean areInConflict(T taskA, T taskB);
+	public <T extends Task<?>> boolean areInConflict(T taskA, T taskB);
 
 }

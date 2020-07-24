@@ -56,7 +56,7 @@ public final class TasksManager {
 	/**
 	 * The manager dedicated to the conflict resolution.
 	 */
-	private static ConflictSolver<WFTask<?>> conflictManager = new ConflictsManager<>();
+	private static ConflictSolver conflictManager = new ConflictsManager();
 	/**
 	 * Logger instance.
 	 *
@@ -273,6 +273,10 @@ public final class TasksManager {
 			if (optExistingWFTask.isPresent()) {
 				wfTask = processConflicts(optExistingWFTask.get(), wfTask);
 			}
+			/*-Optional<FMTask> optExistingFMTask = getFMTaskWithName(taskName);
+			if (optExistingFMTask.isPresent()) {
+				wfTask = processConflicts(optExistingFMTask.get(), wfTask);
+			}*/
 			return wfTasks.add(wfTask);
 		}
 	}
@@ -290,11 +294,15 @@ public final class TasksManager {
 	 * @since 1.0
 	 * @see ConflictsManager
 	 */
-	private static WFTask<?> processConflicts(WFTask<?> taskA, WFTask<?> taskB) throws UnresolvedConflict {
+	private static <T extends Task<?>> T processConflicts(T taskA, T taskB) throws UnresolvedConflict {
 		if (conflictManager.areInConflict(taskA, taskB)) {
 			taskB = conflictManager.solve(taskA, taskB);
-			wfTasks.remove(taskA);
-			getFMTaskWithName(taskB.getName()).ifPresent(TasksManager::removeTask);
+			if (taskA instanceof FMTask) {
+				fmTasks.remove(taskA);
+			} else {
+				wfTasks.remove(taskA);
+				getFMTaskWithName(taskB.getName()).ifPresent(TasksManager::removeTask);
+			}
 		}
 		return taskB;
 	}
