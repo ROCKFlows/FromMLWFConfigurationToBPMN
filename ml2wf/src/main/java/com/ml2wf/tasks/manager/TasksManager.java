@@ -271,12 +271,36 @@ public final class TasksManager {
 				}
 			}
 			// detecting and resolving conflicts
-			Optional<WFTask<?>> existingWFTask = getWFTaskWithName(taskName);
-			if (existingWFTask.isPresent() && conflictManager.areInConflict(existingWFTask.get(), wfTask)) {
-				wfTask = conflictManager.solve(existingWFTask.get(), wfTask);
+			Optional<WFTask<?>> optExistingWFTask = getWFTaskWithName(taskName);
+			if (optExistingWFTask.isPresent()) {
+				wfTask = processConflicts(optExistingWFTask.get(), wfTask);
 			}
 			return wfTasks.add(wfTask);
 		}
+	}
+
+	// conflicts
+
+	/**
+	 * Detects and solves possible conflicts using the {@link #conflictManager}.
+	 *
+	 * @param taskA existing task
+	 * @param taskB new task
+	 * @return the rectified new task
+	 * @throws InvalidTaskException
+	 * @throws UnresolvedConflict
+	 *
+	 * @since 1.0
+	 * @see ConflictsManager
+	 */
+	private static WFTask<?> processConflicts(WFTask<?> taskA, WFTask<?> taskB)
+			throws InvalidTaskException, UnresolvedConflict {
+		if (conflictManager.areInConflict(taskA, taskB)) {
+			taskB = conflictManager.solve(taskA, taskB);
+			wfTasks.remove(taskA);
+			getFMTaskWithName(taskB.getName()).ifPresent(TasksManager::removeTask);
+		}
+		return taskB;
 	}
 
 	// filter
@@ -368,7 +392,14 @@ public final class TasksManager {
 			return false;
 		}
 		if (task instanceof FMTask) {
-			return fmTasks.remove(task);
+			FMTask fmTask = (FMTask) task;
+			// removing from its parent
+			FMTask fmParent = fmTask.getParent();
+			if (fmParent != null) {
+				fmParent.removeChild(fmTask);
+			}
+			// removing from the FMTask collection
+			return fmTasks.remove(fmTask);
 		} else {
 			return wfTasks.remove(task);
 		}

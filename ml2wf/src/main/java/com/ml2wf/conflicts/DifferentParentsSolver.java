@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
+import com.ml2wf.merge.concretes.WFMetaMerger;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.exceptions.InvalidTaskException;
 
@@ -29,6 +30,16 @@ public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolv
 		this.checkRequirements(taskA, taskB);
 		logger.warn("Conflict detected implying {} (parent={}) and {} (parent={}) : They have different parents.",
 				taskA, taskA.getReference(), taskB, taskB.getReference());
+		// T1 + T2 + T1#T2 => T1#T2
+		if (taskA.getReference().equals(WFMetaMerger.STEP_TASK)) {
+			logger.warn("Keeping {} (parent={}).", taskB, taskB.getReference());
+			return taskB;
+		}
+		if (taskB.getReference().equals(WFMetaMerger.STEP_TASK)) {
+			logger.warn("Keeping {} (parent={}).", taskA, taskA.getReference());
+			return taskA;
+		}
+		// ---
 		throw new UnresolvedConflict(
 				String.format(NO_SOLUTION_ERROR, taskA, taskA.getReference(), taskB, taskB.getReference()));
 	}
