@@ -19,7 +19,6 @@ import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -245,12 +244,11 @@ public final class TasksManager {
 	 * @return if the {@code TasksManager} did not already contain the given
 	 *         {@code task}
 	 * @throws UnresolvedConflict
-	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see Task
 	 */
-	public static <T extends Task<?>> boolean addTask(T task) throws InvalidTaskException, UnresolvedConflict {
+	public static <T extends Task<?>> boolean addTask(T task) throws UnresolvedConflict {
 		if (task == null) {
 			return false;
 		}
@@ -271,12 +269,34 @@ public final class TasksManager {
 				}
 			}
 			// detecting and resolving conflicts
-			Optional<WFTask<?>> existingWFTask = getWFTaskWithName(taskName);
-			if (existingWFTask.isPresent() && conflictManager.areInConflict(existingWFTask.get(), wfTask)) {
-				wfTask = conflictManager.solve(existingWFTask.get(), wfTask);
+			Optional<WFTask<?>> optExistingWFTask = getWFTaskWithName(taskName);
+			if (optExistingWFTask.isPresent()) {
+				wfTask = processConflicts(optExistingWFTask.get(), wfTask);
 			}
 			return wfTasks.add(wfTask);
 		}
+	}
+
+	// conflicts
+
+	/**
+	 * Detects and solves possible conflicts using the {@link #conflictManager}.
+	 *
+	 * @param taskA existing task
+	 * @param taskB new task
+	 * @return the rectified new task
+	 * @throws UnresolvedConflict
+	 *
+	 * @since 1.0
+	 * @see ConflictsManager
+	 */
+	private static WFTask<?> processConflicts(WFTask<?> taskA, WFTask<?> taskB) throws UnresolvedConflict {
+		if (conflictManager.areInConflict(taskA, taskB)) {
+			taskB = conflictManager.solve(taskA, taskB);
+			wfTasks.remove(taskA);
+			getFMTaskWithName(taskB.getName()).ifPresent(TasksManager::removeTask);
+		}
+		return taskB;
 	}
 
 	// filter
@@ -368,7 +388,14 @@ public final class TasksManager {
 			return false;
 		}
 		if (task instanceof FMTask) {
-			return fmTasks.remove(task);
+			FMTask fmTask = (FMTask) task;
+			// removing from its parent
+			FMTask fmParent = fmTask.getParent();
+			if (fmParent != null) {
+				fmParent.removeChild(fmTask);
+			}
+			// removing from the FMTask collection
+			return fmTasks.remove(fmTask);
 		} else {
 			return wfTasks.remove(task);
 		}

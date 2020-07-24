@@ -6,7 +6,6 @@ import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 
 /**
  * This interface provides a method for the <b>creation of {@code Task}'s
@@ -26,14 +25,13 @@ public interface TaskFactory {
 	 * @param <T>  Any {@code class} implementing the {@code Spec interface}
 	 * @param node {@code Node} to convert to {@code Task}
 	 * @return the created task corresponding to the given {@code node}
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see Task
 	 * @see Node
 	 */
-	public <T extends Task<?>> T createTask(Node node) throws InvalidTaskException, UnresolvedConflict;
+	public <T extends Task<?>> T createTask(Node node) throws UnresolvedConflict;
 
 	/**
 	 * Converts a {@code WFTask} to a {@code FMTask}.
@@ -45,8 +43,7 @@ public interface TaskFactory {
 	 *
 	 * @param task task to convert
 	 * @return the converted task
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 */
-	public FMTask convertWFtoFMTask(WFTask<?> task) throws InvalidTaskException, UnresolvedConflict;
+	public FMTask convertWFtoFMTask(WFTask<?> task) throws UnresolvedConflict;
 }

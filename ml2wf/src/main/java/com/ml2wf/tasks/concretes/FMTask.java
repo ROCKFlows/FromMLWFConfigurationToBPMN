@@ -12,7 +12,6 @@ import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.FMTaskSpecs;
 import com.ml2wf.util.XMLManager;
@@ -52,11 +51,9 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param parent     parent of the task
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 */
-	public FMTask(String name, FMTask parent, Node node, boolean isAbstract)
-			throws InvalidTaskException, UnresolvedConflict {
+	public FMTask(String name, FMTask parent, Node node, boolean isAbstract) throws UnresolvedConflict {
 		super(name, node);
 		this.parent = parent;
 		this.setAbstract(isAbstract);
@@ -74,10 +71,9 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param name       name of the task
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 */
-	public FMTask(String name, Node node, boolean isAbstract) throws InvalidTaskException, UnresolvedConflict {
+	public FMTask(String name, Node node, boolean isAbstract) throws UnresolvedConflict {
 		super(name, node);
 		this.setAbstract(isAbstract);
 		TasksManager.addTask(this); // add the new task to the manager
@@ -100,11 +96,10 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 * @param task       {@code WFTask} instance to be converted
 	 * @param saveParent whether the result task should save the given
 	 *                   {@code task}'s parent as its own parent or not.
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 * @see WFTask
 	 */
-	public FMTask(WFTask<?> task, boolean saveParent) throws InvalidTaskException, UnresolvedConflict {
+	public FMTask(WFTask<?> task, boolean saveParent) throws UnresolvedConflict {
 		super(task.getName(), task.getNode());
 		this.setAbstract(task.isAbstract());
 		if (saveParent) {
@@ -113,6 +108,7 @@ public final class FMTask extends Task<FMTaskSpecs> {
 				this.parent = optReferredTask.get();
 			}
 		}
+		TasksManager.addTask(this); // add the new task to the manager
 	}
 
 	@Override

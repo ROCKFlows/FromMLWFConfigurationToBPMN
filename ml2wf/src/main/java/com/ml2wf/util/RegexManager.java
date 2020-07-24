@@ -36,6 +36,10 @@ public final class RegexManager {
 	 */
 	private static final String DIGIT = "\\d+";
 	/**
+	 * Regular expression that defines a valid feature name.
+	 */
+	private static final String VALID_FEATURE_NAME = "^[a-zA-Z]+\\w*$";
+	/**
 	 * {@code Pattern} corresponding of the {@link #REFERENCE} regex.
 	 */
 	private static Pattern referencePattern;
@@ -51,6 +55,10 @@ public final class RegexManager {
 	 * {@code Pattern} corresponding of the {@link #DIGIT} regex.
 	 */
 	private static Pattern digitPattern;
+	/**
+	 * {@code Pattern} corresponding of the {@link #VALID_FEATURE_NAME} regex.
+	 */
+	private static Pattern validFeatureNamePattern;
 
 	/**
 	 * {@code RegexManager} empty constructor.
@@ -131,6 +139,23 @@ public final class RegexManager {
 			digitPattern = getPatternOf(DIGIT);
 		}
 		return digitPattern;
+	}
+
+	/**
+	 * Returns the {@code Pattern} corresponding of the <b>valid feature name</b>
+	 * regex.
+	 *
+	 * @return the {@code Pattern} corresponding of the <b>valid feature name</b>
+	 *         regex
+	 *
+	 * @since 1.0
+	 * @see Pattern
+	 */
+	public static Pattern getValidFeatureNamePattern() {
+		if (validFeatureNamePattern == null) {
+			validFeatureNamePattern = getPatternOf(VALID_FEATURE_NAME);
+		}
+		return validFeatureNamePattern;
 	}
 
 }

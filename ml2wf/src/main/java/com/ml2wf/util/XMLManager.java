@@ -34,6 +34,7 @@ import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
 import com.ml2wf.conventions.enums.fm.FMAttributes;
 import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.manager.TasksManager;
 
 /**
@@ -695,7 +696,14 @@ public abstract class XMLManager {
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
 		name = name.replace(Notation.getOptionality(), "");
 		name = name.trim();
-		return name.replace(" ", "_");
+		name = name.replace(" ", "_");
+		Pattern validNamePattern = RegexManager.getValidFeatureNamePattern();
+		if (!validNamePattern.matcher(name).find()) {
+			throw new InvalidTaskException(
+					String.format("The task with name : [%s] is invalid. It must match the following regex : %s", name,
+							validNamePattern.pattern()));
+		}
+		return name;
 	}
 
 }

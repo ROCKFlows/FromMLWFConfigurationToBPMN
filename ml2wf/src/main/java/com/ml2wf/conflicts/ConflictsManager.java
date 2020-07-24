@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.tasks.base.WFTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 
 public class ConflictsManager<T extends WFTask<?>> implements ConflictSolver<T> {
 
@@ -22,7 +21,7 @@ public class ConflictsManager<T extends WFTask<?>> implements ConflictSolver<T> 
 	}
 
 	@Override
-	public T solve(T taskA, T taskB) throws InvalidTaskException, UnresolvedConflict {
+	public T solve(T taskA, T taskB) throws UnresolvedConflict {
 		for (ConflictSolver<T> conflictSolver : this.solvers) {
 			if (conflictSolver.areInConflict(taskA, taskB)) {
 				taskB = conflictSolver.solve(taskA, taskB);
@@ -32,7 +31,7 @@ public class ConflictsManager<T extends WFTask<?>> implements ConflictSolver<T> 
 	}
 
 	@Override
-	public boolean areInConflict(T taskA, T taskB) throws InvalidTaskException {
+	public boolean areInConflict(T taskA, T taskB) {
 		for (ConflictSolver<T> conflictSolver : this.solvers) {
 			if (conflictSolver.areInConflict(taskA, taskB)) {
 				return true;
