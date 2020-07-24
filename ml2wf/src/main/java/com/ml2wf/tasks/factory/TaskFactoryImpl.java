@@ -18,7 +18,6 @@ import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.BPMNTask;
 import com.ml2wf.tasks.concretes.FMTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -55,7 +54,7 @@ public class TaskFactoryImpl implements TaskFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Task<?>> T createTask(Node node) throws InvalidTaskException, UnresolvedConflict {
+	public <T extends Task<?>> T createTask(Node node) throws UnresolvedConflict {
 		String tagName = node.getNodeName();
 		String nodeName = XMLManager.getNodeName(node);
 		nodeName = XMLManager.sanitizeName(nodeName);
@@ -64,7 +63,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	}
 
 	@Override
-	public FMTask convertWFtoFMTask(WFTask<?> task) throws InvalidTaskException, UnresolvedConflict {
+	public FMTask convertWFtoFMTask(WFTask<?> task) throws UnresolvedConflict {
 		FMTask createdFMTask = new FMTask(task, false);
 		createdFMTask.setNode(AbstractMerger.createFeatureWithAbstract(createdFMTask.getName(), task.isAbstract()));
 		createdFMTask.addAllSpecs(task.getSpecs());
@@ -78,13 +77,12 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @param name name of the new task
 	 * @param node node of the new task
 	 * @return a new {@code FMTask} considering the given arguments
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	private FMTask createFMTask(String name, Node node) throws InvalidTaskException, UnresolvedConflict {
+	private FMTask createFMTask(String name, Node node) throws UnresolvedConflict {
 		return new FMTask(name, node, isFMAbstract(node));
 	}
 
@@ -94,14 +92,13 @@ public class TaskFactoryImpl implements TaskFactory {
 	 * @param name name of the new task
 	 * @param node node of the new task
 	 * @return a new {@code WFTask} considering the given arguments
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 * @throws TaskFactoryException
 	 *
 	 * @since 1.0
 	 * @see WFTask
 	 */
-	private WFTask<?> createWFTask(String name, Node node) throws InvalidTaskException, UnresolvedConflict {
+	private WFTask<?> createWFTask(String name, Node node) throws UnresolvedConflict {
 		// TODO: change created type considering user convention (e.g. BPMN)
 		Optional<String> optRefName = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
 		boolean isAbstract = AbstractMerger.getProperty((Element) node, BPMNNames.PROPERTY.getName()).isEmpty();

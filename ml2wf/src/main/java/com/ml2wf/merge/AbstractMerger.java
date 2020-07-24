@@ -32,7 +32,6 @@ import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.factory.TaskFactoryImpl;
 import com.ml2wf.tasks.manager.TasksManager;
@@ -252,7 +251,6 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param name       name of the feature
 	 * @param isAbstract whether the wished created feature must be abstract or not
 	 * @return a new feature ({@code FMTask}) with the given {@code name}
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 * @throws TaskFactoryException
 	 *
@@ -260,7 +258,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @see FMTask
 	 */
 	protected static FMTask createFMTaskWithName(String name, boolean isAbstract)
-			throws InvalidTaskException, UnresolvedConflict {
+			throws UnresolvedConflict {
 		return (FMTask) taskFactory.createTask(createFeatureWithAbstract(name, isAbstract));
 	}
 
@@ -508,15 +506,13 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param parentTask Parent task
 	 * @param task       task to insert
 	 * @return the added child
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see Task
 	 * @see FMTask
 	 */
-	public static <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task)
-			throws InvalidTaskException, UnresolvedConflict {
+	public static <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) throws UnresolvedConflict {
 		logger.debug("Inserting task : {}", task.getName());
 		// inserting the new node
 		FMTask childTask = (task instanceof FMTask) ? (FMTask) task
@@ -546,14 +542,13 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param wfDocument Workflow {@code Document}'s instance containing
 	 *                   annotations.
 	 * @throws InvalidConstraintException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see ConstraintFactory
 	 */
 	protected void processAnnotations(List<Node> annotations)
-			throws InvalidConstraintException, InvalidTaskException, UnresolvedConflict {
+			throws InvalidConstraintException, UnresolvedConflict {
 		logger.info("Processing annotations...");
 		List<Pair<FMTask, Node>> orderPairs; // pair that will contain order constraint data
 		for (Node annotation : annotations) {
@@ -587,13 +582,12 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param wfName workflow's name
 	 * @param tasks  {@code Set<Task>} containing all workflow's tasks
 	 * @throws InvalidConstraintException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 */
 	protected void processAssocConstraints(String wfName, List<WFTask<?>> tasks)
-			throws InvalidConstraintException, InvalidTaskException, UnresolvedConflict {
+			throws InvalidConstraintException, UnresolvedConflict {
 		String logMsg;
 		logger.debug("Filtering mandatories tasks...");
 		// filtering mandatories tasks

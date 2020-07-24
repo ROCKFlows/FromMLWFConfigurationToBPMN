@@ -19,7 +19,6 @@ import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -245,12 +244,11 @@ public final class TasksManager {
 	 * @return if the {@code TasksManager} did not already contain the given
 	 *         {@code task}
 	 * @throws UnresolvedConflict
-	 * @throws InvalidTaskException
 	 *
 	 * @since 1.0
 	 * @see Task
 	 */
-	public static <T extends Task<?>> boolean addTask(T task) throws InvalidTaskException, UnresolvedConflict {
+	public static <T extends Task<?>> boolean addTask(T task) throws UnresolvedConflict {
 		if (task == null) {
 			return false;
 		}
@@ -287,14 +285,12 @@ public final class TasksManager {
 	 * @param taskA existing task
 	 * @param taskB new task
 	 * @return the rectified new task
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see ConflictsManager
 	 */
-	private static WFTask<?> processConflicts(WFTask<?> taskA, WFTask<?> taskB)
-			throws InvalidTaskException, UnresolvedConflict {
+	private static WFTask<?> processConflicts(WFTask<?> taskA, WFTask<?> taskB) throws UnresolvedConflict {
 		if (conflictManager.areInConflict(taskA, taskB)) {
 			taskB = conflictManager.solve(taskA, taskB);
 			wfTasks.remove(taskA);

@@ -13,7 +13,6 @@ import com.ml2wf.merge.base.BaseMergerImpl;
 import com.ml2wf.merge.exceptions.MergeException;
 import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.util.Pair;
 
 /**
@@ -54,12 +53,12 @@ public final class WFMetaMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, InvalidTaskException, UnresolvedConflict {
+	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, UnresolvedConflict {
 		return this.getReferredFMTask(task, this.getGlobalFMTask(STEP_TASK));
 	}
 
 	@Override
-	public FMTask getRootParentNode() throws MergeException, InvalidTaskException, UnresolvedConflict {
+	public FMTask getRootParentNode() throws MergeException, UnresolvedConflict {
 		return this.getGlobalFMTask(META_TASK);
 	}
 

@@ -3,7 +3,6 @@ package com.ml2wf.tasks.base;
 import org.w3c.dom.Node;
 
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.Spec;
 
@@ -41,11 +40,10 @@ public abstract class WFTask<T extends Spec<?>> extends Task<T> {
 	 * @param reference  reference of the task
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 */
 	public WFTask(String name, Node node, boolean isAbstract, String reference)
-			throws InvalidTaskException, UnresolvedConflict {
+			throws UnresolvedConflict {
 		super(name, node, isAbstract);
 		this.reference = reference;
 		TasksManager.addTask(this); // add the new task to the manager

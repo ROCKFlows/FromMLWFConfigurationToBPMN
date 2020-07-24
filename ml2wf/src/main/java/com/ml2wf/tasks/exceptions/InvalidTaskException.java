@@ -10,7 +10,7 @@ package com.ml2wf.tasks.exceptions;
  * @see Task
  *
  */
-public class InvalidTaskException extends Exception {
+public class InvalidTaskException extends RuntimeException {
 
 	/**
 	 * Generated serial ID.

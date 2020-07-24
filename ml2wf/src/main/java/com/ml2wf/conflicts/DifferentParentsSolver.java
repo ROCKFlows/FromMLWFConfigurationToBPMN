@@ -26,7 +26,7 @@ public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolv
 	}
 
 	@Override
-	public T solve(T taskA, T taskB) throws InvalidTaskException, UnresolvedConflict {
+	public T solve(T taskA, T taskB) throws UnresolvedConflict {
 		this.checkRequirements(taskA, taskB);
 		logger.warn("Conflict detected implying {} (parent={}) and {} (parent={}) : They have different parents.",
 				taskA, taskA.getReference(), taskB, taskB.getReference());
@@ -45,12 +45,12 @@ public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolv
 	}
 
 	@Override
-	public boolean areInConflict(T taskA, T taskB) throws InvalidTaskException {
+	public boolean areInConflict(T taskA, T taskB) {
 		this.checkRequirements(taskA, taskB);
 		return !taskA.getReference().equals(taskB.getReference());
 	}
 
-	private void checkRequirements(T taskA, T taskB) throws InvalidTaskException {
+	private void checkRequirements(T taskA, T taskB) {
 		String taskARef = taskA.getReference();
 		if ((taskARef == null) || taskARef.isBlank()) {
 			throw new InvalidTaskException(

@@ -8,7 +8,6 @@ import org.w3c.dom.Node;
 
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.tasks.exceptions.InvalidTaskException;
-import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.tasks.specs.Spec;
 
 /**
@@ -60,9 +59,8 @@ public abstract class Task<T extends Spec<?>> {
 	 * @param node       node of the task
 	 * @param isAbstract whether the task is abstract or not
 	 * @throws InvalidTaskException
-	 * @throws UnresolvedConflict
 	 */
-	public Task(String name, Node node, boolean isAbstract) throws InvalidTaskException, UnresolvedConflict {
+	public Task(String name, Node node, boolean isAbstract) {
 		if (name == null) {
 			throw new InvalidTaskException("Can't create a task with a nullable name");
 		}
@@ -85,7 +83,7 @@ public abstract class Task<T extends Spec<?>> {
 	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 */
-	public Task(String name, Node node) throws InvalidTaskException, UnresolvedConflict {
+	public Task(String name, Node node) {
 		if (name == null) {
 			throw new InvalidTaskException("Can't create a task with a nullable name");
 		}
@@ -93,7 +91,6 @@ public abstract class Task<T extends Spec<?>> {
 		this.node = node;
 		this.isAbstract = false;
 		this.specs = new HashMap<>();
-		TasksManager.addTask(this); // add the new task to the manager
 	}
 
 	/**

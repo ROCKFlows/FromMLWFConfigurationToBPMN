@@ -29,7 +29,6 @@ import com.ml2wf.merge.AbstractMerger;
 import com.ml2wf.merge.base.BaseMergerImpl;
 import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.concretes.FMTask;
-import com.ml2wf.tasks.exceptions.InvalidTaskException;
 import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
 
@@ -180,7 +179,6 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @param constraintText text containing constraints
 	 * @return a generated {@code Node} containing all constraints nodes
 	 * @throws InvalidConstraintException
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
@@ -188,7 +186,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 */
 	@Override
 	public List<Node> getRuleNodes(String constraintText)
-			throws InvalidConstraintException, InvalidTaskException, UnresolvedConflict {
+			throws InvalidConstraintException, UnresolvedConflict {
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 		for (BinaryTree<String> tree : trees) {
@@ -229,12 +227,11 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * criterias.
 	 *
 	 * @param tree tree to manage missing criterias
-	 * @throws InvalidTaskException
 	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 */
-	private void managedMissingCriterias(BinaryTree<String> tree) throws InvalidTaskException, UnresolvedConflict {
+	private void managedMissingCriterias(BinaryTree<String> tree) throws UnresolvedConflict {
 		Set<String> taskNames = TasksManager.getTasks().stream().map(Task::getName).collect(Collectors.toSet());
 		List<String> treeNodes = tree.getAllNodes().stream().filter(n -> (n != null) && !this.config.isAnOperator(n))
 				.collect(Collectors.toList());
