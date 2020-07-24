@@ -20,6 +20,10 @@
         <version.commons-io>2.7</version.commons-io>
         <version.jansi>1.18</version.jansi>
         <dependency.directory>dependency/</dependency.directory>
+        <sonar.projectKey>MireilleBF_FromMLWFConfigurationToBPMN</sonar.projectKey>
+        <sonar.organization>mireillebf-github</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>475220e893ddcfd86b7a8088d9b6ef7d77a98e34</sonar.login>
     </properties>
     <build>
         <finalName>ml2wf</finalName>
@@ -57,6 +61,26 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.4</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<!-- attached to Maven test phase -->
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
         <resources>
             <resource>
