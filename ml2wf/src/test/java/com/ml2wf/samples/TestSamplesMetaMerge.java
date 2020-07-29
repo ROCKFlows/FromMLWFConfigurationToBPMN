@@ -49,7 +49,6 @@ public class TestSamplesMetaMerge {
 	}
 
 	@Test
-	@Disabled
 	@DisplayName("T0 : Test with a basic workflow adding one Step")
 	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF.bpmn2";
@@ -429,7 +428,7 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_10.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = new FMHelper(copiedFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
