@@ -168,6 +168,7 @@ public class TestSamplesMetaMerge {
 	}
 
 	@Test
+	@Disabled
 	@DisplayName("T3 : Test with a basic workflow adding two Steps")
 	public void testAddingTwoStepsUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 

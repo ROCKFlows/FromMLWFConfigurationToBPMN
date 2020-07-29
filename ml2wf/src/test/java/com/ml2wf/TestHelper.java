@@ -99,16 +99,20 @@ public class TestHelper {
 	private static void testTasksAgainstFeatures(List<String> afterList, String wfPATH)
 			throws ParserConfigurationException, SAXException, IOException {
 		File wfFile = new File(wfPATH);
+		String logMsg = String.format(">>>>>>>>>>>>>>>>testTasksAgainstFeatures  WF %s against ", wfPATH, afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+		
 		//TODO improve error managmenet
 		if (! wfFile.exists()) {
-			String logMsg = String.format(">>>>>>>>>>>>>>>>Checks while WF does'nt exist %s ", wfPATH);
+			logMsg = String.format(">>>>>>>>>>>>>>>>Checks while WF does'nt exist %s ", wfPATH);
 			logger.debug(logMsg);
 			System.out.println(logMsg);
 			throw new IOException("Unexpected to check task against feature in a non-existing WF");
 		}
 		else {
 			if (wfFile.isDirectory()) {
-				String logMsg = String.format("TODO Checks in a directory %s ", wfPATH);
+				logMsg = String.format("TODO Checks in a directory %s ", wfPATH);
 				logger.debug(logMsg);
 				System.out.println(logMsg);
 				return;
@@ -120,7 +124,7 @@ public class TestHelper {
 		List<String> tasks = wf.gettaskNameList();
 		tasks = normalizeAllTasks(tasks);
 		List<String> lostTasks = lostTasks(tasks, afterList);
-		String logMsg = String.format("Lost Tasks: %s ", lostTasks);
+		logMsg = String.format("Lost Tasks: %s ", lostTasks);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		assertTrue( lostTasks.isEmpty());
