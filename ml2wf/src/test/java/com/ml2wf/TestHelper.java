@@ -131,8 +131,11 @@ public class TestHelper {
 	}
 
 	public static List<String> noFeatureLost(FMHelper fmBefore, FMHelper fmAfter) {
+		String logMsg = String.format(">> Test - NoFeatureLost ");
+		logger.debug(logMsg);
+		System.out.println(logMsg);
 		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
-		String logMsg = String.format("added features : %s ", afterList);
+		logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		List<String> afterConstraints = checkNoConstraintsAreLost(fmAfter, fmBefore);
 		logMsg = String.format("added Constraints : %s ", afterConstraints);
@@ -172,7 +175,7 @@ public class TestHelper {
 		List<String> afterList = fmAfter.getFeatureNameList();
 		beforeList = normalize(beforeList);
 		afterList = normalize(afterList);
-		logger.debug("No features are lost");
+		logger.debug("No features are lost ??? ");
 		String logMsg = String.format("Before features : %s ", beforeList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
@@ -180,7 +183,7 @@ public class TestHelper {
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		List<String> x = new ArrayList<>(beforeList);
-		assertTrue(afterList.containsAll(beforeList));
+		assertTrue(afterList.containsAll(beforeList), "No Feature were lost ");
 		afterList.removeAll(beforeList);
 		logMsg = String.format("All features are present and added features are: %s ", afterList);
 		logger.debug(logMsg);
@@ -192,7 +195,7 @@ public class TestHelper {
 		List<String> afterList = fmAfter.getConstraintList();
 		logger.debug("Before constraints : %s ", beforeList);
 		logger.debug("after constraints : %s ", afterList);
-		assertTrue(afterList.containsAll(beforeList));
+		assertTrue(afterList.containsAll(beforeList), "No constraints were lost ");
 		afterList.removeAll(beforeList);
 		return afterList;
 	}
