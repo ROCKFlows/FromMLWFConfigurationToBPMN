@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -48,6 +49,7 @@ public class TestSamplesMetaMerge {
 	}
 
 	@Test
+	@Disabled
 	@DisplayName("T0 : Test with a basic workflow adding one Step")
 	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF.bpmn2";

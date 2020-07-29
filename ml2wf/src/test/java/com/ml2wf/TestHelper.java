@@ -100,8 +100,12 @@ public class TestHelper {
 			throws ParserConfigurationException, SAXException, IOException {
 		File wfFile = new File(wfPATH);
 		//TODO improve error managmenet
-		if (! wfFile.exists())
+		if (! wfFile.exists()) {
+			String logMsg = String.format(">>>>>>>>>>>>>>>>Checks while WF does'nt exist %s ", wfPATH);
+			logger.debug(logMsg);
+			System.out.println(logMsg);
 			throw new IOException("Unexpected to check task against feature in a non-existing WF");
+		}
 		else {
 			if (wfFile.isDirectory()) {
 				String logMsg = String.format("TODO Checks in a directory %s ", wfPATH);
@@ -123,6 +127,9 @@ public class TestHelper {
 	}
 
 	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, String wfPATH ) throws ParserConfigurationException, SAXException, IOException{
+		String logMsg = String.format(">> Test - nothingLost : %s ", wfPATH);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
 		List<String> afterList = normalize(fmAfter.getFeatureNameList());
 		testTasksAgainstFeatures(afterList, wfPATH);
 		afterList= normalize(noFeatureLost(fmBefore, fmAfter));
