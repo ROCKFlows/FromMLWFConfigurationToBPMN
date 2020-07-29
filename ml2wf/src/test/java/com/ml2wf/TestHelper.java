@@ -175,8 +175,10 @@ public class TestHelper {
 		logger.debug("No features are lost");
 		String logMsg = String.format("Before features : %s ", beforeList);
 		logger.debug(logMsg);
+		System.out.println(logMsg);
 		logMsg = String.format("After features : %s ", afterList);
 		logger.debug(logMsg);
+		System.out.println(logMsg);
 		List<String> x = new ArrayList<>(beforeList);
 		assertTrue(afterList.containsAll(beforeList));
 		afterList.removeAll(beforeList);

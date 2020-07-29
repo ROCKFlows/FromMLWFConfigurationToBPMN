@@ -13,6 +13,7 @@
       <bpmn2:documentation id="Documentation_1_1">refersTo: Preprocessing_step</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+      <bpmn2:property id="Property_1" name="instance"/>
     </bpmn2:task>
     <bpmn2:task id="Task_2" name="Train_OC_SVM">
       <bpmn2:extensionElements>
@@ -22,6 +23,7 @@
       <bpmn2:documentation id="Documentation_1">Training_step => MLAlgorithm</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+      <bpmn2:property id="Property_2" name="instance"/>
     </bpmn2:task>
     <bpmn2:task id="Task_3" name="Evaluating_10Fold">
       <bpmn2:extensionElements>
@@ -30,6 +32,7 @@
       <bpmn2:documentation id="Documentation_3">refersTo: Evaluating_step</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+      <bpmn2:property id="Property_3" name="instance"/>
     </bpmn2:task>
     <bpmn2:endEvent id="EndEvent_1" name="End Event 1">
       <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>

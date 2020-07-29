@@ -261,6 +261,7 @@ public final class TasksManager {
 			// applying filters
 			if (!removeIfEmptyRef(wfTask) && removeIfPrioritizeConcrete(wfTask)) {
 				// we have to update the corresponding FMTask's abstract status
+				//TODO : never used...
 				Optional<FMTask> optFmTask = TasksManager.getFMTaskWithName(taskName);
 				if (optFmTask.isPresent()) {
 					FMTask fmTask = optFmTask.get();
@@ -432,8 +433,24 @@ public final class TasksManager {
 	public static void updateFMParents(Set<FMTask> tasks) {
 		tasks.stream().filter(t -> t.getParent() == null).forEach(t -> {
 			Optional<FMTask> opt = TasksManager.getFMTaskWithName(XMLManager.getNodeName(t.getNode().getParentNode()));
+
 			if (opt.isPresent()) {
 				t.setParent(opt.get());
+				logger.debug( " %s has now a parent %s ",t.getName(), t.getParent());
+			}
+		});
+
+
+	}
+
+
+	//ADDED To MANAGED Feature that becomes concrete
+	public static void updateStatus(Set<WFTask<?>> set) {
+		set.stream()
+		.forEach(t -> {
+			Optional<FMTask> opt = TasksManager.getFMTaskWithName(XMLManager.getNodeName(t.getNode()));
+			if (opt.isPresent()) {
+				opt.get().setAbstract(t.isAbstract());
 			}
 		});
 	}

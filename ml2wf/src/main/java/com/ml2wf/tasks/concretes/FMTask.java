@@ -109,6 +109,7 @@ public final class FMTask extends Task<FMTaskSpecs> {
 			}
 		}
 		TasksManager.addTask(this); // add the new task to the manager
+		
 	}
 
 	@Override
@@ -163,6 +164,7 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	 */
 	@Override
 	public FMTask appendChild(Task<FMTaskSpecs> child) {
+		
 		XMLManager.getDocument().renameNode(this.node, null, FMNames.AND.getName());
 		child.setNode(this.node.appendChild(child.getNode()));
 		((FMTask) child).setParent(this);
@@ -320,5 +322,6 @@ public final class FMTask extends Task<FMTaskSpecs> {
 	public String toString() {
 		return "FMTask : " + this.getName();
 	}
+
 
 }

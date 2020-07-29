@@ -55,6 +55,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Task<?>> T createTask(Node node) throws UnresolvedConflict {
+		
 		String tagName = node.getNodeName();
 		String nodeName = XMLManager.getNodeName(node);
 		nodeName = XMLManager.sanitizeName(nodeName);
@@ -100,6 +101,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	 */
 	private WFTask<?> createWFTask(String name, Node node) throws UnresolvedConflict {
 		// TODO: change created type considering user convention (e.g. BPMN)
+
 		Optional<String> optRefName = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
 		boolean isAbstract = AbstractMerger.getProperty((Element) node, BPMNNames.PROPERTY.getName()).isEmpty();
 		BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract,
@@ -123,8 +125,9 @@ public class TaskFactoryImpl implements TaskFactory {
 	 */
 	private static boolean isFMAbstract(Node node) {
 		Node abstractAttr = node.getAttributes().getNamedItem(FMAttributes.ABSTRACT.getName());
+
 		if (abstractAttr == null) {
-			logger.warn("Can't get the abstract status for the node : {}. Considering it as a concrete one.",
+			logger.debug("Can't get the abstract status for the node : {}. Considering it as a concrete one.",
 					XMLManager.getNodeName(node));
 			return false;
 		}

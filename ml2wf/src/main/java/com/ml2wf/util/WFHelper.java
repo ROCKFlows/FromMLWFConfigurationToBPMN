@@ -47,9 +47,7 @@ public class WFHelper {
 		return new ArrayList<>(taskNameList);
 	}
 
-	public boolean isTask(String name) {
-		return taskNameList.contains(name);
-	}
+
 
 
 	

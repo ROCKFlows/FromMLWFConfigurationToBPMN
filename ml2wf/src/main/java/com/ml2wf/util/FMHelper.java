@@ -12,7 +12,6 @@ import java.util.NoSuchElementException;
 import org.xml.sax.SAXException;
 
 
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -66,19 +65,22 @@ public class FMHelper {
 
 	
 	public FMHelper(String path) throws ParserConfigurationException, SAXException, IOException {
-
-		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
-		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
-		
-		builder = factory.newDocumentBuilder();
-		document = builder.parse(new File(path));
-		racine = document.getDocumentElement();
-		featureNameList = listFeatures();
-		constraintList = listConstraints();
+		this(new File(path));
 	}
 
-//DOING
+	public FMHelper(File file) throws ParserConfigurationException, SAXException, IOException {
+	final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
+	factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
+	
+	builder = factory.newDocumentBuilder();
+	document = builder.parse(file);
+	racine = document.getDocumentElement();
+	featureNameList = listFeatures();
+	constraintList = listConstraints();
+}
+
+	//DOING
 	private List<String> listConstraints() {
 		logger.debug("-------- List Constraints ------");
 		List<String> constraints = new ArrayList<>();
@@ -124,27 +126,28 @@ public class FMHelper {
 
 	//IMPROVE
 	private String extractImply(Node node) {
-		String rule = "";
+		StringBuilder rule = new StringBuilder();
+		rule.append("");
 		List<String> operands = readOperands(node);
 		if ((operands.size() == 2) ) {
-			rule += operands.get(0);
-			rule += IMPLY_NOTATION;
-			rule += operands.get(1);
+			rule.append(operands.get(0));
+			rule.append(IMPLY_NOTATION);
+			rule.append(operands.get(1));
 		} 		 
 		else {
 			if ((operands.size() > 2 ) ) {
-				rule += operands.get(0);
-				rule += IMPLY_NOTATION;
-				rule += "AND ";
+				rule.append(operands.get(0));
+				rule.append(IMPLY_NOTATION);
+				rule.append("AND ");
 				operands.remove(0);
 				for( String op : operands ) {
-					rule += op + " ";
+					rule.append(op + " ");
 				}
 			}
 			else
-				rule += "Unexpected operands for imply : " +operands;
+				rule.append("Unexpected operands for imply : " +operands);
 		}
-		return rule;
+		return rule.toString();
 	}
 
 
@@ -316,74 +319,16 @@ public class FMHelper {
 		return document;
 	}
 
-	//To think about
-	//Precondition : The root already exists in the FM
-	private boolean addRelatedFeatures(String feature, String newParent, String root) {
-		if (isFeature(newParent)) {
-			if (isFeature(feature)) {
-				return bothFeaturesExist(feature, newParent);
-			}
-			else { //feature is a new feature
-				addFeature(feature, newParent);
-				return true;
-				}
+
+	public String getParent(String feature) {
+		//TODO IMPROVE !!! 
+		for (String f : featureNameList) {
+			if (isDirectChildOf(f, feature))
+				return f;
 		}
-		else {//Parent Feature is new
-			if (isFeature(feature)) {
-				if (isDirectChildOf(root, feature)) {
-					//we can have #root#newParent#Feature
-					addFeature(newParent, root);
-					moveTo(feature,newParent);
-					return true;
-				}
-				else { 
-					//Between # CurrentParent and parent there is no order relationship
-					//suggest to add an order relationship
-					return false;
-				}
-			}
-			else { //Both feature are new
-				addFeature(newParent, root);
-				addFeature(feature, newParent);
-				return true;
-			}
-		}
-	}
-	
-				
-
-
-	private boolean bothFeaturesExist(String feature, String newParent) {
-		//newParent#Feature is valid => newParent#currentParent is valid
-		if (isChildOf(newParent, feature))
-			return true;
-		
-		String currentParent = getParent(feature);
-		//parent#newParent is valid but not yet newParent#Feature : we can move
-		if (isChildOf(currentParent, newParent)) {
-			moveTo(feature,newParent);
-			return true;
-		}
-		else { //parent#newparent is non valid, we can't move 
-			//suggest to define an order relation between newParent and parent
-			return false;
-		}
-
-	}
-
-	private void addFeature(String feature2, String newParent) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void moveTo(String feature2, String newParent) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private String getParent(String feature2) {
-		// TODO Auto-generated method stub
 		return null;
 	}
+
+			
 
 }

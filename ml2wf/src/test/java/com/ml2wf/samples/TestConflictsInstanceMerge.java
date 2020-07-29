@@ -78,12 +78,14 @@ public class TestConflictsInstanceMerge {
 		// Specific properties
 		assertEquals(1, afterList.size());
 		assertTrue(fmAfter.isChildOf("F31", "F31_0"));
+		assertFalse(fmAfter.isAbstract("F31_0"));
 
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFMPath, command);
 
 		// ---- The same behavior is expected but the task refers_to it's name
 		// #F31#F31_0
+		System.out.println("############--------- Step #F31#F31_0");
 		wfPATH = WF_IN_PATH + "WF1_instance2.bpmn2";
 		sourceFM = DEFAULT_IN_FM;
 		// I make a copy for test
@@ -102,6 +104,9 @@ public class TestConflictsInstanceMerge {
 		logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
+		assertEquals(1, afterList.size());
+		assertTrue(fmAfter.isChildOf("F31", "F31_0"));
+		assertFalse(fmAfter.isAbstract("F31_0"));
 
 		// Specific properties
 		assertEquals(1, afterList.size());
@@ -150,10 +155,9 @@ public class TestConflictsInstanceMerge {
 		assertFalse(fmAfter.isAbstract("F31"));
 	}
 
-	// ToFIX : F32 should be concrete
-	//ToFIX a new Bug
+
 	@Test
-	@DisplayName("ToFIX: still T3 : an unreferenced task is stored in the FM under Unmanaged")
+	@DisplayName("T3 : an unreferenced task is stored in the FM under Unmanaged")
 	public void testWFInstance3UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF3_instance.bpmn2";
 		File fin = new File(wfPATH);

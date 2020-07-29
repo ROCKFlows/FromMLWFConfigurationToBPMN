@@ -41,7 +41,6 @@ import com.ml2wf.tasks.factory.TaskFactory;
 import com.ml2wf.tasks.manager.TasksManager;
 
 import com.ml2wf.tasks.specs.FMTaskSpecs;
-
 import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
@@ -150,6 +149,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 					logger.warn("Skipping node {}...", getNodeName(node));
 				}
 			}
+
 			// saving annotations
 			annotations.addAll(this.getAnnotations(wfDocument));
 			if (completeMerge) {
@@ -163,6 +163,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			this.processTask(wfTask);
 		}
 		TasksManager.updateFMParents(TasksManager.getFMTasks());
+		TasksManager.updateStatus(TasksManager.getWFTasks());
 		this.processAnnotations(annotations);
 		endProcessUnmanagedNodes();
 		TasksManager.clearWFTasks();
@@ -181,8 +182,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 		getDocument().getDocumentElement().normalize();
 		List<Node> taskNodes = XMLManager.getTasksList(getDocument(), FMNames.SELECTOR);
 		taskNodes.stream().map(t -> t.getAttributes().getNamedItem(FMAttributes.NAME.getName()))
-				.filter(Objects::nonNull)
-				.forEach(t -> t.setNodeValue(t.getNodeValue().trim().replace(" ", "_")));
+		.filter(Objects::nonNull).forEach(t -> t.setNodeValue(t.getNodeValue().trim().replace(" ", "_")));
 	}
 
 	/**
@@ -388,16 +388,83 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 */
 	protected void processTask(WFTask<?> task) throws MergeException, UnresolvedConflict {
 		String taskName = task.getName();
-		if (TasksManager.existsinFM(taskName) && !this.processDuplicatedTask(taskName)) {
-			// if task is already in the FM
-			// and no further operation is needed
+
+
+		// Begin new Code --- MIREILLE
+		if (TasksManager.existsinFM(taskName) && !this.processDuplicatedTask(task)) {
+			logger.debug("%s already exists in FM, nothing to do", task);
 			return;
 		}
+
 		// retrieving a suitable parent
 		FMTask parentTask = this.getSuitableParent(task);
+		logger.debug("------> ### processTask %s with suitable Parent %s", task.getName(), parentTask);
 		TasksManager.addTask(parentTask);
 		// inserting the new task
-		insertNewTask(parentTask, task);
+		insertNewTaskUnlessConflict(parentTask, task);
+		logger.debug("--END----> ###  processTask  %s with suitable Parent %s has now for reference %s", task.getName(), parentTask, task.getReference());
+
+	}
+
+	/**
+	 * Processes the given {@code task} 
+	 * and returns true  if we have  more to do with this task
+	 *
+	 * <p>
+	 *
+	 * More precisely, this method :
+	 *
+	 * <p>
+	 * <ul>
+	 * <li> checks if the task is already known as unmanaged (return true)</li>
+	 * </ul>
+	 * @param task
+	 * @return
+	 * @throws MergeException
+	 * @throws UnresolvedConflict
+	 */
+	private boolean processDuplicatedTask(WFTask<?> task) throws MergeException, UnresolvedConflict {
+		FMTask unmanagedTask = unmanagedGlobalTasks.get(UNMANAGED_TASKS);
+		Optional<FMTask> optFMTask = unmanagedTask.getChildWithName(task.getName());
+		String ref = task.getReference();
+		
+		if ((ref == null) || (ref.equals(UNMANAGED_TASKS))) {
+			logger.debug("The new task is already unmanaged- ");
+			return false;
+		} else {// We must remember the new parent
+			dealWithunmanagedTask(unmanagedTask, optFMTask, task);
+			return true;
+		}
+
+	}
+
+	/**
+	 * Processes the given {@code task} and the corresponding FMTask if exists {@code optFMTask} 
+	 * and  return true if this task is modified
+	 *
+	 * <p>
+	 *
+	 * More precisely, this method :
+	 *
+	 * <p>
+	 * @param unmanagedTask
+	 * @param optFMTask
+	 * @param task
+	 * @return
+	 * @throws MergeException
+	 * @throws UnresolvedConflict
+	 */
+	private boolean dealWithunmanagedTask(FMTask unmanagedTask, Optional<FMTask> optFMTask, WFTask<?> task)
+			throws MergeException, UnresolvedConflict {
+		if (optFMTask.isEmpty()) {
+			// if it is not under the unmanaged_tasks node (
+			logger.debug("%s is not under the unmanaged_tasks node", task);
+			return false;
+		} 
+		logger.debug("%s is under the unmanaged_tasks node and should go to %s ", task, this.getSuitableParent(task));
+		unmanagedTask.removeChild(optFMTask.get());
+		optFMTask.get().setParent(null);
+		return true;
 	}
 
 	/**
@@ -427,6 +494,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @since 1.0
 	 */
 	private boolean processDuplicatedTask(String taskName) {
+
 		FMTask unmanagedTask = unmanagedGlobalTasks.get(UNMANAGED_TASKS);
 		Optional<FMTask> optFMTask = unmanagedTask.getChildWithName(taskName);
 		if (optFMTask.isEmpty()) {
@@ -457,8 +525,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @since 1.0
 	 * @see Task
 	 */
-	protected FMTask getGlobalFMTask(String globalNodeName)
-			throws MergeException, UnresolvedConflict {
+	protected FMTask getGlobalFMTask(String globalNodeName) throws MergeException, UnresolvedConflict {
 		Optional<FMTask> optGlobalTask = TasksManager.getFMTaskWithName(globalNodeName);
 		if (optGlobalTask.isEmpty()) {
 			return this.createGlobalFMTask(globalNodeName);
@@ -478,8 +545,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @since 1.0
 	 * @see FMTask
 	 */
-	protected FMTask createGlobalFMTask(String globalNodeName)
-			throws MergeException, UnresolvedConflict {
+	protected FMTask createGlobalFMTask(String globalNodeName) throws MergeException, UnresolvedConflict {
 		// create the node element
 		Element globalElement = createFeatureWithAbstract(globalNodeName, true);
 		// create the global task
@@ -510,8 +576,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected FMTask getReferredFMTask(WFTask<?> task, FMTask defaultTask)
-			throws MergeException, UnresolvedConflict {
+	protected FMTask getReferredFMTask(WFTask<?> task, FMTask defaultTask) throws MergeException, UnresolvedConflict {
 		String reference = task.getReference();
 		if (!reference.isBlank()) {
 			// if contains a documentation node that can refer to a generic task
@@ -529,12 +594,11 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	}
 
 	/**
-	 * Creates and returns a {@code FMTask} specified by the given
-	 * {@code task}'s reference.
+	 * Creates and returns a {@code FMTask} specified by the given {@code task}'s
+	 * reference.
 	 *
 	 * @param task task containing the reference
-	 * @return a {@code FMTask} specified by the given
-	 *         {@code task}'s reference
+	 * @return a {@code FMTask} specified by the given {@code task}'s reference
 	 * @throws MergeException
 	 * @throws UnresolvedConflict
 	 *
@@ -542,17 +606,133 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	 * @see BPMNTask
 	 * @see FMTask
 	 */
-	protected FMTask createReferredFMTask(WFTask<?> task)
-			throws MergeException, UnresolvedConflict {
+	protected FMTask createReferredFMTask(WFTask<?> task) throws MergeException, UnresolvedConflict {
 		String reference = task.getReference();
 		logger.warn("The referenced task [{}] is missing in the FeatureModel.", reference);
 		logger.warn("Creating the referenced task : {}", reference);
 		Optional<WFTask<?>> opt = TasksManager.getWFTaskWithName(reference);
-		FMTask newParent = createFMTaskWithName(reference,
-				(opt.isPresent()) ? opt.get().isAbstract() : opt.isEmpty());
+		FMTask newParent = createFMTaskWithName(reference, (opt.isPresent()) ? opt.get().isAbstract() : opt.isEmpty());
+
 		opt = TasksManager.getWFTaskWithName(newParent.getName());
 		FMTask globalTask = (opt.isEmpty()) ? this.getGlobalFMTask(WFMetaMerger.STEP_TASK)
 				: this.getSuitableParent(opt.get());
 		return insertNewTask(globalTask, newParent);
 	}
+
+	// Mireille
+	public <T extends Task<?>> FMTask insertNewTaskUnlessConflict(FMTask newParent, T task) throws UnresolvedConflict {
+		logger.debug("******* Inserting task unless conflict : %s  with parent %s ", task.getName(), newParent);
+		Optional<FMTask> optNewParent = TasksManager.getFMTaskWithName(newParent.getName());
+		Optional<FMTask> optFeature = TasksManager.getFMTaskWithName(task.getName());
+
+		//TODO Remove test on Parent
+		if (optNewParent.isPresent()) {
+			if (optFeature.isPresent()) {
+				return bothFeaturesExist(optFeature.get(), optNewParent.get());
+			} else {// task is a new feature
+				logger.debug("only add feature %s", task);
+				return addFeature(task, newParent);
+			}
+		}
+		return newParent;
+
+	}
+
+	private <T extends Task<?>> FMTask addFeature(T task, FMTask newParent) throws UnresolvedConflict {
+		FMTask childTask = (task instanceof FMTask) ? (FMTask) task : taskFactory.convertWFtoFMTask((WFTask<?>) task);
+		return newParent.appendChild(childTask);
+	}
+
+	public FMTask bothFeaturesExist(FMTask child, FMTask newParent) throws UnresolvedConflict {
+
+		// TO IMPROVE !!.
+		String logMsg;
+		
+		FMTask currentParent = child.getParent();
+			
+
+
+		if (currentParent == newParent) {
+			logger.debug("We do nothing, It'OK : %s has for parent %s -- and refers to %s ", child, newParent,
+					child.getParent());
+			return newParent;
+		}
+
+		if (currentParent.getName().contentEquals(UNMANAGED) || currentParent.getName().contentEquals(UNMANAGED_TASKS)
+				|| currentParent.getName().contentEquals(UNMANAGED_FEATURES)) {
+			return moveChildToNewParent(currentParent, child, newParent);
+		}
+
+		String childName = child.getName();
+		if ((childName.equals(DEFAULT_ROOT_NAME)) || (childName.equals(WFMetaMerger.STEP_TASK))) {
+			return child;
+		}
+
+		if (isChildOf(newParent, child)) {
+			// newParent#child is valid => newParent#currentParent or
+			// currentParent#newParent is valid
+			if (isChildOf(newParent, currentParent)) {
+				// newParent#child and newParent#currentParent#child is valid. Nothing to do
+				logMsg = String.format("We do nothing, we assume %s has for parent %s -- and refers to %s ",
+						child, newParent, child.getParent());
+				logger.debug(logMsg);
+				return newParent;
+			} else {
+				//// newParent#child and currentParent#child is valid but
+				//// newParent#currentParent is invalid
+				logger.warn(
+						"Something strange ...  it's a child of newParent butnot from cu .. %s has move from %s to parent -- and refers to %s ",
+						child, currentParent, newParent);
+				return moveChildToNewParent(currentParent, child, newParent);
+			}
+		} else {
+			//
+			logMsg = String.format(" %s is not child of  %s, it's child of %s ", child, newParent, currentParent);
+			logger.debug(logMsg);
+
+			if (isChildOf(currentParent, newParent)) {
+				// currentParrent#child, currentParent#newParent, newParent#child =>
+				// currentParent#newParent#child : we can move
+				logMsg = String.format(" %s moves under  %s, it's child of %s ", child, newParent, currentParent);
+				logger.debug(logMsg);
+				return moveChildToNewParent(currentParent, child, newParent);
+			} else {
+				// currentParrent#child, newParent#child => but nor currentParent#newParent nor
+				// newParent#currentParent we have a conflict
+				// parent#newparent is non valid, we can’t move
+				throw new UnresolvedConflict(
+						"add an order relationship between " + currentParent + " and " + newParent);
+			}
+
+		}
+
+	}
+
+	private FMTask moveChildToNewParent(FMTask currentParent, FMTask child, FMTask newParent) {
+		logger.warn("%s has to move from %s to parent %s  and refers to %s ", child, currentParent, newParent,
+				child.getParent());
+		Optional<FMTask> optCurrentParent = TasksManager.getFMTaskWithName(currentParent.getName());
+		child.setParent(newParent);
+		newParent.appendChild(child);
+		if (optCurrentParent.isPresent()) {
+			optCurrentParent.get().removeChild(child);
+		}
+		return newParent;
+	}
+
+	private boolean isChildOf(FMTask parent, FMTask child) {
+
+		for (FMTask task : TasksManager.getFMTaskWithParent(parent)) {
+			if (task.getName().equals(child.getName())) {
+				return true;
+			} else {
+				boolean isChild = isChildOf(task, child);
+				if (isChild)
+					return true;
+			}
+		}
+		return false;
+	}
+
+
 }

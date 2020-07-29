@@ -21,6 +21,7 @@
 					</and>
 				</and>
 				<and abstract="true" name="Steps">
+					<graphics key="collapsed" value="false"/>
 					<feature abstract="true" name="Evaluating_Step"/>
 					<and abstract="true" name="Preprocessing_Step">
 						<feature name="drop_invalid_windows"/>

@@ -1,6 +1,7 @@
 package com.ml2wf.samples;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -46,36 +47,45 @@ public class TestSamplesInstanceMerge {
 	public void clean() {
 	}
 
-	// ToFIX : The only problem lies in abstract features that should be concrete
+	private String[] mergeInstance(String instanceWFPATH, String copiedFM) {
+		String[] command = new String[] { "merge", "--instance", "-i ", instanceWFPATH, "-o ", copiedFM, "-v", "7" };
+		com.ml2wf.App.main(command);
+		return command;
+	}
+	
+	private void logAfterMessage(String testName, List<String> addedFeatures) {
+		String logMsg = String.format("******* addedFeatures in %s : %s ", testName , addedFeatures);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
+	}
+	
+
+	
 	@Test
-	@DisplayName("ToFIX abstract ; T0 : Test with a basic workflow instance adding one Step")
+	@DisplayName("T0 : Test with a basic workflow instance adding one Step")
 	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String instanceWFPATH = WF_IN_PATH + "BasicWF_instance00.bpmn2";
 		String sourceFM = FM_IN_PATH + "basicFM.xml";
 		// FIX avoid to make a copy
 		String copiedFM = FM_OUT_PATH + "basicFMT0.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
-		File fin = new File(instanceWFPATH);
-		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+	
+		TestHelper.copyFM(sourceFM, copiedFM);
+		
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		FMHelper fmBefore = new FMHelper(sourceFM);
 		// Command
 		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
-
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
 		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		logAfterMessage("basicFMT0", addedFeatures);
 		TestHelper.testAbstractAndConcreteFeatures(addedFeatures, instanceWFPATH, fmAfter);
 
-		// TODO Improve to avoid double testing
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, instanceWFPATH);
 		logger.debug("added features : %s ", afterList);
 
-		// FIX : I woul like a warning for Evaluating_Step
+		// ToFIX : I woul like a warning for Evaluating_Step
 		assertEquals(3, afterList.size());
 		assertTrue(fmAfter.isFeature("Evaluating_step"));
 		assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
@@ -86,11 +96,6 @@ public class TestSamplesInstanceMerge {
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
-	private String[] mergeInstance(String instanceWFPATH, String copiedFM) {
-		String[] command = new String[] { "merge", "--instance", "-i ", instanceWFPATH, "-o ", copiedFM, "-v", "7" };
-		com.ml2wf.App.main(command);
-		return command;
-	}
 
 	@Test
 	@DisplayName("T1 : Test a merge that should do nothing")
@@ -114,13 +119,11 @@ public class TestSamplesInstanceMerge {
 
 		// General Properties to check
 		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		logAfterMessage("FM1", addedFeatures);
 		TestHelper.testAbstractAndConcreteFeatures(addedFeatures, instanceWFPATH, fmAfter);
 
-		// TODO Improve to avoid double testing
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, instanceWFPATH);
-		String logMsg = String.format("added features : %s ", afterList);
-		logger.debug(logMsg);
-		System.out.println(logMsg);
+		logAfterMessage("lost - FM1", afterList);
 		assertTrue(afterList.isEmpty());
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
@@ -133,20 +136,58 @@ public class TestSamplesInstanceMerge {
 
 	// TODO test with tasks relatied to non existent metatasks
 
-	// FIX an error is raised...
-	// It should be solved managing hierarchies of tasks
-	// I expect :
-	// Preprocessing_step#Preprocess_data#Missing_value#Mean
-	// Preprocessing_step#Preprocessing_step0
-	// Training_step_1 refersTo: Training_step
+	// FIX an error
 	@Test
-	@DisplayName("ToFIX FM2 : Test with a basic workflow instance adding 3 Steps ")
+	@DisplayName("ToFIX error FM2 : I lost idempotence by merging a WF with a task already identified as \"unmanaged\" ... the problem is serious because the result is very wrong!: Test with a basic workflow instance adding 3 Steps ")
 	public void testAddingHierarchicStepsUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
 		String instanceWFPATH = WF_IN_PATH + "instanceWF2.bpmn2";
 		String sourceFM = FM_IN_PATH + "basicFM.xml";
-		// FIX avoid to make a copy
 		String copiedFM = FM_OUT_PATH + "FM2.xml";
+		TestHelper.copyFM(sourceFM, copiedFM);
+
+		FMHelper fmBefore = new FMHelper(copiedFM); 
+		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
+		FMHelper fmAfter = new FMHelper(copiedFM);
+
+		// General Properties to check 
+		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter); 
+		logAfterMessage("FM2",		  addedFeatures);
+
+		assertEquals(7, addedFeatures.size(), "Training_step_1, Preprocessing_step_0, Unmanaged, Unmanaged_Tasks, Preprocess_data, Missing_value, Mean]"  ); 
+		assertTrue(fmAfter.isChildOf("Steps", "Training_step_1"));
+		assertFalse(fmAfter.isAbstract("Training_step_1"));
+		assertTrue(fmAfter.isChildOf("Unmanaged", "Mean"));
+
+		//toFix : Needed to see the resulting FM ! 
+		String newFM = FM_OUT_PATH +
+				"FM2_BeforeIdempotence.xml"; TestHelper.copyFM(copiedFM, newFM);
+
+		//toFix : I lost Idempotence... and some tasks !! that are under the root !!
+				//ToFix I try it step by Step
+				System.out.println(" \n \n \n Checking Idempotence ");
+				newFM = FM_OUT_PATH + "FM2_FORIdempotence.xml";
+				TestHelper.copyFM(copiedFM, newFM);
+				this.mergeInstance(instanceWFPATH, newFM);
+
+
+				FMHelper fmAfterBIS = new FMHelper(newFM);
+				addedFeatures = TestHelper.noFeatureLost( fmAfter, fmAfterBIS);
+				logAfterMessage("FM2 BIS", addedFeatures);
+				TestHelper.checkIdempotence(copiedFM, command);
+
+
+	}
+	
+	
+	@Test
+	@DisplayName("ToFIX error FM3 : Test with a basic workflow instance adding 2 instance steps")
+	public void testAdding2InstanceStepsUsingCommandLine()
+			throws ParserConfigurationException, SAXException, IOException {
+		String instanceWFPATH = WF_IN_PATH + "instanceBasicHierarchie.bpmn2";
+		String sourceFM = FM_IN_PATH + "basicFM.xml";
+		// FIX avoid to make a copy
+		String copiedFM = FM_OUT_PATH + "FM3.xml";
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
 		FileUtils.copyFile(sourceFile, copiedFile);
@@ -160,30 +201,17 @@ public class TestSamplesInstanceMerge {
 
 		// General Properties to check
 		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		logAfterMessage("FM3", addedFeatures);
+		assertTrue(fmAfter.isChildOf("Missing_Values", "Missing_Values_0"));
+		assertTrue(fmAfter.isChildOf("Training_step", "Training_step_1"));
+		assertTrue(fmAfter.isAbstract("Missing_Values"));
+		assertFalse(fmAfter.isAbstract("Training_step_1"));
+		assertFalse(fmAfter.isAbstract("Missing_Values_0"));
 
-		String logMsg = String.format("addedFeatures: %s ", addedFeatures);
-		logger.debug(logMsg);
-		System.out.println(logMsg);
-		//Just to already fail 
-		 assertTrue(addedFeatures.size()>5);
-		// Preprocessing_step0 refersTo: Preprocessing_step
-		// #Preprocess_data#Missing_value#Mean refersTo:Preprocessing STep
-		// Training_step_1 refersTo: Training_step
-		// TOFIX
-		// TestHelper.testAbstractAndConcreteFeatures(addedFeatures,instanceWFPATH,
-		// fmAfter);
-		// FIX
-		// assertEquals(2, afterList.size());
-		/*
-		 * String f1 = "Evaluating_step"; String f2 = "Acquire_Metadata";
-		 * assertTrue(fmAfter.isFeature(f1)); assertTrue(fmAfter.isFeature(f2));
-		 * assertTrue(fmAfter.isDirectChildOf("Steps", f1));
-		 * assertTrue(fmAfter.isDirectChildOf("Steps", f2));
-		 */
-
-		// Check idempotence
-		// TOFIX
-		// TestHelper.checkIdempotence(copiedFM, command);
+		TestHelper.checkIdempotence(copiedFM, command);
 	}
+
+
+	
 
 }

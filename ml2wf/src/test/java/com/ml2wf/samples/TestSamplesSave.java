@@ -1,6 +1,7 @@
 package com.ml2wf.samples;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -135,9 +136,7 @@ public class TestSamplesSave {
 
 			// General Properties to check
 			List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, Arrays.asList(metaWFPATH, instanceWFPATH));
-			String logMsg = String.format("added features : %s ", afterList);
-			logger.debug(logMsg);
-			System.out.println(logMsg);
+			logMessageAfter(afterList);
 			
 
 			// Specific properties
@@ -146,8 +145,6 @@ public class TestSamplesSave {
 			assertTrue(fmAfter.isDirectChildOf("Steps", "Evaluating_step"));
 			// TODO test abstract Features
 			// TODO test generated constraints
-			// FIX
-			// Check idempotence
 			// FIX Unmanaged is generated
 			//TODO test relations and constraints
 			//Don't forget to test optionnal; empty instances; empty meta; ect.
@@ -170,36 +167,45 @@ public class TestSamplesSave {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	// FIX : AFTER should be empty : %s[Unmanaged] Only when applying idempotence
 	@Test
-	@DisplayName("TODO : Test with a hierarchic workflow adding one Step")
+	@DisplayName("TOFIX ABSTRACT :BasicHierarchie : Test with a hierarchic workflow adding one Step")
 	public void testBasicHierachieSampleUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
 
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFHierarchie.bpmn2";
-		String instanceWFPATH = instanceWF_IN_PATH + "instanceBasicHierarchieToFail.bpmn2";
+		String instanceWFPATH = instanceWF_IN_PATH + "instanceBasicHierarchie.bpmn2";
 		String sourceFM = FM_IN_PATH + "basicFM.xml";
 
 		// I make a copy for test
 		String copiedFM = FM_OUT_PATH + "basicFM_Hierarchie.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
-		File fin = new File(metaWFPATH);
-		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		TestHelper.copyFM(sourceFM, copiedFM);
+		
+		/*
+		 * File sourceFile = new File(sourceFM); FileUtils.copyFile(sourceFile,
+		 * copiedFile); File fin = new File(metaWFPATH); assertTrue(fin.exists());
+		 * assertTrue(copiedFile.exists());
+		 */
+		
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		FMHelper fmBefore = new FMHelper(instanceWFPATH);
 		String[] command = commandSave(metaWFPATH, instanceWFPATH, copiedFM);
-		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, Arrays.asList(metaWFPATH, instanceWFPATH));
-		// This test involves managing naming differences using '_' in FM and BPMN
-		logger.debug("added features : %s ", afterList);
-		// System.out.println(afterList);
+		logMessageAfter(afterList);
+		
+		//META -  #Preprocessing_step#Missing_Values + Training_step 
+		//Instance Missing_Values_0 + Traing_step_1
+		
+		assertTrue(fmAfter.isChildOf("Missing_Values", "Missing_Values_0"));
+		assertTrue(fmAfter.isChildOf("Training_step", "Training_step_1"));
+		assertTrue(fmAfter.isAbstract("Missing_Values"));
+		//TOFIX
+		//assertFalse(fmAfter.isAbstract("Missing_Values_0"));
+		//assertFalse(fmAfter.isAbstract("Training_step_1"));
 
+		
 		// Specific properties
 		// assertEquals(1, afterList.size());
 		// TODO test abstract Features
@@ -208,6 +214,12 @@ public class TestSamplesSave {
 		// Check idempotence
 		TestHelper.checkIdempotence(copiedFM, command);
 
+	}
+
+	private void logMessageAfter(List<String> afterList) {
+		String logMsg = String.format("************** added features : %s ", afterList);
+		logger.debug(logMsg);
+		System.out.println(logMsg);
 	}
 	
 	

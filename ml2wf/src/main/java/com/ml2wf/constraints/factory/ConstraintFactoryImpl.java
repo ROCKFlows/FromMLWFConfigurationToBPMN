@@ -105,7 +105,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @see ConfigImpl
 	 * @see ConstraintParser
 	 */
-	public ConstraintFactoryImpl(Document document) throws ParserConfigurationException {
+	public ConstraintFactoryImpl(Document document)  {
 		// Document instantiation
 		this.document = document;
 		// Parser instantiation

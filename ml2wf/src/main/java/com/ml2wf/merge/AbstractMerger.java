@@ -259,6 +259,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 */
 	protected static FMTask createFMTaskWithName(String name, boolean isAbstract)
 			throws UnresolvedConflict {
+			logger.debug("AbstractMerger createFMTaskWithName %s ==> isAbstract : %s", name, isAbstract);
 		return (FMTask) taskFactory.createTask(createFeatureWithAbstract(name, isAbstract));
 	}
 
@@ -343,6 +344,7 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @since 1.0
 	 */
 	public static List<Node> getNestedNodes(Node node) {
+
 		List<Node> result = new ArrayList<>();
 		// retrieving attributes values
 		String rawName = XMLManager.getNodeName(node);
@@ -357,18 +359,21 @@ public abstract class AbstractMerger extends XMLManager {
 			addAttributeDoc((Element) node, attributesDoc); // add the attributesDoc to the docNode text content
 			return Arrays.asList(node); // return the current node as a list
 		}
+		
 		// Manage the parentNode
 		Element parentNode = (Element) node.cloneNode(true);
 		String parentName = names.remove(0);
 		parentNode.setAttribute(BPMNAttributes.NAME.getName(), parentName);
 		addAttributeDoc(parentNode, attributesDoc); // add the attributesDoc to the docNode text content
 		result.add(parentNode);
+		
 		// foreach nested node's name
 		for (String name : names) {
 			parentNode = createNestedNode(parentNode, name);
 			addAttributeDoc(parentNode, attributesDoc); // add the attributesDoc to the docNode text content
 			result.add(parentNode);
 		}
+
 		return result;
 	}
 
@@ -514,12 +519,15 @@ public abstract class AbstractMerger extends XMLManager {
 	 */
 	public static <T extends Task<?>> FMTask insertNewTask(FMTask parentTask, T task) throws UnresolvedConflict {
 		logger.debug("Inserting task : {}", task.getName());
+		//FIX
+		logger.debug("******* AbstractMerger : Inserting task :%s with parent %s", task.getName(),parentTask) ;
 		// inserting the new node
 		FMTask childTask = (task instanceof FMTask) ? (FMTask) task
 				: taskFactory.convertWFtoFMTask((WFTask<?>) task);
 		return parentTask.appendChild(childTask);
 	}
 
+	
 	/**
 	 * Returns a {@code List<Node>} containing all annotations of the
 	 * {@code wfDocument}.
