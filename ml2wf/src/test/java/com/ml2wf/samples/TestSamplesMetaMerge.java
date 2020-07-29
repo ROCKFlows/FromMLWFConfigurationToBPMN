@@ -425,7 +425,7 @@ public class TestSamplesMetaMerge {
 		assertTrue(fin.exists());
 
 		String sourceFM = FM_IN_PATH + "basicFM_SAVE0.xml";
-		String copiedFM = FM_OUT_PATH + "basicFM_10.xml";
+		String copiedFM = FM_OUT_PATH + "basicFM_10"+ Math.random()+ ".xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
 		FMHelper fmBefore = new FMHelper(copiedFM);
