@@ -435,7 +435,7 @@ public class TestSamplesMetaMerge {
 		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
-		// System.out.println(logMsg);
+		System.out.println(logMsg);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 
 		// No Task are lost

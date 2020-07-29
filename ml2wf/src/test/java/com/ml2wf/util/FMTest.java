@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
  * @author blay
  *
  */
-class FMTest {
+public class FMTest {
 
 	private static final String FM_IN_PATH = "./src/test/resources/ForValidationTests/feature_models/";
 

@@ -658,8 +658,10 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 			return newParent;
 		}
 
-		if (currentParent.getName().contentEquals(UNMANAGED) || currentParent.getName().contentEquals(UNMANAGED_TASKS)
-				|| currentParent.getName().contentEquals(UNMANAGED_FEATURES)) {
+		if ( (currentParent == null) 
+				|| currentParent.getName().equals(UNMANAGED) 
+				|| currentParent.getName().equals(UNMANAGED_TASKS)
+				|| currentParent.getName().equals(UNMANAGED_FEATURES)) {
 			return moveChildToNewParent(currentParent, child, newParent);
 		}
 
@@ -709,15 +711,25 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
 	}
 
 	private FMTask moveChildToNewParent(FMTask currentParent, FMTask child, FMTask newParent) {
-		logger.warn("%s has to move from %s to parent %s  and refers to %s ", child, currentParent, newParent,
+		String logMsg = String.format("%s has to move from %s to parent %s  and refers to %s ", child, currentParent, newParent,
 				child.getParent());
+		logger.warn(logMsg);
+		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>"+logMsg);
+		if (currentParent == null) {
+			setParent(child, newParent);
+			return newParent;
+		}
 		Optional<FMTask> optCurrentParent = TasksManager.getFMTaskWithName(currentParent.getName());
-		child.setParent(newParent);
-		newParent.appendChild(child);
+		setParent(child, newParent);
 		if (optCurrentParent.isPresent()) {
 			optCurrentParent.get().removeChild(child);
 		}
 		return newParent;
+	}
+
+	private void setParent(FMTask child, FMTask newParent) {
+		child.setParent(newParent);
+		newParent.appendChild(child);
 	}
 
 	private boolean isChildOf(FMTask parent, FMTask child) {
