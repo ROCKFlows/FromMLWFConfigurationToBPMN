@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -46,6 +47,7 @@ public class TestBuild {
 	
 	//TODO : Automate tests
 	@Test
+	@Disabled
 	@DisplayName("TODO : Build0 ")
 	public void testBuild0UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String root = SAMPLE_PATH + "build0/";
@@ -70,9 +72,9 @@ public class TestBuild {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterListMeta = TestHelper.nothingLost(fmBefore, fmAfter, metaDirectory);
+		List<String> afterListMeta = TestHelper.nothingLost(fmBefore, fmAfter, metaDirectory, command);
 		//List<String> afterListInstance = 
-				TestHelper.nothingLost(fmBefore, fmAfter, instanceDirectory);
+				TestHelper.nothingLost(fmBefore, fmAfter, instanceDirectory, command);
 		//F31, F2, exist
 		//F311 (WF4), T1 (WFT1), T2(WFT1T2)
 		//Meta Instances
@@ -97,6 +99,7 @@ public class TestBuild {
 	
 	//TODO : Automate tests
 		@Test
+		@Disabled
 		@DisplayName("TODO : Build1 ")
 		public void testBuild1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 			String root = SAMPLE_PATH + "build1/";
@@ -119,9 +122,9 @@ public class TestBuild {
 			FMHelper fmAfter = new FMHelper(copiedFM);
 
 			// General Properties to check
-			List<String> afterListMeta = TestHelper.nothingLost(fmBefore, fmAfter, metaDirectory);
+			List<String> afterListMeta = TestHelper.nothingLost(fmBefore, fmAfter, metaDirectory, command);
 			//List<String> afterListInstance = 
-			TestHelper.nothingLost(fmBefore, fmAfter, instanceDirectory);
+			TestHelper.nothingLost(fmBefore, fmAfter, instanceDirectory, command);
 			//F31, F2, exist
 			//F311 (WF4), T1 (WFT1), T2(WFT1T2)
 			//Meta Instances

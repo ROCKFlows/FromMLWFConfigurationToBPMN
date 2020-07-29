@@ -15,6 +15,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +49,15 @@ public class TestSamplesMetaMerge {
 	public void clean() {
 	}
 
+	@BeforeAll
+	public static void setup() {
+		File fout = new File(FM_OUT_PATH);
+		if (!fout.isDirectory()) {
+			fout.mkdir();
+		}
+		logger.debug("TestSamplesMetaMerge ----------");
+	}
+	
 	@Test
 	@DisplayName("T0 : Test with a basic workflow adding one Step")
 	public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
@@ -65,7 +75,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 		// List<String> afterList = TestHelper.noFeatureLost(fmBefore, fmAfter);
 		logger.debug("added features : %s ", afterList);
 		// All added feature should be abstract
@@ -106,7 +116,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 		logger.debug("added features : %s ", afterList);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 
@@ -141,7 +151,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
@@ -167,7 +177,6 @@ public class TestSamplesMetaMerge {
 	}
 
 	@Test
-	@Disabled
 	@DisplayName("T3 : Test with a basic workflow adding two Steps")
 	public void testAddingTwoStepsUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 
@@ -185,7 +194,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 		logger.debug("added features : %s ", afterList);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 
@@ -222,7 +231,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		// System.out.println(logMsg);
@@ -262,7 +271,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		// System.out.println(logMsg);
@@ -307,7 +316,7 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
@@ -363,7 +372,8 @@ public class TestSamplesMetaMerge {
 
 	// ToFIX: An error message is expected
 	@Test
-	@DisplayName("T8 : Test Merge when input FM file doesn't exist")
+	@Disabled
+	@DisplayName("T8 -- Side effect : Test Merge when input FM file doesn't exist")
 	public void testGenerationWithNoFMInputFile()
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFHierarchie2.bpmn2";
@@ -396,14 +406,14 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		// System.out.println(logMsg);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 
 		// No Task are lost
-		TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 
 		// Ensure all new Features corresponding to Tasks are Steps
 		for (String f : afterList) {
@@ -434,14 +444,14 @@ public class TestSamplesMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		TestHelper.allTheseFeaturesAreAbstract(afterList, fmAfter);
 
 		// No Task are lost
-		TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH);
+		TestHelper.nothingLost(fmBefore, fmAfter, metaWFPATH, command);
 
 		logMsg = String.format("No Features should be added : %s", afterList);
 		logger.debug(logMsg);

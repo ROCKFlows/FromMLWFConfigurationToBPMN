@@ -78,11 +78,11 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter, command);
 		logAfterMessage("basicFMT0", addedFeatures);
 		TestHelper.testAbstractAndConcreteFeatures(addedFeatures, instanceWFPATH, fmAfter);
 
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, instanceWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, instanceWFPATH, command);
 		logger.debug("added features : %s ", afterList);
 
 		// ToFIX : I woul like a warning for Evaluating_Step
@@ -118,11 +118,11 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter, command);
 		logAfterMessage("FM1", addedFeatures);
 		TestHelper.testAbstractAndConcreteFeatures(addedFeatures, instanceWFPATH, fmAfter);
 
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, instanceWFPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, instanceWFPATH, command);
 		logAfterMessage("lost - FM1", afterList);
 		assertTrue(afterList.isEmpty());
 		TestHelper.checkIdempotence(copiedFM, command);
@@ -151,7 +151,7 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check 
-		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter); 
+		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter, command); 
 		logAfterMessage("FM2",		  addedFeatures);
 
 		assertEquals(7, addedFeatures.size(), "Training_step_1, Preprocessing_step_0, Unmanaged, Unmanaged_Tasks, Preprocess_data, Missing_value, Mean]"  ); 
@@ -171,7 +171,7 @@ public class TestSamplesInstanceMerge {
 				this.mergeInstance(instanceWFPATH, newFM);
 
 
-				FMHelper fmAfterBIS = new FMHelper(newFM);
+				//FMHelper fmAfterBIS = new FMHelper(newFM);
 				//TODO : I Give up
 				//addedFeatures = TestHelper.noFeatureLost( fmAfter, fmAfterBIS);
 				//logAfterMessage("FM2 BIS", addedFeatures);
@@ -203,7 +203,7 @@ public class TestSamplesInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter);
+		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter, command);
 		logAfterMessage("FM3", addedFeatures);
 		assertTrue(fmAfter.isChildOf("Missing_Values", "Missing_Values_0"));
 		assertTrue(fmAfter.isChildOf("Training_step", "Training_step_1"));

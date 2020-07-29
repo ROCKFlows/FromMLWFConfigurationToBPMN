@@ -70,7 +70,7 @@ public class TestConflictsInstanceMerge {
 
 		// General Properties to check
 
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
@@ -99,7 +99,7 @@ public class TestConflictsInstanceMerge {
 		fmAfter = new FMHelper(copiedFMBis);
 
 		// General Properties to check
-		afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		// This test involves managing naming differences using '_' in FM and BPMN
 		logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
@@ -142,7 +142,7 @@ public class TestConflictsInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		// This test involves managing naming differences using '_' in FM and BPMN
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
@@ -175,7 +175,7 @@ public class TestConflictsInstanceMerge {
 		FMHelper fmAfter = new FMHelper(copiedFMPath);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		// This test involves managing naming differences using '_' in FM and BPMN
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
@@ -212,7 +212,7 @@ public class TestConflictsInstanceMerge {
 
 		// General Properties to check
 
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
@@ -255,7 +255,7 @@ public class TestConflictsInstanceMerge {
 
 		// General Properties to check
 
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
@@ -306,7 +306,7 @@ public class TestConflictsInstanceMerge {
 
 		// General Properties to check
 
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
@@ -352,7 +352,7 @@ public class TestConflictsInstanceMerge {
 
 		// General Properties to check
 
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);

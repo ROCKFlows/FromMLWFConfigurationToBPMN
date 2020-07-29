@@ -177,7 +177,7 @@ public class TestConflictsMetaMerge {
 			FMHelper fmAfter = new FMHelper(resultingFM);
 
 			// General Properties to check
-			TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+			TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, new String[] {"metamerge", wfPATH});
 			logMsg = String.format("\t" + wf + "&&&&&&&&&&&&&&&&&&----------Children of step%s", (new FMHelper(resultingFM)).getChildren("Steps"));
 			logger.debug(logMsg);
 			System.out.println(logMsg);
@@ -203,7 +203,7 @@ public class TestConflictsMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		logger.debug("added features : %s ", afterList);
 		assertEquals(0, afterList.size());
 		// No warning is expected
@@ -230,7 +230,7 @@ public class TestConflictsMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		// This test involves managing naming differences using '_' in FM and BPMN
 		logger.debug("added features : %s ", afterList);
 		// System.out.println(afterList);
@@ -263,7 +263,7 @@ public class TestConflictsMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		// This test involves managing naming differences using '_' in FM and BPMN
 		logger.debug("added features : %s ", afterList);
 		// System.out.println(afterList);
@@ -293,7 +293,7 @@ public class TestConflictsMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		// This test involves managing naming differences using '_' in FM and BPMN
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
@@ -328,7 +328,7 @@ public class TestConflictsMetaMerge {
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfter, wfPATH, command);
 		// This test involves managing naming differences using '_' in FM and BPMN
 		logger.debug("added features : %s ", afterList);
 		System.out.println(afterList);
@@ -355,10 +355,10 @@ public class TestConflictsMetaMerge {
 		assertTrue(fin.exists());
 		assertTrue(copiedFile.exists());
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		//FMHelper fmBefore = new FMHelper(copiedFM);
 		String[] command = this.commandMetaMerge(wfPATH, copiedFM);
 		assertTrue(copiedFile.exists());
-		FMHelper fmAfter = new FMHelper(copiedFM);
+		//FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
 		// It fails, because the merge fails
@@ -401,7 +401,7 @@ public class TestConflictsMetaMerge {
 		FMHelper fmAfterWF7 = new FMHelper(w7FMPath);
 
 		// General Properties to check
-		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfterWF7, wf7PATH);
+		List<String> afterList = TestHelper.nothingLost(fmBefore, fmAfterWF7, wf7PATH, command);
 
 		String logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
@@ -460,7 +460,7 @@ public class TestConflictsMetaMerge {
 		FMHelper fmAfterWFT1 = new FMHelper(wT1FMPath);
 
 		// General Properties to check
-		afterList = TestHelper.nothingLost(fmBefore, fmAfterWFT1, wT1FMPath);
+		afterList = TestHelper.nothingLost(fmBefore, fmAfterWFT1, wT1FMPath, command);
 		logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
@@ -473,7 +473,7 @@ public class TestConflictsMetaMerge {
 		FMHelper fmAfterWFT1_7 = new FMHelper(wT1_7FMPath);
 
 		// General Properties to check
-		afterList = TestHelper.nothingLost(fmAfterWFT1, fmAfterWFT1_7, wf7PATH);
+		afterList = TestHelper.nothingLost(fmAfterWFT1, fmAfterWFT1_7, wf7PATH, command);
 		logMsg = String.format("added features after adding W7 in FMA_T1: %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);

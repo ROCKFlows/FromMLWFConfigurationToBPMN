@@ -16,7 +16,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.util.FMHelper;
@@ -84,7 +83,7 @@ public class TestHelper {
 		return listCopy;
 	}
 
-	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, List<String> wfs) throws ParserConfigurationException, SAXException, IOException {
+	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, List<String> wfs, String[] command) throws ParserConfigurationException, SAXException, IOException {
 
 		List<String> afterList = normalize(fmAfter.getFeatureNameList());
 
@@ -92,7 +91,7 @@ public class TestHelper {
 			testTasksAgainstFeatures(afterList, wfPATH);
 		};
 
-		afterList= normalize(noFeatureLost(fmBefore, fmAfter));
+		afterList= normalize(noFeatureLost(fmBefore, fmAfter, command));
 		return afterList;
 	}
 
@@ -130,22 +129,22 @@ public class TestHelper {
 		assertTrue( lostTasks.isEmpty());
 	}
 
-	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, String wfPATH ) throws ParserConfigurationException, SAXException, IOException{
+	public static List<String> nothingLost(FMHelper fmBefore, FMHelper fmAfter, String wfPATH, String[] command ) throws ParserConfigurationException, SAXException, IOException{
 		String logMsg = String.format(">> Test - nothingLost : %s ", wfPATH);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		List<String> afterList = normalize(fmAfter.getFeatureNameList());
 		testTasksAgainstFeatures(afterList, wfPATH);
-		afterList= normalize(noFeatureLost(fmBefore, fmAfter));
+		afterList= normalize(noFeatureLost(fmBefore, fmAfter, command));
 
 		return afterList;
 	}
 
-	public static List<String> noFeatureLost(FMHelper fmBefore, FMHelper fmAfter) {
+	public static List<String> noFeatureLost(FMHelper fmBefore, FMHelper fmAfter, String[] command) {
 		String logMsg = String.format(">> Test - NoFeatureLost ");
 		logger.debug(logMsg);
 		System.out.println(logMsg);
-		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
+		List<String> afterList = checkNoFeaturesAreLost(fmAfter, fmBefore, command);
 		logMsg = String.format("added features : %s ", afterList);
 		logger.debug(logMsg);
 		List<String> afterConstraints = checkNoConstraintsAreLost(fmAfter, fmBefore);
@@ -171,7 +170,7 @@ public class TestHelper {
 		logMsg = String.format("After : %s" , fmAfter.getFeatureNameList());
 		logger.debug(logMsg);
 		//System.out.println("After : " + fmAfter.getFeatureNameList());
-		afterList = checkNoFeaturesAreLost(fmAfter, fmBefore);
+		afterList = checkNoFeaturesAreLost(fmAfter, fmBefore, command);
 		logMsg = String.format("AFTER should be empty : %s", afterList);
 		logger.debug(logMsg);
 		//System.out.println("AFTER should be empty : %s" + afterList);
@@ -181,20 +180,20 @@ public class TestHelper {
 	}
 
 
-	public static List<String> checkNoFeaturesAreLost(FMHelper fmAfter, FMHelper fmBefore) {
+	public static List<String> checkNoFeaturesAreLost(FMHelper fmAfter, FMHelper fmBefore, String[] command) {
 		List<String> beforeList = fmBefore.getFeatureNameList();
 		List<String> afterList = fmAfter.getFeatureNameList();
 		beforeList = normalize(beforeList);
 		afterList = normalize(afterList);
-		logger.debug("No features are lost ??? ");
+		logger.debug("No features are lost ???  ");
 		String logMsg = String.format("Before features : %s ", beforeList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
 		logMsg = String.format("After features : %s ", afterList);
 		logger.debug(logMsg);
 		System.out.println(logMsg);
-		List<String> x = new ArrayList<>(beforeList);
-		assertTrue(afterList.containsAll(beforeList), "No Feature were lost ");
+		logMsg = "No Feature were lost " + Arrays.toString(command);
+		assertTrue(afterList.containsAll(beforeList), "No Feature were lost " + logMsg);
 		afterList.removeAll(beforeList);
 		logMsg = String.format("All features are present and added features are: %s ", afterList);
 		logger.debug(logMsg);
@@ -302,9 +301,11 @@ public class TestHelper {
 	public static void copyFM(String sourceFM,String copiedFM) throws IOException {
 		File copiedFile = new File(copiedFM);
 		File sourceFile = new File(sourceFM);
+		System.out.println("---------------- Files are copied :  " + sourceFM + " and " + copiedFM);
 		assertTrue(sourceFile.exists());
 		FileUtils.copyFile(sourceFile, copiedFile);
 		assertTrue(copiedFile.exists());
+		System.out.println("---------------- Files are copied :  " + sourceFM + " and " + copiedFM);
 	}
 
 	public static boolean testConstraintImpliesAnd(List<String> constraints, String leftFeature, List<String> featureList) {
