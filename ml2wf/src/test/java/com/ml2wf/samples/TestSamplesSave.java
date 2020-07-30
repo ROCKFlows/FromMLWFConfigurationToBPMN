@@ -54,8 +54,7 @@ public class TestSamplesSave {
 	
 	//Add test on abstract and concrete Features
 	@Test
-	@Disabled
-	@DisplayName("ToFIX : T0 : Test with only one basic meta workflow and one instance wf adding one Step")
+	@DisplayName("T0 : Test with only one basic meta workflow and one instance wf adding one Step")
 	public void testT0UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF.bpmn2";
 		File fin = new File(metaWFPATH);
@@ -68,8 +67,7 @@ public class TestSamplesSave {
 		TestHelper.copyFM(sourceFM, copiedFM);
 
 
-
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = commandSave(metaWFPATH, instanceWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -116,7 +114,6 @@ public class TestSamplesSave {
 	
       	// ToFIX Unmanaged is generated
 	    //Non consistent FM is generated
-	@Disabled
 		@Test
 		@DisplayName("ToFIX : T1 : Test with a basic workflow adding one Step")
 		public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
@@ -131,8 +128,7 @@ public class TestSamplesSave {
 			TestHelper.copyFM(sourceFM, copiedFM);
 
 
-
-			FMHelper fmBefore = new FMHelper(sourceFM);
+			FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 			// Command
 			String[] command = commandSave(metaWFPATH, instanceWFPATH, copiedFM);
 			FMHelper fmAfter = new FMHelper(copiedFM);
@@ -170,7 +166,7 @@ public class TestSamplesSave {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	@Disabled
+
 	@Test
 	@DisplayName("TOFIX ABSTRACT :BasicHierarchie : Test with a hierarchic workflow adding one Step")
 	public void testBasicHierachieSampleUsingCommandLine()
@@ -191,7 +187,7 @@ public class TestSamplesSave {
 		 */
 		
 
-		FMHelper fmBefore = new FMHelper(instanceWFPATH);
+		FMHelper fmBefore = FMHelper.createFMHelper(instanceWFPATH);
 		String[] command = commandSave(metaWFPATH, instanceWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 

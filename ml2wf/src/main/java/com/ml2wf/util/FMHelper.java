@@ -21,6 +21,8 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +30,7 @@ public class FMHelper {
 
 
 	private static final Logger logger = LogManager.getLogger(FMHelper.class);
-
+	private static final String FM_OUT_PATH = "./target/generated/FM_INTERMEDIATE/";
 
 	private static final String FEATURE = "feature";
 	private static final String AND = "and";
@@ -79,6 +81,14 @@ public class FMHelper {
 	featureNameList = listFeatures();
 	constraintList = listConstraints();
 }
+	
+	public static FMHelper createFMHelper(String sourceFMOrigine) throws IOException, ParserConfigurationException, SAXException {
+		String sourceFMSAV = FM_OUT_PATH + sourceFMOrigine.hashCode()+".xml";
+		File copiedFile = new File(sourceFMSAV);
+		File sourceFile = new File(sourceFMOrigine);
+		FileUtils.copyFile(sourceFile, copiedFile);
+		return new FMHelper(copiedFile);
+	}
 
 	//DOING
 	private List<String> listConstraints() {

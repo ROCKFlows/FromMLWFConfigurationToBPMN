@@ -69,7 +69,7 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_0.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -110,7 +110,7 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_1.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -145,7 +145,7 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_2.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -188,7 +188,7 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_3.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -225,7 +225,8 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_4.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -265,7 +266,7 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_5.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -310,7 +311,7 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_6.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -370,10 +371,10 @@ public class TestSamplesMetaMerge {
 
 	}
 
-	// ToFIX: An error message is expected
+	// ToFIX: An error message is expected; Interactions with a merge test without original FM 
 	@Test
 	@Disabled
-	@DisplayName("T8 -- Side effect : Test Merge when input FM file doesn't exist")
+	@DisplayName("T8 -- TOFIX Side effect : Test Merge when input FM file doesn't exist")
 	public void testGenerationWithNoFMInputFile()
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		String metaWFPATH = metaWF_IN_PATH + "BasicMetaWFHierarchie2.bpmn2";
@@ -400,7 +401,7 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_9.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -438,7 +439,7 @@ public class TestSamplesMetaMerge {
 		String copiedFM = FM_OUT_PATH + "basicFM_10"+ Math.random()+ ".xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMerge(metaWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);

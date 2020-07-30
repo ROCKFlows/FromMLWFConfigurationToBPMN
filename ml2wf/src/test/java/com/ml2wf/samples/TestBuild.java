@@ -47,7 +47,6 @@ public class TestBuild {
 	
 	//TODO : Automate tests
 	@Test
-	@Disabled
 	@DisplayName("TODO : Build0 ")
 	public void testBuild0UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String root = SAMPLE_PATH + "build0/";
@@ -65,7 +64,7 @@ public class TestBuild {
 		String copiedFM = FM_OUT_PATH + "FMA_B0.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		String[] command = commandBuild(metaDirectory, instanceDirectory, copiedFM);
 
 		assertTrue(new File(copiedFM).exists());
@@ -99,7 +98,6 @@ public class TestBuild {
 	
 	//TODO : Automate tests
 		@Test
-		@Disabled
 		@DisplayName("TODO : Build1 ")
 		public void testBuild1UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 			String root = SAMPLE_PATH + "build1/";
@@ -117,7 +115,8 @@ public class TestBuild {
 			String copiedFM = FM_OUT_PATH + "FMA_B1.xml";
 			TestHelper.copyFM(sourceFM, copiedFM);
 
-			FMHelper fmBefore = new FMHelper(sourceFM);
+			FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
+			
 			String[] command = commandBuild(metaDirectory, instanceDirectory, copiedFM);
 			FMHelper fmAfter = new FMHelper(copiedFM);
 

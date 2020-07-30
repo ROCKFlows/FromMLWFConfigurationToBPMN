@@ -161,7 +161,7 @@ public class TestHelper {
 		FMHelper fmAfter;
 		logger.debug("Test Idempotence {}");
 		List<String> afterList;
-		fmBefore = new FMHelper(fM);
+		fmBefore = FMHelper.createFMHelper(fM);
 		String logMsg = String.format("Before : %s" , fmBefore.getFeatureNameList());
 		logger.debug(logMsg);
 		//System.out.println("Before : " + fmBefore.getFeatureNameList());

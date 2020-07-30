@@ -72,7 +72,7 @@ public class TestSamplesInstanceMerge {
 		TestHelper.copyFM(sourceFM, copiedFM);
 		
 
-		FMHelper fmBefore = new FMHelper(sourceFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -105,16 +105,11 @@ public class TestSamplesInstanceMerge {
 		String sourceFM = FM_IN_PATH + "basicFM_SAVE0.xml";
 		// FIX avoid to make a copy
 		String copiedFM = FM_OUT_PATH + "basicFM_SAVE_Idempotence_with_merge_intance.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
-		File fin = new File(instanceWFPATH);
-		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
+		
 		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
-		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
@@ -146,8 +141,8 @@ public class TestSamplesInstanceMerge {
 		String sourceFM = FM_IN_PATH + "basicFM.xml";
 		String copiedFM = FM_OUT_PATH + "FM2.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
-
-		FMHelper fmBefore = new FMHelper(copiedFM); 
+		
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -155,26 +150,27 @@ public class TestSamplesInstanceMerge {
 		List<String> addedFeatures = TestHelper.noFeatureLost(fmBefore, fmAfter, command); 
 		logAfterMessage("FM2",		  addedFeatures);
 
-//		assertEquals(7, addedFeatures.size(), "Training_step_1, Preprocessing_step_0, Unmanaged, Unmanaged_Tasks, Preprocess_data, Missing_value, Mean]"  ); 
+		assertEquals(7, addedFeatures.size(), "Training_step_1, Preprocessing_step_0, Unmanaged, Unmanaged_Tasks, Preprocess_data, Missing_value, Mean]"  ); 
 		assertTrue(fmAfter.isChildOf("Steps", "Training_step_1"));
 		assertFalse(fmAfter.isAbstract("Training_step_1"));
-//		assertTrue(fmAfter.isChildOf("Unmanaged", "Mean"));
+		assertTrue(fmAfter.isChildOf("Unmanaged", "Mean"));
 
 		//toFix : Needed to see the resulting FM ! 
-		/*
-		 * String newFM = FM_OUT_PATH + "FM2_BeforeIdempotence.xml";
-		 * TestHelper.copyFM(copiedFM, newFM);
-		 * 
-		 * //toFix : I lost Idempotence... and some tasks !! that are under the root !!
-		 * //ToFix I try it step by Step
-		 * System.out.println(" \n \n \n Checking Idempotence "); newFM = FM_OUT_PATH +
-		 * "FM2_FORIdempotence.xml"; TestHelper.copyFM(copiedFM, newFM);
-		 * this.mergeInstance(instanceWFPATH, newFM);
-		 * 
-		 */
+		
+		  String newFM = FM_OUT_PATH + "FM2_BeforeIdempotence.xml";
+		  TestHelper.copyFM(copiedFM, newFM);
+		  
+		  //toFix : I lost Idempotence... and some tasks !! that are under the root !!
+		  //ToFix I try it step by Step
+		  System.out.println(" \n \n \n Checking Idempotence "); 
+		  newFM = FM_OUT_PATH +		  "FM2_FORIdempotence.xml"; 
+		  TestHelper.copyFM(copiedFM, newFM);
+		  this.mergeInstance(instanceWFPATH, newFM);
+		  
+		 
 				//FMHelper fmAfterBIS = new FMHelper(newFM);
 				//TODO : I Give up
-				//addedFeatures = TestHelper.noFeatureLost( fmAfter, fmAfterBIS);
+				//addedFeatures = TestHelper.noFeatureLost( fmAfter, fmAfterBIS, new String[] {"merge instance", newFM});
 				//logAfterMessage("FM2 BIS", addedFeatures);
 				//TestHelper.checkIdempotence(copiedFM, command);
 
@@ -199,7 +195,7 @@ public class TestSamplesInstanceMerge {
 		assertTrue(fin.exists());
 		assertTrue(copiedFile.exists());
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 

@@ -122,13 +122,18 @@ public class TestConflictsMetaMerge {
 
 	private void mergeMeta(int testNumber, List<String> wfList, String globalWF)
 			throws ParserConfigurationException, SAXException, IOException {
-		String sourceFM = DEFAULT_IN_FM;
-		FMHelper fmBefore = new FMHelper(sourceFM);
-
+		String sourceFMOrigine = DEFAULT_IN_FM;
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFMOrigine);
+		
+		//To try to avoid some unexpected side effets
+		String  sourceFMSAV= FM_OUT_PATH + "FMSAV" + testNumber + ".xml";
+		TestHelper.copyFM(sourceFMOrigine, sourceFMSAV);
+		
+	
 		// Step 1 : I merge all the WF inside the same FM in sequence
 		System.out.println("**********Step 1 : I merge all the WF inside the same FM in sequence*********");
 		String resultingFM = FM_OUT_PATH + "FMA_Test" + testNumber + ".xml";
-		TestHelper.copyFM(sourceFM, resultingFM);
+		TestHelper.copyFM(sourceFMSAV, resultingFM);
 		String logMsg = String.format("Step 1 : merge in %s all the WF %s", resultingFM, wfList);
 		logger.debug(logMsg);
 
@@ -146,7 +151,7 @@ public class TestConflictsMetaMerge {
 		}
 
 		String resultingFMBis = FM_OUT_PATH + "FMA_TestBis" + testNumber + ".xml";
-		TestHelper.copyFM(sourceFM, resultingFMBis);
+		TestHelper.copyFM(sourceFMSAV, resultingFMBis);
 
 		String wfPATH = WF_IN_PATH + globalWF + ".bpmn2";
 		this.commandMetaMerge(wfPATH, resultingFMBis);
@@ -156,7 +161,7 @@ public class TestConflictsMetaMerge {
 		// Step 3: I want to prove order independance
 		Collections.shuffle(wfList);
 		resultingFM = FM_OUT_PATH + "FMA_TestOrderFree" + testNumber + ".xml";
-		TestHelper.copyFM(sourceFM, resultingFM);
+		TestHelper.copyFM(sourceFMSAV, resultingFM);
 		this.mergeMetaAWFList(wfList, fmBefore, resultingFM);
 		TestHelper.compare(resultingFM, resultingFMBis);
 	}
@@ -196,8 +201,7 @@ public class TestConflictsMetaMerge {
 		// I make a copy for test
 		String copiedFM = FM_OUT_PATH + "FMA_WF1.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
-
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Command
 		String[] command = this.commandMetaMerge(wfPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
@@ -218,14 +222,14 @@ public class TestConflictsMetaMerge {
 		String sourceFM = DEFAULT_IN_FM;
 		// I make a copy for test
 		String copiedFM = FM_OUT_PATH + "FMA_WF2.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
+		TestHelper.copyFM(sourceFM, copiedFM);
+		
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
+		
 		String[] command = this.commandMetaMerge(wfPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -250,16 +254,14 @@ public class TestConflictsMetaMerge {
 		String sourceFM = DEFAULT_IN_FM;
 		// I make a copy for test
 		String copiedFM = FM_OUT_PATH + "FMA_WF3.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
+		TestHelper.copyFM(sourceFM, copiedFM);
+
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
+		
 		String[] command = this.commandMetaMerge(wfPATH, copiedFM);
-		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
@@ -280,16 +282,14 @@ public class TestConflictsMetaMerge {
 		String sourceFM = DEFAULT_IN_FM;
 		// I make a copy for test
 		String copiedFM = FM_OUT_PATH + "FMA_WF4.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
+		TestHelper.copyFM(sourceFM, copiedFM);
+		
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		String[] command = this.commandMetaMerge(wfPATH, copiedFM);
-		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
@@ -315,16 +315,14 @@ public class TestConflictsMetaMerge {
 		String sourceFM = DEFAULT_IN_FM;
 		// I make a copy for test
 		String copiedFM = FM_OUT_PATH + "FMA_WF5.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
+		TestHelper.copyFM(sourceFM, copiedFM);
+		
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		String[] command = this.commandMetaMerge(wfPATH, copiedFM);
-		assertTrue(copiedFile.exists());
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
@@ -348,16 +346,18 @@ public class TestConflictsMetaMerge {
 		String sourceFM = DEFAULT_IN_FM;
 		// I make a copy for test
 		String copiedFM = FM_OUT_PATH + "FMA_WF6.xml";
-		File copiedFile = new File(copiedFM);
-		File sourceFile = new File(sourceFM);
-		FileUtils.copyFile(sourceFile, copiedFile);
+		TestHelper.copyFM(sourceFM, copiedFM);
+		
 		File fin = new File(wfPATH);
 		assertTrue(fin.exists());
-		assertTrue(copiedFile.exists());
+
+
+		//FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
+		
 
 		//FMHelper fmBefore = new FMHelper(copiedFM);
 		String[] command = this.commandMetaMerge(wfPATH, copiedFM);
-		assertTrue(copiedFile.exists());
+		
 		//FMHelper fmAfter = new FMHelper(copiedFM);
 
 		// General Properties to check
@@ -394,7 +394,8 @@ public class TestConflictsMetaMerge {
 		File finWFT1 = new File(wfT1PATH);
 		assertTrue(finWFT1.exists());
 
-		FMHelper fmBefore = new FMHelper(sourceFMPath);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFMPath);
+		
 		// Command
 		String[] command = this.commandMetaMerge(wf7PATH, w7FMPath);
 

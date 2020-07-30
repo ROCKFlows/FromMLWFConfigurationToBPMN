@@ -61,7 +61,7 @@ public class TestConflictsInstanceMerge {
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF1_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
-		FMHelper fmBefore = new FMHelper(copiedFMPath);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 
 		// Call the merge
 		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
@@ -135,7 +135,7 @@ public class TestConflictsInstanceMerge {
 		String copiedFM = FM_OUT_PATH + "FMA_WF2_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFM);
 
-		FMHelper fmBefore = new FMHelper(copiedFM);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		String[] command = this.commandMergeInstance(wfPATH, copiedFM);
 
 		assertTrue(new File(copiedFM).exists());
@@ -168,7 +168,7 @@ public class TestConflictsInstanceMerge {
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF3_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
-		FMHelper fmBefore = new FMHelper(copiedFMPath);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
 
 		assertTrue(new File(copiedFMPath).exists());
@@ -203,7 +203,7 @@ public class TestConflictsInstanceMerge {
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF4_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
-		FMHelper fmBefore = new FMHelper(copiedFMPath);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 
 		// Call the merge
 		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
@@ -246,8 +246,8 @@ public class TestConflictsInstanceMerge {
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF5_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
-		FMHelper fmBefore = new FMHelper(copiedFMPath);
-
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
+		
 		// Call the merge
 		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
 
@@ -297,7 +297,7 @@ public class TestConflictsInstanceMerge {
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF6_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
-		FMHelper fmBefore = new FMHelper(copiedFMPath);
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 
 		// Call the merge
 		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
@@ -343,8 +343,7 @@ public class TestConflictsInstanceMerge {
 		String copiedFMPath = FM_OUT_PATH + "FMA_WF7_i.xml";
 		TestHelper.copyFM(sourceFM, copiedFMPath);
 
-		FMHelper fmBefore = new FMHelper(copiedFMPath);
-
+		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
 		// Call the merge
 		String[] command = this.commandMergeInstance(wfPATH, copiedFMPath);
 
