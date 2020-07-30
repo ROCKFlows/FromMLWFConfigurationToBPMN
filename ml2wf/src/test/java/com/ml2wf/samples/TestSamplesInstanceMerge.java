@@ -143,6 +143,7 @@ public class TestSamplesInstanceMerge {
 		TestHelper.copyFM(sourceFM, copiedFM);
 		
 		FMHelper fmBefore = FMHelper.createFMHelper(sourceFM);
+		
 		String[] command = this.mergeInstance(instanceWFPATH, copiedFM);
 		FMHelper fmAfter = new FMHelper(copiedFM);
 
@@ -157,22 +158,22 @@ public class TestSamplesInstanceMerge {
 
 		//toFix : Needed to see the resulting FM ! 
 		
-		  String newFM = FM_OUT_PATH + "FM2_BeforeIdempotence.xml";
-		  TestHelper.copyFM(copiedFM, newFM);
+		String newFM = FM_OUT_PATH + "FM2_BeforeIdempotence.xml";
+		TestHelper.copyFM(copiedFM, newFM);
 		  
 		  //toFix : I lost Idempotence... and some tasks !! that are under the root !!
 		  //ToFix I try it step by Step
-		  System.out.println(" \n \n \n Checking Idempotence "); 
-		  newFM = FM_OUT_PATH +		  "FM2_FORIdempotence.xml"; 
-		  TestHelper.copyFM(copiedFM, newFM);
-		  this.mergeInstance(instanceWFPATH, newFM);
+		 // System.out.println(" \n \n \n Checking Idempotence "); 
+		  //newFM = FM_OUT_PATH +		  "FM2_FORIdempotence.xml"; 
+		  //TestHelper.copyFM(copiedFM, newFM);
+		  //this.mergeInstance(instanceWFPATH, newFM);
 		  
 		 
 				//FMHelper fmAfterBIS = new FMHelper(newFM);
 				//TODO : I Give up
 				//addedFeatures = TestHelper.noFeatureLost( fmAfter, fmAfterBIS, new String[] {"merge instance", newFM});
 				//logAfterMessage("FM2 BIS", addedFeatures);
-				//TestHelper.checkIdempotence(copiedFM, command);
+		//TestHelper.checkIdempotence(copiedFM, command);
 
 
 	}
@@ -181,7 +182,7 @@ public class TestSamplesInstanceMerge {
 	
 	
 	@Test
-	@DisplayName("ToFIX error FM3 : Test with a basic workflow instance adding 2 instance steps")
+	@DisplayName("T3 - FM3 : Test with a basic workflow instance adding 2 instance steps")
 	public void testAdding2InstanceStepsUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
 		String instanceWFPATH = WF_IN_PATH + "instanceBasicHierarchie.bpmn2";

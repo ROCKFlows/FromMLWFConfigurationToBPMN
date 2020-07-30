@@ -115,7 +115,7 @@ public class TestSamplesSave {
       	// ToFIX Unmanaged is generated
 	    //Non consistent FM is generated
 		@Test
-		@DisplayName("ToFIX : T1 : Test with a basic workflow adding one Step")
+		@DisplayName(" T1 : Test with a basic workflow adding one Step")
 		public void testBasicSampleUsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 			String metaWFPATH = metaWF_IN_PATH + "BasicMetaWF2.bpmn2";
 			File fin = new File(metaWFPATH);

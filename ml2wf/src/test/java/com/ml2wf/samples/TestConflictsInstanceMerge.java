@@ -124,7 +124,7 @@ public class TestConflictsInstanceMerge {
 	// Todo : test the presence of a warning
 	//ToFIX no conflict Detected
 	@Test
-	@DisplayName("ToFIX still Abstract +  Warning : refer to a task known as abstract")
+	@DisplayName("ToFIX  Warning needed : refer to a task known as abstract")
 	public void testWFInstance2UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF2_instance.bpmn2";
 		File fin = new File(wfPATH);
@@ -151,7 +151,6 @@ public class TestConflictsInstanceMerge {
 		// Specific properties
 		// No features are added
 		assertEquals(0, afterList.size());
-		// FIX
 		assertFalse(fmAfter.isAbstract("F31"));
 	}
 

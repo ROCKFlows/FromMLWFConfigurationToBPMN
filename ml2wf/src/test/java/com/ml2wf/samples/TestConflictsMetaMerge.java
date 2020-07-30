@@ -94,9 +94,8 @@ public class TestConflictsMetaMerge {
 		this.mergeMeta(3, Arrays.asList("WFT1T3", "WFT1T2T3"), "WFT1T2T3");
 	}
 
-	// ToFIX : We are expecting T2 to be a subtask of T1
 	@Test
-	@DisplayName("ToFIX still : Test 4 in #147 : #f2#f3 + #f1#f2#f3 = #f1#f2#f3 in any order")
+	@DisplayName("Test 4 in #147 : #f2#f3 + #f1#f2#f3 = #f1#f2#f3 in any order")
 	public void test4UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		this.mergeMeta(4, Arrays.asList("WFT2T3", "WFT1T2T3"), "WFT1T2T3");
 	}
@@ -244,8 +243,6 @@ public class TestConflictsMetaMerge {
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
-	// FIX a warning should be raised
-	// Pas signalé
 	// #F2#F31 is impossible because F31 is already a subfeature if F3
 	@Test
 	@DisplayName("Conflict : T3 :  F31 can't be in the same time child of F3 and F2 #81 #66")
@@ -305,11 +302,9 @@ public class TestConflictsMetaMerge {
 		TestHelper.checkIdempotence(copiedFM, command);
 	}
 
-	// FIX a warning is at least expected
 	// We expect FA as a subfeature of F3 and a super feature of F31
-	// Pas signalé
 	@Test
-	@DisplayName("ToFIX still : WF5 : No Conflict : Add  an intermediate step #F3#FA#F31")
+	@DisplayName(" WF5 : No Conflict : Add  an intermediate step #F3#FA#F31")
 	public void testWF5UsingCommandLine() throws ParserConfigurationException, SAXException, IOException {
 		String wfPATH = WF_IN_PATH + "WF5.bpmn2";
 		String sourceFM = DEFAULT_IN_FM;
