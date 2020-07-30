@@ -133,10 +133,8 @@ public class TestSamplesInstanceMerge {
 	// TODO test with tasks relatied to non existent metatasks
 
 	// FIX an error
-	//An error on CI !!
 	@Test
-	@Disabled
-	@DisplayName("ToFIX error FM2 during CI : I lost idempotence by merging a WF with a task already identified as \"unmanaged\" ... the problem is serious because the result is very wrong!: Test with a basic workflow instance adding 3 Steps ")
+	@DisplayName("ToFIX error FM2 : I lost idempotence by merging a WF with a task already identified as \"unmanaged\" ... the problem is serious because the result is very wrong!: Test with a basic workflow instance adding 3 Steps ")
 	public void testAddingHierarchicStepsUsingCommandLine()
 			throws ParserConfigurationException, SAXException, IOException {
 		String instanceWFPATH = WF_IN_PATH + "instanceWF2.bpmn2";
