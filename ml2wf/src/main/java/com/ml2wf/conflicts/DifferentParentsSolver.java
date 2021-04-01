@@ -5,10 +5,12 @@ import org.apache.logging.log4j.Logger;
 
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.merge.concretes.WFMetaMerger;
+import com.ml2wf.tasks.base.Task;
 import com.ml2wf.tasks.base.WFTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.tasks.exceptions.InvalidTaskException;
 
-public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolver<T> {
+public class DifferentParentsSolver implements ConflictSolver {
 
 	private static final String NO_REF_ERROR = "Can't resolve a conflict involving a WFTask (%s) without reference.";
 	private static final String NO_SOLUTION_ERROR = "Can't find a solution for %s (parent=%s) and %s (parent=%s) having different parents.";
@@ -26,41 +28,62 @@ public class DifferentParentsSolver<T extends WFTask<?>> implements ConflictSolv
 	}
 
 	@Override
-	public T solve(T taskA, T taskB) throws UnresolvedConflict {
+	public <T extends Task<?>> T solve(T taskA, T taskB) throws UnresolvedConflict {
 		this.checkRequirements(taskA, taskB);
+		String refA = getRefName(taskA);
+		String refB = getRefName(taskB);
 		logger.warn("Conflict detected implying {} (parent={}) and {} (parent={}) : They have different parents.",
-				taskA, taskA.getReference(), taskB, taskB.getReference());
+				taskA, refA, taskB, refB);
 		// T1 + T2 + T1#T2 => T1#T2
-		if (taskA.getReference().equals(WFMetaMerger.STEP_TASK)) {
-			logger.warn("Keeping {} (parent={}).", taskB, taskB.getReference());
+		if (refA.equals(WFMetaMerger.STEP_TASK)) {
+			logger.warn("Keeping {} (parent={}).", taskB, refB);
 			return taskB;
 		}
-		if (taskB.getReference().equals(WFMetaMerger.STEP_TASK)) {
-			logger.warn("Keeping {} (parent={}).", taskA, taskA.getReference());
+		if (refB.equals(WFMetaMerger.STEP_TASK)) {
+			logger.warn("Keeping {} (parent={}).", taskA, refA);
 			return taskA;
 		}
 		// ---
 		throw new UnresolvedConflict(
-				String.format(NO_SOLUTION_ERROR, taskA, taskA.getReference(), taskB, taskB.getReference()));
+				String.format(NO_SOLUTION_ERROR, taskA, refA, taskB, refB));
 	}
 
 	@Override
-	public boolean areInConflict(T taskA, T taskB) {
+	public <T extends Task<?>> boolean areInConflict(T taskA, T taskB) {
 		this.checkRequirements(taskA, taskB);
-		return !taskA.getReference().equals(taskB.getReference());
+		return !getRefName(taskA).equals(getRefName(taskB));
 	}
 
-	private void checkRequirements(T taskA, T taskB) {
-		String taskARef = taskA.getReference();
-		if ((taskARef == null) || taskARef.isBlank()) {
+	private <T extends Task<?>> void checkRequirements(T taskA, T taskB) {
+		if (taskA == null) {
 			throw new InvalidTaskException(
 					String.format(NO_REF_ERROR, taskA));
 		}
-		String taskBRef = taskB.getReference();
-		if ((taskBRef == null) || taskBRef.isBlank()) {
+		if (taskB == null) {
 			throw new InvalidTaskException(
 					String.format(NO_REF_ERROR, taskB));
 		}
+		String ref = getRefName(taskA);
+		if ((ref == null) || ref.isBlank()) {
+			throw new InvalidTaskException(
+					String.format(NO_REF_ERROR, taskA));
+		}
+		ref = getRefName(taskB);
+		if ((ref == null) || ref.isBlank()) {
+			throw new InvalidTaskException(
+					String.format(NO_REF_ERROR, taskB));
+		}
+	}
+
+	private static <T extends Task<?>> String getRefName(T task) {
+		if (task instanceof FMTask) {
+			FMTask fmTask = (FMTask) task;
+			if (fmTask.getParent() == null) {
+				return "";
+			}
+			return fmTask.getParent().getName();
+		}
+		return ((WFTask<?>) task).getReference();
 	}
 
 }
