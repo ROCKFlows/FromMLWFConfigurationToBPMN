@@ -15,7 +15,7 @@ import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.config.ConfigImpl;
 import com.ml2wf.constraints.config.DefaultConfig;
 import com.ml2wf.constraints.parser.ConstraintParser;
-import com.ml2wf.constraints.parser.Parser;
+import com.ml2wf.constraints.parser.IParser;
 import com.ml2wf.constraints.tree.BinaryTree;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.fm.FMNames;
@@ -60,9 +60,9 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	/**
 	 * {@code Parser}'s instance that will parse given constraints.
 	 *
-	 * @see Parser
+	 * @see IParser
 	 */
-	private final Parser parser;
+	private final IParser parser;
 	/**
 	 * {@code Document} instance that will be used for {@code Node} creation.
 	 *

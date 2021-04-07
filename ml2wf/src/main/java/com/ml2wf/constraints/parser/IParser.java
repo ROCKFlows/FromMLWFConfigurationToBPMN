@@ -12,7 +12,7 @@ import com.ml2wf.constraints.util.OperAssociation;
  *
  * @version 1.0
  */
-public interface Parser {
+public interface IParser {
 
 	/**
 	 * Parses {@code content} and returns a {@code List} of {@code BinaryTree}

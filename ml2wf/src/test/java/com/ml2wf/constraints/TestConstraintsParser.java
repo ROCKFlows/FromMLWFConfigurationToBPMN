@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ml2wf.constraints.config.ConfigImpl;
 import com.ml2wf.constraints.parser.ConstraintParser;
-import com.ml2wf.constraints.parser.Parser;
+import com.ml2wf.constraints.parser.IParser;
 
 public class TestConstraintsParser {
 
@@ -18,7 +18,7 @@ public class TestConstraintsParser {
 	private static String simpleExpression = "A & B";
 	private static String complexExpression = "A => !(B | (C & !(D & E) | F) & G) & H";
 
-	private Parser parser;
+	private IParser parser;
 
 	@BeforeEach
 	public void setUp() {

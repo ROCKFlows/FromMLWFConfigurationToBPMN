@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import com.ml2wf.constraints.config.ConfigImpl;
 import com.ml2wf.constraints.tree.BinaryTree;
 import com.ml2wf.constraints.util.OperAssociation;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This class is a constraint parser.
@@ -27,23 +29,25 @@ import com.ml2wf.constraints.util.OperAssociation;
  *
  * <p>
  *
- * It is an implementation of the {@link Parser} interface.
+ * It is an implementation of the {@link IParser} interface.
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
- * @see Parser
+ * @see IParser
  * @see ConfigImpl
  * @see BinaryTree
+ *
+ * @since 1.0.0
  */
-public class ConstraintParser implements Parser {
+public class ConstraintParser implements IParser {
 
+	private static final String EXPRESSION_REGEX = "([\\w\\s]*)(%s+)([\\w\\s]*)";
 	/**
 	 * {@code Config}'s instance used to define delimiters and regex patterns.
 	 *
 	 * @see ConfigImpl
 	 */
+	@Getter @Setter
 	private ConfigImpl config;
 
 	/**
@@ -55,26 +59,6 @@ public class ConstraintParser implements Parser {
 	 */
 	public ConstraintParser(ConfigImpl cfg) {
 		this.setConfig(cfg);
-	}
-
-	/**
-	 * Returns the {@code Config} instance.
-	 *
-	 * @return the {@code Config} instance
-	 *
-	 * @see ConfigImpl
-	 */
-	public ConfigImpl getConfig() {
-		return this.config;
-	}
-
-	/**
-	 * Sets the {@code Config} instance.
-	 *
-	 * @see ConfigImpl
-	 */
-	public void setConfig(ConfigImpl cfg) {
-		this.config = cfg;
 	}
 
 	@Override
@@ -93,7 +77,7 @@ public class ConstraintParser implements Parser {
 		List<String> operators = this.config.getOperatorsList();
 		operators = operators.stream().map(Pattern::quote).collect(Collectors.toList());
 		// regex part
-		String regex = String.format("([\\w\\s]*)(%s+)([\\w\\s]*)", String.join("|", operators));
+		String regex = String.format(EXPRESSION_REGEX, String.join("|", operators));
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(expression);
 		while (matcher.find()) {
@@ -125,12 +109,12 @@ public class ConstraintParser implements Parser {
 	 */
 	private BinaryTree<String> constraintMapToTree(Map<Integer, Deque<String>> depthMap) {
 		BinaryTree<String> result = new BinaryTree<>();
-		Deque<String> operList; // list of operands/operators
+		Deque<String> operandsOperatorsList;
 		for (Map.Entry<Integer, Deque<String>> entry : depthMap.entrySet()) {
 			// foreach constraint
-			operList = entry.getValue();
-			for (String brutOper : operList) {
-				List<OperAssociation> parsed = this.parseExpression(brutOper);
+			operandsOperatorsList = entry.getValue();
+			for (String brutOperandOperator : operandsOperatorsList) {
+				List<OperAssociation> parsed = this.parseExpression(brutOperandOperator);
 				BinaryTree<String> tmpTree = this.getTreeFromParsedCons(parsed);
 				result.insertWhenPossible(tmpTree);
 			}
@@ -150,11 +134,11 @@ public class ConstraintParser implements Parser {
 	 *
 	 * <pre>
 	 * <code>
-	 * function getTreeFromParsedCons(parsedOper: List)
+	 * function getTreeFromParsedCons(parsedOperAssociations: List)
 	 *   lastInsertionLeft <- false
 	 *   buffer <- empty string
 	 *   tree <- empty tree
-	 *   foreach operAssociation in parsedOper do
+	 *   foreach operAssociation in parsedOperAssociations do
 	 *     operator <- operAssociation.operator
 	 *     created <- tree.addRightChild(operator)
 	 *     if config.isUnaryOperator(operator) then
@@ -193,29 +177,32 @@ public class ConstraintParser implements Parser {
 	 * </code>
 	 * </pre>
 	 *
-	 * @param parsedOper {@code List} of {@code OperAssociation}
-	 * @return a {@code BinaryTree} representing the {@code parsedOper}
+	 * @param parsedOperAssociations {@code List} of {@code OperAssociation}
+	 * @return a {@code BinaryTree} representing the {@code parsedOperAssociations}
 	 *
 	 * @since 1.0
 	 * @see BinaryTree
 	 * @see OperAssociation
 	 */
-	private BinaryTree<String> getTreeFromParsedCons(List<OperAssociation> parsedOper) {
+	private BinaryTree<String> getTreeFromParsedCons(List<OperAssociation> parsedOperAssociations) {
 		// TODO: decompose this method and improve performances
 		boolean lastInsertionLeft = false;
-		String buffer = ""; // buffer that will contains buffered operands
+		String buffer = "";
 		BinaryTree<String> tree = new BinaryTree<>();
 		BinaryTree<String> created;
-		for (OperAssociation operAssociation : parsedOper) {
+		for (OperAssociation operAssociation : parsedOperAssociations) {
 			// foreach operator-operands associations
 			String operator = operAssociation.getOperator();
-			created = tree.addRightChild(operator); // add operator
+			// add operator
+			created = tree.addRightChild(operator);
 			if (this.config.isUnaryOperator(operator)) {
 				// if operator is unary
-				created.blockLeftChild(true); // block left child due to unary
+				// block left child
+				created.blockLeftChild(true);
 				if (operAssociation.hasRightOperand()) {
-					// if unaryoperand is directly associated to an operand
-					tree.addRightChild(operAssociation.getRightOperand()); // add this operand
+					// if unary operand is directly associated to an operand
+					// add this operand
+					tree.addRightChild(operAssociation.getRightOperand());
 					lastInsertionLeft = false;
 				}
 			} else {
@@ -224,7 +211,8 @@ public class ConstraintParser implements Parser {
 					// if has a left operand
 					// add this operand
 					tree.setLeftChild(operAssociation.getLeftOperand());
-					tree.blockLeftChild(true); // block left child due to operand
+					// block left child due to operand
+					tree.blockLeftChild(true);
 					lastInsertionLeft = true;
 				}
 				if (operAssociation.hasRightOperand()) {
@@ -232,7 +220,8 @@ public class ConstraintParser implements Parser {
 					// save it in the buffer
 					if (!buffer.isBlank()) {
 						created = tree.addLeftChild(buffer);
-						created.block(true); // block left child due to operand
+						// block left child due to operand
+						created.block(true);
 						lastInsertionLeft = true;
 					}
 					buffer = operAssociation.getRightOperand();
@@ -242,10 +231,12 @@ public class ConstraintParser implements Parser {
 		if (!buffer.isEmpty()) {
 			if (lastInsertionLeft) {
 				tree.addRightChild(buffer);
-				tree.blockRightChild(true); // block left child due to operand
+				// block left child due to operand
+				tree.blockRightChild(true);
 			} else {
 				tree.addLeftChild(buffer);
-				tree.blockLeftChild(true); // block left child due to operand
+				// block left child due to operand
+				tree.blockLeftChild(true);
 			}
 		}
 		return tree;
@@ -280,7 +271,7 @@ public class ConstraintParser implements Parser {
 	 * @since 1.0
 	 * @see StringTokenizer
 	 */
-	private List<String> getSplittedConstraints(String constraint) {
+	private static List<String> getSplittedConstraints(String constraint) {
 		List<String> result = new ArrayList<>();
 		StringTokenizer tokenizer;
 		tokenizer = new StringTokenizer(constraint, "(.*)", true);
@@ -322,7 +313,7 @@ public class ConstraintParser implements Parser {
 	 *
 	 * @since 1.0
 	 */
-	private Map<Integer, Deque<String>> computeDepth(List<String> constraints) {
+	private static Map<Integer, Deque<String>> computeDepth(List<String> constraints) {
 		Map<Integer, Deque<String>> depth = new TreeMap<>();
 		int separatorCounter = 0;
 		for (String element : constraints) {
@@ -331,9 +322,7 @@ public class ConstraintParser implements Parser {
 			} else if (element.equals(")")) {
 				separatorCounter--;
 			} else {
-				if (!depth.containsKey(separatorCounter)) {
-					depth.put(separatorCounter, new ArrayDeque<>());
-				}
+				depth.computeIfAbsent(separatorCounter, ArrayDeque::new);
 				depth.get(separatorCounter).add(element);
 			}
 		}
@@ -378,24 +367,29 @@ public class ConstraintParser implements Parser {
 			if (currentChar.equals(unaryOp)) {
 				// if it is an unary operator
 				unaryCounter++;
-				builder.append("("); // open the unary operator linked bracket
+				// open the unary operator linked bracket
+				builder.append("(");
 			} else if (currentChar.equals("(")) {
 				// if it is an opening bracket
-				bracketCounter++; // increment the nested level
+				// increment the nested level
+				bracketCounter++;
 			} else if (currentChar.equals(")")) {
 				// if it is a closing bracket
-				bracketCounter--; // decrement the nested level
+				// decrement the nested level
+				bracketCounter--;
 				if (unaryCounter > bracketCounter) {
-					// if an unary operator was operating
-					// on this bracket
-					unaryCounter--; // decrease the number of active unary linked bracket
-					builder.append(")"); // close the unary operator linked bracket
+					// if an unary operator was operating on this bracket
+					// decrease the number of active unary linked bracket
+					unaryCounter--;
+					// close the unary operator linked bracket
+					builder.append(")");
 				}
-			} else if ((this.config.getOperatorsList().contains(currentChar) || currentChar.equals(")"))
+			} else if ((config.getOperatorsList().contains(currentChar) || ")".equals(currentChar))
 					&& (unaryCounter > bracketCounter)) {
 				// if it is an operator or a closing bracket and there is no nested bracket
 				unaryCounter--;
-				builder.append(")"); // close the unary operator linked bracket
+				// close the unary operator linked bracket
+				builder.append(")");
 			}
 			builder.append(currentChar);
 		}
@@ -438,7 +432,7 @@ public class ConstraintParser implements Parser {
 	 * @see Pattern
 	 * @see Matcher
 	 */
-	private List<String> getConstraintParts(String textContent) {
+	private static List<String> getConstraintParts(String textContent) {
 		String regex = String.format("%s(.*?)%s", Pattern.quote("[["), Pattern.quote("]]"));
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(textContent);
