@@ -15,11 +15,6 @@ import com.ml2wf.conflicts.ConflictSolver;
 public class UnresolvedConflict extends Exception {
 
 	/**
-	 * Generated serial ID.
-	 */
-	private static final long serialVersionUID = 5994738837557737546L;
-
-	/**
 	 * {@code UnsolvedConflict}'s default constructor.
 	 *
 	 * @param arg0 exception explanation

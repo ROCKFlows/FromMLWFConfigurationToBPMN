@@ -10,7 +10,7 @@ public class ConflictsManager implements ConflictSolver {
 
 	// TODO: check composite DP
 
-	private List<ConflictSolver> solvers = new ArrayList<>();
+	private final List<ConflictSolver> solvers = new ArrayList<>();
 
 	public ConflictsManager() {
 		this.initSolvers();
@@ -39,5 +39,4 @@ public class ConflictsManager implements ConflictSolver {
 		}
 		return false;
 	}
-
 }
