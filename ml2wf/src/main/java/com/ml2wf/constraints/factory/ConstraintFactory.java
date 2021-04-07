@@ -15,8 +15,7 @@ import com.ml2wf.util.Pair;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
+ * @since 1.0.0
  */
 public interface ConstraintFactory {
 
@@ -25,27 +24,28 @@ public interface ConstraintFactory {
 	 * {@code constraintText}.
 	 *
 	 * @param constraintText text containing constraints
+	 *
 	 * @return a {@code List} of generated constraint nodes
+	 *
 	 * @throws InvalidConstraintException
 	 * @throws UnresolvedConflict
 	 *
-	 * @since 1.0
 	 * @see Node
 	 */
-	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException, UnresolvedConflict;
+	List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException, UnresolvedConflict;
 
 	/**
 	 * Returns a {@code List} of {@code Pair} containing the LCA {@code FMTask} as
 	 * key and the descriptive {@code Node} as value.
 	 *
 	 * @param constraintText text containing constraints
+	 *
 	 * @return a {@code List} of {@code Pair} containing the LCA {@code FMTask} as
 	 *         left element and the descriptive {@code Node} as right element
 	 *
-	 * @since 1.0
 	 * @see Pair
 	 */
-	public List<Pair<FMTask, Node>> getOrderNodes(String constraintText);
+	List<Pair<FMTask, Node>> getOrderNodes(String constraintText);
 
 	/**
 	 * Returns an <b>implication</b> association of the {@code globalTask} with the
@@ -58,8 +58,9 @@ public interface ConstraintFactory {
 	 *
 	 * @param globalTask global task
 	 * @param tasksNames names of the implied tasks by the {@code global task}
+	 *
 	 * @return an implication association of the {@code globalTask} with the
 	 *         {@code tasksNames}
 	 */
-	public String getAssociationConstraint(String globalTask, List<String> tasksNames);
+	String getAssociationConstraint(String globalTask, List<String> tasksNames);
 }
