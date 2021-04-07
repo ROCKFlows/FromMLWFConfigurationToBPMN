@@ -320,7 +320,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	public Node createNode(String element) {
 		Node node;
 		if (this.config.isAnOperator(element)) {
-			node = this.document.createElement(this.config.getVocmapping().get(element));
+			node = this.document.createElement(this.config.getVocMapping().get(element));
 		} else {
 			node = this.document.createElement(FMNames.VAR.getName());
 			node.appendChild(this.document.createTextNode(element));

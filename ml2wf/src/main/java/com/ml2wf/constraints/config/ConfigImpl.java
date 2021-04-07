@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.ml2wf.conventions.enums.fm.FMNames;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 
 /**
@@ -37,32 +42,34 @@ import com.ml2wf.conventions.enums.fm.FMNames;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  */
-public class ConfigImpl implements Config {
+@Log4j2
+public final class ConfigImpl implements Config {
 
 	/**
 	 * Default configuration file path.
 	 */
-	private static String DEFAULT_FILE_PATH = "./config/configuration.cfg";
+	private static final String DEFAULT_FILE_PATH = "./config/configuration.cfg";
+	private static final String APPLYING_DEFAULT_MSG = "Applying default configuration...";
 	/**
 	 * Configuration file path.
 	 */
-	private String filePath;
+	@Getter private String filePath;
 	/**
 	 * {@code Map} mapping operators symbol with {@code FeatureModelNames} elements.
 	 *
 	 * @see FMNames
 	 */
-	private Map<String, String> vocMapping;
+	@Getter private Map<String, String> vocMapping;
 	/**
 	 * {@code List} of unary operators.
 	 */
-	private List<String> unaryOperators;
+	@Getter private List<String> unaryOperators;
 	/**
 	 * {@code List} of binary operators.
 	 */
-	private List<String> binaryOperators;
+	@Getter private List<String> binaryOperators;
 
 	/**
 	 * {@code Config}'s default constructor.
@@ -74,8 +81,8 @@ public class ConfigImpl implements Config {
 	 */
 	private ConfigImpl() {
 		// TODO: add cfg file path parameter ?
-		this.filePath = DEFAULT_FILE_PATH;
-		this.readConfig();
+		filePath = DEFAULT_FILE_PATH;
+		readConfig();
 	}
 
 	/**
@@ -88,15 +95,13 @@ public class ConfigImpl implements Config {
 	 *
 	 * @author Nicolas Lacroix
 	 *
-	 * @version 1.0
-	 *
 	 * @see ConfigImpl
 	 * @see <a href=
 	 *      "https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom">Initialization-on-demand
 	 *      holder idiom</a>
-	 *
 	 */
-	private static class ConfigHolder {
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	private static final class ConfigHolder {
 
 		/**
 		 * {@code Config}'s unique instance.
@@ -121,15 +126,6 @@ public class ConfigImpl implements Config {
 	}
 
 	/**
-	 * Returns the configuration file path.
-	 *
-	 * @return the configuration file path
-	 */
-	public String getFilePath() {
-		return this.filePath;
-	}
-
-	/**
 	 * Sets the configuration file path.
 	 *
 	 * <p>
@@ -141,36 +137,38 @@ public class ConfigImpl implements Config {
 	 */
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
-		this.readConfig();
+		readConfig();
 	}
 
 	@Override
 	public void readConfig() {
 		// initializes collections
-		this.vocMapping = new HashMap<>();
-		this.unaryOperators = new ArrayList<>();
-		this.binaryOperators = new ArrayList<>();
+		vocMapping = new HashMap<>();
+		unaryOperators = new ArrayList<>();
+		binaryOperators = new ArrayList<>();
 		// get config file data
 		// check if filePath is valid
-		Path path = Paths.get(this.filePath);
+		Path path = Paths.get(filePath);
 		if (!Files.exists(path)) {
-			// TODO: log error
-			this.applyDefault();
+			log.error("Can't read config. The given path {} does not exist.", path);
+			log.warn(APPLYING_DEFAULT_MSG);
+			applyDefault();
 			return;
 		}
 		try (Stream<String> lines = Files.lines(path)) {
 			// foreach line
 			lines.forEach(l -> {
 				l = l.replace(" ", "");
-				if (!l.startsWith("#") && !l.isBlank() && this.processEntry(l.split(":"))) {
+				if (!l.startsWith("#") && !l.isBlank() && processEntry(l.split(":"))) {
 					// if it is not a comment or an empty line
 					// and config is complete
-					return;
+					// TODO: to fix
 				}
 			});
 		} catch (IOException e) {
-			// TODO : log error
-			this.applyDefault();
+			log.error("Failed to read configuration file [{}].", e.getMessage());
+			log.warn(APPLYING_DEFAULT_MSG);
+			applyDefault();
 		}
 	}
 
@@ -200,28 +198,30 @@ public class ConfigImpl implements Config {
 	private boolean processEntry(String[] entry) {
 		// TODO: improve verifications (create a dedicated method ?)
 		try {
-			this.checkEntry(entry);
+			checkEntry(entry);
 		} catch (InvalidConfigEntryException e) {
-			// TODO: log error
-			this.applyDefault();
+			log.error("Invalid configuration [{}].", e.getMessage());
+			log.warn(APPLYING_DEFAULT_MSG);
+			applyDefault();
 			return true;
 		} catch (IncompleteConfigEntryException e) {
-			// TODO: log error
-			this.getDefault(entry);
-			return DefaultConfig.isComplete(this.vocMapping);
+			log.error("Incomplete configuration [{}].", e.getMessage());
+			log.warn("Applying default configuration for missing entries...");
+			getDefault(entry);
+			return DefaultConfig.isComplete(vocMapping);
 		}
 		int arity = Integer.parseInt(entry[1]);
-		this.vocMapping.put(entry[2], entry[0]);
+		vocMapping.put(entry[2], entry[0]);
 		if (arity == 1) {
-			this.unaryOperators.add(entry[2]);
+			unaryOperators.add(entry[2]);
 		} else if (arity == 2) {
-			this.binaryOperators.add(entry[2]);
+			binaryOperators.add(entry[2]);
 		} else {
-			// TODO: log error
-			// return
-			this.getDefault(entry);
+			log.error("Invalid operator's arity [{}] for [{}].", arity, entry[1]);
+			log.warn("Replacing with default configuration...");
+			getDefault(entry);
 		}
-		return DefaultConfig.isComplete(this.vocMapping);
+		return DefaultConfig.isComplete(vocMapping);
 	}
 
 	/**
@@ -232,10 +232,11 @@ public class ConfigImpl implements Config {
 	 * It not, throws the appropriate {@code Exception}.
 	 *
 	 * @param entry entry to check
+	 *
 	 * @throws InvalidConfigEntryException
 	 * @throws IncompleteConfigEntryException
 	 */
-	private void checkEntry(String[] entry) throws InvalidConfigEntryException, IncompleteConfigEntryException {
+	private static void checkEntry(String[] entry) throws InvalidConfigEntryException, IncompleteConfigEntryException {
 		if (entry.length == 0) {
 			// TODO: log error
 			throw new InvalidConfigEntryException("Empty entry.");
@@ -266,14 +267,15 @@ public class ConfigImpl implements Config {
 	 * @see DefaultConfig
 	 */
 	private void getDefault(String[] badEntry) {
-		// TODO: log
+		log.debug("Getting default configuration for bad entry [{}]...", Arrays.toString(badEntry));
 		Optional<DefaultConfig> optDefCfg = DefaultConfig.getDefaultFor(badEntry[0]);
 		if (optDefCfg.isPresent()) {
 			DefaultConfig defaultCfg = optDefCfg.get();
-			this.processEntry(defaultCfg.getEntry());
+			processEntry(defaultCfg.getEntry());
+		} else {
+			log.fatal("Unknown configuration entry for [{}].", badEntry[0]);
+			throw new IllegalStateException("Unknown configuration entry.");
 		}
-		// TODO: log fatal error
-		// exit
 	}
 
 	/**
@@ -288,17 +290,8 @@ public class ConfigImpl implements Config {
 	private void applyDefault() {
 		List<String[]> defaultEntries = DefaultConfig.getDefaultEntries();
 		for (String[] defaultEntry : defaultEntries) {
-			this.processEntry(defaultEntry);
+			processEntry(defaultEntry);
 		}
-	}
-
-	/**
-	 * Returns the vocabulary mapping.
-	 *
-	 * @return the vocabulary mapping
-	 */
-	public Map<String, String> getVocmapping() {
-		return this.vocMapping;
 	}
 
 	/**
@@ -307,25 +300,7 @@ public class ConfigImpl implements Config {
 	 * @return the {@code List} of operators
 	 */
 	public List<String> getOperatorsList() {
-		return this.vocMapping.keySet().stream().collect(Collectors.toList());
-	}
-
-	/**
-	 * Returns the {@code List} of unary operators.
-	 *
-	 * @return the {@code List} of unary operators
-	 */
-	public List<String> getUnaryOperators() {
-		return this.unaryOperators;
-	}
-
-	/**
-	 * Returns the {@code List} of binary operators.
-	 *
-	 * @return the {@code List} of binary operators
-	 */
-	public List<String> getBinaryOperators() {
-		return this.binaryOperators;
+		return new ArrayList<>(vocMapping.keySet());
 	}
 
 	/**
@@ -337,7 +312,7 @@ public class ConfigImpl implements Config {
 	 * @since 1.0
 	 */
 	public boolean isUnaryOperator(String operator) {
-		return this.unaryOperators.contains(operator);
+		return unaryOperators.contains(operator);
 	}
 
 	/**
@@ -349,7 +324,7 @@ public class ConfigImpl implements Config {
 	 * @since 1.0
 	 */
 	public boolean isBinaryOperator(String operator) {
-		return this.binaryOperators.contains(operator);
+		return binaryOperators.contains(operator);
 	}
 
 	/**
@@ -361,7 +336,7 @@ public class ConfigImpl implements Config {
 	 * @since 1.0
 	 */
 	public boolean isAnOperator(String character) {
-		return this.getOperatorsList().contains(character);
+		return getOperatorsList().contains(character);
 	}
 
 	/**
@@ -374,6 +349,6 @@ public class ConfigImpl implements Config {
 	 * @return all order operators
 	 */
 	public List<String> getOrderOperator() {
-		return this.vocMapping.keySet().stream().limit(2).collect(Collectors.toList());
+		return vocMapping.keySet().stream().limit(2).collect(Collectors.toList());
 	}
 }

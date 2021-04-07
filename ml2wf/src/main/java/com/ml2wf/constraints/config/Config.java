@@ -7,15 +7,14 @@ package com.ml2wf.constraints.config;
  * @author Nicolas Lacroix
  *
  * @version 1.0
- *
  */
+@FunctionalInterface
 public interface Config {
 
 	/**
-	 * Reads the configuration file at the {@code filePath} location and initializes
-	 * the {@code vocMapping Map} using the {@link #processEntry(String[])} method.
+	 * Reads a configuration file.
 	 *
 	 * @since 1.0
 	 */
-	public void readConfig();
+	void readConfig();
 }

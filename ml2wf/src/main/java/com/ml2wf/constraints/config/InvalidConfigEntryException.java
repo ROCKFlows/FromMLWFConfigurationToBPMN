@@ -16,17 +16,12 @@ package com.ml2wf.constraints.config;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
  * @see Config
  * @see IncompleteConfigEntryException
+ *
+ * @since 1.0.0
  */
 public class InvalidConfigEntryException extends Exception {
-
-	/**
-	 * Generated serial version UID.
-	 */
-	private static final long serialVersionUID = 7999280215768970821L;
 
 	/**
 	 * {@code InvalidConfigEntryException}'s default constructor.

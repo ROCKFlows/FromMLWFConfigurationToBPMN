@@ -1,7 +1,7 @@
 package com.ml2wf.conflicts;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.merge.concretes.WFMetaMerger;
@@ -10,37 +10,27 @@ import com.ml2wf.tasks.base.WFTask;
 import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.tasks.exceptions.InvalidTaskException;
 
+@NoArgsConstructor
+@Log4j2
 public class DifferentParentsSolver implements ConflictSolver {
 
 	private static final String NO_REF_ERROR = "Can't resolve a conflict involving a WFTask (%s) without reference.";
 	private static final String NO_SOLUTION_ERROR = "Can't find a solution for %s (parent=%s) and %s (parent=%s) having different parents.";
 
-	/**
-	 * Logger instance.
-	 *
-	 * @since 1.0
-	 * @see Logger
-	 */
-	private static final Logger logger = LogManager.getLogger(DifferentParentsSolver.class);
-
-	public DifferentParentsSolver() {
-		// empty constructor
-	}
-
 	@Override
 	public <T extends Task<?>> T solve(T taskA, T taskB) throws UnresolvedConflict {
-		this.checkRequirements(taskA, taskB);
+		checkRequirements(taskA, taskB);
 		String refA = getRefName(taskA);
 		String refB = getRefName(taskB);
-		logger.warn("Conflict detected implying {} (parent={}) and {} (parent={}) : They have different parents.",
+		log.warn("Conflict detected implying {} (parent={}) and {} (parent={}) : They have different parents.",
 				taskA, refA, taskB, refB);
 		// T1 + T2 + T1#T2 => T1#T2
 		if (refA.equals(WFMetaMerger.STEP_TASK)) {
-			logger.warn("Keeping {} (parent={}).", taskB, refB);
+			log.warn("Keeping {} (parent={}).", taskB, refB);
 			return taskB;
 		}
 		if (refB.equals(WFMetaMerger.STEP_TASK)) {
-			logger.warn("Keeping {} (parent={}).", taskA, refA);
+			log.warn("Keeping {} (parent={}).", taskA, refA);
 			return taskA;
 		}
 		// ---
@@ -50,11 +40,11 @@ public class DifferentParentsSolver implements ConflictSolver {
 
 	@Override
 	public <T extends Task<?>> boolean areInConflict(T taskA, T taskB) {
-		this.checkRequirements(taskA, taskB);
+		checkRequirements(taskA, taskB);
 		return !getRefName(taskA).equals(getRefName(taskB));
 	}
 
-	private <T extends Task<?>> void checkRequirements(T taskA, T taskB) {
+	private static <T extends Task<?>> void checkRequirements(T taskA, T taskB) {
 		if (taskA == null) {
 			throw new InvalidTaskException(
 					String.format(NO_REF_ERROR, taskA));
@@ -85,5 +75,4 @@ public class DifferentParentsSolver implements ConflictSolver {
 		}
 		return ((WFTask<?>) task).getReference();
 	}
-
 }
