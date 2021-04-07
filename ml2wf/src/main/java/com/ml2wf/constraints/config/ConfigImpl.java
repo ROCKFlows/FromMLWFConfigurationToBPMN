@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.ml2wf.conventions.enums.fm.FeatureNames;
+import com.ml2wf.conventions.enums.fm.FMNames;
 
 
 /**
@@ -52,7 +52,7 @@ public class ConfigImpl implements Config {
 	/**
 	 * {@code Map} mapping operators symbol with {@code FeatureModelNames} elements.
 	 *
-	 * @see FeatureNames
+	 * @see FMNames
 	 */
 	private Map<String, String> vocMapping;
 	/**

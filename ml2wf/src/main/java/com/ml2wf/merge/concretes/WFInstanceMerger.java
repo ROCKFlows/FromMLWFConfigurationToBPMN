@@ -10,17 +10,18 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.factory.ConstraintFactoryImpl;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.bpmn.BPMNNames;
-import com.ml2wf.conventions.enums.fm.FeatureNames;
+import com.ml2wf.conventions.enums.fm.FMNames;
 import com.ml2wf.merge.base.BaseMergerImpl;
+import com.ml2wf.merge.exceptions.MergeException;
+import com.ml2wf.tasks.base.WFTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.Pair;
 import com.ml2wf.util.XMLManager;
 
@@ -38,7 +39,7 @@ import com.ml2wf.util.XMLManager;
  * @see BaseMergerImpl
  *
  */
-public class WFInstanceMerger extends BaseMergerImpl {
+public final class WFInstanceMerger extends BaseMergerImpl {
 
 	/**
 	 * Instances default task tag name.
@@ -64,59 +65,19 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		super(file);
 	}
 
-	/**
-	 * Returns a suitable parent for the {@code Node task} according to its
-	 * specified <b>reference</b>.
-	 *
-	 * <p>
-	 *
-	 * Creates the referred parent node if not exists.
-	 *
-	 * <p>
-	 *
-	 * If there isn't any valid referenced parent, returns the first document node.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that each instantiated task <b>refers to a generic one presents
-	 * in the FeatureModel</B>.
-	 *
-	 * @param task task to get a suitable parent
-	 * @return a suitable parent for the {@code Node task} according to its
-	 *         specified reference
-	 *
-	 * @since 1.0
-	 */
 	@Override
-	public Node getSuitableParent(Node task) {
-		// retrieving the references parent
-		Node docNode = ((Element) task).getElementsByTagName(BPMNNames.DOCUMENTATION.getName()).item(0);
-		if (docNode != null) {
-			// if contains a documentation node that can refer to a generic task
-			String reference = docNode.getTextContent().replace(Notation.getReferenceVoc(), "");
-			// retrieving all candidates
-			List<Node> candidates = XMLManager.getTasksList(getDocument(), FeatureNames.SELECTOR);
-			// electing the good candidate
-			String candidateName;
-			for (Node candidate : candidates) {
-				candidateName = XMLManager.getNodeName(candidate);
-				if (candidateName.equals(reference)) {
-					return candidate;
-				}
-			}
-			Element newParent = this.createFeatureWithName(reference);
-			return this.getGlobalTask(WFMetaMerger.STEP_TASK).appendChild(newParent);
-		}
-		return this.unmanagedNode;
+	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, UnresolvedConflict {
+		return this.getReferredFMTask(task, unmanagedGlobalTasks.get(UNMANAGED_TASKS));
 	}
 
 	@Override
-	public Node getRootParentNode() {
-		return this.getGlobalTask(INSTANCES_TASK);
+	public FMTask getRootParentNode() throws MergeException, UnresolvedConflict {
+		return this.getGlobalFMTask(INSTANCES_TASK);
 	}
 
 	@Override
-	public void processSpecificNeeds(Pair<String, Document> wfInfo) throws InvalidConstraintException {
+	public void processSpecificNeeds(Pair<String, Document> wfInfo)
+			throws InvalidConstraintException, UnresolvedConflict {
 		Document wfDocument = wfInfo.getValue();
 		logger.debug("Specific need : meta reference.");
 		String metaReferrence = this.getMetaReferenced(wfDocument);
@@ -141,13 +102,8 @@ public class WFInstanceMerger extends BaseMergerImpl {
 	 * @since 1.0
 	 */
 	private String getMetaReferenced(Document wfDocument) {
-		NodeList docNodes = wfDocument.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
-		if (docNodes.getLength() > 0) {
-			Node docNode = docNodes.item(0);
-			// TODO: improve verification
-			return XMLManager.getReferredTask(docNode.getTextContent());
-		}
-		return null;
+		List<String> docContent = XMLManager.getAllBPMNDocContent(wfDocument.getDocumentElement());
+		return getReferredTask(docContent).orElse(UNMANAGED);
 	}
 
 	/**
@@ -169,9 +125,8 @@ public class WFInstanceMerger extends BaseMergerImpl {
 		references = references.replace(Notation.getReferencesDelimiterLeft(), "");
 		references = references.replace(Notation.getReferencesDelimiterRight(), "");
 		// getting/creating the createdWFNode description
-		Node descNode = this.createTag(this.createdWFNode, FeatureNames.DESCRIPTION);
+		Node descNode = this.createTag(this.createdWFTask, FMNames.DESCRIPTION);
 		// merging content with description
 		mergeNodesTextContent(descNode, references);
 	}
-
 }

@@ -3,15 +3,20 @@ package com.ml2wf.constraints.factory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.constraints.config.ConfigImpl;
 import com.ml2wf.constraints.config.DefaultConfig;
@@ -19,9 +24,13 @@ import com.ml2wf.constraints.parser.ConstraintParser;
 import com.ml2wf.constraints.parser.Parser;
 import com.ml2wf.constraints.tree.BinaryTree;
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.conventions.enums.fm.FeatureNames;
+import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.merge.AbstractMerger;
+import com.ml2wf.merge.base.BaseMergerImpl;
+import com.ml2wf.tasks.base.Task;
+import com.ml2wf.tasks.concretes.FMTask;
+import com.ml2wf.tasks.manager.TasksManager;
 import com.ml2wf.util.Pair;
-import com.ml2wf.util.XMLManager;
 
 /**
  * This class is a factory for {@code Node} from constraints.
@@ -66,6 +75,13 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @see Document
 	 */
 	private Document document;
+	/**
+	 * Logger instance.
+	 *
+	 * @since 1.0
+	 * @see Logger
+	 */
+	private static final Logger logger = LogManager.getLogger(ConstraintFactoryImpl.class);
 
 	/**
 	 * {@code ConstraintFactoryImpl}'s complete constructor.
@@ -89,7 +105,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @see ConfigImpl
 	 * @see ConstraintParser
 	 */
-	public ConstraintFactoryImpl(Document document) throws ParserConfigurationException {
+	public ConstraintFactoryImpl(Document document)  {
 		// Document instantiation
 		this.document = document;
 		// Parser instantiation
@@ -163,16 +179,19 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @param constraintText text containing constraints
 	 * @return a generated {@code Node} containing all constraints nodes
 	 * @throws InvalidConstraintException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
 	@Override
-	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException {
+	public List<Node> getRuleNodes(String constraintText)
+			throws InvalidConstraintException, UnresolvedConflict {
 		List<Node> rules = new ArrayList<>();
 		List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 		for (BinaryTree<String> tree : trees) {
-			Node rule = this.document.createElement(FeatureNames.RULE.getName());
+			this.managedMissingCriterias(tree);
+			Node rule = this.document.createElement(FMNames.RULE.getName());
 			this.generateRuleNode(tree, rule);
 			rules.add(rule);
 		}
@@ -180,21 +199,20 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	}
 
 	@Override
-	public List<Pair<Node, Node>> getOrderNodes(String constraintText) {
-		// TODO : to test
-		List<Pair<Node, Node>> pairs = new ArrayList<>();
+	public List<Pair<FMTask, Node>> getOrderNodes(String constraintText) {
+		List<Pair<FMTask, Node>> pairs = new ArrayList<>();
 		Node description;
 		if (this.parser.isOrderConstraint(constraintText)) {
 			List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
 			for (BinaryTree<String> tree : trees) {
-				description = this.document.createElement(FeatureNames.DESCRIPTION.getName());
+				description = this.document.createElement(FMNames.DESCRIPTION.getName());
 				// get involved nodes
 				List<String> taskNames = tree.getAllNodes().stream().filter(n -> !this.config.isAnOperator(n))
 						.collect(Collectors.toList());
-				List<Node> nodes = taskNames.stream().map(n -> XMLManager.getNodeWithName(this.document, n))
+				List<FMTask> tasks = taskNames.stream().map(TasksManager::getFMTaskWithName).map(o -> o.orElse(null))
 						.collect(Collectors.toList());
 				// get and add LCA
-				Node lca = (nodes.contains(null)) ? null : XMLManager.getLowestCommonAncestor(nodes);
+				FMTask lca = (tasks.contains(null)) ? null : FMTask.getLCA(tasks);
 				// set description node
 				description.setTextContent(tree.toString());
 				// add new pair to list
@@ -205,24 +223,34 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	}
 
 	/**
-	 * Returns an <b>implication</b> association of the {@code globalTask} with the
-	 * {@code tasksNames}.
+	 * Creates missing criterias to keep constraints despite of some missing
+	 * criterias.
 	 *
-	 * <p>
+	 * @param tree tree to manage missing criterias
+	 * @throws UnresolvedConflict
 	 *
-	 * <b>Note</b> that this method returns this association using the
-	 * {@code DefaultConfig}'s symbols.
-	 *
-	 * @param globalTask global task
-	 * @param tasksNames tasks implied by the {@code global task}
-	 * @return an implication association of the {@code globalTask} with the
-	 *         {@code tasksNames}
+	 * @since 1.0
 	 */
+	private void managedMissingCriterias(BinaryTree<String> tree) throws UnresolvedConflict {
+		Set<String> taskNames = TasksManager.getTasks().stream().map(Task::getName).collect(Collectors.toSet());
+		List<String> treeNodes = tree.getAllNodes().stream().filter(n -> (n != null) && !this.config.isAnOperator(n))
+				.collect(Collectors.toList());
+		List<String> missingNames = new ArrayList<>(treeNodes);
+		missingNames.removeAll(taskNames);
+		FMTask parentTask = BaseMergerImpl.getUnmanagedGlobalTask(BaseMergerImpl.UNMANAGED_FEATURES);
+		FMTask featureTask;
+		for (String missingName : missingNames) {
+			logger.warn("Creating the missing criteria : {}.", missingName);
+			Element feature = AbstractMerger.createFeatureWithAbstract(missingName, false);
+			featureTask = AbstractMerger.getTaskFactory().createTask(feature);
+			AbstractMerger.insertNewTask(parentTask, featureTask);
+		}
+	}
+
+	@Override
 	public String getAssociationConstraint(String globalTask, List<String> tasksNames) {
-		// TODO: add in interface
 		return Notation.getConstraintDelimiterLeft() + globalTask + DefaultConfig.IMP.getSymbol()
 				+ String.join(DefaultConfig.CONJ.getSymbol(), tasksNames) + Notation.getConstraintDelimiterRight();
-
 	}
 
 	/**
@@ -287,14 +315,14 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 	 * @since 1.0
 	 * @see Node
 	 * @see ConfigImpl
-	 * @see FeatureNames
+	 * @see FMNames
 	 */
 	public Node createNode(String element) {
 		Node node;
 		if (this.config.isAnOperator(element)) {
 			node = this.document.createElement(this.config.getVocmapping().get(element));
 		} else {
-			node = this.document.createElement(FeatureNames.VAR.getName());
+			node = this.document.createElement(FMNames.VAR.getName());
 			node.appendChild(this.document.createTextNode(element));
 		}
 		return node;

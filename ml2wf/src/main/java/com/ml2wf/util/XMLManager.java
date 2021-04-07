@@ -3,11 +3,10 @@ package com.ml2wf.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -16,13 +15,8 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Attr;
@@ -38,7 +32,10 @@ import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.TaskTagsSelector;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
-import com.ml2wf.conventions.enums.fm.FeatureAttributes;
+import com.ml2wf.conventions.enums.fm.FMAttributes;
+import com.ml2wf.conventions.enums.fm.FMNames;
+import com.ml2wf.tasks.exceptions.InvalidTaskException;
+import com.ml2wf.tasks.manager.TasksManager;
 
 /**
  * This class is the base class for any XML managing class.
@@ -52,7 +49,7 @@ import com.ml2wf.conventions.enums.fm.FeatureAttributes;
  * @version 1.0
  *
  */
-public class XMLManager {
+public abstract class XMLManager {
 
 	/**
 	 * Path to the XML file's directory.
@@ -71,10 +68,6 @@ public class XMLManager {
 	 */
 	private static Document document;
 	/**
-	 * Extension separator for files.
-	 */
-	private static final String EXTENSION_SEPARATOR = ".";
-	/**
 	 * Documentation's counter.
 	 *
 	 * <p>
@@ -82,7 +75,7 @@ public class XMLManager {
 	 * This counter is used to number each documentation which is required for the
 	 * <a href="https://featureide.github.io/">FeatureIDE framework</a>.
 	 */
-	private int docCount = 0;
+	private static int docCount;
 	/**
 	 * Logger instance.
 	 *
@@ -105,9 +98,10 @@ public class XMLManager {
 	 * @throws IOException
 	 */
 	public XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
-		this.sourceFile = file;
+		this.sourceFile = FileHandler.processFile(this, file);
 		this.path = file.getAbsolutePath();
-		XMLManager.setDocument(XMLManager.preprocess(this.sourceFile));
+		XMLManager.updateDocument(this.sourceFile);
+		this.normalizeDocument();
 	}
 
 	/**
@@ -162,55 +156,75 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns the xml's {@code Document} instance
-	 *
-	 * @param document the new xml's {@code Document} instance
+	 * Removes the xml's {@code Document} instance
 	 *
 	 * @see Document
 	 */
-	public static void setDocument(Document document) {
-		XMLManager.document = document;
+	public static void removeDocument() {
+		XMLManager.document = null;
 	}
 
 	/**
-	 * Returns the file extension separator.
+	 * Updates the xml's {@code Document} instance if the {@code document} is
+	 * {@code null} or the given {@code sourceFile} is different from the
+	 * {@code document}'s source file.
 	 *
-	 * @return the file extension separator
-	 */
-	public static String getExtensionSeparator() {
-		return EXTENSION_SEPARATOR;
-	}
-
-	// file methods
-
-	/**
-	 * Preprocess the given XML file before any treatment.
-	 *
-	 * @throws SAXException
+	 * @param sourceFile the {@code document}'s source file
 	 * @throws IOException
+	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 *
 	 * @since 1.0
-	 *
 	 * @see Document
 	 */
-	public static Document preprocess(File file) throws ParserConfigurationException, SAXException, IOException {
-		String logMsg = String.format("Preprocessing file : %s...", file.getName());
-		logger.info(logMsg);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		// --- protection against XXE attacks
-		logger.debug("Protecting against XXE attacks");
-		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
-		dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
-		// ---
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document document = dBuilder.parse(file);
-		document.getDocumentElement().normalize();
-		return document;
+	public static void updateDocument(File sourceFile) throws ParserConfigurationException, SAXException, IOException {
+		if ((document == null)
+				|| ((document.getBaseURI() != null) && !document.getBaseURI().equals(sourceFile.toURI().toString()))) {
+			document = FileHandler.preprocess(sourceFile);
+			docCount = countDocumentation();
+			TasksManager.clear();
+		}
 	}
 
 	/**
-	 * Saves the current {@code document} into the given {@code destFile}.
+	 * Returns the number of <b>documentation ids</b> in the document.
+	 *
+	 * <p>
+	 *
+	 * This allow to define the {@link #docCount} initial value to avoid duplicated
+	 * id.
+	 *
+	 * @return the number of <b>documentation ids</b> in the document.
+	 *
+	 * @since 1.0
+	 */
+	protected static int countDocumentation() {
+		int count = 0;
+		NodeList documentations = document.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
+		Pattern pattern = RegexManager.getDigitPattern();
+		for (int i = 0; i < documentations.getLength(); i++) {
+			Node docNode = documentations.item(i);
+			Node docIDNode = docNode.getAttributes().getNamedItem(BPMNAttributes.ID.getName());
+			Matcher matcher = pattern.matcher(docIDNode.getNodeValue());
+			if (matcher.find()) {
+				int currentID = Integer.parseInt(matcher.group());
+				count = Integer.max(count, currentID);
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * Increments the {@code docCount} and returns its incremented value.
+	 *
+	 * @return its incremented value
+	 */
+	protected static int incrementDocCount() {
+		return ++docCount;
+	}
+
+	/**
+	 * Saves the current {@code document} into the given {@code file} path.
 	 *
 	 * @param file the destination {@code File}
 	 * @throws TransformerException
@@ -218,30 +232,13 @@ public class XMLManager {
 	 *
 	 * @since 1.0
 	 */
-	public void save(File destFile) throws TransformerException, IOException {
-		String logMsg = String.format("Saving file at location : %s...", destFile);
-		logger.info(logMsg);
-		if (!destFile.createNewFile()) {
-			logger.debug("[SAVE] Destination file aldready exists.");
-			logger.debug("[SAVE] Overriding...");
-		}
-		DOMSource source = new DOMSource(document);
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		// --- protection against XXE attacks
-		logger.debug("Protecting against XXE attacks");
-		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-		// ---
-		Transformer transformer = transformerFactory.newTransformer();
-		StreamResult result = new StreamResult(destFile);
-		transformer.transform(source, result);
-		logger.info("File saved.");
+	public void save(File file) throws TransformerException, IOException {
+		FileHandler.saveDocument(FileHandler.processFile(this, file), document);
 	}
 
 	/**
-	 * Saves the current {@code document} into the given {@code destFile}.
+	 * Saves the current {@code document} into the {@link #getSourceFile()} path.
 	 *
-	 * @param file the destination {@code File}
 	 * @throws TransformerException
 	 * @throws IOException
 	 *
@@ -252,55 +249,21 @@ public class XMLManager {
 	}
 
 	/**
-	 * Backs up the current {@link #sourceFile}.
-	 *
-	 * <p>
-	 *
-	 * The result filename will be : <b>FileBaseName</b> +
-	 * {@link Notation#getBackupVoc()} + <b>_dd_MM_yy_hh_mm.FileExtension</b>.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that this method hasn't any retroactive effect.
-	 *
-	 * @throws TransformerException
-	 * @throws IOException
-	 *
-	 * @since 1.0
+	 * Normalizes the document by applying the {@link Element#normalize()} method
+	 * and replacing all whitespaces by underscores.
 	 */
-	protected void backUp() throws TransformerException, IOException {
-		logger.info("Backing up...");
-		SimpleDateFormat dateFormater = null;
-		Date backUpDate = new Date();
-		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
-		String backUpPath = insertInFileName(this.path, Notation.getBackupVoc() + dateFormater.format(backUpDate));
-		File destFile = new File(backUpPath);
-		this.save(destFile);
-		logger.info("Back up finished.");
-	}
+	protected abstract void normalizeDocument();
 
 	/**
-	 * Inserts given {@code content} between the FileBaseName and the FileExtension.
+	 * Returns a formated documentation containing the reference declaration.
 	 *
-	 * @param fName   filename
-	 * @param content content to insert
-	 * @return the new {@code fName} with the inserted {@code content}
+	 * @param content content containing the referred element
+	 * @return a formated documentation containing the reference declaration
 	 *
 	 * @since 1.0
 	 */
-	public static String insertInFileName(String fName, String content) {
-		String extension = FilenameUtils.getExtension(fName);
-		if (extension != null) {
-			String name = FilenameUtils.getBaseName(fName);
-			String parentPath = FilenameUtils.getFullPath(fName);
-			return parentPath + name + content + EXTENSION_SEPARATOR + extension;
-		}
-		String logMsg = String.format("Error while renaming file : %s", fName);
-		logger.warn(logMsg);
-		String errorfName = "BACKUP_ERROR.xml";
-		logMsg = String.format("Saving backup file as : %s", errorfName);
-		logger.warn(logMsg);
-		return errorfName;
+	public static String getReferenceDocumentation(String content) {
+		return Notation.getReferenceVoc() + XMLManager.sanitizeName(content);
 	}
 
 	/**
@@ -308,25 +271,49 @@ public class XMLManager {
 	 *
 	 * <p>
 	 *
-	 * The documentation contains informations about the task's ID and the referred
-	 * generic task.
+	 * The documentation will contain informations about the task's ID, the referred
+	 * generic task and some attributes values.
 	 *
 	 * @param node Node to add the documentation
+	 * @return the created documentation {@code Node}
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	public void addDocumentationNode(Node node, String content) {
-		Element documentation = document.createElement(BPMNNames.DOCUMENTATION.getName());
-		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + this.docCount++);
+	public static Node addDocumentationNode(Node node) {
+		Element documentation = node.getOwnerDocument().createElement(BPMNNames.DOCUMENTATION.getName());
+		documentation.setAttribute(BPMNAttributes.ID.getName(), Notation.getDocumentationVoc() + incrementDocCount());
 		documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
-		CDATASection refersTo = document.createCDATASection(Notation.getReferenceVoc() + content);
-		String logMsg = String.format("   Adding documentation %s", refersTo.getTextContent());
-		logger.debug(logMsg);
+		CDATASection refersTo = node.getOwnerDocument().createCDATASection("");
 		documentation.appendChild(refersTo);
-		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
-		logger.debug(logMsg);
-		node.insertBefore(documentation, node.getFirstChild());
+		logger.debug("   Inserting node : {} before {}...", node, node.getFirstChild());
+		return node.insertBefore(documentation, node.getFirstChild());
+	}
+
+	/**
+	 * Removes useless children of the given {@code node}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this notion is subjective and in this case, a useless
+	 * children has no attributes, no child and its text content is blank.
+	 *
+	 * @return the updated {@code Node}
+	 *
+	 * @since 1.0
+	 * @see Node
+	 */
+	public static Node cleanChildren(Node node) {
+		NodeList children = node.getChildNodes();
+		List<Node> toRemove = new ArrayList<>();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+			if (!child.hasAttributes() && !child.hasChildNodes() && child.getTextContent().isBlank()) {
+				toRemove.add(child);
+			}
+		}
+		toRemove.forEach(node::removeChild);
+		return node;
 	}
 
 	/**
@@ -414,6 +401,22 @@ public class XMLManager {
 	}
 
 	/**
+	 * Returns a {@code List<String>} containing all documentations' content for the
+	 * given BPMN {@code element}.
+	 *
+	 * @param node node to extract docuemntation content
+	 * @return a {@code List<String>} containing all documentations' content for the
+	 *         given BPMN {@code element}
+	 *
+	 * @since 1.0
+	 * @see Element
+	 */
+	public static List<String> getAllBPMNDocContent(Element element) {
+		return XMLManager.nodeListAsList(element.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())).stream()
+				.map(Node::getTextContent).collect(Collectors.toList());
+	}
+
+	/**
 	 * Returns the {@code Document} according to the specified {@code url}.
 	 *
 	 * @param url url of the xml file
@@ -473,34 +476,6 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns the <b>lowest common ancestor</b> (LCA) for given {@code nodes}.
-	 *
-	 * @param nodes nodes to retrieve the LCA
-	 * @return the <b>lowest common ancestor</b> (LCA) for given {@code nodes}
-	 *
-	 * @since 1.0
-	 */
-	public static Node getLowestCommonAncestor(List<Node> nodes) {
-		Node parent;
-		List<Node> commonParents = new ArrayList<>();
-		List<Node> nodeParents = new ArrayList<>();
-		for (Node node : nodes) {
-			// for each node
-			parent = node;
-			while ((parent = parent.getParentNode()) != null) {
-				// get all parents
-				nodeParents.add(parent);
-			}
-			if (commonParents.isEmpty()) {
-				commonParents.addAll(nodeParents);
-			}
-			// retaining common parents
-			commonParents.retainAll(nodeParents);
-		}
-		return commonParents.get(0);
-	}
-
-	/**
 	 * Returns the name tag's value of the given {@code node} if exists.
 	 *
 	 * Returns an empty string if not.
@@ -515,10 +490,10 @@ public class XMLManager {
 	public static String getNodeName(Node node) {
 		String logMsg = String.format("Retrieving name for node : %s...", node);
 		logger.trace(logMsg);
-		if (!node.hasAttributes()) {
+		if ((node == null) || !node.hasAttributes()) {
 			return "";
 		}
-		Node n = node.getAttributes().getNamedItem(FeatureAttributes.NAME.getName());
+		Node n = node.getAttributes().getNamedItem(FMAttributes.NAME.getName());
 		if (n != null) {
 			logMsg = String.format("Node's name is : %s", n.getNodeValue());
 			logger.trace(logMsg);
@@ -528,60 +503,94 @@ public class XMLManager {
 	}
 
 	/**
-	 * Returns a {@code List} containing all {@code nodes}' names.
+	 * Returns the given {@code node}'s level.
 	 *
-	 * @param nodes nodes to get the names
-	 * @return a {@code List} containing all {@code nodes}' names
+	 * @param node node to get the level
+	 * @return the given {@code node}'s level
 	 *
 	 * @since 1.0
-	 *
-	 * @see NodeList
+	 * @see Node
 	 */
-	public static List<String> getNodesNames(List<Node> nodes) {
-		return nodes.stream().map(XMLManager::getNodeName)
-				.collect(Collectors.toList());
+	public static int getNodeLevel(Node node) {
+		int i = 1;
+		Node parent;
+		while (((parent = node.getParentNode()) != null) && !getNodeName(parent).isBlank()) {
+			i++;
+			node = parent;
+		}
+		return i;
 	}
 
 	/**
-	 * Returns the {@code Node} with the given {@code name} in the document.
+	 * Returns an {@code Optional} containing the first feature node at the given
+	 * {@code level} in the given {@code document}.
 	 *
 	 * <p>
 	 *
-	 * Returns null if no node is found.
+	 * <b>Note</b> that an {@code Optional#empty()} is returned if
+	 * {@code level <= 0}.
 	 *
-	 * @param root root containing source nodes
-	 * @param name name of wished node
-	 * @return the {@code Node} with the given {@code name} in the document or null
-	 *         if no node is found
+	 * @param document the document to retrieve the node
+	 * @param level    the nested level
+	 * @return an {@code Optional} containing the first feature node at the given
+	 *         {@code level} in the given {@code document}.
 	 *
 	 * @since 1.0
-	 *
-	 * @see Node
+	 * @see Document
 	 */
-	public static Node getNodeWithName(Node root, String name) {
-		NodeList children = root.getChildNodes();
-		Node child;
-		Node recursiveResult; // result of recursive call
-		for (int i = 0; i < children.getLength(); i++) {
-			child = children.item(i);
-			String childName = XMLManager.getNodeName(child);
-			if (childName.equals(name)) {
-				return child;
-			} else if ((recursiveResult = getNodeWithName(child, name)) != null) {
-				return recursiveResult;
-			}
+	public static Optional<Node> getFeatureNodeAtLevel(Document document, int level) {
+		if (level <= 0) {
+			return Optional.empty();
 		}
-		return null;
+		return getTasksList(document, FMNames.SELECTOR).stream().filter(t -> XMLManager.getNodeLevel(t) == level)
+				.findFirst();
 	}
 
 	/**
-	 * Returns the referred meta task from the given {@code reference} text.
+	 * Returns an {@code Optional} containing the referred meta task from the given
+	 * {@code reference} text.
 	 *
 	 * @param reference reference containing the referred meta task
-	 * @return the referred meta task from the given {@code reference} text
+	 * @return an {@code Optional} containing the referred meta task from the given
+	 *         {@code reference} text
+	 *
+	 * @since 1.0
 	 */
-	public static String getReferredTask(String reference) {
-		return reference.replace(Notation.getReferenceVoc(), "").replace(Notation.getGenericVoc(), "");
+	public static Optional<String> getReferredTask(String reference) {
+		String regex = String.format("%s(\\w*)", Notation.getReferenceVoc());
+		final Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(reference);
+		if (matcher.find()) {
+			return Optional.of(matcher.group(1));
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Returns an {@code Optional} containing the first referred meta task from the
+	 * given {@code references}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method calls the {@link #getReferredTask(String)}
+	 * method for each reference in {@code references} and returns the first non
+	 * empty result.
+	 *
+	 * @param references references containing the referred meta task
+	 * @return an {@code Optional} containing the first referred meta task from the
+	 *         given {@code reference} text
+	 *
+	 * @since 1.0
+	 */
+	public static Optional<String> getReferredTask(List<String> references) {
+		Optional<String> result = Optional.empty();
+		for (String reference : references) {
+			result = getReferredTask(reference);
+			if (result.isPresent()) {
+				return result;
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -634,26 +643,6 @@ public class XMLManager {
 	}
 
 	/**
-	 * returns whether the given {@code Element} is a meta-task or not.
-	 *
-	 * @param node node to check
-	 * @return whether the given {@code Element} is a meta-task or not
-	 *
-	 * @since 1.0
-	 */
-	public boolean isMetaTask(Element node) {
-		String regex = String.format("%s+", Notation.getReferenceVoc());
-		final Pattern pattern = Pattern.compile(regex);
-		NodeList docNodes = node.getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
-		for (int i = 0; i < docNodes.getLength(); i++) {
-			if (pattern.matcher(docNodes.item(i).getTextContent()).find()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
 	 * Merges {@code nodeA}'s text content with the given {@code content}.
 	 *
 	 * @param nodeA   first node
@@ -664,7 +653,8 @@ public class XMLManager {
 		String contentA = nodeA.getTextContent().trim().replace("\\s+", " ");
 		String contentB = content.trim().replace("\\s+", " ");
 		contentA = contentA.replace(contentB, "");
-		nodeA.setTextContent(contentA + "\n" + contentB);
+		String result = contentA + "\n" + contentB;
+		nodeA.setTextContent(result.trim());
 		return true;
 	}
 
@@ -704,8 +694,16 @@ public class XMLManager {
 		}
 		name = name.replaceFirst(Notation.getDocumentationVoc(), "");
 		name = name.replaceFirst(Notation.getReferenceVoc(), "");
+		name = name.replace(Notation.getOptionality(), "");
 		name = name.trim();
-		return name.replace(" ", "_");
+		name = name.replace(" ", "_");
+		Pattern validNamePattern = RegexManager.getValidFeatureNamePattern();
+		if (!validNamePattern.matcher(name).find()) {
+			throw new InvalidTaskException(
+					String.format("The task with name : [%s] is invalid. It must match the following regex : %s", name,
+							validNamePattern.pattern()));
+		}
+		return name;
 	}
 
 }

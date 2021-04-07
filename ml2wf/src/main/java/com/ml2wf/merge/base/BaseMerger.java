@@ -3,8 +3,11 @@ package com.ml2wf.merge.base;
 import java.io.File;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
+import com.ml2wf.merge.exceptions.MergeException;
+import com.ml2wf.tasks.base.WFTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.Pair;
 
 /**
@@ -57,33 +60,37 @@ public interface BaseMerger {
 	public void mergeWithWF(boolean backUp, boolean completeMerge, File... wfFiles) throws Exception;
 
 	/**
-	 * Returns a suitable parent {@code Node} for the given {@code Node}.
+	 * Returns a suitable parent {@code FMTask} for the given {@code child}.
 	 *
-	 * @return a suitable parent {@code Node} for the given {@code Node}
+	 * @param child child to retrieve a suitable parent
+	 * @return a suitable parent {@code FMTask} for the given {@code WFTask}
+	 * @throws MergeException
 	 *
 	 * @since 1.0
-	 *
-	 * @see Node
+	 * @see FMTask
+	 * @see WFTask
 	 */
-	public abstract Node getSuitableParent(Node child);
+	public abstract FMTask getSuitableParent(WFTask<?> child)
+			throws MergeException, UnresolvedConflict;
 
 	/**
-	 * Returns the root parent {@code Node} according to the workflow's type (meta
+	 * Returns the root parent {@code FMTask} according to the workflow's type (meta
 	 * or instance).
 	 *
 	 * <p>
 	 *
-	 * This root parent {@code Node} is used during the workflow's task insertion
+	 * This root parent {@code FMTask} is used during the workflow's task insertion
 	 * (complete merge).
 	 *
-	 * @return the root parent {@code Node} according to the workflow's type (meta
+	 * @return the root parent {@code FMTask} according to the workflow's type (meta
 	 *         or instance)
+	 * @throws MergeException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
-	 *
-	 * @see Node
+	 * @see FMTask
 	 */
-	public abstract Node getRootParentNode();
+	public abstract FMTask getRootParentNode() throws MergeException, UnresolvedConflict;
 
 	/**
 	 * Processes specific needs to complete the merge operation.

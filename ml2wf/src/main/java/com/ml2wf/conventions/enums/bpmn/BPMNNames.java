@@ -8,7 +8,7 @@ import com.ml2wf.conventions.enums.TaskTagsSelector;
 
 /**
  * This {@code enum} contains handled tags' names according to the
- * <a href="https://www.bpmn.org/">BPMN standard</a>.
+ * <a href="http://www.bpmn.org/">BPMN standard</a>.
  *
  * @author Nicolas Lacroix
  *
@@ -21,8 +21,9 @@ public enum BPMNNames implements TaskTagsSelector {
 	PROCESS("bpmn2:process"), INCOMING("bpmn2:incoming"), OUTGOING("bpmn2:outgoing"),
 	EXTENSION("bpmn2:extensionElements"), STYLE("ext:style"), DOCUMENTATION("bpmn2:documentation"),
 	ANNOTATION("bpmn2:textAnnotation"), TEXT("bpmn2:text"), DIAGRAM("bpmndi:BPMNDiagram"), PLANE("bpmndi:BPMNPlane"),
+	PROPERTY("bpmn2:property"),
 	// task tags
-	TASK("bpmn2:task"), USERTASK("bpmn2:userTask"),
+	TASK("bpmn2:task"), USERTASK("bpmn2:userTask"), SERVICETASK("bpmn2:serviceTask"),
 	// positional tags
 	SHAPE("bpmndi:BPMNShape"), BOUNDS("dc:Bounds"), LABEL("bpmndi:BPMNLabel"),
 	// reserved tags
@@ -51,8 +52,20 @@ public enum BPMNNames implements TaskTagsSelector {
 		return this.name;
 	}
 
+	/**
+	 * Returns whether the given tag is a BPMN task tag's name or not.
+	 *
+	 * @param tag tag to check
+	 * @return whether the given tag is a BPMN task tag's name or not
+	 *
+	 * @since 1.0
+	 */
+	public boolean isBPMNTask(String tag) {
+		return this.getTaskTags().contains(tag);
+	}
+
 	@Override
 	public List<String> getTaskTags() {
-		return new ArrayList<>(Arrays.asList(USERTASK.getName(), TASK.getName()));
+		return new ArrayList<>(Arrays.asList(USERTASK.getName(), TASK.getName(), SERVICETASK.getName()));
 	}
 }

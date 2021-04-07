@@ -446,12 +446,11 @@ public class BinaryTree<T> {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(" ");
 		if (this.hasLeftChild()) {
-			builder.append(this.leftChild.getRoot().toString());
-			builder.append(" ");
+			builder.append(this.leftChild.toString());
 		}
 		if (this.root != null) {
+			builder.append(" ");
 			builder.append(this.root.toString());
 			builder.append(" ");
 		}

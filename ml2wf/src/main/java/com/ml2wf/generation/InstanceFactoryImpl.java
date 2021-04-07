@@ -2,9 +2,10 @@ package com.ml2wf.generation;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,6 +22,8 @@ import com.ml2wf.constraints.InvalidConstraintException;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.conventions.enums.bpmn.BPMNAttributes;
 import com.ml2wf.conventions.enums.bpmn.BPMNNames;
+import com.ml2wf.tasks.specs.BPMNTaskSpecs;
+import com.ml2wf.util.RegexManager;
 import com.ml2wf.util.XMLManager;
 
 /**
@@ -42,14 +45,24 @@ import com.ml2wf.util.XMLManager;
 public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 
 	/**
-	 * Hexadecimal color code of instantiated elements.
+	 * Hexadecimal color code of instantiated mandatory elements.
 	 */
-	public static final String INSTANTIATE_COLOR = "#00f900";
+	public static final String MANDATORY_COLOR = "#00f900";
+	/**
+	 * Hexadecimal color code of instantiated optional elements.
+	 */
+	public static final String OPTIONAL_COLOR = "#835C3B";
 	/**
 	 * This {@code taskCounter} is incremented for each task. This allows other
 	 * methods to give an unique name to a given task.
 	 */
 	private int taskCounter = 0;
+	/**
+	 * This {@code propertyCounter} is incremented for each property added in the
+	 * current workflow. This allows other methods to give a unique ID to a given
+	 * property.
+	 */
+	private int propertyCounter = 0;
 	/**
 	 * Logger instance.
 	 *
@@ -68,6 +81,15 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	public InstanceFactoryImpl(File file) throws ParserConfigurationException, SAXException, IOException {
 		super(file);
+	}
+
+	@Override
+	protected void normalizeDocument() {
+		getDocument().getDocumentElement().normalize();
+		List<Node> taskNodes = XMLManager.getTasksList(getDocument(), BPMNNames.SELECTOR);
+		taskNodes.stream().map(t -> t.getAttributes().getNamedItem(BPMNAttributes.NAME.getName()))
+				.filter(Objects::nonNull)
+				.forEach(t -> t.setNodeValue(t.getNodeValue().trim().replace(" ", "_")));
 	}
 
 	/**
@@ -99,12 +121,9 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	@Override
-	public void getWFInstance(File outputDir)
+	public void getWFInstance(File outputFile)
 			throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		logger.info("Starting the Workflow instatiation...");
-		if (!outputDir.isDirectory()) {
-			outputDir = outputDir.getParentFile();
-		}
 		this.addMetaWFReferences();
 		String logMsg;
 		for (Node node : XMLManager.getTasksList(getDocument(), BPMNNames.SELECTOR)) {
@@ -113,8 +132,6 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			this.instantiateNode(node);
 		}
 		logger.info("Instantiation finished.");
-		String resultFname = XMLManager.insertInFileName(super.getSourceFile().getName(), Notation.getInstanceVoc());
-		super.save(new File(Paths.get(outputDir.getPath(), resultFname).toString()));
 	}
 
 	/**
@@ -132,6 +149,25 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	public void getWFInstance() throws TransformerException, SAXException, IOException, ParserConfigurationException {
 		this.getWFInstance(super.getSourceFile());
+	}
+
+	/**
+	 * Returns the last reference from the given {@code content}.
+	 *
+	 * <p>
+	 *
+	 * e.g. A#B#C -> C
+	 *
+	 * @param content content to retrieve the last reference
+	 * @return the last reference from the given {@code content}
+	 *
+	 * @since 1.0
+	 */
+	public static String getLastReference(String content) {
+		// splitting references
+		String[] splittedContent = content.split(Notation.getGeneratedPrefixVoc());
+		// getting the last reference
+		return sanitizeName(splittedContent[splittedContent.length - 1]);
 	}
 
 	/**
@@ -155,18 +191,37 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 * @see Node
 	 */
 	private void instantiateNode(Node node) {
-		// documentation part
-		// TODO: factorize in method ?
+		// retrieving node name
 		String content = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName()).getNodeValue();
-		content = XMLManager.sanitizeName(content);
-		this.addDocumentationNode(node, content);
-		// extension part
+		// getting the node's reference
+		String currentRef = getLastReference(content);
+		// adding a documentation node for the current node
+		Node docNode = addDocumentationNode(node);
+		mergeNodesTextContent(docNode, BPMNTaskSpecs.OPTIONAL.formatSpec(content));
+		mergeNodesTextContent(docNode, getReferenceDocumentation(currentRef));
+		// property/extension part
+		this.addProperty(node, Notation.getBpmnPropertyInstance());
 		this.addExtensionNode(node);
 		// node renaming part
 		Node nodeAttrName = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName());
-		// TODO: update instance syntax
-		String nodeName = XMLManager.sanitizeName(nodeAttrName.getNodeValue()) + "_" + this.taskCounter++;
+		String nodeName = XMLManager.sanitizeName(currentRef) + "_" + this.taskCounter++;
 		nodeAttrName.setNodeValue(nodeName);
+	}
+
+	/**
+	 * Adds the given {@code propertyValue} to the given {@code node}.
+	 *
+	 * @param node node to add the property
+	 *
+	 * @since 1.0
+	 */
+	private void addProperty(Node node, String propertyValue) {
+		Element propertyAttr = getDocument().createElement(BPMNNames.PROPERTY.getName());
+		String propertyId = Notation.getBpmnPropertyPrefix() + this.propertyCounter++;
+		propertyAttr.setAttribute(BPMNAttributes.ID.getName(), propertyId);
+		propertyAttr.setIdAttribute(BPMNAttributes.ID.getName(), true);
+		propertyAttr.setAttribute(BPMNAttributes.NAME.getName(), propertyValue);
+		node.appendChild(propertyAttr);
 	}
 
 	/**
@@ -211,7 +266,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 			return;
 		}
 		Node processNode = processNodeList.item(0);
-		this.addDocumentationNode(processNode, referred);
+		mergeNodesTextContent(addDocumentationNode(processNode), getReferenceDocumentation(referred));
 	}
 
 	/**
@@ -252,13 +307,30 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	private void addExtensionNode(Node node) {
 		Node extension = getDocument().createElement(BPMNNames.EXTENSION.getName());
 		Element style = getDocument().createElement(BPMNNames.STYLE.getName());
-		String logMsg = String.format("	Adding style %s to node %s", INSTANTIATE_COLOR, node);
-		logger.debug(logMsg);
-		style.setAttribute(BPMNAttributes.BACKGROUND.getName(), INSTANTIATE_COLOR);
+		String backColor = (this.isOptionalElement((Element) node)) ? OPTIONAL_COLOR : MANDATORY_COLOR;
+		logger.debug("	Adding style {} to node {}", backColor, node);
+		style.setAttribute(BPMNAttributes.BACKGROUND.getName(), backColor);
 		extension.appendChild(style);
-		logMsg = String.format("   Inserting node : %s before %s...", node, node.getFirstChild());
-		logger.debug(logMsg);
+		logger.debug("   Inserting node : {} before {}...", node, node.getFirstChild());
 		node.insertBefore(extension, node.getFirstChild());
+	}
+
+	/**
+	 * Returns whether the given {@code element} is optional or not.
+	 *
+	 * @param element element to get the optionality value
+	 * @return whether the given {@code element} is optional or not
+	 *
+	 * @since 1.0
+	 */
+	private boolean isOptionalElement(Element element) {
+		for (String documentation : XMLManager.getAllBPMNDocContent(element)) {
+			Matcher matcher = RegexManager.getOptionalityPattern().matcher(documentation.replace(" ", ""));
+			if (matcher.find() && (matcher.groupCount() > 0)) {
+				return Boolean.valueOf(matcher.group(1));
+			}
+		}
+		return false;
 	}
 
 }

@@ -1,17 +1,13 @@
 package com.ml2wf.cmd;
 
 import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.xml.sax.SAXException;
 
 import com.ml2wf.generation.InstanceFactory;
 import com.ml2wf.generation.InstanceFactoryImpl;
+import com.ml2wf.util.XMLManager;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -43,7 +39,8 @@ public class Generate extends AbstractCommand {
 	@Option(names = { "-i", "--input" }, required = true, arity = "1", order = 1, description = "input file")
 	File input;
 
-	@Option(names = { "-o", "--output" }, required = true, arity = "1", order = 1, description = "output directory")
+	@Option(names = { "-o",
+			"--output" }, required = true, arity = "1", order = 1, description = "output file or directory")
 	File output;
 
 	/**
@@ -54,30 +51,22 @@ public class Generate extends AbstractCommand {
 	 */
 	private static final Logger logger = LogManager.getLogger(Generate.class);
 
-	// TODO: to comment if kept
-	private static final String CANT_INSTANTIATE = "Can't instantiate the WorkFlow.";
+	@Override
+	protected String getDefaultMessage() {
+		return CANT_INSTANTIATE;
+	}
 
 	@Override
 	public void run() {
 
-		InstanceFactoryImpl factory;
+		InstanceFactory factory;
 		try {
-			// TODO: improve file verification and logs position
-			if (!this.input.isFile()) {
-				logger.fatal(CANT_INSTANTIATE);
-				logger.fatal("The input is not a file.");
-				return;
-			} else if (!this.output.isFile()) {
-				logger.fatal(CANT_INSTANTIATE);
-				logger.fatal("The output is not a file.");
-				return;
-			}
 			factory = new InstanceFactoryImpl(this.input);
 			factory.getWFInstance(this.output);
+			((XMLManager) factory).save(this.output);
 			LogManager.shutdown();
-		} catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
-			logger.fatal(CANT_INSTANTIATE);
-			logger.fatal(e.getMessage());
+		} catch (Exception e) {
+			this.logException(logger, e);
 		}
 	}
 

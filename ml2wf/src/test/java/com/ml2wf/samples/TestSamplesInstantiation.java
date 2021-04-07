@@ -6,15 +6,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import com.ml2wf.generation.InstanceFactoryImpl;
@@ -74,10 +70,4 @@ public class TestSamplesInstantiation {
 		this.factory = null;
 	}
 
-	@Test
-	@Disabled
-	@DisplayName("Test with a basic workflow")
-	public void testSamples() throws TransformerException, SAXException, IOException, ParserConfigurationException {
-		// TODO: this.factory.getWFInstance(RESULT_DIRECTORY);
-	}
 }

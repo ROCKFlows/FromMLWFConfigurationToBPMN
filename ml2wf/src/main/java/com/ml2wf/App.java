@@ -27,6 +27,11 @@ public class App {
 	private static final Logger logger = LogManager.getLogger(App.class);
 
 	public static void main(String[] args) {
+		// TODO: check windows console colors support
+		/*-AnsiConsole.systemInstall();
+		System.clearProperty("log4j2.skipJansi");
+		System.setProperty("log4j2.skipJansi", "false");
+		logger.fatal("@|red,bold Fatal|@");*/
 		CommandLine commandLine = new CommandLine(new App())
 				.addSubcommand("generate", new Generate())
 				.addSubcommand("save", new Save())

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+  <Properties>
+    <Property name="log4j2.skipJansi" value="false"/>
+  </Properties>
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <!-- <PatternLayout disableAnsi="false" pattern="%d{HH:mm:ss.SSS} [%-10rms elapsed] [%highlight{%-5level}] [%-25C{1}l.%L] - %highlight{%msg%n}"/> -->
+      <PatternLayout disableAnsi="false" pattern="%d{HH:mm:ss.SSS} [%-10rms elapsed] [%-5level] [%-25C{1}l.%L] - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="INFO">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>

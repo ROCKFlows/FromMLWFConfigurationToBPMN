@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.constraints.InvalidConstraintException;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.Pair;
 
 /**
@@ -25,22 +27,39 @@ public interface ConstraintFactory {
 	 * @param constraintText text containing constraints
 	 * @return a {@code List} of generated constraint nodes
 	 * @throws InvalidConstraintException
+	 * @throws UnresolvedConflict
 	 *
 	 * @since 1.0
 	 * @see Node
 	 */
-	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException;
+	public List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException, UnresolvedConflict;
 
 	/**
-	 * Returns a {@code List} of {@code Pair} containing the LCA {@code Node} as key
-	 * and the descriptive {@code Node} as value.
+	 * Returns a {@code List} of {@code Pair} containing the LCA {@code FMTask} as
+	 * key and the descriptive {@code Node} as value.
 	 *
 	 * @param constraintText text containing constraints
-	 * @return a {@code List} of {@code Pair} containing the LCA {@code Node} as
+	 * @return a {@code List} of {@code Pair} containing the LCA {@code FMTask} as
 	 *         left element and the descriptive {@code Node} as right element
 	 *
 	 * @since 1.0
 	 * @see Pair
 	 */
-	public List<Pair<Node, Node>> getOrderNodes(String constraintText);
+	public List<Pair<FMTask, Node>> getOrderNodes(String constraintText);
+
+	/**
+	 * Returns an <b>implication</b> association of the {@code globalTask} with the
+	 * {@code tasks}.
+	 *
+	 * <p>
+	 *
+	 * <b>Note</b> that this method returns this association using the
+	 * {@code DefaultConfig}'s symbols.
+	 *
+	 * @param globalTask global task
+	 * @param tasksNames names of the implied tasks by the {@code global task}
+	 * @return an implication association of the {@code globalTask} with the
+	 *         {@code tasksNames}
+	 */
+	public String getAssociationConstraint(String globalTask, List<String> tasksNames);
 }

@@ -17,12 +17,12 @@ public interface InstanceFactory {
 
 	/**
 	 * Instantiates a generic workflow and saves it under the given
-	 * {@code ouputDir}.
+	 * {@code outputFile}.
 	 *
-	 * @param outputDir the output directory
+	 * @param outputFile the output file or directory
 	 * @throws Exception
 	 *
 	 * @since 1.0
 	 */
-	public void getWFInstance(File outputDir) throws Exception; // TODO: check parameters
+	public void getWFInstance(File outputFile) throws Exception;
 }

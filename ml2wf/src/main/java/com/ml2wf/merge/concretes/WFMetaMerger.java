@@ -6,10 +6,13 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.ml2wf.conflicts.exceptions.UnresolvedConflict;
 import com.ml2wf.merge.base.BaseMergerImpl;
+import com.ml2wf.merge.exceptions.MergeException;
+import com.ml2wf.tasks.base.WFTask;
+import com.ml2wf.tasks.concretes.FMTask;
 import com.ml2wf.util.Pair;
 
 /**
@@ -26,7 +29,7 @@ import com.ml2wf.util.Pair;
  * @see BaseMergerImpl
  *
  */
-public class WFMetaMerger extends BaseMergerImpl {
+public final class WFMetaMerger extends BaseMergerImpl {
 
 	/**
 	 * Meta default task tag name.
@@ -50,13 +53,13 @@ public class WFMetaMerger extends BaseMergerImpl {
 	}
 
 	@Override
-	public Node getSuitableParent(Node child) {
-		return this.getGlobalTask(STEP_TASK);
+	public FMTask getSuitableParent(WFTask<?> task) throws MergeException, UnresolvedConflict {
+		return this.getReferredFMTask(task, this.getGlobalFMTask(STEP_TASK));
 	}
 
 	@Override
-	public Node getRootParentNode() {
-		return this.getGlobalTask(META_TASK);
+	public FMTask getRootParentNode() throws MergeException, UnresolvedConflict {
+		return this.getGlobalFMTask(META_TASK);
 	}
 
 	@Override
