@@ -1,8 +1,13 @@
 package com.ml2wf.constraints.tree;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * This class represents a binary tree structure.
@@ -26,26 +31,27 @@ import java.util.List;
  *
  * @param <T> type of {@code node}
  *
- * @version 1.0
+ * @since 1.0.0
  */
 public class BinaryTree<T> {
 
 	/**
 	 * Root of the tree.
 	 */
+	@Getter @Setter
 	private T root;
 	/**
 	 * Left child of the tree.
 	 */
-	private BinaryTree<T> leftChild;
+	@Getter private BinaryTree<T> leftChild;
 	/**
 	 * Right child of the tree.
 	 */
-	private BinaryTree<T> rightChild;
+	@Getter private BinaryTree<T> rightChild;
 	/**
 	 * Blocking state of the tree.
 	 */
-	private boolean isBlocked;
+	@Getter private boolean isBlocked;
 
 	/**
 	 * {@code BinaryTree}'s full constructor.
@@ -58,7 +64,7 @@ public class BinaryTree<T> {
 		this.root = root;
 		this.leftChild = leftChild;
 		this.rightChild = rightChild;
-		this.isBlocked = false;
+		isBlocked = false;
 	}
 
 	/**
@@ -87,51 +93,15 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * Returns the tree's root.
-	 *
-	 * @return the tree's root
-	 */
-	public T getRoot() {
-		return this.root;
-	}
-
-	/**
-	 * Sets the tree's root.
-	 *
-	 * @param root the new root
-	 */
-	public void setRoot(T root) {
-		this.root = root;
-	}
-
-	/**
-	 * Returns the tree's left child.
-	 *
-	 * @return the tree's left child
-	 */
-	public BinaryTree<T> getLeftChild() {
-		return this.leftChild;
-	}
-
-	/**
 	 * Sets the tree's left child.
 	 *
 	 * @param leftChild the new tree's left child
 	 */
 	public void setLeftChild(T leftChild) {
-		if (this.isBlocked) {
+		if (isBlocked) {
 			return; // TODO: raise exception
 		}
 		this.leftChild = new BinaryTree<>(leftChild);
-	}
-
-	/**
-	 * Returns the tree's right child.
-	 *
-	 * @return the tree's right child
-	 */
-	public BinaryTree<T> getRightChild() {
-		return this.rightChild;
 	}
 
 	/**
@@ -140,19 +110,10 @@ public class BinaryTree<T> {
 	 * @param rightChild the new tree's right child
 	 */
 	public void setRightChild(T rightChild) {
-		if (this.isBlocked) {
+		if (isBlocked) {
 			return; // TODO: raise exception
 		}
 		this.rightChild = new BinaryTree<>(rightChild);
-	}
-
-	/**
-	 * Returns whether the current tree is blocked or not.
-	 *
-	 * @return whether the current tree is blocked or not
-	 */
-	public boolean isBlocked() {
-		return this.isBlocked;
 	}
 
 	/**
@@ -168,7 +129,7 @@ public class BinaryTree<T> {
 	public void setBlocked(boolean block) {
 		// TODO: check logic (compare to block)
 		// blocking node but not his children ?
-		this.isBlocked = block;
+		isBlocked = block;
 	}
 
 	/**
@@ -179,13 +140,11 @@ public class BinaryTree<T> {
 	 * <b>Note</b> that blocking the current tree recursively block its children.
 	 *
 	 * @param block the new blocking state
-	 *
-	 * @since 1.0
 	 */
 	public void block(boolean block) {
-		this.isBlocked = block;
-		this.blockLeftChild(block);
-		this.blockRightChild(block);
+		isBlocked = block;
+		blockLeftChild(block);
+		blockRightChild(block);
 	}
 
 	/**
@@ -197,18 +156,16 @@ public class BinaryTree<T> {
 	 * {@code BinaryTree} left child is instantiated and blocked.
 	 *
 	 * @param block the new blocking state
-	 *
-	 * @since 1.0
 	 */
 	public void blockLeftChild(boolean block) {
-		if (this.leftChild == null) {
+		if (leftChild == null) {
 			if (!block) {
 				return;
 			} else {
-				this.leftChild = new BinaryTree<>(); // TODO: reuse creating methods
+				leftChild = new BinaryTree<>(); // TODO: reuse creating methods
 			}
 		}
-		this.leftChild.setBlocked(block);
+		leftChild.setBlocked(block);
 	}
 
 	/**
@@ -220,18 +177,16 @@ public class BinaryTree<T> {
 	 * {@code BinaryTree} right child is instantiated and blocked.
 	 *
 	 * @param block the new blocking state
-	 *
-	 * @since 1.0
 	 */
 	public void blockRightChild(boolean block) {
-		if (this.rightChild == null) {
+		if (rightChild == null) {
 			if (!block) {
 				return;
 			} else {
-				this.rightChild = new BinaryTree<>(); // TODO: reuse creating methods
+				rightChild = new BinaryTree<>(); // TODO: reuse creating methods
 			}
 		}
-		this.rightChild.setBlocked(block);
+		rightChild.setBlocked(block);
 	}
 
 	/**
@@ -239,57 +194,57 @@ public class BinaryTree<T> {
 	 * TODO: improve this behavior
 	 */
 	public BinaryTree<T> addLeftChild(BinaryTree<T> child) {
-		if (this.isBlocked) {
+		if (isBlocked) {
 			return null; // TODO: raise exception
 		}
-		if (this.root == null) {
+		if (root == null) {
 			// TODO: improve this behavior
-			this.root = child.getRoot();
-			this.leftChild = child.getLeftChild();
-			this.rightChild = child.getRightChild();
+			root = child.getRoot();
+			leftChild = child.getLeftChild();
+			rightChild = child.getRightChild();
 			return this;
 		} else {
-			if (this.leftChild != null) {
-				return this.rightChild.addLeftChild(child);
+			if (leftChild != null) {
+				return rightChild.addLeftChild(child);
 			} else {
-				this.leftChild = child;
-				return this.leftChild;
+				leftChild = child;
+				return leftChild;
 			}
 		}
 	}
 
 	public BinaryTree<T> addLeftChild(T child) {
-		if (this.isBlocked) {
+		if (isBlocked) {
 			return null; // TODO: raise exception
 		}
-		return this.addLeftChild(new BinaryTree<>(child));
+		return addLeftChild(new BinaryTree<>(child));
 	}
 
 	public BinaryTree<T> addRightChild(BinaryTree<T> child) {
-		if (this.isBlocked) {
+		if (isBlocked) {
 			return null; // TODO: raise exception
 		}
-		if (this.root == null) {
+		if (root == null) {
 			// TODO: improve this behavior
-			this.root = child.getRoot();
-			this.leftChild = child.getLeftChild();
-			this.rightChild = child.getRightChild();
+			root = child.getRoot();
+			leftChild = child.getLeftChild();
+			rightChild = child.getRightChild();
 			return this;
 		} else {
-			if (this.rightChild != null) {
-				return this.rightChild.addRightChild(child);
+			if (rightChild != null) {
+				return rightChild.addRightChild(child);
 			} else {
-				this.rightChild = child;
-				return this.rightChild;
+				rightChild = child;
+				return rightChild;
 			}
 		}
 	}
 
 	public BinaryTree<T> addRightChild(T child) {
-		if (this.isBlocked) {
+		if (isBlocked) {
 			return null; // TODO: raise exception
 		}
-		return this.addRightChild(new BinaryTree<>(child));
+		return addRightChild(new BinaryTree<>(child));
 	}
 
 	/**
@@ -316,31 +271,25 @@ public class BinaryTree<T> {
 	 * <b>Note</b> that an insertion can fail if the tree is blocked.
 	 *
 	 * @param tree tree to insert
+	 *
 	 * @return whether the insertion succeed or not
 	 */
 	public boolean insertWhenPossible(BinaryTree<T> tree) {
-		if (this.isBlocked) {
+		if (isBlocked) {
 			return false;
 		}
-		if (this.root == null) {
-			this.root = tree.getRoot();
-			this.leftChild = tree.getLeftChild();
-			this.rightChild = tree.getRightChild();
-			return true;
-		} else if (this.leftChild == null) {
-			this.leftChild = tree;
-			return true;
-		} else if (this.rightChild == null) {
-			this.rightChild = tree;
-			return true;
+		if (root == null) {
+			root = tree.getRoot();
+			leftChild = tree.getLeftChild();
+			rightChild = tree.getRightChild();
+		} else if (leftChild == null) {
+			leftChild = tree;
+		} else if (rightChild == null) {
+			rightChild = tree;
 		} else {
-			for (BinaryTree<T> child : Arrays.asList(this.leftChild, this.rightChild)) {
-				if (child.insertWhenPossible(tree)) {
-					return true;
-				}
-			}
-			return false;
+			return Stream.of(leftChild, rightChild).anyMatch(c -> c.insertWhenPossible(tree));
 		}
+		return true;
 	}
 
 	/**
@@ -351,7 +300,7 @@ public class BinaryTree<T> {
 	 * @since 1.0
 	 */
 	public boolean hasChildren() {
-		return this.hasLeftChild() || this.hasRightChild();
+		return hasLeftChild() || hasRightChild();
 	}
 
 	/**
@@ -362,7 +311,7 @@ public class BinaryTree<T> {
 	 * @since 1.0
 	 */
 	public boolean hasLeftChild() {
-		return this.leftChild != null;
+		return leftChild != null;
 	}
 
 	/**
@@ -373,7 +322,7 @@ public class BinaryTree<T> {
 	 * @since 1.0
 	 */
 	public boolean hasRightChild() {
-		return this.rightChild != null;
+		return rightChild != null;
 	}
 
 	/**
@@ -385,8 +334,8 @@ public class BinaryTree<T> {
 	 */
 	public List<T> getAllNodes() {
 		List<T> list = new ArrayList<>();
-		list.add(this.root); // TODO: check root == null ?
-		for (BinaryTree<T> child : Arrays.asList(this.leftChild, this.rightChild)) {
+		list.add(root); // TODO: check root == null ?
+		for (BinaryTree<T> child : Arrays.asList(leftChild, rightChild)) {
 			// TODO: check performances issues with Arrays.asList
 			if (child != null) {
 				list.addAll(child.getAllNodes());
@@ -396,66 +345,38 @@ public class BinaryTree<T> {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + (this.isBlocked ? 1231 : 1237);
-		result = (prime * result) + ((this.leftChild == null) ? 0 : this.leftChild.hashCode());
-		result = (prime * result) + ((this.rightChild == null) ? 0 : this.rightChild.hashCode());
-		result = (prime * result) + ((this.root == null) ? 0 : this.root.hashCode());
-		return result;
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		BinaryTree<?> that = (BinaryTree<?>) o;
+		return isBlocked == that.isBlocked &&
+				Objects.equals(root, that.root) &&
+				Objects.equals(leftChild, that.leftChild) &&
+				Objects.equals(rightChild, that.rightChild);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		// TODO: replace by a simpler method
-		if (this == obj) {
-			return true;
-		}
-		if ((obj == null) || (this.getClass() != obj.getClass())) {
-			return false;
-		}
-		BinaryTree<?> other = (BinaryTree<?>) obj;
-		if (this.isBlocked != other.isBlocked) {
-			return false;
-		}
-		if (this.leftChild == null) {
-			if (other.leftChild != null) {
-				return false;
-			}
-		} else if (!this.leftChild.equals(other.leftChild)) {
-			return false;
-		}
-		if (this.rightChild == null) {
-			if (other.rightChild != null) {
-				return false;
-			}
-		} else if (!this.rightChild.equals(other.rightChild)) {
-			return false;
-		}
-		if (this.root == null) {
-			if (other.root != null) {
-				return false;
-			}
-		} else if (!this.root.equals(other.root)) {
-			return false;
-		}
-		return true;
+	public int hashCode() {
+		return Objects.hash(root, leftChild, rightChild, isBlocked);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		if (this.hasLeftChild()) {
-			builder.append(this.leftChild.toString());
+		if (hasLeftChild()) {
+			builder.append(leftChild.toString());
 		}
-		if (this.root != null) {
+		if (root != null) {
 			builder.append(" ");
-			builder.append(this.root.toString());
+			builder.append(root.toString());
 			builder.append(" ");
 		}
-		if (this.hasRightChild()) {
-			builder.append(this.rightChild.toString());
+		if (hasRightChild()) {
+			builder.append(rightChild.toString());
 		}
 		return builder.toString();
 	}

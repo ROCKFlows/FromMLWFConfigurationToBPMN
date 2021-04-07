@@ -1,5 +1,8 @@
 package com.ml2wf.constraints.util;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,19 +11,19 @@ import java.util.List;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
+ * @since 1.0.0
  */
 public class OperAssociation {
 
 	/**
 	 * An operator.
 	 */
+	@Getter @Setter
 	private String operator;
 	/**
 	 * A {@code List} of operands.
 	 */
-	private List<String> operands;
+	@Getter private final List<String> operands;
 
 	/**
 	 * {@code OperAssociation}'s complete constructor.
@@ -35,7 +38,7 @@ public class OperAssociation {
 	 */
 	public OperAssociation(String operator, List<String> operands) {
 		this.operator = operator;
-		this.operands = operands;
+		this.operands = new ArrayList<>(operands);
 	}
 
 	/**
@@ -64,41 +67,14 @@ public class OperAssociation {
 	}
 
 	/**
-	 * Returns the {@code operator} of the current association.
-	 *
-	 * @return the {@code operator} of the current association.
-	 */
-	public String getOperator() {
-		return this.operator;
-	}
-
-	/**
-	 * Sets the current {@code operator}.
-	 *
-	 * @param operator new operator
-	 */
-	public void setOperator(String operator) {
-		this.operator = operator;
-	}
-
-	/**
-	 * Returns the {@code List} of operands the current association.
-	 *
-	 * @return the {@code List} of operands the current association.
-	 */
-	public List<String> getOperands() {
-		return this.operands;
-	}
-
-	/**
 	 * Adds an operand to the operands {@code List}.
 	 *
 	 * @param operand a new operand
 	 * @return whether the operation succeed or not
 	 */
 	public boolean addOperand(String operand) {
-		if (this.operands.size() < 2) {
-			return this.operands.add(operand);
+		if (operands.size() < 2) {
+			return operands.add(operand);
 		}
 		return false;
 	}
@@ -109,8 +85,8 @@ public class OperAssociation {
 	 * @return the left operand associated to the operator.
 	 */
 	public String getLeftOperand() {
-		if (this.hasLeftOperand()) {
-			return this.operands.get(0);
+		if (hasLeftOperand()) {
+			return operands.get(0);
 		}
 		return null;
 	}
@@ -121,8 +97,8 @@ public class OperAssociation {
 	 * @return the right operand associated to the operator.
 	 */
 	public String getRightOperand() {
-		if (this.hasRightOperand()) {
-			return this.operands.get(1);
+		if (hasRightOperand()) {
+			return operands.get(1);
 		}
 		return null;
 	}
@@ -133,7 +109,7 @@ public class OperAssociation {
 	 * @return whether the current operator is associated to a left operand or not.
 	 */
 	public boolean hasLeftOperand() {
-		return (this.operands.size() == 2) && !this.operands.get(0).isBlank();
+		return (operands.size() == 2) && !operands.get(0).isBlank();
 	}
 
 	/**
@@ -142,7 +118,7 @@ public class OperAssociation {
 	 * @return whether the current operator is associated to a right operand or not.
 	 */
 	public boolean hasRightOperand() {
-		return (this.operands.size() == 2) && !this.operands.get(1).isBlank();
+		return (operands.size() == 2) && !operands.get(1).isBlank();
 	}
 
 }
