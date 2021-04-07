@@ -58,15 +58,15 @@ public class ConstraintParser implements IParser {
 	 * @see ConfigImpl
 	 */
 	public ConstraintParser(ConfigImpl cfg) {
-		this.setConfig(cfg);
+		setConfig(cfg);
 	}
 
 	@Override
 	public List<BinaryTree<String>> parseContent(String content) {
 		List<BinaryTree<String>> result = new ArrayList<>();
-		content = this.encloseUnary(content);
-		for (String constraint : this.getConstraintParts(content)) {
-			result.add(this.constraintMapToTree(this.computeDepth(this.getSplittedConstraints(constraint))));
+		content = encloseUnary(content);
+		for (String constraint : getConstraintParts(content)) {
+			result.add(constraintMapToTree(computeDepth(getSplittedConstraints(constraint))));
 		}
 		return result;
 	}
@@ -74,7 +74,7 @@ public class ConstraintParser implements IParser {
 	@Override
 	public List<OperAssociation> parseExpression(String expression) {
 		List<OperAssociation> result = new ArrayList<>();
-		List<String> operators = this.config.getOperatorsList();
+		List<String> operators = config.getOperatorsList();
 		operators = operators.stream().map(Pattern::quote).collect(Collectors.toList());
 		// regex part
 		String regex = String.format(EXPRESSION_REGEX, String.join("|", operators));
@@ -93,7 +93,7 @@ public class ConstraintParser implements IParser {
 
 	@Override
 	public boolean isOrderConstraint(String constraintText) {
-		return this.config.getOrderOperator().stream().anyMatch(constraintText::contains);
+		return config.getOrderOperator().stream().anyMatch(constraintText::contains);
 	}
 
 	/**
@@ -114,8 +114,8 @@ public class ConstraintParser implements IParser {
 			// foreach constraint
 			operandsOperatorsList = entry.getValue();
 			for (String brutOperandOperator : operandsOperatorsList) {
-				List<OperAssociation> parsed = this.parseExpression(brutOperandOperator);
-				BinaryTree<String> tmpTree = this.getTreeFromParsedCons(parsed);
+				List<OperAssociation> parsed = parseExpression(brutOperandOperator);
+				BinaryTree<String> tmpTree = getTreeFromParsedCons(parsed);
 				result.insertWhenPossible(tmpTree);
 			}
 		}
@@ -195,7 +195,7 @@ public class ConstraintParser implements IParser {
 			String operator = operAssociation.getOperator();
 			// add operator
 			created = tree.addRightChild(operator);
-			if (this.config.isUnaryOperator(operator)) {
+			if (config.isUnaryOperator(operator)) {
 				// if operator is unary
 				// block left child
 				created.blockLeftChild(true);
@@ -357,7 +357,7 @@ public class ConstraintParser implements IParser {
 	 */
 	private String encloseUnary(String expression) {
 		// TODO: replace by config file (get(0))
-		String unaryOp = this.config.getUnaryOperators().get(0);
+		String unaryOp = config.getUnaryOperators().get(0);
 		StringBuilder builder = new StringBuilder();
 		int bracketCounter = 0;
 		int unaryCounter = 0;
