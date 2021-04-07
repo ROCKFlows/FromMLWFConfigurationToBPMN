@@ -19,6 +19,7 @@
         <version.log4j>2.13.3</version.log4j>
         <version.commons-io>2.7</version.commons-io>
         <version.jansi>1.18</version.jansi>
+        <version.lombok>1.18.20</version.lombok>
         <dependency.directory>dependency/</dependency.directory>
         <sonar.projectKey>MireilleBF_FromMLWFConfigurationToBPMN</sonar.projectKey>
         <sonar.organization>mireillebf-github</sonar.organization>
@@ -147,5 +148,12 @@
 		    <artifactId>jansi</artifactId>
 		    <version>${version.jansi}</version>
 		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${version.lombok}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
