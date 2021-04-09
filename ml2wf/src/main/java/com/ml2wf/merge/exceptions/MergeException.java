@@ -7,24 +7,18 @@ import com.ml2wf.merge.base.BaseMerger;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
  * @see BaseMerger
  *
+ * @since 1.0.0
  */
 public class MergeException extends Exception {
 
-	/**
-	 * Generated serial ID.
-	 */
-	private static final long serialVersionUID = -6338472968929435621L;
-
-	/**
-	 * {@code MergeException}'s default constructor.
-	 *
-	 * @param arg0 exception explanation
-	 */
-	public MergeException(String arg0) {
-		super(arg0);
-	}
-
+    /**
+     * {@code MergeException}'s constructor with a message.
+     *
+     * @param message	the exception's message
+     */
+    public MergeException(String message) {
+        super(message);
+    }
 }

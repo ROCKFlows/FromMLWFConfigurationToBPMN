@@ -95,8 +95,8 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
         // Document instantiation
         this.document = document;
         // Parser instantiation
-        this.config = ConfigImpl.getInstance();
-        this.parser = new ConstraintParser(this.config);
+        config = ConfigImpl.getInstance();
+        parser = new ConstraintParser(config);
     }
 
     /**
@@ -130,6 +130,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
      * before adding them.
      *
      * @param constraintText text containing constraints
+     *
      * @return a generated {@code Node} containing all constraints nodes
      *
      * @throws UnresolvedConflict if an unresolved conflict is detected
@@ -139,11 +140,11 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
     @Override
     public List<Node> getRuleNodes(String constraintText) throws UnresolvedConflict {
         List<Node> rules = new ArrayList<>();
-        List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
+        List<BinaryTree<String>> trees = parser.parseContent(constraintText);
         for (BinaryTree<String> tree : trees) {
-            this.managedMissingCriteria(tree);
-            Node rule = this.document.createElement(FMNames.RULE.getName());
-            this.generateRuleNode(tree, rule);
+            managedMissingCriteria(tree);
+            Node rule = document.createElement(FMNames.RULE.getName());
+            generateRuleNode(tree, rule);
             rules.add(rule);
         }
         return rules;
@@ -153,14 +154,17 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
     public List<Pair<FMTask, Node>> getOrderNodes(String constraintText) {
         List<Pair<FMTask, Node>> pairs = new ArrayList<>();
         Node description;
-        if (this.parser.isOrderConstraint(constraintText)) {
-            List<BinaryTree<String>> trees = this.parser.parseContent(constraintText);
+        if (parser.isOrderConstraint(constraintText)) {
+            List<BinaryTree<String>> trees = parser.parseContent(constraintText);
             for (BinaryTree<String> tree : trees) {
-                description = this.document.createElement(FMNames.DESCRIPTION.getName());
+                description = document.createElement(FMNames.DESCRIPTION.getName());
                 // get involved nodes
-                List<String> taskNames = tree.getAllNodes().stream().filter(n -> !this.config.isAnOperator(n))
+                List<String> taskNames = tree.getAllNodes().stream()
+                        .filter(n -> !config.isAnOperator(n))
                         .collect(Collectors.toList());
-                List<FMTask> tasks = taskNames.stream().map(TasksManager::getFMTaskWithName).map(o -> o.orElse(null))
+                List<FMTask> tasks = taskNames.stream()
+                        .map(TasksManager::getFMTaskWithName)
+                        .map(o -> o.orElse(null))
                         .collect(Collectors.toList());
                 // get and add LCA
                 FMTask lca = (tasks.contains(null)) ? null : FMTask.getLCA(tasks);
@@ -189,7 +193,7 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
      */
     private void managedMissingCriteria(BinaryTree<String> tree) throws UnresolvedConflict {
         Set<String> taskNames = TasksManager.getTasks().stream().map(Task::getName).collect(Collectors.toSet());
-        List<String> missingNames = tree.getAllNodes().stream().filter(n -> (n != null) && !this.config.isAnOperator(n))
+        List<String> missingNames = tree.getAllNodes().stream().filter(n -> (n != null) && !config.isAnOperator(n))
                 .collect(Collectors.toList());
         missingNames.removeAll(taskNames);
         FMTask parentTask = BaseMergerImpl.getUnmanagedGlobalTask(BaseMergerImpl.UNMANAGED_FEATURES);
@@ -241,13 +245,12 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
     private void generateRuleNode(BinaryTree<String> tree, Node base) {
         String rootValue = tree.getRoot();
         if (rootValue == null) {
-            // stop condition
             return;
         }
-        base = base.appendChild(this.createNode(rootValue));
+        base = base.appendChild(createNode(rootValue));
         for (BinaryTree<String> child : Arrays.asList(tree.getLeftChild(), tree.getRightChild())) {
             if (child != null) {
-                this.generateRuleNode(child, base);
+                generateRuleNode(child, base);
             }
         }
     }
@@ -266,11 +269,11 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
      */
     public Node createNode(String element) {
         Node node;
-        if (this.config.isAnOperator(element)) {
-            node = this.document.createElement(this.config.getVocMapping().get(element));
+        if (config.isAnOperator(element)) {
+            node = document.createElement(config.getVocMapping().get(element));
         } else {
-            node = this.document.createElement(FMNames.VAR.getName());
-            node.appendChild(this.document.createTextNode(element));
+            node = document.createElement(FMNames.VAR.getName());
+            node.appendChild(document.createTextNode(element));
         }
         return node;
     }
