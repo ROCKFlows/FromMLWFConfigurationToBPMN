@@ -92,7 +92,7 @@ public abstract class AbstractMerger extends XMLManager {
      */
     protected AbstractMerger(File file) throws ParserConfigurationException, SAXException, IOException {
         super(file);
-        this.constraintFactory = new ConstraintFactoryImpl(getDocument());
+        constraintFactory = new ConstraintFactoryImpl(getDocument());
         setTaskFactory(new TaskFactoryImpl());
     }
 
@@ -129,7 +129,7 @@ public abstract class AbstractMerger extends XMLManager {
         Node constraintsNode = createConstraintTag();
         // getting constraints
         List<Node> constraints = new ArrayList<>(
-                XMLManager.nodeListAsList(getDocument().getElementsByTagName(FMNames.RULE.getName())));
+                nodeListAsList(getDocument().getElementsByTagName(FMNames.RULE.getName())));
         for (Node rule : rules) {
             if (constraints.stream().noneMatch(rule::isEqualNode)) {
                 // if it is not duplicated constraint
@@ -251,7 +251,7 @@ public abstract class AbstractMerger extends XMLManager {
     protected static Element createNestedNode(Element parent, String name) {
         Element created = parent.getOwnerDocument().createElement(parent.getNodeName());
         created.setAttribute(BPMNAttributes.NAME.getName(), name);
-        String refContent = getReferenceDocumentation(XMLManager.getNodeName(parent));
+        String refContent = getReferenceDocumentation(getNodeName(parent));
         Optional<Node> optProperty = getProperty(parent, BPMNNames.PROPERTY.getName());
         optProperty.ifPresent(node -> created.appendChild(node.cloneNode(true)));
         mergeNodesTextContent(addDocumentationNode(created), refContent);
@@ -311,7 +311,7 @@ public abstract class AbstractMerger extends XMLManager {
      */
     public static List<Node> getNestedNodes(Node node) {
         // retrieving attributes values
-        String rawName = XMLManager.getNodeName(node);
+        String rawName = getNodeName(node);
         String attributesDoc = getAttributesDoc(rawName);
         // retrieving all nested nodes' names
         String[] nodeName = rawName.split(Notation.GENERATED_PREFIX_VOC);
@@ -383,7 +383,7 @@ public abstract class AbstractMerger extends XMLManager {
             mergeNodesTextContent(addDocumentationNode(element), attributesDoc);
         } else {
             Node docNode = docNodes.item(0);
-            XMLManager.mergeNodesTextContent(docNode, attributesDoc);
+            mergeNodesTextContent(docNode, attributesDoc);
         }
     }
 
@@ -402,7 +402,7 @@ public abstract class AbstractMerger extends XMLManager {
      */
     protected String getTaskName(Node task) {
         log.debug("Retrieving name for task : {}...", task);
-        String taskName = XMLManager.getNodeName(task);
+        String taskName = getNodeName(task);
         String[] split = taskName.split(Notation.GENERATED_PREFIX_VOC);
         taskName = (split.length > 0) ? split[split.length - 1] : taskName;
         log.debug("Task's name is : {}", taskName);
@@ -503,7 +503,7 @@ public abstract class AbstractMerger extends XMLManager {
      * @see Document
      */
     protected List<Node> getAnnotations(Document wfDocument) {
-        return XMLManager.nodeListAsList(wfDocument.getElementsByTagName(BPMNNames.ANNOTATION.getName()));
+        return nodeListAsList(wfDocument.getElementsByTagName(BPMNNames.ANNOTATION.getName()));
     }
 
     /**
@@ -523,16 +523,16 @@ public abstract class AbstractMerger extends XMLManager {
         for (Node annotation : annotations) {
             // TODO: improve performances (check annotation.getChildNodes().item(1)
             // sufficient ?)
-            for (Node commentNode : XMLManager.nodeListAsList(annotation.getChildNodes())) {
+            for (Node commentNode : nodeListAsList(annotation.getChildNodes())) {
                 String comment = commentNode.getTextContent();
-                orderPairs = this.getConstraintFactory().getOrderNodes(comment);
+                orderPairs = constraintFactory.getOrderNodes(comment);
                 if (!orderPairs.isEmpty()) {
                     // this is an order constraint
-                    this.processOrderConstraint(orderPairs);
+                    processOrderConstraint(orderPairs);
                 } else {
                     // this is a "classic" constraint
-                    List<Node> newRules = this.getConstraintFactory().getRuleNodes(comment);
-                    this.adoptRules(newRules);
+                    List<Node> newRules = constraintFactory.getRuleNodes(comment);
+                    adoptRules(newRules);
                 }
             }
         }
@@ -565,11 +565,11 @@ public abstract class AbstractMerger extends XMLManager {
             return;
         }
         log.debug("Getting the constraint association...");
-        String associationConstraint = getConstraintFactory().getAssociationConstraint(wfName, mandatoriesNames);
+        String associationConstraint = constraintFactory.getAssociationConstraint(wfName, mandatoriesNames);
         log.info("Generated constraint association : {}", associationConstraint);
         // add the new constraint
         log.info("Adding association constraint...");
-        this.adoptRules(this.getConstraintFactory().getRuleNodes(associationConstraint));
+        adoptRules(constraintFactory.getRuleNodes(associationConstraint));
     }
 
     /**
@@ -614,7 +614,7 @@ public abstract class AbstractMerger extends XMLManager {
             if (key != null) {
                 // the order association has been parsed
                 Node docNode = createTag(key, FMNames.DESCRIPTION);
-                if (!XMLManager.mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
+                if (!mergeNodesTextContent(docNode, pair.getValue().getTextContent())) {
                     // if there is a merge failure for description nodes
                     log.error("The merge operation for description nodes failed.");
                 }
