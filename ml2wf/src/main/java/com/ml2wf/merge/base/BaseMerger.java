@@ -16,10 +16,9 @@ import com.ml2wf.util.Pair;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
  * @see <a href="https://en.wikipedia.org/wiki/Feature_model">FeatureModel</a>
  *
+ * @since  1.0
  */
 public interface BaseMerger {
 
@@ -36,10 +35,8 @@ public interface BaseMerger {
 	 * @param completeMerge indicates whether the workflow has to be completely
 	 *                      merged or not
 	 * @throws Exception
-	 *
-	 * @since 1.0
 	 */
-	public void mergeWithWF(boolean backUp, boolean completeMerge, File wfFile) throws Exception;
+	void mergeWithWF(boolean backUp, boolean completeMerge, File wfFile) throws Exception;
 
 	/**
 	 * Merges the workflow files at {@code filesPath} location into the WF document.
@@ -53,25 +50,24 @@ public interface BaseMerger {
 	 * @param backUp        indicates if a backup is needed
 	 * @param completeMerge indicates whether the workflow has to be completely
 	 *                      merged or not
-	 * @throws Exception
 	 *
-	 * @since 1.0
+	 * @throws Exception
 	 */
-	public void mergeWithWF(boolean backUp, boolean completeMerge, File... wfFiles) throws Exception;
+	void mergeWithWF(boolean backUp, boolean completeMerge, File... wfFiles) throws Exception;
 
 	/**
 	 * Returns a suitable parent {@code FMTask} for the given {@code child}.
 	 *
 	 * @param child child to retrieve a suitable parent
+	 *
 	 * @return a suitable parent {@code FMTask} for the given {@code WFTask}
+	 *
 	 * @throws MergeException
 	 *
-	 * @since 1.0
 	 * @see FMTask
 	 * @see WFTask
 	 */
-	public abstract FMTask getSuitableParent(WFTask<?> child)
-			throws MergeException, UnresolvedConflict;
+	FMTask getSuitableParent(WFTask<?> child) throws MergeException, UnresolvedConflict;
 
 	/**
 	 * Returns the root parent {@code FMTask} according to the workflow's type (meta
@@ -84,13 +80,13 @@ public interface BaseMerger {
 	 *
 	 * @return the root parent {@code FMTask} according to the workflow's type (meta
 	 *         or instance)
+	 *
 	 * @throws MergeException
 	 * @throws UnresolvedConflict
 	 *
-	 * @since 1.0
 	 * @see FMTask
 	 */
-	public abstract FMTask getRootParentNode() throws MergeException, UnresolvedConflict;
+	FMTask getRootParentNode() throws MergeException, UnresolvedConflict;
 
 	/**
 	 * Processes specific needs to complete the merge operation.
@@ -100,12 +96,11 @@ public interface BaseMerger {
 	 * e.g. add references
 	 *
 	 * @param wfInfo {@code Pair} containing the {@code Document} and its name
-	 * @throws Exception
 	 *
-	 * @since 1.0
+	 * @throws Exception
 	 *
 	 * @see Pair
 	 * @see Document
 	 */
-	public void processSpecificNeeds(Pair<String, Document> wfInfo) throws Exception;
+	void processSpecificNeeds(Pair<String, Document> wfInfo) throws Exception;
 }

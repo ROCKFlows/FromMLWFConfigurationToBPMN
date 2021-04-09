@@ -244,16 +244,14 @@ public abstract class AbstractMerger extends XMLManager {
 	 * @param name       name of the feature
 	 * @param isAbstract whether the wished created feature must be abstract or not
 	 * @return a new feature ({@code FMTask}) with the given {@code name}
-	 * @throws UnresolvedConflict
-	 * @throws TaskFactoryException
 	 *
-	 * @since 1.0
+	 * @throws UnresolvedConflict
+	 *
 	 * @see FMTask
 	 */
-	protected static FMTask createFMTaskWithName(String name, boolean isAbstract)
-			throws UnresolvedConflict {
-			logger.debug("AbstractMerger createFMTaskWithName %s ==> isAbstract : %s", name, isAbstract);
-		return (FMTask) taskFactory.createTask(createFeatureWithAbstract(name, isAbstract));
+	protected static FMTask createFMTaskWithName(String name, boolean isAbstract) throws UnresolvedConflict {
+		logger.debug("AbstractMerger createFMTaskWithName %s ==> isAbstract : %s", name, isAbstract);
+		return taskFactory.createTask(createFeatureWithAbstract(name, isAbstract));
 	}
 
 	/**

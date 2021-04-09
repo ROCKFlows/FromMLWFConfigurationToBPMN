@@ -8,18 +8,30 @@ import com.ml2wf.conflicts.ConflictSolver;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
  * @see ConflictSolver
  *
+ * @since 1.0.0
  */
 public class UnresolvedConflict extends Exception {
 
     /**
-     * {@code UnsolvedConflict}'s default constructor.
+     * {@code UnsolvedConflict}'s constructor with a message.
      *
-     * @param arg0 exception explanation
+     * @param message   the exception's message
      */
-    public UnresolvedConflict(String arg0) {
-        super(arg0);
+    public UnresolvedConflict(String message) {
+        super(message);
+    }
+
+    /**
+     * {@code UnsolvedConflict}'s constructor with a format message.
+     *
+     * @param format    the exception's format base
+     * @param args      the exception's format arguments
+     *
+     * @see String#format(String, Object...)
+     */
+    public UnresolvedConflict(String format, Object... args) {
+        super(String.format(format, args));
     }
 }
