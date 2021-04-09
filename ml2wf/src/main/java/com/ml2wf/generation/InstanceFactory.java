@@ -8,21 +8,20 @@ import java.io.File;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
  * @see <a href="https://www.bpmn.org/">BPMN</a>
  *
+ * @since 1.0.0
  */
+@FunctionalInterface
 public interface InstanceFactory {
 
-	/**
-	 * Instantiates a generic workflow and saves it under the given
-	 * {@code outputFile}.
-	 *
-	 * @param outputFile the output file or directory
-	 * @throws Exception
-	 *
-	 * @since 1.0
-	 */
-	public void getWFInstance(File outputFile) throws Exception;
+    /**
+     * Instantiates a generic workflow and saves it under the given
+     * {@code outputFile}.
+     *
+     * @param outputFile the output file or directory
+     *
+     * @throws Exception
+     */
+    void getWFInstance(File outputFile) throws Exception;
 }
