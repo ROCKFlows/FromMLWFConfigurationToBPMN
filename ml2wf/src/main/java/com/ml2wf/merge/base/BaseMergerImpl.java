@@ -381,7 +381,7 @@ public abstract class BaseMergerImpl extends AbstractMerger implements BaseMerge
         String taskName = task.getName();
 
         // Begin new Code --- MIREILLE
-        if (TasksManager.existsinFM(taskName) && !processDuplicatedTask(task)) {
+        if (TasksManager.existsInFM(taskName) && !processDuplicatedTask(task)) {
             log.debug("{} already exists in FM, nothing to do", task);
             return;
         }

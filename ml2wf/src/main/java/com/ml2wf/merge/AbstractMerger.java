@@ -450,7 +450,7 @@ public abstract class AbstractMerger extends XMLManager {
             wfDocument = FileHandler.preprocess(file);
             wfTaskName = getWorkflowName(wfDocument).replace(" ", "_");
             log.debug("WF's name is {}.", wfTaskName);
-            if (TasksManager.existsinFM(wfTaskName)) {
+            if (TasksManager.existsInFM(wfTaskName)) {
                 log.warn("This workflow is already in the FeatureModel");
                 log.warn("Skipping...");
                 return new Pair<>();

@@ -4,6 +4,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,115 +32,85 @@ import com.ml2wf.util.RegexManager;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
  * @see Spec
  * @see FMTask
  *
+ * @since 1.0.0
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public enum FMTaskSpecs implements Spec<FMTask> {
 
-	// TODO: add ABSTRACT
-	OPTIONAL("optional", RegexManager.getOptionalityPattern()) {
+    // TODO: add ABSTRACT
+    OPTIONAL("optional", RegexManager.getOptionalityPattern()) {
 
-		@Override
-		public void apply(FMTask task) {
-			// TODO: factorize with other apply implementations
-			Optional<String> optSpecValue = this.getSpecValue(task);
-			if (optSpecValue.isEmpty()) {
-				return;
-			}
-			Element featureAttribute = AbstractMerger.createFeatureAttribute(this.getName(),
-					Boolean.valueOf(optSpecValue.get()));
-			task.getNode().appendChild(featureAttribute);
-			task.addSpec(this.getName(), optSpecValue.get());
-		}
+        @Override
+        public void apply(FMTask task) {
+            // TODO: factorize with other apply implementations
+            Optional<String> optSpecValue = this.getSpecValue(task);
+            if (optSpecValue.isEmpty()) {
+                return;
+            }
+            Element featureAttribute = AbstractMerger.createFeatureAttribute(getName(),
+                    Boolean.parseBoolean(optSpecValue.get()));
+            task.getNode().appendChild(featureAttribute);
+            task.addSpec(getName(), optSpecValue.get());
+        }
 
-	},
-	CATEGORY("category", RegexManager.getCategoryPattern()) {
+    },
+    CATEGORY("category", RegexManager.getCategoryPattern()) {
 
-		@Override
-		public void apply(FMTask task) {
-			Optional<String> optSpecValue = this.getSpecValue(task);
-			if (optSpecValue.isEmpty()) {
-				return;
-			}
-			Element featureAttribute = AbstractMerger.createFeatureAttribute(this.getName(), optSpecValue.get());
-			task.getNode().appendChild(featureAttribute);
-			task.addSpec(this.getName(), optSpecValue.get());
-		}
+        @Override
+        public void apply(FMTask task) {
+            Optional<String> optSpecValue = getSpecValue(task);
+            if (optSpecValue.isEmpty()) {
+                return;
+            }
+            Element featureAttribute = AbstractMerger.createFeatureAttribute(getName(), optSpecValue.get());
+            task.getNode().appendChild(featureAttribute);
+            task.addSpec(getName(), optSpecValue.get());
+        }
 
-	};
+    };
 
-	/**
-	 * The current specification's name.
-	 */
-	private String name;
-	/**
-	 * Current pattern (regex) used to retrieve the current specification value.
-	 *
-	 * @see Pattern
-	 */
-	private Pattern pattern;
+    /**
+     * The current specification's name.
+     */
+    private final String name;
+    /**
+     * Current pattern (regex) used to retrieve the current specification value.
+     *
+     * @see Pattern
+     */
+    private final Pattern pattern;
 
-	/**
-	 * {@code FMTaskSpecs}'s default constructor.
-	 *
-	 * @param name    specification's name
-	 * @param pattern pattern used to retrieve the specification
-	 */
-	private FMTaskSpecs(String name, Pattern pattern) {
-		this.name = name;
-		this.pattern = pattern;
-	}
+    @Override
+    public boolean hasSpec(FMTask task) {
+        return task.getSpecs().containsKey(name);
+    }
 
-	/**
-	 * Returns the current {@code name}.
-	 *
-	 * @return the current {@code name}
-	 */
-	public String getName() {
-		return this.name;
-	}
+    @Override
+    public Optional<String> getSpecValue(FMTask task) {
+        // TODO: factorize with BPMNTaskSpecs#getSpecValue(FMTask)
+        if (hasSpec(task)) {
+            return Optional.of(task.getSpecValue(this.getName()));
+        }
+        NodeList docNodes = ((Element) task.getNode()).getElementsByTagName(FMNames.DESCRIPTION.getName());
+        if (docNodes.getLength() == 0) {
+            return Optional.empty();
+        }
+        Node docNode = docNodes.item(0);
+        Matcher matcher = this.getPattern().matcher(docNode.getTextContent());
+        if (matcher.matches() && (matcher.groupCount() > 0)) {
+            return Optional.of(matcher.group(1));
+        }
+        return Optional.empty();
+    }
 
-	/**
-	 * Returns the current {@code pattern}.
-	 *
-	 * @return the current {@code pattern}
-	 */
-	public Pattern getPattern() {
-		return this.pattern;
-	}
-
-	@Override
-	public boolean hasSpec(FMTask task) {
-		return task.getSpecs().containsKey(this.getName());
-	}
-
-	@Override
-	public Optional<String> getSpecValue(FMTask task) {
-		// TODO: factorize with BPMNTaskSpecs#getSpecValue(FMTask)
-		if (this.hasSpec(task)) {
-			return Optional.of(task.getSpecValue(this.getName()));
-		} else {
-			NodeList docNodes = ((Element) task.getNode()).getElementsByTagName(FMNames.DESCRIPTION.getName());
-			if (docNodes.getLength() == 0) {
-				return Optional.empty();
-			}
-			Node docNode = docNodes.item(0);
-			Matcher matcher = this.getPattern().matcher(docNode.getTextContent());
-			if (matcher.matches() && (matcher.groupCount() > 0)) {
-				return Optional.of(matcher.group(1));
-			}
-		}
-		return Optional.empty();
-	}
-
-	@Override
-	public void applyAll(FMTask task) {
-		for (FMTaskSpecs spec : FMTaskSpecs.values()) {
-			spec.apply(task);
-		}
-	}
-
+    @Override
+    public void applyAll(FMTask task) {
+        for (FMTaskSpecs spec : FMTaskSpecs.values()) {
+            spec.apply(task);
+        }
+    }
 }

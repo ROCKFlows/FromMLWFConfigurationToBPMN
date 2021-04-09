@@ -4,11 +4,13 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.w3c.dom.Element;
 
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.tasks.base.WFTask;
-import com.ml2wf.tasks.concretes.BPMNTask;
 import com.ml2wf.util.RegexManager;
 import com.ml2wf.util.XMLManager;
 
@@ -28,119 +30,74 @@ import com.ml2wf.util.XMLManager;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
  * @see Spec
- * @see BPMNTask
  *
+ * @since 1.0.0
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public enum BPMNTaskSpecs implements WFSpec<WFTask<?>> {
 
-	// TODO: add ABSTRACT
-	OPTIONAL("optional", RegexManager.getOptionalityPattern()) {
+    // TODO: add ABSTRACT
+    OPTIONAL("optional", RegexManager.getOptionalityPattern()) {
 
-		@Override
-		public Optional<String> getSpecValue(WFTask<?> task) {
-			if (this.hasSpec(task)) {
-				return Optional.of(task.getSpecValue(this.getName()));
-			} else {
-				for (String documentation : XMLManager.getAllBPMNDocContent((Element) task.getNode())) {
-					Matcher matcher = this.getPattern().matcher(documentation.replace(" ", ""));
-					if (matcher.find() && (matcher.groupCount() > 0)) {
-						return Optional.of(matcher.group(1));
-					}
-				}
-			}
-			return Optional.empty();
-		}
+        @Override
+        public String formatSpec(String content) {
+            if (content.contains(Notation.OPTIONALITY)) {
+                return Notation.OPTIONALITY + " : " + true;
+            }
+            return "";
+        }
+    },
+    CATEGORY("category", RegexManager.getCategoryPattern());
 
-		@Override
-		public String formatSpec(String content) {
-			if (content.contains(Notation.OPTIONALITY)) {
-				return Notation.OPTIONALITY + " : " + true;
-			}
-			return "";
-		}
-	},
-	CATEGORY("category", RegexManager.getCategoryPattern());
+    /**
+     * The current specification's name.
+     */
+    private final String name;
+    /**
+     * Current pattern (regex) used to retrieve the current specification value.
+     *
+     * @see Pattern
+     */
+    private final Pattern pattern;
 
-	/**
-	 * The current specification's name.
-	 */
-	private String name;
-	/**
-	 * Current pattern (regex) used to retrieve the current specification value.
-	 *
-	 * @see Pattern
-	 */
-	private Pattern pattern;
+    @Override
+    public boolean hasSpec(WFTask<?> task) {
+        return task.getSpecs().containsKey(name);
+    }
 
-	/**
-	 * {@code BPMNTaskSpecs}'s default constructor.
-	 *
-	 * @param name    specification's name
-	 * @param pattern pattern used to retrieve the specification
-	 */
-	private BPMNTaskSpecs(String name, Pattern pattern) {
-		this.name = name;
-		this.pattern = pattern;
-	}
+    @Override
+    public void apply(WFTask<?> task) {
+        Optional<String> optSpecValue;
+        if (!hasSpec(task)) {
+            optSpecValue = getSpecValue(task);
+            if (optSpecValue.isEmpty()) {
+                return;
+            }
+            task.addSpec(name, optSpecValue.get());
+        }
+    }
 
-	/**
-	 * Returns the current {@code name}.
-	 *
-	 * @return the current {@code name}
-	 */
-	public String getName() {
-		return this.name;
-	}
+    @Override
+    public void applyAll(WFTask<?> task) {
+        for (BPMNTaskSpecs spec : BPMNTaskSpecs.values()) {
+            spec.apply(task);
+        }
+    }
 
-	/**
-	 * Returns the current {@code pattern}.
-	 *
-	 * @return the current {@code pattern}
-	 */
-	public Pattern getPattern() {
-		return this.pattern;
-	}
-
-	@Override
-	public boolean hasSpec(WFTask<?> task) {
-		return task.getSpecs().containsKey(this.name);
-	}
-
-	@Override
-	public void apply(WFTask<?> task) {
-		Optional<String> optSpecValue;
-		if (!this.hasSpec(task)) {
-			optSpecValue = this.getSpecValue(task);
-			if (optSpecValue.isEmpty()) {
-				return;
-			}
-			task.addSpec(this.getName(), optSpecValue.get());
-		}
-	}
-
-	@Override
-	public void applyAll(WFTask<?> task) {
-		for (BPMNTaskSpecs spec : BPMNTaskSpecs.values()) {
-			spec.apply(task);
-		}
-	}
-
-	@Override
-	public Optional<String> getSpecValue(WFTask<?> task) {
-		if (this.hasSpec(task)) {
-			return Optional.of(task.getSpecValue(this.getName()));
-		} else {
-			for (String documentation : XMLManager.getAllBPMNDocContent((Element) task.getNode())) {
-				Matcher matcher = this.getPattern().matcher(documentation.replace(" ", ""));
-				if (matcher.find() && (matcher.groupCount() > 0)) {
-					return Optional.of(matcher.group(1));
-				}
-			}
-		}
-		return Optional.empty();
-	}
-
+    @Override
+    public Optional<String> getSpecValue(WFTask<?> task) {
+        if (hasSpec(task)) {
+            return Optional.of(task.getSpecValue(name));
+        } else {
+            for (String documentation : XMLManager.getAllBPMNDocContent((Element) task.getNode())) {
+                Matcher matcher = pattern.matcher(documentation.replace(" ", ""));
+                if (matcher.find() && (matcher.groupCount() > 0)) {
+                    return Optional.of(matcher.group(1));
+                }
+            }
+        }
+        return Optional.empty();
+    }
 }
