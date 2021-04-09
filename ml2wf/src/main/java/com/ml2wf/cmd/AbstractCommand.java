@@ -23,103 +23,103 @@ import picocli.CommandLine.Spec;
  */
 public abstract class AbstractCommand implements Runnable {
 
-	@Spec
-	Model.CommandSpec spec;
+    @Spec
+    Model.CommandSpec spec;
 
-	@Option(names = { "-v",
-			"--verbose" }, arity = "1", order = 1, defaultValue = "0", description = "verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL")
-	public void processVerboseArg(int verboseLevel) {
-		Configurator.setLevel(getPackageName(), getVerbLevel(verboseLevel));
-	}
+    @Option(names = { "-v",
+            "--verbose" }, arity = "1", order = 1, defaultValue = "0", description = "verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL")
+    public void processVerboseArg(int verboseLevel) {
+        Configurator.setLevel(getPackageName(), getVerbLevel(verboseLevel));
+    }
 
-	/**
-	 * Package name to change the logger level.
-	 */
-	private static final String PACKAGE_NAME = App.class.getPackageName();
-	/**
-	 * Default verbosity {@code Level}.
-	 */
-	private static final Level DEFAULT_VERB_LEVEL = Level.INFO;
-	/**
-	 * Error message due to an error that occured during the instantiation process.
-	 */
-	protected static final String CANT_MERGE = "Can't merge the Workflow with the FeatureModel.";
-	/**
-	 * Error message due to an error that occured during the merging process.
-	 */
-	protected static final String CANT_INSTANTIATE = "Can't instantiate the WorkFlow.";
-	/**
-	 * Error message telling the user that the application exits.
-	 */
-	protected static final String EXITING = "Exiting...";
+    /**
+     * Package name to change the logger level.
+     */
+    private static final String PACKAGE_NAME = App.class.getPackageName();
+    /**
+     * Default verbosity {@code Level}.
+     */
+    private static final Level DEFAULT_VERB_LEVEL = Level.INFO;
+    /**
+     * Error message due to an error that occured during the instantiation process.
+     */
+    protected static final String CANT_MERGE = "Can't merge the Workflow with the FeatureModel.";
+    /**
+     * Error message due to an error that occured during the merging process.
+     */
+    protected static final String CANT_INSTANTIATE = "Can't instantiate the WorkFlow.";
+    /**
+     * Error message telling the user that the application exits.
+     */
+    protected static final String EXITING = "Exiting...";
 
-	/**
-	 * Returns the {@code PACKAGE_NAME}.
-	 *
-	 * @return the {@code PACKAGE_NAME}
-	 */
-	protected static String getPackageName() {
-		return PACKAGE_NAME;
-	}
+    /**
+     * Returns the {@code PACKAGE_NAME}.
+     *
+     * @return the {@code PACKAGE_NAME}
+     */
+    protected static String getPackageName() {
+        return PACKAGE_NAME;
+    }
 
-	/**
-	 * Returns the default message considering the command nature.
-	 *
-	 * <p>
-	 *
-	 * e.g. {@link #CANT_MERGE}, {@link #CANT_INSTANTIATE}
-	 *
-	 * @return the default message considering the command nature
-	 *
-	 * @since 1.0
-	 */
-	protected abstract String getDefaultMessage();
+    /**
+     * Returns the default message considering the command nature.
+     *
+     * <p>
+     *
+     * e.g. {@link #CANT_MERGE}, {@link #CANT_INSTANTIATE}
+     *
+     * @return the default message considering the command nature
+     *
+     * @since 1.0
+     */
+    protected abstract String getDefaultMessage();
 
-	/**
-	 * Returns the verbosity {@code Level} according to the given {@code level}
-	 * integer.
-	 *
-	 * @return the verbosity {@code Level} according to the given {@code level}
-	 *         integer
-	 *
-	 * @since 1.0
-	 * @see Level
-	 */
-	protected static Level getVerbLevel(int level) {
-		try {
-			Optional<Level> verboseLevel = Arrays.asList(Level.values()).stream()
-					.filter(l -> l.intLevel() == (level * 100))
-					.findAny();
-			if (verboseLevel.isPresent()) {
-				return verboseLevel.get();
-			}
-		} catch (NumberFormatException nfe) {
-			return DEFAULT_VERB_LEVEL;
-		}
-		return DEFAULT_VERB_LEVEL;
-	}
+    /**
+     * Returns the verbosity {@code Level} according to the given {@code level}
+     * integer.
+     *
+     * @return the verbosity {@code Level} according to the given {@code level}
+     *         integer
+     *
+     * @since 1.0
+     * @see Level
+     */
+    protected static Level getVerbLevel(int level) {
+        try {
+            Optional<Level> verboseLevel = Arrays.asList(Level.values()).stream()
+                    .filter(l -> l.intLevel() == (level * 100))
+                    .findAny();
+            if (verboseLevel.isPresent()) {
+                return verboseLevel.get();
+            }
+        } catch (NumberFormatException nfe) {
+            return DEFAULT_VERB_LEVEL;
+        }
+        return DEFAULT_VERB_LEVEL;
+    }
 
-	/**
-	 * Logs the given {@code exception}'s error message if it is not blank using the
-	 * given {@code logger}. Otherwise, prints the given {@code exception}'s stack
-	 * trace.
-	 *
-	 * @param logger    logger used to log the error
-	 * @param exception exception to log
-	 *
-	 * @since 1.0
-	 * @see Logger
-	 */
-	protected void logException(Logger logger, Exception exception) {
-		this.processVerboseArg(1); // 1 = fatal
-		logger.fatal(this.getDefaultMessage());
-		String msg = exception.getMessage();
-		if ((msg != null) && !msg.isBlank()) {
-			logger.fatal(exception.getMessage());
-			logger.fatal(EXITING);
-		} else {
-			logger.fatal("Please refer to the following trace for more informations :", exception);
-		}
-	}
+    /**
+     * Logs the given {@code exception}'s error message if it is not blank using the
+     * given {@code logger}. Otherwise, prints the given {@code exception}'s stack
+     * trace.
+     *
+     * @param logger    logger used to log the error
+     * @param exception exception to log
+     *
+     * @since 1.0
+     * @see Logger
+     */
+    protected void logException(Logger logger, Exception exception) {
+        this.processVerboseArg(1); // 1 = fatal
+        logger.fatal(this.getDefaultMessage());
+        String msg = exception.getMessage();
+        if ((msg != null) && !msg.isBlank()) {
+            logger.fatal(exception.getMessage());
+            logger.fatal(EXITING);
+        } else {
+            logger.fatal("Please refer to the following trace for more informations :", exception);
+        }
+    }
 
 }

@@ -19,48 +19,48 @@ import com.ml2wf.util.Pair;
  */
 public interface ConstraintFactory {
 
-	/**
-	 * Generates a rule {@code Node} containing all constraints nodes from the given
-	 * {@code constraintText}.
-	 *
-	 * @param constraintText text containing constraints
-	 *
-	 * @return a {@code List} of generated constraint nodes
-	 *
-	 * @throws InvalidConstraintException
-	 * @throws UnresolvedConflict
-	 *
-	 * @see Node
-	 */
-	List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException, UnresolvedConflict;
+    /**
+     * Generates a rule {@code Node} containing all constraints nodes from the given
+     * {@code constraintText}.
+     *
+     * @param constraintText text containing constraints
+     *
+     * @return a {@code List} of generated constraint nodes
+     *
+     * @throws InvalidConstraintException
+     * @throws UnresolvedConflict
+     *
+     * @see Node
+     */
+    List<Node> getRuleNodes(String constraintText) throws InvalidConstraintException, UnresolvedConflict;
 
-	/**
-	 * Returns a {@code List} of {@code Pair} containing the LCA {@code FMTask} as
-	 * key and the descriptive {@code Node} as value.
-	 *
-	 * @param constraintText text containing constraints
-	 *
-	 * @return a {@code List} of {@code Pair} containing the LCA {@code FMTask} as
-	 *         left element and the descriptive {@code Node} as right element
-	 *
-	 * @see Pair
-	 */
-	List<Pair<FMTask, Node>> getOrderNodes(String constraintText);
+    /**
+     * Returns a {@code List} of {@code Pair} containing the LCA {@code FMTask} as
+     * key and the descriptive {@code Node} as value.
+     *
+     * @param constraintText text containing constraints
+     *
+     * @return a {@code List} of {@code Pair} containing the LCA {@code FMTask} as
+     *         left element and the descriptive {@code Node} as right element
+     *
+     * @see Pair
+     */
+    List<Pair<FMTask, Node>> getOrderNodes(String constraintText);
 
-	/**
-	 * Returns an <b>implication</b> association of the {@code globalTask} with the
-	 * {@code tasks}.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that this method returns this association using the
-	 * {@code DefaultConfig}'s symbols.
-	 *
-	 * @param globalTask global task
-	 * @param tasksNames names of the implied tasks by the {@code global task}
-	 *
-	 * @return an implication association of the {@code globalTask} with the
-	 *         {@code tasksNames}
-	 */
-	String getAssociationConstraint(String globalTask, List<String> tasksNames);
+    /**
+     * Returns an <b>implication</b> association of the {@code globalTask} with the
+     * {@code tasks}.
+     *
+     * <p>
+     *
+     * <b>Note</b> that this method returns this association using the
+     * {@code DefaultConfig}'s symbols.
+     *
+     * @param globalTask global task
+     * @param tasksNames names of the implied tasks by the {@code global task}
+     *
+     * @return an implication association of the {@code globalTask} with the
+     *         {@code tasksNames}
+     */
+    String getAssociationConstraint(String globalTask, List<String> tasksNames);
 }

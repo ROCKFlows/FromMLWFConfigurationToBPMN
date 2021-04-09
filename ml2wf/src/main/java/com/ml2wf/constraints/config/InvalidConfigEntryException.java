@@ -23,12 +23,12 @@ package com.ml2wf.constraints.config;
  */
 public class InvalidConfigEntryException extends Exception {
 
-	/**
-	 * {@code InvalidConfigEntryException}'s default constructor.
-	 *
-	 * @param message message to print.
-	 */
-	public InvalidConfigEntryException(String message) {
-		super(message);
-	}
+    /**
+     * {@code InvalidConfigEntryException}'s default constructor.
+     *
+     * @param message message to print.
+     */
+    public InvalidConfigEntryException(String message) {
+        super(message);
+    }
 }

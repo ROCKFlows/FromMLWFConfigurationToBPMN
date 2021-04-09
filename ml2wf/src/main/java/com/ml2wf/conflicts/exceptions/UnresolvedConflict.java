@@ -14,12 +14,12 @@ import com.ml2wf.conflicts.ConflictSolver;
  */
 public class UnresolvedConflict extends Exception {
 
-	/**
-	 * {@code UnsolvedConflict}'s default constructor.
-	 *
-	 * @param arg0 exception explanation
-	 */
-	public UnresolvedConflict(String arg0) {
-		super(arg0);
-	}
+    /**
+     * {@code UnsolvedConflict}'s default constructor.
+     *
+     * @param arg0 exception explanation
+     */
+    public UnresolvedConflict(String arg0) {
+        super(arg0);
+    }
 }

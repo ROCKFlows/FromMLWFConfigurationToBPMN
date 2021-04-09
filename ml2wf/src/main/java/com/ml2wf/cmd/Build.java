@@ -37,87 +37,87 @@ import picocli.CommandLine.Option;
 @Command(name = "build", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "build a knowledge tree (FeatureModel) from a set of meta-workflows and instance workflows")
 public class Build extends AbstractCommand {
 
-	@Option(names = { "-f",
-			"--feature" }, required = true, arity = "1", order = 1, description = "FeatureModel file")
-	File featureModel;
+    @Option(names = { "-f",
+            "--feature" }, required = true, arity = "1", order = 1, description = "FeatureModel file")
+    File featureModel;
 
-	@Option(names = { "-m",
-			"--meta" }, required = true, arity = "1", order = 1, description = "meta-workflows directory")
-	File metaDirectory;
+    @Option(names = { "-m",
+            "--meta" }, required = true, arity = "1", order = 1, description = "meta-workflows directory")
+    File metaDirectory;
 
-	@Option(names = { "-i",
-			"--instance" }, required = true, arity = "1", order = 1, description = "instance-workflows directory")
-	File instanceDirectory;
+    @Option(names = { "-i",
+            "--instance" }, required = true, arity = "1", order = 1, description = "instance-workflows directory")
+    File instanceDirectory;
 
-	@Option(names = { "-b",
-			"--backup" }, arity = "0", order = 1, description = "backup the original FeatureModel file before any modification")
-	boolean backUp;
+    @Option(names = { "-b",
+            "--backup" }, arity = "0", order = 1, description = "backup the original FeatureModel file before any modification")
+    boolean backUp;
 
-	/**
-	 * {@code BaseMerger}'s instance.
-	 */
-	private BaseMerger merger;
+    /**
+     * {@code BaseMerger}'s instance.
+     */
+    private BaseMerger merger;
 
-	/**
-	 * Logger instance.
-	 *
-	 * @since 1.0
-	 * @see Logger
-	 */
-	private static final Logger logger = LogManager.getLogger(Build.class);
+    /**
+     * Logger instance.
+     *
+     * @since 1.0
+     * @see Logger
+     */
+    private static final Logger logger = LogManager.getLogger(Build.class);
 
-	/**
-	 * Calls the {@code BaseMerger}'s implementation for the meta-workflows.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that it will call it with <b>completeMerge=true</b>.
-	 *
-	 * @throws Exception
-	 *
-	 * @since 1.0
-	 */
-	private void processMeta() throws Exception {
-		this.merger = new WFMetaMerger(this.featureModel);
-		this.merger.mergeWithWF(this.backUp, true, this.metaDirectory);
-		this.backUp = false; // allows only one backup
-	}
+    /**
+     * Calls the {@code BaseMerger}'s implementation for the meta-workflows.
+     *
+     * <p>
+     *
+     * <b>Note</b> that it will call it with <b>completeMerge=true</b>.
+     *
+     * @throws Exception
+     *
+     * @since 1.0
+     */
+    private void processMeta() throws Exception {
+        this.merger = new WFMetaMerger(this.featureModel);
+        this.merger.mergeWithWF(this.backUp, true, this.metaDirectory);
+        this.backUp = false; // allows only one backup
+    }
 
-	/**
-	 * Calls the {@code BaseMerger}'s implementation for the instance-workflows.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that it will call it with <b>completeMerge=true</b>.
-	 *
-	 * @throws Exception
-	 *
-	 * @since 1.0
-	 */
-	private void processInstances() throws Exception {
-		this.merger = new WFInstanceMerger(this.featureModel);
-		this.merger.mergeWithWF(this.backUp, true, this.instanceDirectory);
-	}
+    /**
+     * Calls the {@code BaseMerger}'s implementation for the instance-workflows.
+     *
+     * <p>
+     *
+     * <b>Note</b> that it will call it with <b>completeMerge=true</b>.
+     *
+     * @throws Exception
+     *
+     * @since 1.0
+     */
+    private void processInstances() throws Exception {
+        this.merger = new WFInstanceMerger(this.featureModel);
+        this.merger.mergeWithWF(this.backUp, true, this.instanceDirectory);
+    }
 
-	@Override
-	protected String getDefaultMessage() {
-		return CANT_MERGE;
-	}
+    @Override
+    protected String getDefaultMessage() {
+        return CANT_MERGE;
+    }
 
-	@Override
-	public void run() {
-		logger.info("Processing using the FeatureModel : {}...", this.featureModel);
-		try {
-			logger.info("Processing meta-workflows in directory : {}...", this.metaDirectory);
-			this.processMeta();
-			((XMLManager) this.merger).save();
-			logger.info("Processing instance-workflows in directory : {}...", this.instanceDirectory);
-			this.processInstances();
-			((XMLManager) this.merger).save();
-			LogManager.shutdown();
-		} catch (Exception e) {
-			this.logException(logger, e);
-		}
-	}
+    @Override
+    public void run() {
+        logger.info("Processing using the FeatureModel : {}...", this.featureModel);
+        try {
+            logger.info("Processing meta-workflows in directory : {}...", this.metaDirectory);
+            this.processMeta();
+            ((XMLManager) this.merger).save();
+            logger.info("Processing instance-workflows in directory : {}...", this.instanceDirectory);
+            this.processInstances();
+            ((XMLManager) this.merger).save();
+            LogManager.shutdown();
+        } catch (Exception e) {
+            this.logException(logger, e);
+        }
+    }
 
 }
