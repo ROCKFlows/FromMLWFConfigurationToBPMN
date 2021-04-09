@@ -165,7 +165,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	public static String getLastReference(String content) {
 		// splitting references
-		String[] splittedContent = content.split(Notation.getGeneratedPrefixVoc());
+		String[] splittedContent = content.split(Notation.GENERATED_PREFIX_VOC);
 		// getting the last reference
 		return sanitizeName(splittedContent[splittedContent.length - 1]);
 	}
@@ -200,7 +200,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		mergeNodesTextContent(docNode, BPMNTaskSpecs.OPTIONAL.formatSpec(content));
 		mergeNodesTextContent(docNode, getReferenceDocumentation(currentRef));
 		// property/extension part
-		this.addProperty(node, Notation.getBpmnPropertyInstance());
+		this.addProperty(node, Notation.BPMN_PROPERTY_INSTANCE);
 		this.addExtensionNode(node);
 		// node renaming part
 		Node nodeAttrName = node.getAttributes().getNamedItem(BPMNAttributes.NAME.getName());
@@ -217,7 +217,7 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 	 */
 	private void addProperty(Node node, String propertyValue) {
 		Element propertyAttr = getDocument().createElement(BPMNNames.PROPERTY.getName());
-		String propertyId = Notation.getBpmnPropertyPrefix() + this.propertyCounter++;
+		String propertyId = Notation.BPMN_PROPERTY_PREFIX + this.propertyCounter++;
 		propertyAttr.setAttribute(BPMNAttributes.ID.getName(), propertyId);
 		propertyAttr.setIdAttribute(BPMNAttributes.ID.getName(), true);
 		propertyAttr.setAttribute(BPMNAttributes.NAME.getName(), propertyValue);
@@ -280,11 +280,11 @@ public class InstanceFactoryImpl extends XMLManager implements InstanceFactory {
 		Node globalAnnotation = XMLManager.getGlobalAnnotationNode(getDocument());
 		List<String> lines = new ArrayList<>(Notation.getGlobalAnnotationDefaultContent());
 		String metaRef = lines.remove(1);
-		metaRef = String.format(metaRef, Notation.getReferencesDelimiterLeft(), reference,
-				Notation.getReferencesDelimiterRight());
+		metaRef = String.format(metaRef, Notation.REFERENCES_DELIMITER_LEFT, reference,
+				Notation.REFERENCES_DELIMITER_RIGHT);
 		lines = lines.stream()
-				.map(l -> String.format(l, Notation.getReferencesDelimiterLeft(),
-						Notation.getReferencesDelimiterRight()))
+				.map(l -> String.format(l, Notation.REFERENCES_DELIMITER_LEFT,
+						Notation.REFERENCES_DELIMITER_RIGHT))
 				.collect(Collectors.toList());
 		lines.add(1, metaRef);
 		Node newTextNode = getDocument().createElement(BPMNNames.TEXT.getName());

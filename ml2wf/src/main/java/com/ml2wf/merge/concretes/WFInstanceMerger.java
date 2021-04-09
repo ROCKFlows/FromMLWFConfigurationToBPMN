@@ -122,8 +122,8 @@ public final class WFInstanceMerger extends BaseMergerImpl {
 		// removing WF's name
 		// and references delimiters
 		// TODO: remove WF's name part
-		references = references.replace(Notation.getReferencesDelimiterLeft(), "");
-		references = references.replace(Notation.getReferencesDelimiterRight(), "");
+		references = references.replace(Notation.REFERENCES_DELIMITER_LEFT, "");
+		references = references.replace(Notation.REFERENCES_DELIMITER_RIGHT, "");
 		// getting/creating the createdWFNode description
 		Node descNode = this.createTag(this.createdWFTask, FMNames.DESCRIPTION);
 		// merging content with description

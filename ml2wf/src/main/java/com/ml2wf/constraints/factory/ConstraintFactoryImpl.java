@@ -175,8 +175,8 @@ public class ConstraintFactoryImpl implements ConstraintFactory {
 
     @Override
     public String getAssociationConstraint(String globalTask, List<String> tasksNames) {
-        return Notation.getConstraintDelimiterLeft() + globalTask + DefaultConfig.IMP.getSymbol()
-                + String.join(DefaultConfig.CONJ.getSymbol(), tasksNames) + Notation.getConstraintDelimiterRight();
+        return Notation.CONSTRAINT_DELIMITER_LEFT + globalTask + DefaultConfig.IMP.getSymbol()
+                + String.join(DefaultConfig.CONJ.getSymbol(), tasksNames) + Notation.CONSTRAINT_DELIMITER_RIGHT;
     }
 
     /**

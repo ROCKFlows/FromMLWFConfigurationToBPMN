@@ -158,7 +158,7 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 			NodeList docChildren = ((Element) resultNode).getElementsByTagName(BPMNNames.DOCUMENTATION.getName());
 			assertTrue(docChildren.getLength() > 0);
 			Node docNode = docChildren.item(0);
-			assertTrue(Pattern.matches(Notation.getDocumentationVoc() + "\\d+",
+			assertTrue(Pattern.matches(Notation.DOCUMENTATION_VOC + "\\d+",
 					docNode.getAttributes().getNamedItem(BPMNAttributes.ID.getName()).getNodeValue()));
 		}
 	}

@@ -13,12 +13,13 @@ import java.util.List;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see <a href="https://featureide.github.io/">FeatureIDE framework</a>
  * @see <a href="https://www.bpmn.org/">BPMN</a>
  *
  */
+@FunctionalInterface
 public interface TaskTagsSelector {
 
 	/**
@@ -27,8 +28,6 @@ public interface TaskTagsSelector {
 	 *
 	 * @return a {@code List<String>} containing all task tags considering the type
 	 *         of xml file
-	 *
-	 * @since 1.0
 	 */
-	public List<String> getTaskTags();
+	List<String> getTaskTags();
 }

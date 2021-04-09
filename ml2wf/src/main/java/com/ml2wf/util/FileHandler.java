@@ -148,7 +148,7 @@ public class FileHandler {
 		} else {
 			// else we have to join the directory with the file name based on the
 			// source file name
-			return Paths.get(outputFile.getPath(), insertInFileName(getDefaultFileName(), Notation.getInstanceVoc()))
+			return Paths.get(outputFile.getPath(), insertInFileName(getDefaultFileName(), Notation.INSTANCE_VOC))
 					.toFile();
 		}
 	}
@@ -171,7 +171,7 @@ public class FileHandler {
 			if (outputFile.mkdirs()) {
 				// if it is created
 				return Paths
-						.get(path, insertInFileName(getDefaultFileName(), Notation.getInstanceVoc()))
+						.get(path, insertInFileName(getDefaultFileName(), Notation.INSTANCE_VOC))
 						.toFile();
 			} else {
 				// we can't create the wished directory
@@ -271,7 +271,7 @@ public class FileHandler {
 	public static Document createEmptyFM(DocumentBuilder docBuilder) {
 		Document document = docBuilder.newDocument();
 		// adding the DOM structure
-		Element root = (Element) document.appendChild(document.createElement(FMNames.EXTENDEDFEATUREMODEL.getName()));
+		Element root = (Element) document.appendChild(document.createElement(FMNames.EXTENDED_FEATURE_MODEL.getName()));
 		Element struct = (Element) root.appendChild(document.createElement(FMNames.STRUCT.getName()));
 		Element base = (Element) struct.appendChild(document.createElement(FMNames.AND.getName()));
 		base.setAttribute(FMAttributes.ABSTRACT.getName(), String.valueOf(true));
@@ -318,7 +318,7 @@ public class FileHandler {
 	 * <p>
 	 *
 	 * The result filename will be : <b>FileBaseName</b> +
-	 * {@link Notation#getBackupVoc()} + <b>_dd_MM_yy_hh_mm.FileExtension</b>.
+	 * {@link Notation#BACKUP_VOC} + <b>_dd_MM_yy_hh_mm.FileExtension</b>.
 	 *
 	 * <p>
 	 *
@@ -338,7 +338,7 @@ public class FileHandler {
 		Date backUpDate = new Date();
 		dateFormater = new SimpleDateFormat("_dd_MM_yy_hh_mm");
 		String backUpPath = FileHandler.insertInFileName(path,
-				Notation.getBackupVoc() + dateFormater.format(backUpDate));
+				Notation.BACKUP_VOC + dateFormater.format(backUpDate));
 		File destFile = new File(backUpPath);
 		FileHandler.saveDocument(destFile, document);
 		logger.info("Back up finished.");

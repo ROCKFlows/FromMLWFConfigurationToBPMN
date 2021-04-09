@@ -174,10 +174,10 @@ public abstract class AbstractMerger extends XMLManager {
 			return nodeList.item(0);
 		} else {
 			Node consTag = getDocument().createElement(FMNames.CONSTRAINTS.getName());
-			NodeList fmTagList = getDocument().getElementsByTagName(FMNames.FEATUREMODEL.getName());
+			NodeList fmTagList = getDocument().getElementsByTagName(FMNames.FEATURE_MODEL.getName());
 			if (fmTagList.getLength() == 0) {
 				// if it is an ExtendedFeatureModel
-				fmTagList = getDocument().getElementsByTagName(FMNames.EXTENDEDFEATUREMODEL.getName());
+				fmTagList = getDocument().getElementsByTagName(FMNames.EXTENDED_FEATURE_MODEL.getName());
 			}
 			Node rootNode = fmTagList.item(0);
 			return rootNode.appendChild(consTag);
@@ -343,7 +343,7 @@ public abstract class AbstractMerger extends XMLManager {
 		String rawName = XMLManager.getNodeName(node);
 		String attributesDoc = getAttributesDoc(rawName);
 		// retrieving all nested nodes' names
-		String[] nodeName = rawName.split(Notation.getGeneratedPrefixVoc());
+		String[] nodeName = rawName.split(Notation.GENERATED_PREFIX_VOC);
 		List<String> names = new ArrayList<>(Arrays.asList(nodeName));
 		// sanitizing names
 		names = names.stream().filter(n -> !n.isBlank()).map(XMLManager::sanitizeName).collect(Collectors.toList());
@@ -430,7 +430,7 @@ public abstract class AbstractMerger extends XMLManager {
 		String logMsg = String.format("Retrieving name for task : %s...", task);
 		logger.debug(logMsg);
 		String taskName = XMLManager.getNodeName(task);
-		String[] splitted = taskName.split(Notation.getGeneratedPrefixVoc());
+		String[] splitted = taskName.split(Notation.GENERATED_PREFIX_VOC);
 		taskName = (splitted.length > 0) ? splitted[splitted.length - 1] : taskName;
 		logMsg = String.format("Task's name is : %s", taskName);
 		logger.debug(logMsg);

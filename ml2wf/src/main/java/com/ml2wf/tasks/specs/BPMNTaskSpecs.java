@@ -56,8 +56,8 @@ public enum BPMNTaskSpecs implements WFSpec<WFTask<?>> {
 
 		@Override
 		public String formatSpec(String content) {
-			if (content.contains(Notation.getOptionality())) {
-				return Notation.getOptionality() + " : " + true;
+			if (content.contains(Notation.OPTIONALITY)) {
+				return Notation.OPTIONALITY + " : " + true;
 			}
 			return "";
 		}
