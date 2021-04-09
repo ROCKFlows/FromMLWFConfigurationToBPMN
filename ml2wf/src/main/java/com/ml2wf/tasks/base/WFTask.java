@@ -19,11 +19,11 @@ import java.util.Objects;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
  * @param <T>
  *
  * @see Task
  *
+ * @since 1.0.0
  */
 public abstract class WFTask<T extends Spec<?>> extends Task<T> {
 
@@ -44,9 +44,10 @@ public abstract class WFTask<T extends Spec<?>> extends Task<T> {
      * @param reference  reference of the task
      * @param node       node of the task
      * @param isAbstract whether the task is abstract or not
+     *
+     * @throws UnresolvedConflict
      */
-    protected WFTask(String name, Node node, boolean isAbstract, String reference)
-            throws UnresolvedConflict {
+    protected WFTask(String name, Node node, boolean isAbstract, String reference) throws UnresolvedConflict {
         super(name, node, isAbstract);
         this.reference = reference;
         // add the new task to the manager

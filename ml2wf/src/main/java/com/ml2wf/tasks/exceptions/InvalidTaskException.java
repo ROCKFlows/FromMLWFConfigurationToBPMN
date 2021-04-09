@@ -6,24 +6,16 @@ package com.ml2wf.tasks.exceptions;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- * @see Task
- *
+ * @since 1.0.0
  */
 public class InvalidTaskException extends RuntimeException {
 
-	/**
-	 * Generated serial ID.
-	 */
-	private static final long serialVersionUID = -1126515282699788030L;
-
-	/**
-	 * {@code InvalidTaskException}'s default constructor.
-	 *
-	 * @param arg0 exception explanation
-	 */
-	public InvalidTaskException(String arg0) {
-		super(arg0);
-	}
-
+    /**
+     * {@code InvalidTaskException}'s constructor with a message.
+     *
+     * @param message   the exception's message
+     */
+    public InvalidTaskException(String message) {
+        super(message);
+    }
 }

@@ -2,8 +2,8 @@ package com.ml2wf.tasks.factory;
 
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -29,109 +29,92 @@ import com.ml2wf.util.XMLManager;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
  * @see TaskFactory
  * @see Task
  *
+ * @since 1.0.0
  */
+@NoArgsConstructor
+@Log4j2
 public class TaskFactoryImpl implements TaskFactory {
 
-	/**
-	 * Logger instance.
-	 *
-	 * @since 1.0
-	 * @see Logger
-	 */
-	private static final Logger logger = LogManager.getLogger(TaskFactoryImpl.class);
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Task<?>> T createTask(Node node) throws UnresolvedConflict {
+        String tagName = node.getNodeName();
+        String nodeName = XMLManager.getNodeName(node);
+        nodeName = XMLManager.sanitizeName(nodeName);
+        return (FMNames.SELECTOR.isFMTask(tagName)) ? (T) createFMTask(nodeName, node) :
+                (T) createWFTask(nodeName, node);
+    }
 
-	/**
-	 * {@code TaskFactoryImpl}'s empty constructor.
-	 */
-	public TaskFactoryImpl() {
-		// empty constructor
-	}
+    @Override
+    public FMTask convertWFtoFMTask(WFTask<?> task) throws UnresolvedConflict {
+        FMTask createdFMTask = new FMTask(task, false);
+        createdFMTask.setNode(AbstractMerger.createFeatureWithAbstract(createdFMTask.getName(), task.isAbstract()));
+        createdFMTask.addAllSpecs(task.getSpecs());
+        createdFMTask.applySpecs();
+        return createdFMTask;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Task<?>> T createTask(Node node) throws UnresolvedConflict {
-		
-		String tagName = node.getNodeName();
-		String nodeName = XMLManager.getNodeName(node);
-		nodeName = XMLManager.sanitizeName(nodeName);
-		return (FMNames.SELECTOR.isFMTask(tagName)) ? (T) this.createFMTask(nodeName, node)
-				: (T) this.createWFTask(nodeName, node);
-	}
+    /**
+     * Creates and returns a new {@code FMTask} considering the given arguments.
+     *
+     * @param name name of the new task
+     * @param node node of the new task
+     *
+     * @return a new {@code FMTask} considering the given arguments
+     *
+     * @throws UnresolvedConflict
+     *
+     * @see FMTask
+     */
+    private static FMTask createFMTask(String name, Node node) throws UnresolvedConflict {
+        return new FMTask(name, node, isFMAbstract(node));
+    }
 
-	@Override
-	public FMTask convertWFtoFMTask(WFTask<?> task) throws UnresolvedConflict {
-		FMTask createdFMTask = new FMTask(task, false);
-		createdFMTask.setNode(AbstractMerger.createFeatureWithAbstract(createdFMTask.getName(), task.isAbstract()));
-		createdFMTask.addAllSpecs(task.getSpecs());
-		createdFMTask.applySpecs();
-		return createdFMTask;
-	}
+    /**
+     * Creates and returns a new {@code WFTask} considering the given arguments.
+     *
+     * @param name name of the new task
+     * @param node node of the new task
+     *
+     * @return a new {@code WFTask} considering the given arguments
+     *
+     * @throws UnresolvedConflict
+     *
+     * @see WFTask
+     */
+    private static WFTask<?> createWFTask(String name, Node node) throws UnresolvedConflict {
+        // TODO: change created type considering user convention (e.g. BPMN)
+        Optional<String> optRefName = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
+        boolean isAbstract = AbstractMerger.getProperty((Element) node, BPMNNames.PROPERTY.getName()).isEmpty();
+        BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract,
+                optRefName.orElse((isAbstract) ? WFMetaMerger.STEP_TASK : BaseMergerImpl.UNMANAGED_TASKS));
+        createdFMTask.applySpecs();
+        return createdFMTask;
+    }
 
-	/**
-	 * Creates and returns a new {@code FMTask} considering the given arguments.
-	 *
-	 * @param name name of the new task
-	 * @param node node of the new task
-	 * @return a new {@code FMTask} considering the given arguments
-	 * @throws UnresolvedConflict
-	 *
-	 * @since 1.0
-	 * @see FMTask
-	 */
-	private FMTask createFMTask(String name, Node node) throws UnresolvedConflict {
-		return new FMTask(name, node, isFMAbstract(node));
-	}
-
-	/**
-	 * Creates and returns a new {@code WFTask} considering the given arguments.
-	 *
-	 * @param name name of the new task
-	 * @param node node of the new task
-	 * @return a new {@code WFTask} considering the given arguments
-	 * @throws UnresolvedConflict
-	 * @throws TaskFactoryException
-	 *
-	 * @since 1.0
-	 * @see WFTask
-	 */
-	private WFTask<?> createWFTask(String name, Node node) throws UnresolvedConflict {
-		// TODO: change created type considering user convention (e.g. BPMN)
-
-		Optional<String> optRefName = XMLManager.getReferredTask(XMLManager.getAllBPMNDocContent((Element) node));
-		boolean isAbstract = AbstractMerger.getProperty((Element) node, BPMNNames.PROPERTY.getName()).isEmpty();
-		BPMNTask createdFMTask = new BPMNTask(name, node, isAbstract,
-				optRefName.orElse((isAbstract) ? WFMetaMerger.STEP_TASK : BaseMergerImpl.UNMANAGED_TASKS));
-		createdFMTask.applySpecs();
-		return createdFMTask;
-	}
-
-	/**
-	 * Returns whether the given {@code node} is abstract or not.
-	 *
-	 * <p>
-	 *
-	 * This helps setting the {@link FMTask#isAbstract} attribute.
-	 *
-	 * @param node node containing the abstract information
-	 * @return whether the given {@code node} is abstract or not
-	 *
-	 * @since 1.0
-	 * @see FMTask
-	 */
-	private static boolean isFMAbstract(Node node) {
-		Node abstractAttr = node.getAttributes().getNamedItem(FMAttributes.ABSTRACT.getName());
-
-		if (abstractAttr == null) {
-			logger.debug("Can't get the abstract status for the node : {}. Considering it as a concrete one.",
-					XMLManager.getNodeName(node));
-			return false;
-		}
-		return Boolean.valueOf(abstractAttr.getNodeValue());
-	}
-
+    /**
+     * Returns whether the given {@code node} is abstract or not.
+     *
+     * <p>
+     *
+     * This helps setting the {@link FMTask#isAbstract()} attribute.
+     *
+     * @param node node containing the abstract information
+     *
+     * @return whether the given {@code node} is abstract or not
+     *
+     * @see FMTask
+     */
+    private static boolean isFMAbstract(Node node) {
+        Node abstractAttr = node.getAttributes().getNamedItem(FMAttributes.ABSTRACT.getName());
+        if (abstractAttr == null) {
+            log.debug("Can't get the abstract status for the node : {}. Considering it as a concrete one.",
+                    XMLManager.getNodeName(node));
+            return false;
+        }
+        return Boolean.parseBoolean(abstractAttr.getNodeValue());
+    }
 }

@@ -13,37 +13,37 @@ import com.ml2wf.tasks.concretes.FMTask;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
  * @see Task
+ *
+ * @since 1.0.0
  */
 public interface TaskFactory {
 
-	/**
-	 * Creates and returns the created task corresponding to the given {@code node}.
-	 *
-	 * @param <T>  Any {@code class} implementing the {@code Spec interface}
-	 * @param node {@code Node} to convert to {@code Task}
-	 * @return the created task corresponding to the given {@code node}
-	 * @throws UnresolvedConflict
-	 *
-	 * @since 1.0
-	 * @see Task
-	 * @see Node
-	 */
-	public <T extends Task<?>> T createTask(Node node) throws UnresolvedConflict;
+    /**
+     * Creates and returns the created task corresponding to the given {@code node}.
+     *
+     * @param <T>  Any {@code class} implementing the {@code Spec interface}
+     * @param node {@code Node} to convert to {@code Task}
+     *
+     * @return the created task corresponding to the given {@code node}
+     *
+     * @throws UnresolvedConflict
+     *
+     * @see Node
+     */
+    <T extends Task<?>> T createTask(Node node) throws UnresolvedConflict;
 
-	/**
-	 * Converts a {@code WFTask} to a {@code FMTask}.
-	 *
-	 * <p>
-	 *
-	 * <b>Note</b> that this method uses the {@link FMTask#FMTask(WFTask)}
-	 * constructor for the convertion.
-	 *
-	 * @param task task to convert
-	 * @return the converted task
-	 * @throws UnresolvedConflict
-	 */
-	public FMTask convertWFtoFMTask(WFTask<?> task) throws UnresolvedConflict;
+    /**
+     * Converts a {@link WFTask} to a {@code FMTask}.
+     *
+     * @param task  the {@link WFTask} to convert
+     *
+     * @return the converted task
+     *
+     * @throws UnresolvedConflict
+     *
+     * @see WFTask
+     * @see FMTask
+     */
+    FMTask convertWFtoFMTask(WFTask<?> task) throws UnresolvedConflict;
 }
