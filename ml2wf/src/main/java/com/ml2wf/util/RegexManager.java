@@ -3,6 +3,8 @@ package com.ml2wf.util;
 import java.util.regex.Pattern;
 
 import com.ml2wf.conventions.Notation;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * This class contains all attributes and methods required for the feature
@@ -10,11 +12,11 @@ import com.ml2wf.conventions.Notation;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
  * @see Pattern
  *
+ * @since 1.0.0
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RegexManager {
 
     /**
@@ -60,20 +62,13 @@ public final class RegexManager {
     private static Pattern validFeatureNamePattern;
 
     /**
-     * {@code RegexManager} empty constructor.
-     */
-    private RegexManager() {
-
-    }
-
-    /**
      * Compiles the given {@code regex} and returns the corresponding
      * {@code Pattern}.
      *
      * @param regex regular expression to compile
+     *
      * @return the {@code Pattern} corresponding of the compiled {@code regex}
      *
-     * @since 1.0
      * @see Pattern
      */
     private static Pattern getPatternOf(String regex) {
@@ -85,7 +80,6 @@ public final class RegexManager {
      *
      * @return the {@code Pattern} corresponding of the <b>reference</b> regex
      *
-     * @since 1.0
      * @see Pattern
      */
     public static Pattern getReferencePattern() {
@@ -100,7 +94,6 @@ public final class RegexManager {
      *
      * @return the {@code Pattern} corresponding of the <b>optionality</b> regex
      *
-     * @since 1.0
      * @see Pattern
      */
     public static Pattern getOptionalityPattern() {
@@ -115,7 +108,6 @@ public final class RegexManager {
      *
      * @return the {@code Pattern} corresponding of the <b>category</b> regex
      *
-     * @since 1.0
      * @see Pattern
      */
     public static Pattern getCategoryPattern() {
@@ -130,7 +122,6 @@ public final class RegexManager {
      *
      * @return the {@code Pattern} corresponding of the <b>digit</b> regex
      *
-     * @since 1.0
      * @see Pattern
      */
     public static Pattern getDigitPattern() {
@@ -144,10 +135,8 @@ public final class RegexManager {
      * Returns the {@code Pattern} corresponding of the <b>valid feature name</b>
      * regex.
      *
-     * @return the {@code Pattern} corresponding of the <b>valid feature name</b>
-     *         regex
+     * @return the {@code Pattern} corresponding of the <b>valid feature name</b> regex
      *
-     * @since 1.0
      * @see Pattern
      */
     public static Pattern getValidFeatureNamePattern() {
@@ -156,5 +145,4 @@ public final class RegexManager {
         }
         return validFeatureNamePattern;
     }
-
 }

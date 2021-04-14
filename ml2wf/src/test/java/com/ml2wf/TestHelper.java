@@ -120,7 +120,7 @@ public class TestHelper {
 		}
 
 		WFHelper wf = new WFHelper(wfPATH);
-		List<String> tasks = wf.gettaskNameList();
+		List<String> tasks = wf.getTaskNamesList();
 		tasks = normalizeAllTasks(tasks);
 		List<String> lostTasks = lostTasks(tasks, afterList);
 		logMsg = String.format("Lost Tasks: %s ", lostTasks);
@@ -221,9 +221,9 @@ public class TestHelper {
 
 	public static void noLostTaskAtInstanciation(String wfInPath, String wfOutPath) throws ParserConfigurationException, SAXException, IOException {
 		WFHelper wfmeta = new WFHelper(wfInPath);
-		List<String> tasksMeta = wfmeta.gettaskNameList();
+		List<String> tasksMeta = wfmeta.getTaskNamesList();
 		WFHelper wfinstance = new WFHelper(wfOutPath);
-		List<String> tasksInstance = wfinstance.gettaskNameList();
+		List<String> tasksInstance = wfinstance.getTaskNamesList();
 		assertEquals(tasksMeta.size(), tasksInstance.size());
 		//Todo manage references to meta in generated tasks
 
@@ -258,7 +258,7 @@ public class TestHelper {
 	public static void testAbstractAndConcreteFeatures(List<String> addedFeatures, String instanceWFPATH, FMHelper fmAfter) throws ParserConfigurationException, SAXException, IOException {
 
 		WFHelper wfinstance = new WFHelper(instanceWFPATH);
-		List<String> taskNames = wfinstance.gettaskNameList();
+		List<String> taskNames = wfinstance.getTaskNamesList();
 		List<String> subtasks = normalizeOnlySubtasks(taskNames);
 		List<String> allTasks = normalizeAllTasks(taskNames);
 		allTasks.removeAll(subtasks);

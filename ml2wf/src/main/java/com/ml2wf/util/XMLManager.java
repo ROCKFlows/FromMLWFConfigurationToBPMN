@@ -2,7 +2,6 @@ package com.ml2wf.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,14 +10,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
@@ -46,21 +43,11 @@ import com.ml2wf.tasks.manager.TasksManager;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
+ * @since 1.0.0
  */
+@Log4j2
 public abstract class XMLManager {
 
-    /**
-     * Path to the XML file's directory.
-     */
-    private String path;
-    /**
-     * {@code File} instance of the XML file.
-     *
-     * @see File
-     */
-    private File sourceFile;
     /**
      * {@code Document} instance of the XML file.
      *
@@ -77,72 +64,42 @@ public abstract class XMLManager {
      */
     private static int docCount;
     /**
-     * Logger instance.
-     *
-     * @since 1.0
-     * @see Logger
+     * Path to the XML file's directory.
      */
-    private static final Logger logger = LogManager.getLogger(XMLManager.class);
+    @Getter @Setter private String path;
+    /**
+     * {@code File} instance of the XML file.
+     *
+     * @see File
+     */
+    @Getter @Setter private File sourceFile;
 
     /**
      * {@code XMLTool}'s default constructor.
      *
      * <p>
      *
-     * <b>Note</b> that the {@link #preprocess()} method is called to initialize
+     * <b>Note</b> that the {@link #normalizeDocument()} abstract method is called to initialize
      * {@link #document}.
      *
      * @param file the XML file
+     *
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException
      */
-    public XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
-        this.sourceFile = FileHandler.processFile(this, file);
-        this.path = file.getAbsolutePath();
-        XMLManager.updateDocument(this.sourceFile);
-        this.normalizeDocument();
+    protected XMLManager(File file) throws ParserConfigurationException, SAXException, IOException {
+        sourceFile = FileHandler.processFile(this, file);
+        path = file.getAbsolutePath();
+        XMLManager.updateDocument(sourceFile);
+        normalizeDocument();
     }
 
     /**
-     * Returns the xml's path
-     *
-     * @return the xml's path
+     * Normalizes the document by applying the {@link Element#normalize()} method
+     * and replacing all whitespaces by underscores.
      */
-    public String getPath() {
-        return this.path;
-    }
-
-    /**
-     * Sets the xml's path
-     *
-     * @param path the new path
-     */
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    /**
-     * Returns the xml's {@code File} instance
-     *
-     * @return the xml's {@code File} instance
-     *
-     * @see File
-     */
-    public File getSourceFile() {
-        return this.sourceFile;
-    }
-
-    /**
-     * Sets the xml's {@code File} instance
-     *
-     * @param sourceFile the new xml's {@code File} instance
-     *
-     * @see File
-     */
-    public void setSourceFile(File sourceFile) {
-        this.sourceFile = sourceFile;
-    }
+    protected abstract void normalizeDocument();
 
     /**
      * Returns the xml's {@code Document} instance
@@ -165,16 +122,25 @@ public abstract class XMLManager {
     }
 
     /**
+     * Increments the {@code docCount} and returns its incremented value.
+     *
+     * @return its incremented value
+     */
+    protected static int incrementDocCount() {
+        return ++docCount;
+    }
+
+    /**
      * Updates the xml's {@code Document} instance if the {@code document} is
      * {@code null} or the given {@code sourceFile} is different from the
      * {@code document}'s source file.
      *
      * @param sourceFile the {@code document}'s source file
+     *
      * @throws IOException
      * @throws SAXException
      * @throws ParserConfigurationException
      *
-     * @since 1.0
      * @see Document
      */
     public static void updateDocument(File sourceFile) throws ParserConfigurationException, SAXException, IOException {
@@ -195,8 +161,6 @@ public abstract class XMLManager {
      * id.
      *
      * @return the number of <b>documentation ids</b> in the document.
-     *
-     * @since 1.0
      */
     protected static int countDocumentation() {
         int count = 0;
@@ -215,22 +179,12 @@ public abstract class XMLManager {
     }
 
     /**
-     * Increments the {@code docCount} and returns its incremented value.
-     *
-     * @return its incremented value
-     */
-    protected static int incrementDocCount() {
-        return ++docCount;
-    }
-
-    /**
      * Saves the current {@code document} into the given {@code file} path.
      *
      * @param file the destination {@code File}
+     *
      * @throws TransformerException
      * @throws IOException
-     *
-     * @since 1.0
      */
     public void save(File file) throws TransformerException, IOException {
         FileHandler.saveDocument(FileHandler.processFile(this, file), document);
@@ -241,26 +195,17 @@ public abstract class XMLManager {
      *
      * @throws TransformerException
      * @throws IOException
-     *
-     * @since 1.0
      */
     public void save() throws TransformerException, IOException {
-        this.save(this.getSourceFile());
+        save(getSourceFile());
     }
-
-    /**
-     * Normalizes the document by applying the {@link Element#normalize()} method
-     * and replacing all whitespaces by underscores.
-     */
-    protected abstract void normalizeDocument();
 
     /**
      * Returns a formated documentation containing the reference declaration.
      *
      * @param content content containing the referred element
-     * @return a formated documentation containing the reference declaration
      *
-     * @since 1.0
+     * @return a formatted documentation containing the reference declaration
      */
     public static String getReferenceDocumentation(String content) {
         return Notation.REFERENCE_VOC + XMLManager.sanitizeName(content);
@@ -275,9 +220,9 @@ public abstract class XMLManager {
      * generic task and some attributes values.
      *
      * @param node Node to add the documentation
+     *
      * @return the created documentation {@code Node}
      *
-     * @since 1.0
      * @see Node
      */
     public static Node addDocumentationNode(Node node) {
@@ -286,7 +231,7 @@ public abstract class XMLManager {
         documentation.setIdAttribute(BPMNAttributes.ID.getName(), true);
         CDATASection refersTo = node.getOwnerDocument().createCDATASection("");
         documentation.appendChild(refersTo);
-        logger.debug("   Inserting node : {} before {}...", node, node.getFirstChild());
+        log.debug("   Inserting node : {} before {}...", node, node.getFirstChild());
         return node.insertBefore(documentation, node.getFirstChild());
     }
 
@@ -300,7 +245,6 @@ public abstract class XMLManager {
      *
      * @return the updated {@code Node}
      *
-     * @since 1.0
      * @see Node
      */
     public static Node cleanChildren(Node node) {
@@ -320,9 +264,8 @@ public abstract class XMLManager {
      * Creates the global annotation {@code Node}.
      *
      * @param wfDocument document to get the global annotation node
-     * @return the global annotation {@code Node}
      *
-     * @since 1.0
+     * @return the global annotation {@code Node}
      *
      * @see Node
      */
@@ -353,16 +296,17 @@ public abstract class XMLManager {
      * <b>Note</b> that all positional tags are considered as style tags contained
      * in the {@code BPMNNodesStyle enum}.
      *
-     * @param wfDocument      document to add the position node
-     * @param referredElement the referred element's name
-     * @param x               abscissa
-     * @param y               ordinate
+     * @param wfDocument        document to add the position node
+     * @param referredElement   the referred element's name
+     * @param x                 the abscissa
+     * @param y                 the ordinate
+     *
      * @return the positional {@code Node}
      */
     public static Node createPositionalNode(Document wfDocument, String referredElement, double x, double y) {
         // TODO: improve this method (refactoring required)
         // TODO: refactor creating methods in enums
-        logger.debug("Creating positional Node...");
+        log.debug("Creating positional Node...");
         Element shapeNode = wfDocument.createElement(BPMNNames.SHAPE.getName());
         // creating shape node's id attribute
         String idAttrName = Notation.BPMN_SHAPE_VOC + referredElement;
@@ -403,42 +347,16 @@ public abstract class XMLManager {
      * Returns a {@code List<String>} containing all documentations' content for the
      * given BPMN {@code element}.
      *
-     * @param node node to extract docuemntation content
+     * @param element   the element to extract the documentation content
+     *
      * @return a {@code List<String>} containing all documentations' content for the
      *         given BPMN {@code element}
      *
-     * @since 1.0
      * @see Element
      */
     public static List<String> getAllBPMNDocContent(Element element) {
         return XMLManager.nodeListAsList(element.getElementsByTagName(BPMNNames.DOCUMENTATION.getName())).stream()
                 .map(Node::getTextContent).collect(Collectors.toList());
-    }
-
-    /**
-     * Returns the {@code Document} according to the specified {@code url}.
-     *
-     * @param url url of the xml file
-     * @return the {@code Document} according to the specified {@code url}.
-     * @throws SAXException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     *
-     * @since 1.0
-     *
-     * @see Document
-     * @see URL
-     */
-    public static Document getDocumentFromURL(URL url) throws SAXException, IOException, ParserConfigurationException {
-        String logMsg = String.format("Retrieving document for URL : %s...", url);
-        logger.debug(logMsg);
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document document = dBuilder.parse(url.openStream());
-        document.getDocumentElement().normalize();
-        return document;
     }
 
     /**
@@ -450,14 +368,13 @@ public abstract class XMLManager {
      * {@link #createGlobalAnnotationNode(Document)} method if needed.
      *
      * @param wfDocument document to get the global annotation node
-     * @return the global annotation {@code Node}
      *
-     * @since 1.0
+     * @return the global annotation {@code Node}
      *
      * @see Node
      */
     public static Node getGlobalAnnotationNode(Document wfDocument) {
-        logger.debug("Getting global annotation node...");
+        log.debug("Getting global annotation node...");
         NodeList nodeList = wfDocument.getElementsByTagName(BPMNNames.ANNOTATION.getName());
         List<Node> annotationNodes = XMLManager.nodeListAsList(nodeList);
         for (Node annotation : annotationNodes) {
@@ -469,7 +386,7 @@ public abstract class XMLManager {
                 }
             }
         }
-        logger.warn("Global annotation node not found.");
+        log.warn("Global annotation node not found.");
         return createGlobalAnnotationNode(wfDocument);
     }
 
@@ -479,22 +396,19 @@ public abstract class XMLManager {
      * Returns an empty string if not.
      *
      * @param node node containing the name attribute
-     * @return Returns the name tag's value of the given {@code node} if exists
      *
-     * @since 1.0
+     * @return Returns the name tag's value of the given {@code node} if exists
      *
      * @see Node
      */
     public static String getNodeName(Node node) {
-        String logMsg = String.format("Retrieving name for node : %s...", node);
-        logger.trace(logMsg);
+        log.trace("Retrieving name for node : {}...", node);
         if ((node == null) || !node.hasAttributes()) {
             return "";
         }
         Node n = node.getAttributes().getNamedItem(FMAttributes.NAME.getName());
         if (n != null) {
-            logMsg = String.format("Node's name is : %s", n.getNodeValue());
-            logger.trace(logMsg);
+            log.trace("Node's name is : {}", n.getNodeValue());
             return n.getNodeValue();
         }
         return "";
@@ -504,9 +418,9 @@ public abstract class XMLManager {
      * Returns the given {@code node}'s level.
      *
      * @param node node to get the level
+     *
      * @return the given {@code node}'s level
      *
-     * @since 1.0
      * @see Node
      */
     public static int getNodeLevel(Node node) {
@@ -528,12 +442,12 @@ public abstract class XMLManager {
      * <b>Note</b> that an {@code Optional#empty()} is returned if
      * {@code level <= 0}.
      *
-     * @param document the document to retrieve the node
-     * @param level    the nested level
+     * @param document  the document to retrieve the node
+     * @param level     the nested level
+     *
      * @return an {@code Optional} containing the first feature node at the given
      *         {@code level} in the given {@code document}.
      *
-     * @since 1.0
      * @see Document
      */
     public static Optional<Node> getFeatureNodeAtLevel(Document document, int level) {
@@ -549,10 +463,9 @@ public abstract class XMLManager {
      * {@code reference} text.
      *
      * @param reference reference containing the referred meta task
+     *
      * @return an {@code Optional} containing the referred meta task from the given
      *         {@code reference} text
-     *
-     * @since 1.0
      */
     public static Optional<String> getReferredTask(String reference) {
         String regex = String.format("%s(\\w*)", Notation.REFERENCE_VOC);
@@ -575,10 +488,9 @@ public abstract class XMLManager {
      * empty result.
      *
      * @param references references containing the referred meta task
+     *
      * @return an {@code Optional} containing the first referred meta task from the
      *         given {@code reference} text
-     *
-     * @since 1.0
      */
     public static Optional<String> getReferredTask(List<String> references) {
         Optional<String> result = Optional.empty();
@@ -595,15 +507,14 @@ public abstract class XMLManager {
      * Returns all task nodes of the given {@code document}.
      *
      * @param document source document of task nodes extraction
-     * @return all task nodes of the given {@code document}
      *
-     * @since 1.0
+     * @return all task nodes of the given {@code document}
      *
      * @see Document
      * @see Node
      */
     public static List<Node> getTasksList(Document document, TaskTagsSelector selector) {
-        logger.debug("Retrieving tasks list...");
+        log.debug("Retrieving tasks list...");
         List<Node> nodes = new ArrayList<>();
         for (String taskTag : selector.getTaskTags()) {
             nodes.addAll(XMLManager.nodeListAsList(document.getElementsByTagName(taskTag)));
@@ -619,15 +530,16 @@ public abstract class XMLManager {
      * If it is not found, returns the document's name.
      *
      * @param wfDocument document containing the workflow's name
+     *
      * @return the workflow's name
      */
     public static String getWorkflowName(Document wfDocument) {
-        logger.debug("Getting workflow's name...");
+        log.debug("Getting workflow's name...");
         Node annotation = XMLManager.getGlobalAnnotationNode(wfDocument);
         String regex = String.format("%s(.+)%s", Notation.getQuotedNotation(Notation.REFERENCES_DELIMITER_LEFT),
                 Notation.getQuotedNotation(Notation.REFERENCES_DELIMITER_RIGHT));
         Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = null;
+        Matcher matcher;
         if (annotation != null) {
             String wfNameLine = annotation.getTextContent().split("\n")[0];
             matcher = pattern.matcher(wfNameLine);
@@ -635,8 +547,8 @@ public abstract class XMLManager {
                 return matcher.group(1);
             }
         }
-        logger.debug("No workflow's name was found.");
-        logger.debug("Using file name as new workflow's name.");
+        log.debug("No workflow's name was found.");
+        log.debug("Using file name as new workflow's name.");
         return new File(wfDocument.getDocumentURI()).getName().split("\\.")[0];
     }
 
@@ -645,6 +557,7 @@ public abstract class XMLManager {
      *
      * @param nodeA   first node
      * @param content content to merge with
+     *
      * @return true if the merge operation succeed, false if it failed.
      */
     public static boolean mergeNodesTextContent(Node nodeA, String content) {
@@ -660,9 +573,8 @@ public abstract class XMLManager {
      * Returns a {@code List} version of the {@code NodeList} parameter.
      *
      * @param nodes {@code NodeList} source
-     * @return a {@code List} version of the {@code NodeList} parameter
      *
-     * @since 1.0
+     * @return a {@code List} version of the {@code NodeList} parameter
      *
      * @see List
      * @see NodeList
@@ -679,16 +591,15 @@ public abstract class XMLManager {
      * Sanitizes {@code name} removing genericity and instantiation caracteristics.
      *
      * @param name name to sanitize
-     * @return sanitized {@code name}
      *
-     * @since 1.0
+     * @return sanitized {@code name}
      */
     public static String sanitizeName(String name) {
         // sanitization for instantiate WF's task
-        List<String> splitted = new ArrayList<>(Arrays.asList(name.split(Notation.GENERATED_PREFIX_VOC)));
-        splitted.removeIf(String::isBlank);
-        if (!splitted.isEmpty()) {
-            name = splitted.get(0);
+        List<String> splitName = new ArrayList<>(Arrays.asList(name.split(Notation.GENERATED_PREFIX_VOC)));
+        splitName.removeIf(String::isBlank);
+        if (!splitName.isEmpty()) {
+            name = splitName.get(0);
         }
         name = name.replaceFirst(Notation.DOCUMENTATION_VOC, "");
         name = name.replaceFirst(Notation.REFERENCE_VOC, "");
@@ -703,5 +614,4 @@ public abstract class XMLManager {
         }
         return name;
     }
-
 }

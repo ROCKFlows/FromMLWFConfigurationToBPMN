@@ -20,7 +20,7 @@ class WFHelperTest {
 		File ffm = new File(sourceWF);
 		assertTrue(ffm.exists());
 		WFHelper wf = new WFHelper(sourceWF);
-		List<String> tasks = wf.gettaskNameList();
+		List<String> tasks = wf.getTaskNamesList();
 		assertEquals(3, tasks.size());
 		// System.out.println(tasks);
 		/*
@@ -39,7 +39,7 @@ class WFHelperTest {
 		File ffm = new File(sourceWF);
 		assertTrue(ffm.exists());
 		WFHelper wf = new WFHelper(sourceWF);
-		List<String> tasks = wf.gettaskNameList();
+		List<String> tasks = wf.getTaskNamesList();
 		assertEquals(3, tasks.size());
 		// System.out.println(tasks);
 		/*
@@ -58,7 +58,7 @@ class WFHelperTest {
 		File ffm = new File(sourceWF);
 		assertTrue(ffm.exists());
 		WFHelper wf = new WFHelper(sourceWF);
-		List<String> tasks = wf.gettaskNameList();
+		List<String> tasks = wf.getTaskNamesList();
 		// assertEquals(3, tasks.size());
 		System.out.println(tasks);
 		/*
