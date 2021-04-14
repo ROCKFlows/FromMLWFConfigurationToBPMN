@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -31,7 +32,7 @@ import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.XMLManager;
 
 /**
- * This class tests the {@link WFTasksMerger} class.
+ * This class tests the {@link WFInstanceMerger} class.
  *
  * <p>
  *
@@ -44,14 +45,13 @@ import com.ml2wf.util.XMLManager;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see AbstractXMLTest
- * @see WFTasksMerger
- *
+ * @see WFInstanceMerger
  */
 @DisplayName("Test of WFTasksMerger")
-public class TestWFInstanceMerger extends AbstractXMLTest {
+class TestWFInstanceMerger extends AbstractXMLTest {
 
 	/**
 	 * Default XML filename.
@@ -65,17 +65,17 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 	protected static ClassLoader classLoader = TestWFInstanceMerger.class.getClassLoader();
 
 	@BeforeEach
-	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
-			InvalidConstraintException, URISyntaxException {
+	public void setUp() throws SAXException, IOException, ParserConfigurationException, URISyntaxException {
 		// loading FM file
-		this.testedClass = new WFInstanceMerger(new File(classLoader.getResource(FM_FILE_PATH).toURI()));
+		testedClass = new WFInstanceMerger(
+				new File(Objects.requireNonNull(classLoader.getResource(FM_FILE_PATH)).toURI()));
 	}
 
 	@AfterEach
-	public void clean() throws IOException, URISyntaxException {
-		this.testedClass = null;
-		this.sourceDocument = null;
-		this.resultDocument = null;
+	public void clean() {
+		testedClass = null;
+		sourceDocument = null;
+		resultDocument = null;
 		TasksManager.clear();
 		XMLManager.removeDocument();
 	}
@@ -98,15 +98,15 @@ public class TestWFInstanceMerger extends AbstractXMLTest {
 	 * <b>Note</b> that this is a {@link ParameterizedTest}.
 	 *
 	 * @param file the wf file
+	 *
 	 * @throws Exception
 	 *
-	 * @since 1.0
 	 * @see {@link #instanceFiles()}
 	 */
 	@ParameterizedTest
 	@MethodSource("instanceFiles")
 	@DisplayName("Test of merging feature")
-	public void testMergingStructure(File file)
+	void testMergingStructure(File file)
 			throws Exception {
 		System.out.println(file);
 		this.sourceDocument = FileHandler.preprocess(file);

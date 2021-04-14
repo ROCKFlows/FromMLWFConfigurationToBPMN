@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -30,7 +31,7 @@ import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.XMLManager;
 
 /**
- * This class tests the {@link WFTasksMerger} class.
+ * This class tests the {@link WFMetaMerger} class.
  *
  * <p>
  *
@@ -43,14 +44,13 @@ import com.ml2wf.util.XMLManager;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see AbstractXMLTest
- * @see WFTasksMerger
- *
+ * @see WFMetaMerger
  */
 @DisplayName("Test of WFTasksMerger")
-public class TestWFMetaMerger extends AbstractXMLTest {
+class TestWFMetaMerger extends AbstractXMLTest {
 
 	/**
 	 * Default XML filename.
@@ -64,17 +64,17 @@ public class TestWFMetaMerger extends AbstractXMLTest {
 	protected static ClassLoader classLoader = TestWFMetaMerger.class.getClassLoader();
 
 	@BeforeEach
-	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
-			InvalidConstraintException, URISyntaxException {
+	public void setUp() throws SAXException, IOException, ParserConfigurationException, URISyntaxException {
 		// loading FM file
-		this.testedClass = new WFMetaMerger(new File(classLoader.getResource(FM_FILE_PATH).toURI()));
+		this.testedClass = new WFMetaMerger(
+				new File(Objects.requireNonNull(classLoader.getResource(FM_FILE_PATH)).toURI()));
 	}
 
 	@AfterEach
-	public void clean() throws IOException, URISyntaxException {
-		this.testedClass = null;
-		this.sourceDocument = null;
-		this.resultDocument = null;
+	public void clean() {
+		testedClass = null;
+		sourceDocument = null;
+		resultDocument = null;
 		TasksManager.clear();
 		XMLManager.removeDocument();
 	}
@@ -95,23 +95,22 @@ public class TestWFMetaMerger extends AbstractXMLTest {
 	 * <b>Note</b> that this is a {@link ParameterizedTest}.
 	 *
 	 * @param file the wf file
+	 *
 	 * @throws Exception
 	 *
-	 * @since 1.0
-	 * @see {@link #metaFiles()}
+	 * @see #metaFiles()
 	 */
 	@ParameterizedTest
 	@MethodSource("metaFiles")
 	@DisplayName("Test of merging feature")
-	public void testMergingStructure(File file)
-			throws Exception {
-		((WFMetaMerger) this.testedClass).mergeWithWF(false, true, file);
-		this.sourceDocument = FileHandler.preprocess(file);
-		this.resultDocument = XMLManager.getDocument();
+	void testMergingStructure(File file) throws Exception {
+		((WFMetaMerger) testedClass).mergeWithWF(false, true, file);
+		sourceDocument = FileHandler.preprocess(file);
+		resultDocument = XMLManager.getDocument();
 		// getting WF's source task nodes
-		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
+		List<Node> sourceNodes = XMLManager.getTasksList(sourceDocument, BPMNNames.SELECTOR);
 		// getting FM tasks
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, FMNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(resultDocument, FMNames.SELECTOR);
 		// getting tasks' names
 		List<String> sourceNodesNames = getNames(sourceNodes, BPMNAttributes.NAME.getName(), true);
 		List<String> resultNodesNames = getNames(resultNodes, FMAttributes.NAME.getName(), false);

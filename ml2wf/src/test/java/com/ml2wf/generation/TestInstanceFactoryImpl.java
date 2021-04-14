@@ -47,27 +47,20 @@ import com.ml2wf.util.XMLManager;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see AbstractXMLTest
  * @see InstanceFactoryImpl
- *
  */
 @TestInstance(Lifecycle.PER_CLASS)
 @DisplayName("Test of InstanceFactoryImpl")
-public class TestInstanceFactoryImpl extends AbstractXMLTest {
-
-	@BeforeAll
-	public void setUp() throws TransformerException, SAXException, IOException, ParserConfigurationException,
-			InvalidConstraintException, URISyntaxException {
-		// empty
-	}
+class TestInstanceFactoryImpl extends AbstractXMLTest {
 
 	@AfterEach
 	public void clean() {
-		this.testedClass = null;
-		this.sourceDocument = null;
-		this.resultDocument = null;
+		testedClass = null;
+		sourceDocument = null;
+		resultDocument = null;
 		TasksManager.clear();
 		XMLManager.removeDocument();
 	}
@@ -89,28 +82,25 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	 * <b>Note</b> that this is a {@link ParameterizedTest}.
 	 *
 	 * @param file the meta-wf file
-	 * @throws IOException
-	 * @throws SAXException
+	 *
 	 * @throws ParserConfigurationException
-	 * @throws TransformerException
+	 * @throws SAXException
+	 * @throws IOException
 	 *
-	 * @since 1.0
-	 * @see {@link #metaFiles()}
-	 *
+	 * @see #metaFiles()
 	 */
 	@ParameterizedTest
 	@MethodSource("metaFiles")
 	@DisplayName("Verification of the global structure")
-	public void testGlobalStructure(File file)
-			throws ParserConfigurationException, SAXException, IOException, TransformerException {
+	void testGlobalStructure(File file) throws ParserConfigurationException, SAXException, IOException {
 		// getting documents (source+result)
-		this.testedClass = new InstanceFactoryImpl(file);
-		this.sourceDocument = (Document) XMLManager.getDocument().cloneNode(true);
-		((InstanceFactoryImpl) this.testedClass).getWFInstance();
-		this.resultDocument = XMLManager.getDocument();
+		testedClass = new InstanceFactoryImpl(file);
+		sourceDocument = (Document) XMLManager.getDocument().cloneNode(true);
+		((InstanceFactoryImpl) testedClass).getWFInstance();
+		resultDocument = XMLManager.getDocument();
 		// TODO: to complete/improve considering the wished number of instantiated tasks
-		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
+		List<Node> sourceNodes = XMLManager.getTasksList(sourceDocument, BPMNNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(resultDocument, BPMNNames.SELECTOR);
 		assertTrue(sourceNodes.size() <= resultNodes.size()); // #1
 	}
 
@@ -132,25 +122,23 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	 * <b>Note</b> that this is a {@link ParameterizedTest}.
 	 *
 	 * @param file the meta-wf file
-	 * @throws IOException
-	 * @throws SAXException
-	 * @throws ParserConfigurationException
-	 * @throws TransformerException
 	 *
-	 * @since 1.0
-	 * @see {@link #metaFiles()}
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 *
+	 * @see #metaFiles()
 	 */
 	@ParameterizedTest
 	@MethodSource("metaFiles")
 	@DisplayName("Verification of the nodes structure")
-	public void testNodesStructures(File file)
-			throws ParserConfigurationException, SAXException, IOException, TransformerException {
+	void testNodesStructures(File file) throws ParserConfigurationException, SAXException, IOException {
 		// getting documents (source+result)
-		this.testedClass = new InstanceFactoryImpl(file);
-		this.sourceDocument = (Document) XMLManager.getDocument().cloneNode(true);
-		((InstanceFactoryImpl) this.testedClass).getWFInstance();
-		this.resultDocument = XMLManager.getDocument();
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
+		testedClass = new InstanceFactoryImpl(file);
+		sourceDocument = (Document) XMLManager.getDocument().cloneNode(true);
+		((InstanceFactoryImpl) testedClass).getWFInstance();
+		resultDocument = XMLManager.getDocument();
+		List<Node> resultNodes = XMLManager.getTasksList(resultDocument, BPMNNames.SELECTOR);
 		for (Node resultNode : resultNodes) {
 			NodeList extensionChildren = ((Element) resultNode)
 					.getElementsByTagName(BPMNNames.EXTENSION.getName());
@@ -181,27 +169,25 @@ public class TestInstanceFactoryImpl extends AbstractXMLTest {
 	 * <b>Note</b> that this is a {@link ParameterizedTest}.
 	 *
 	 * @param file the meta-wf file
-	 * @throws IOException
-	 * @throws SAXException
-	 * @throws ParserConfigurationException
-	 * @throws TransformerException
 	 *
-	 * @since 1.0
-	 * @see {@link #metaFiles()}
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 *
+	 * @see #metaFiles()
 	 */
 	@ParameterizedTest
 	@MethodSource("metaFiles")
 	@DisplayName("Verification of references")
-	public void testReferences(File file)
-			throws ParserConfigurationException, SAXException, IOException, TransformerException {
+	void testReferences(File file) throws ParserConfigurationException, SAXException, IOException {
 		// getting documents (source+result)
-		this.testedClass = new InstanceFactoryImpl(file);
-		this.sourceDocument = (Document) XMLManager.getDocument().cloneNode(true);
-		((InstanceFactoryImpl) this.testedClass).getWFInstance();
-		this.resultDocument = XMLManager.getDocument();
+		testedClass = new InstanceFactoryImpl(file);
+		sourceDocument = (Document) XMLManager.getDocument().cloneNode(true);
+		((InstanceFactoryImpl) testedClass).getWFInstance();
+		resultDocument = XMLManager.getDocument();
 		// retrieving task nodes
-		List<Node> sourceNodes = XMLManager.getTasksList(this.sourceDocument, BPMNNames.SELECTOR);
-		List<Node> resultNodes = XMLManager.getTasksList(this.resultDocument, BPMNNames.SELECTOR);
+		List<Node> sourceNodes = XMLManager.getTasksList(sourceDocument, BPMNNames.SELECTOR);
+		List<Node> resultNodes = XMLManager.getTasksList(resultDocument, BPMNNames.SELECTOR);
 		// retrieving meta-tasks' names
 		List<String> metaTasksNames = getNames(sourceNodes, BPMNAttributes.NAME.getName(), false);
 		assertFalse(metaTasksNames.stream().anyMatch(String::isBlank)); // #1

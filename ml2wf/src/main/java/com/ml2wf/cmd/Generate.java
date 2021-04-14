@@ -2,6 +2,8 @@ package com.ml2wf.cmd;
 
 import java.io.File;
 
+import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,31 +27,35 @@ import picocli.CommandLine.Option;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see AbstractCommand
  * @see InstanceFactory
  * @see Command
  * @see Logger
- *
  */
-@Command(name = "generate", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "generate a workflow")
+@Command(name = "generate",
+        version = "1.0.0",
+        sortOptions = false,
+        usageHelpWidth = 60,
+        description = "generate a workflow")
+@NoArgsConstructor
+@Log4j2
 public class Generate extends AbstractCommand {
 
-    @Option(names = { "-i", "--input" }, required = true, arity = "1", order = 1, description = "input file")
+    @Option(names = { "-i", "--input" },
+            required = true,
+            arity = "1",
+            order = 1,
+            description = "input file")
     File input;
 
-    @Option(names = { "-o",
-            "--output" }, required = true, arity = "1", order = 1, description = "output file or directory")
+    @Option(names = { "-o", "--output" },
+            required = true,
+            arity = "1",
+            order = 1,
+            description = "output file or directory")
     File output;
-
-    /**
-     * Logger instance.
-     *
-     * @since 1.0
-     * @see Logger
-     */
-    private static final Logger logger = LogManager.getLogger(Generate.class);
 
     @Override
     protected String getDefaultMessage() {
@@ -61,13 +67,12 @@ public class Generate extends AbstractCommand {
 
         InstanceFactory factory;
         try {
-            factory = new InstanceFactoryImpl(this.input);
-            factory.getWFInstance(this.output);
-            ((XMLManager) factory).save(this.output);
+            factory = new InstanceFactoryImpl(input);
+            factory.getWFInstance(output);
+            ((XMLManager) factory).save(output);
             LogManager.shutdown();
         } catch (Exception e) {
-            this.logException(logger, e);
+            logException(log, e);
         }
     }
-
 }

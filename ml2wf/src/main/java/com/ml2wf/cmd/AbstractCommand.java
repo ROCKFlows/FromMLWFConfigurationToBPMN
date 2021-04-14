@@ -18,19 +18,9 @@ import picocli.CommandLine.Spec;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
- *
+ * @since 1.0.0
  */
 public abstract class AbstractCommand implements Runnable {
-
-    @Spec
-    Model.CommandSpec spec;
-
-    @Option(names = { "-v",
-            "--verbose" }, arity = "1", order = 1, defaultValue = "0", description = "verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL")
-    public void processVerboseArg(int verboseLevel) {
-        Configurator.setLevel(getPackageName(), getVerbLevel(verboseLevel));
-    }
 
     /**
      * Package name to change the logger level.
@@ -41,17 +31,29 @@ public abstract class AbstractCommand implements Runnable {
      */
     private static final Level DEFAULT_VERB_LEVEL = Level.INFO;
     /**
-     * Error message due to an error that occured during the instantiation process.
+     * Error message due to an error that occurred during the instantiation process.
      */
     protected static final String CANT_MERGE = "Can't merge the Workflow with the FeatureModel.";
     /**
-     * Error message due to an error that occured during the merging process.
+     * Error message due to an error that occurred during the merging process.
      */
     protected static final String CANT_INSTANTIATE = "Can't instantiate the WorkFlow.";
     /**
      * Error message telling the user that the application exits.
      */
     protected static final String EXITING = "Exiting...";
+
+    @Spec
+    Model.CommandSpec spec;
+
+    @Option(names = { "-v", "--verbose" },
+            arity = "1",
+            order = 1,
+            defaultValue = "0",
+            description = "verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL")
+    public void processVerboseArg(int verboseLevel) {
+        Configurator.setLevel(getPackageName(), getVerbLevel(verboseLevel));
+    }
 
     /**
      * Returns the {@code PACKAGE_NAME}.
@@ -70,8 +72,6 @@ public abstract class AbstractCommand implements Runnable {
      * e.g. {@link #CANT_MERGE}, {@link #CANT_INSTANTIATE}
      *
      * @return the default message considering the command nature
-     *
-     * @since 1.0
      */
     protected abstract String getDefaultMessage();
 
@@ -82,12 +82,11 @@ public abstract class AbstractCommand implements Runnable {
      * @return the verbosity {@code Level} according to the given {@code level}
      *         integer
      *
-     * @since 1.0
      * @see Level
      */
     protected static Level getVerbLevel(int level) {
         try {
-            Optional<Level> verboseLevel = Arrays.asList(Level.values()).stream()
+            Optional<Level> verboseLevel = Arrays.stream(Level.values())
                     .filter(l -> l.intLevel() == (level * 100))
                     .findAny();
             if (verboseLevel.isPresent()) {
@@ -107,18 +106,18 @@ public abstract class AbstractCommand implements Runnable {
      * @param logger    logger used to log the error
      * @param exception exception to log
      *
-     * @since 1.0
      * @see Logger
      */
     protected void logException(Logger logger, Exception exception) {
-        this.processVerboseArg(1); // 1 = fatal
-        logger.fatal(this.getDefaultMessage());
+        // verbose level 1 = fatal
+        processVerboseArg(1);
+        logger.fatal(getDefaultMessage());
         String msg = exception.getMessage();
         if ((msg != null) && !msg.isBlank()) {
             logger.fatal(exception.getMessage());
             logger.fatal(EXITING);
         } else {
-            logger.fatal("Please refer to the following trace for more informations :", exception);
+            logger.fatal("Please refer to the following trace for more information :", exception);
         }
     }
 

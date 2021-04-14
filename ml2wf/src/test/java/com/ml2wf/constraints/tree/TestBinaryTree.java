@@ -21,12 +21,11 @@ import org.junit.jupiter.api.Test;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see BinaryTree
- *
  */
-public class TestBinaryTree {
+class TestBinaryTree {
 
 	/**
 	 * Default root name.
@@ -63,20 +62,20 @@ public class TestBinaryTree {
 
 	@BeforeEach
 	public void setUp() {
-		this.emptyTree = new BinaryTree<>();
-		this.soloRootTree = new BinaryTree<>(ROOT);
-		this.fullTree = new BinaryTree<>(ROOT, this.emptyTree, this.soloRootTree);
-		this.leftChild = new BinaryTree<>(LEFT);
-		this.rightChild = new BinaryTree<>(RIGHT);
+		emptyTree = new BinaryTree<>();
+		soloRootTree = new BinaryTree<>(ROOT);
+		fullTree = new BinaryTree<>(ROOT, emptyTree, soloRootTree);
+		leftChild = new BinaryTree<>(LEFT);
+		rightChild = new BinaryTree<>(RIGHT);
 	}
 
 	@AfterEach
 	public void clean() {
-		this.emptyTree = null;
-		this.soloRootTree = null;
-		this.fullTree = null;
-		this.leftChild = null;
-		this.rightChild = null;
+		emptyTree = null;
+		soloRootTree = null;
+		fullTree = null;
+		leftChild = null;
+		rightChild = null;
 	}
 
 	/**
@@ -84,13 +83,13 @@ public class TestBinaryTree {
 	 */
 	@Test
 	@DisplayName("Test of getters")
-	public void testGetters() {
-		assertNull(this.emptyTree.getRoot());
-		assertNull(this.emptyTree.getLeftChild());
-		assertNull(this.emptyTree.getRightChild());
-		assertEquals(ROOT, this.soloRootTree.getRoot());
-		assertSame(this.emptyTree, this.fullTree.getLeftChild());
-		assertSame(this.soloRootTree, this.fullTree.getRightChild());
+	void testGetters() {
+		assertNull(emptyTree.getRoot());
+		assertNull(emptyTree.getLeftChild());
+		assertNull(emptyTree.getRightChild());
+		assertEquals(ROOT, soloRootTree.getRoot());
+		assertSame(emptyTree, fullTree.getLeftChild());
+		assertSame(soloRootTree, fullTree.getRightChild());
 	}
 
 	/**
@@ -98,13 +97,13 @@ public class TestBinaryTree {
 	 */
 	@Test
 	@DisplayName("Test of setters")
-	public void testSetters() {
-		this.emptyTree.setRoot(ROOT);
-		assertEquals(ROOT, this.emptyTree.getRoot());
-		this.emptyTree.setLeftChild(LEFT);
-		assertEquals(this.leftChild, this.emptyTree.getLeftChild());
-		this.emptyTree.setRightChild(RIGHT);
-		assertEquals(this.rightChild, this.emptyTree.getRightChild());
+	void testSetters() {
+		emptyTree.setRoot(ROOT);
+		assertEquals(ROOT, emptyTree.getRoot());
+		emptyTree.setLeftChild(LEFT);
+		assertEquals(leftChild, emptyTree.getLeftChild());
+		emptyTree.setRightChild(RIGHT);
+		assertEquals(rightChild, emptyTree.getRightChild());
 	}
 
 	/**
@@ -124,13 +123,13 @@ public class TestBinaryTree {
 	 */
 	@Test
 	@DisplayName("Test of setters")
-	public void testAddMethods() {
-		this.emptyTree.setRoot(ROOT);
-		assertEquals(ROOT, this.emptyTree.getRoot());
-		this.emptyTree.setLeftChild(LEFT);
-		assertEquals(this.leftChild, this.emptyTree.getLeftChild());
-		this.emptyTree.setRightChild(RIGHT);
-		assertEquals(this.rightChild, this.emptyTree.getRightChild());
+	void testAddMethods() {
+		emptyTree.setRoot(ROOT);
+		assertEquals(ROOT, emptyTree.getRoot());
+		emptyTree.setLeftChild(LEFT);
+		assertEquals(leftChild, emptyTree.getLeftChild());
+		emptyTree.setRightChild(RIGHT);
+		assertEquals(rightChild, emptyTree.getRightChild());
 	}
 
 	/**
@@ -139,23 +138,22 @@ public class TestBinaryTree {
 	 */
 	@Test
 	@DisplayName("Test of (un)blocking methods")
-	public void testBlock() {
-		assertFalse(this.emptyTree.isBlocked());
+	void testBlock() {
+		assertFalse(emptyTree.isBlocked());
 		// test blocking
-		this.fullTree.block(true);
-		assertTrue(this.emptyTree.isBlocked());
+		fullTree.block(true);
+		assertTrue(emptyTree.isBlocked());
 		// test adding children when blocked
-		assertNull(this.emptyTree.addLeftChild(LEFT));
-		assertNull(this.emptyTree.addRightChild(RIGHT));
+		assertNull(emptyTree.addLeftChild(LEFT));
+		assertNull(emptyTree.addRightChild(RIGHT));
 		// test setting children when blocked
-		this.emptyTree.setLeftChild(LEFT);
-		assertNull(this.emptyTree.getLeftChild());
-		this.emptyTree.setLeftChild(RIGHT);
-		assertNull(this.emptyTree.getRightChild());
+		emptyTree.setLeftChild(LEFT);
+		assertNull(emptyTree.getLeftChild());
+		emptyTree.setLeftChild(RIGHT);
+		assertNull(emptyTree.getRightChild());
 		// test inserting when possible when blocked
-		assertFalse(this.emptyTree.insertWhenPossible(this.fullTree));
-		this.fullTree.block(false);
-		assertFalse(this.emptyTree.isBlocked());
+		assertFalse(emptyTree.insertWhenPossible(fullTree));
+		fullTree.block(false);
+		assertFalse(emptyTree.isBlocked());
 	}
-
 }

@@ -2,6 +2,8 @@ package com.ml2wf.cmd;
 
 import java.io.File;
 
+import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,34 +30,40 @@ import picocli.CommandLine.Option;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see AbstractCommand
  * @see Command
  * @see Logger
- *
  */
-@Command(name = "save", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "saves a worklow as a task in a FeatureModel")
+@Command(name = "save",
+        version = "1.0.0",
+        sortOptions = false,
+        usageHelpWidth = 60,
+        description = "saves a worklow as a task in a FeatureModel")
+@NoArgsConstructor
+@Log4j2
 public class Save extends AbstractCommand {
 
-    @Option(names = { "-i",
-            "--input" }, required = true, arity = "2", order = 1, description = "input file (meta workflow and instance workflow)")
+    @Option(names = { "-i","--input" },
+            required = true,
+            arity = "2",
+            order = 1,
+            description = "input file (meta workflow and instance workflow)")
     File[] input;
 
-    @Option(names = { "-o", "--output" }, required = true, arity = "1", order = 1, description = "output file")
+    @Option(names = { "-o", "--output" },
+            required = true,
+            arity = "1",
+            order = 1,
+            description = "output file")
     File output;
 
-    @Option(names = { "-b",
-            "--backup" }, arity = "0", order = 1, description = "backup the original FeatureModel file before any modification")
+    @Option(names = { "-b", "--backup" },
+            arity = "0",
+            order = 1,
+            description = "backup the original FeatureModel file before any modification")
     boolean backUp;
-
-    /**
-     * Logger instance.
-     *
-     * @since 1.0
-     * @see Logger
-     */
-    private static final Logger logger = LogManager.getLogger(Save.class);
 
     @Override
     protected String getDefaultMessage() {
@@ -67,16 +75,16 @@ public class Save extends AbstractCommand {
         BaseMerger merger;
         try {
             // meta wf
-            merger = new WFMetaMerger(this.output);
-            merger.mergeWithWF(this.backUp, true, this.input[0]);
+            merger = new WFMetaMerger(output);
+            merger.mergeWithWF(backUp, true, input[0]);
             ((XMLManager) merger).save();
             // instance wf
-            merger = new WFInstanceMerger(this.output);
-            merger.mergeWithWF(this.backUp, true, this.input[1]);
+            merger = new WFInstanceMerger(output);
+            merger.mergeWithWF(backUp, true, input[1]);
             ((XMLManager) merger).save();
             LogManager.shutdown();
         } catch (Exception e) {
-            this.logException(logger, e);
+            logException(log, e);
         }
     }
 }

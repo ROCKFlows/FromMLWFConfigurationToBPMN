@@ -1,7 +1,6 @@
 package com.ml2wf;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import com.ml2wf.cmd.Build;
 import com.ml2wf.cmd.Generate;
@@ -14,17 +13,25 @@ import picocli.CommandLine.Model;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
-@Command(name = "ml2wf", version = "1.0", sortOptions = false, usageHelpWidth = 60, header = "\n ----  Machine Learning problem to Workflow  ---- \n\n", footer = "\n\n  ---- Provided by AUTHOR ---- \n", description = "")
+@Command(name = "ml2wf",
+        version = "1.0.0",
+        sortOptions = false,
+        usageHelpWidth = 60,
+        header = "\n ----  Machine Learning problem to Workflow  ---- \n\n",
+        footer = "\n\n  ---- Provided by AUTHOR ---- \n",
+        description = "")
+@Log4j2
 public class App {
 
     @Spec
     Model.CommandSpec spec;
 
-    @Option(names = { "-v",
-            "--version" }, versionHelp = true, arity = "0", order = 1, description = "Displays version info")
+    @Option(names = { "-v", "--version" },
+            versionHelp = true,
+            arity = "0",
+            order = 1,
+            description = "Displays version info")
     boolean version;
-
-    private static final Logger logger = LogManager.getLogger(App.class);
 
     public static void main(String[] args) {
         // TODO: check windows console colors support
@@ -39,7 +46,7 @@ public class App {
                 .addSubcommand("merge", new Merge());
         commandLine.execute(args);
         if (commandLine.isUsageHelpRequested()) {
-            logger.info(commandLine.getUsageMessage());
+            log.info(commandLine.getUsageMessage());
         }
     }
 }

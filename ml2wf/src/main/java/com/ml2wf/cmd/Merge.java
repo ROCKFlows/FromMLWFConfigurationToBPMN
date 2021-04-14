@@ -2,7 +2,8 @@ package com.ml2wf.cmd;
 
 import java.io.File;
 
-import org.apache.logging.log4j.LogManager;
+import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.Logger;
 
 import com.ml2wf.merge.AbstractMerger;
@@ -29,18 +30,23 @@ import picocli.CommandLine.Option;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see AbstractCommand
  * @see AbstractMerger
  * @see Command
  * @see Logger
- *
  */
-@Command(name = "merge", version = "1.0", sortOptions = false, usageHelpWidth = 60, description = "import a worklow in a FeatureModel")
+@Command(name = "merge",
+        version = "1.0.0",
+        sortOptions = false,
+        usageHelpWidth = 60,
+        description = "import a worklow in a FeatureModel")
+@NoArgsConstructor
+@Log4j2
 public class Merge extends AbstractCommand {
 
-    @ArgGroup(exclusive = true, multiplicity = "1")
+    @ArgGroup(multiplicity = "1")
     Exclusive exclusive;
 
     /**
@@ -60,7 +66,6 @@ public class Merge extends AbstractCommand {
      * @author Nicolas Lacroix
      *
      * @see ArgGroup
-     *
      */
     static class Exclusive {
 
@@ -70,20 +75,30 @@ public class Merge extends AbstractCommand {
         boolean instance;
     }
 
-    @Option(names = { "-i",
-            "--input" }, required = true, arity = "1", order = 1, description = "input file")
+    @Option(names = { "-i", "--input" },
+            required = true,
+            arity = "1",
+            order = 1,
+            description = "input file")
     File input;
 
-    @Option(names = { "-o",
-            "--output" }, required = true, arity = "1", order = 2, description = "output file")
+    @Option(names = { "-o", "--output" },
+            required = true,
+            arity = "1",
+            order = 2,
+            description = "output file")
     File output;
 
-    @Option(names = { "-f",
-            "--full" }, arity = "0", order = 3, description = "Full merge (including meta/instance association")
+    @Option(names = { "-f", "--full" },
+            arity = "0",
+            order = 3,
+            description = "Full merge (including meta/instance association")
     boolean fullMerge;
 
-    @Option(names = { "-b",
-            "--backup" }, arity = "0", order = 4, description = "backup the original FeatureModel file before any modification")
+    @Option(names = { "-b", "--backup" },
+            arity = "0",
+            order = 4,
+            description = "backup the original FeatureModel file before any modification")
     boolean backUp;
 
     /**
@@ -91,17 +106,9 @@ public class Merge extends AbstractCommand {
      */
     private BaseMerger merger;
 
-    /**
-     * Logger instance.
-     *
-     * @since 1.0
-     * @see Logger
-     */
-    private static final Logger logger = LogManager.getLogger(Merge.class);
-
     protected void processMerge() throws Exception {
-        this.merger.mergeWithWF(this.backUp, this.fullMerge, this.input);
-        ((XMLManager) this.merger).save();
+        merger.mergeWithWF(backUp, fullMerge, input);
+        ((XMLManager) merger).save();
     }
 
     @Override
@@ -112,12 +119,10 @@ public class Merge extends AbstractCommand {
     @Override
     public void run() {
         try {
-            this.merger = (this.exclusive.meta) ? new WFMetaMerger(this.output) : new WFInstanceMerger(this.output);
-            this.processMerge();
+            merger = (exclusive.meta) ? new WFMetaMerger(output) : new WFInstanceMerger(output);
+            processMerge();
         } catch (Exception e) {
-            this.logException(logger, e);
+            logException(log, e);
         }
-
     }
-
 }

@@ -1,10 +1,10 @@
 package com.ml2wf;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,10 +25,9 @@ import com.ml2wf.util.XMLManager;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see XMLManager
- *
  */
 public abstract class AbstractXMLTest {
 
@@ -71,14 +70,14 @@ public abstract class AbstractXMLTest {
 	 *
 	 * @return a {@code Stream} containing all meta-workflows located under the
 	 *         {@link #META_DIRECTORY} directory
-	 * @throws IOException
+	 *
 	 * @throws URISyntaxException
 	 *
-	 * @since 1.0
 	 * @see FileUtils
 	 */
-	protected static Stream<File> metaFiles() throws IOException, URISyntaxException {
-		File instanceDir = new File(classLoader.getResource(META_DIRECTORY).toURI());
+	protected static Stream<File> metaFiles() throws URISyntaxException {
+		File instanceDir = new File(
+				Objects.requireNonNull(classLoader.getResource(META_DIRECTORY)).toURI());
 		return new HashSet<>(FileUtils.listFiles(instanceDir, FileHandler.getWfExtensions(), true)).stream();
 	}
 
@@ -88,14 +87,13 @@ public abstract class AbstractXMLTest {
 	 *
 	 * @return a {@code Stream} containing all instance-workflows located under the
 	 *         {@link #INSTANCES_DIRECTORY} directory
-	 * @throws IOException
+	 *
 	 * @throws URISyntaxException
 	 *
-	 * @since 1.0
 	 * @see FileUtils
 	 */
-	protected static Stream<File> instanceFiles() throws IOException, URISyntaxException {
-		File instanceDir = new File(classLoader.getResource(INSTANCES_DIRECTORY).toURI());
+	protected static Stream<File> instanceFiles() throws URISyntaxException {
+		File instanceDir = new File(Objects.requireNonNull(classLoader.getResource(INSTANCES_DIRECTORY)).toURI());
 		return new HashSet<>(FileUtils.listFiles(instanceDir, FileHandler.getWfExtensions(), true)).stream();
 	}
 
@@ -103,9 +101,9 @@ public abstract class AbstractXMLTest {
 	 * Retruns all references for the given {@code nodes}.
 	 *
 	 * @param nodes nodes to retrieve references
+	 *
 	 * @return all references for the given {@code nodes}
 	 *
-	 * @since 1.0
 	 * @see Node
 	 */
 	protected static List<String> getReferences(List<Node> nodes) {
@@ -117,7 +115,7 @@ public abstract class AbstractXMLTest {
 	}
 
 	/**
-	 * Retruns all names for the given {@code nodes}.
+	 * Returns all names for the given {@code nodes}.
 	 *
 	 * @param nodes          nodes to retrieve names
 	 * @param tagName        the tag name used to retrieve the nodes' names
@@ -125,7 +123,6 @@ public abstract class AbstractXMLTest {
 	 *                       nodes or not
 	 * @return all names for the given {@code nodes}
 	 *
-	 * @since 1.0
 	 * @see Node
 	 */
 	protected static List<String> getNames(List<Node> nodes, String tagName, boolean considerNested) {

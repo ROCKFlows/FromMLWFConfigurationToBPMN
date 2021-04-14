@@ -22,25 +22,24 @@ import org.junit.jupiter.api.Test;
  *
  * @author Nicolas Lacroix
  *
- * @version 1.0
+ * @since 1.0.0
  *
  * @see OperAssociation
- *
  */
-public class TestOperAssociation {
+class TestOperAssociation {
 
 	/**
 	 * An operator.
 	 */
-	private static String operator = "&";
+	private static final String operator = "&";
 	/**
 	 * A left operand.
 	 */
-	private static String leftOperand = "A";
+	private static final String leftOperand = "A";
 	/**
 	 * A right operand.
 	 */
-	private static String rightOperand = "B";
+	private static final String rightOperand = "B";
 
 	/**
 	 * An empty {@code OperAssociation}.
@@ -87,7 +86,7 @@ public class TestOperAssociation {
 	 */
 	@Test
 	@DisplayName("Test of getters")
-	public void testGetters() {
+	void testGetters() {
 		assertNull(this.emptyAssociation.getOperator());
 		assertNull(this.emptyAssociation.getLeftOperand());
 		assertNull(this.emptyAssociation.getRightOperand());
@@ -103,7 +102,7 @@ public class TestOperAssociation {
 	 */
 	@Test
 	@DisplayName("Test of setters")
-	public void testSetters() {
+	void testSetters() {
 		this.emptyAssociation.setOperator(operator);
 		assertEquals(operator, this.emptyAssociation.getOperator());
 		this.emptyAssociation.addOperand(leftOperand);
@@ -120,7 +119,7 @@ public class TestOperAssociation {
 	 */
 	@Test
 	@DisplayName("Test of hasLeft() and hasRight() methods")
-	public void hasLeftRigthOperand() {
+	void hasLeftRigthOperand() {
 		assertTrue(this.fullOperatorAssociation.hasLeftOperand());
 		assertTrue(this.fullOperatorAssociation.hasRightOperand());
 	}
