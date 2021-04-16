@@ -1,6 +1,8 @@
 package com.ml2wf.v2.tree;
 
-public class WorkflowTree extends AbstractTree {
+import com.ml2wf.v2.task.WorkflowTask;
+
+public class WorkflowTree extends AbstractTree<WorkflowTask> {
 
     public WorkflowTree() {
         super();

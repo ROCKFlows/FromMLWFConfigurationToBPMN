@@ -128,4 +128,11 @@ public abstract class AbstractTask<T extends AbstractTask<T>> {
     public boolean hasChildren() {
         return !children.isEmpty();
     }
+
+    /**
+     * Normalizes the current task by trimming its name and replacing whitespaces by underscores.
+     */
+    public void normalize() {
+        setName(name.trim().replace(" ", "_"));
+    }
 }
