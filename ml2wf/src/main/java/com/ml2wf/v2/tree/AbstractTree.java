@@ -7,7 +7,7 @@ import java.util.List;
 
 public abstract class AbstractTree<T extends AbstractTask<T>> {
 
-    private final List<T> tasks;
+    protected final List<T> tasks;
 
     /**
      * {@code AbstractTree}'s default constructor.

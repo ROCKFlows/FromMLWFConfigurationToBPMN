@@ -5,6 +5,7 @@ import com.ml2wf.v2.util.NodeWriter;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import java.util.HashSet;
@@ -99,6 +100,17 @@ public abstract class AbstractTask<T extends AbstractTask<T>> {
      * @return an {@link Optional} containing the removed child
      */
     public abstract Optional<T> removeChild(T childTask);
+
+    /**
+     * Returns the {@link #node}'s owner {@link Document}.
+     *
+     * @return the {@link #node}'s owner {@link Document}
+     *
+     * @see Document
+     */
+    public Document getDocument() {
+        return node.getOwnerDocument();
+    }
 
     /**
      * Sets the current task's name and updates its internal {@link #node}.
