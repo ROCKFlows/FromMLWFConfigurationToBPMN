@@ -1,8 +1,10 @@
 package com.ml2wf.v2.task;
 
+import com.ml2wf.v2.util.NodeDescriber;
 import com.ml2wf.v2.util.NodeReader;
 import com.ml2wf.v2.util.NodeWriter;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.w3c.dom.Document;
@@ -12,60 +14,30 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@EqualsAndHashCode
 public abstract class AbstractTask<T extends AbstractTask<T>> {
 
-    // TODO: set default abstract+name according to the given node
     // TODO: add nonnull annotations
 
-    @Getter protected String name;
+    @Getter private String name;
     @Getter @Setter(AccessLevel.PROTECTED)
     protected T parent;
     @Getter protected Set<T> children;
     @Getter protected final Node node;
-    @Getter protected boolean isAbstract;
-
-    /**
-     * {@code AbstractTask} constructor with a {@link Node}, a parent {@link AbstractTask} and
-     * an abstract status.
-     *
-     * @param node          the node
-     * @param parent        the parent task
-     * @param isAbstract    whether the task is abstract or not
-     */
-    protected AbstractTask(Node node, T parent, boolean isAbstract) {
-        this.parent = parent;
-        children = new HashSet<>();
-        this.node = node;
-        this.isAbstract = isAbstract;
-        this.name = NodeReader.getName(this.node);
-    }
+    @Getter private boolean isAbstract;
 
     /**
      * {@code AbstractTask} constructor with a {@link Node} and a parent {@link AbstractTask}.
      *
-     * <p>
-     *
-     * <b>Note</b> that the task is set as concrete (non-abstract).
-     *
-     * @param node      the node
-     * @param parent    the parent task
-     */
-    protected AbstractTask(Node node, T parent) {
-        this(node, parent, NodeReader.isAbstract(node));
-    }
-
-    /**
-     * {@code AbstractTask} constructor with a {@link Node} and an abstract status.
-     *
-     * <p>
-     *
-     * <b>Note</b> that the task is set with a {@code null} {@link #parent}.
-     *
      * @param node          the node
-     * @param isAbstract    whether the task is abstract or not
+     * @param parent        the parent task
      */
-    protected AbstractTask(Node node, boolean isAbstract) {
-        this(node, null, isAbstract);
+    AbstractTask(Node node, T parent) {
+        this.parent = parent;
+        this.children = new HashSet<>();
+        this.node = node;
+        this.isAbstract = NodeReader.isAbstract(this.node);
+        this.name = NodeReader.getName(this.node);
     }
 
     /**
@@ -78,8 +50,8 @@ public abstract class AbstractTask<T extends AbstractTask<T>> {
      *
      * @param node      the node
      */
-    protected AbstractTask(Node node) {
-        this(node, NodeReader.isAbstract(node));
+    AbstractTask(Node node) {
+        this(node, null);
     }
 
     /**
@@ -146,5 +118,16 @@ public abstract class AbstractTask<T extends AbstractTask<T>> {
      */
     public void normalize() {
         setName(name.trim().replace(" ", "_"));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s) {parent=%s, isAbstract=%s, node=[%s]",
+                getClass().getSimpleName(),
+                name,
+                (parent != null) ? parent.getName() : null,
+                isAbstract,
+                NodeDescriber.getNodeDescription(node)
+        );
     }
 }
