@@ -7,7 +7,7 @@ import org.w3c.dom.Node;
 public final class FeatureModelTaskFactory implements ITaskFactory<FeatureModelTask> {
 
     @Override
-    public FeatureModelTask createTask(FeatureModelTask parent, Node node) {
+    public FeatureModelTask createTask(Node node, FeatureModelTask parent) {
         return new FeatureModelTask(node, parent);
     }
 }

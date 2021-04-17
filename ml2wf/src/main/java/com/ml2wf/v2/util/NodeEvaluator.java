@@ -9,7 +9,7 @@ public final class NodeEvaluator {
 
     public static boolean isUnmanaged(Node node) {
         Node parent;
-        while ((parent = node.getParentNode()) != null) {
+        while ((parent = node.getParentNode()) != null && NodeReader.hasAttribute(parent, "name")) {
             if ("Unmanaged".equals(NodeReader.getName(parent))) {
                 return true;
             }

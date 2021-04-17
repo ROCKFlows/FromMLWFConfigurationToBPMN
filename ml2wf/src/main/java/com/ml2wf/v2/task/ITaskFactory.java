@@ -5,9 +5,9 @@ import org.w3c.dom.Node;
 @FunctionalInterface
 public interface ITaskFactory<T extends AbstractTask<T>> {
 
-    T createTask(T parent, Node node);
+    T createTask(Node node, T parent);
 
     default T createTask(Node node) {
-        return createTask(null, node);
+        return createTask(node, null);
     }
 }

@@ -7,13 +7,17 @@ import org.w3c.dom.NodeList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public final class NodeIterator implements Iterator<Node> {
+public final class NodeListIterator implements Iterator<Node> {
 
     private final NodeList nodeList;
     private int index;
 
-    public NodeIterator(Document document, String tag) {
-        this.nodeList = document.getElementsByTagName(tag);
+    public NodeListIterator(final NodeList nodeList) {
+        this.nodeList = nodeList;
+    }
+
+    public NodeListIterator(Document document, String tag) {
+        this(document.getElementsByTagName(tag));
     }
 
     @Override

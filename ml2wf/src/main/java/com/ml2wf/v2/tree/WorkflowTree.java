@@ -3,7 +3,7 @@ package com.ml2wf.v2.tree;
 import com.ml2wf.v2.task.WorkflowTask;
 
 import com.ml2wf.v2.task.WorkflowTaskFactory;
-import com.ml2wf.v2.util.NodeIterator;
+import com.ml2wf.v2.util.NodeListIterator;
 import org.w3c.dom.Document;
 
 import java.util.ArrayList;
@@ -24,10 +24,9 @@ public class WorkflowTree extends AbstractTree<WorkflowTask> {
     @Override
     public List<WorkflowTask> initializeTasks() {
         // TODO: add isInit attribute if we keep this init method
-        NodeIterator nodeIterator = new NodeIterator(getDocument(), "bpmn2:task");
-        while (nodeIterator.hasNext()) {
-            tasks.add(taskFactory.createTask(nodeIterator.next()));
-        }
+        new NodeListIterator(getDocument(), "bpmn2:task")
+                // TODO: add logs if fails
+                .forEachRemaining(n -> tasks.add(taskFactory.createTask(n)));
         return new ArrayList<>(tasks);
     }
 

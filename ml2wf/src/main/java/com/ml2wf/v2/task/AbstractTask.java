@@ -33,9 +33,9 @@ public abstract class AbstractTask<T extends AbstractTask<T>> {
      * @param parent        the parent task
      */
     AbstractTask(Node node, T parent) {
-        this.parent = parent;
-        this.children = new HashSet<>();
         this.node = node;
+        this.parent = parent;
+        this.children = new HashSet<>(); // TODO: to fill
         this.isAbstract = NodeReader.isAbstract(this.node);
         this.name = NodeReader.getName(this.node);
     }

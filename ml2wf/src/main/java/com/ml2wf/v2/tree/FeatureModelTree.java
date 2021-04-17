@@ -5,7 +5,7 @@ import com.ml2wf.v2.task.FeatureModelTaskFactory;
 import com.ml2wf.v2.task.constraints.Constraint;
 
 import com.ml2wf.v2.util.NodeDescriber;
-import com.ml2wf.v2.util.NodeIterator;
+import com.ml2wf.v2.util.NodeListIterator;
 import lombok.extern.log4j.Log4j2;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -32,27 +32,28 @@ public class FeatureModelTree extends AbstractTree<FeatureModelTask> {
     public List<FeatureModelTask> initializeTasks() {
         // TODO: add isInit attribute if we keep this init method
         // TODO: init constraints too once validated/supported
-        // TODO: to fix
         Node currentNode = null; // TODO: check default null value
-        NodeIterator andNodeIterator = new NodeIterator(getDocument(), "and");
-        while (andNodeIterator.hasNext()) {
+        NodeListIterator andNodeListIterator = new NodeListIterator(getDocument(), "and");
+        while (andNodeListIterator.hasNext()) {
             try {
-                currentNode = andNodeIterator.next();
+                currentNode = andNodeListIterator.next();
                 tasks.add(taskFactory.createTask(currentNode));
             } catch (Exception exception) {
+                // TODO: create custom exceptions
+                log.error("Can't create FeatureModelTask from node [{}]",
+                        NodeDescriber.getNodeDescription(currentNode));
+            }
+        }
+        NodeListIterator featureNodeListIterator = new NodeListIterator(getDocument(), "feature");
+        while (featureNodeListIterator.hasNext()) {
+            try {
+                currentNode = featureNodeListIterator.next();
+                tasks.add(taskFactory.createTask(currentNode));
+            } catch (Exception exception) {
+                // TODO: create custom exceptions
                 log.error("Can't create task from node [{}]", NodeDescriber.getNodeDescription(currentNode));
             }
         }
-        NodeIterator featureNodeIterator = new NodeIterator(getDocument(), "feature");
-        while (featureNodeIterator.hasNext()) {
-            try {
-                currentNode = featureNodeIterator.next();
-                tasks.add(taskFactory.createTask(currentNode));
-            } catch (Exception exception) {
-                log.error("Can't create task from node [{}]", NodeDescriber.getNodeDescription(currentNode));
-            }
-        }
-        // return new ArrayList<>(tasks);
-        throw new UnsupportedOperationException("Not supported yet");
+        return new ArrayList<>(tasks);
     }
 }

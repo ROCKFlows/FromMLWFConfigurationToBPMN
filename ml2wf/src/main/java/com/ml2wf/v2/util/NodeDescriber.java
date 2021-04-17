@@ -10,8 +10,9 @@ public final class NodeDescriber {
     private static final String FORMAT = "name=%s,tag=%s,document=%s,nb_children=%d";
 
     public static String getNodeDescription(Node node) {
-        // TODO: change "TODO" for name
-        return String.format(FORMAT, "TODO", node.getNodeName(),
-                node.getOwnerDocument(), node.getChildNodes().getLength());
+        String name = NodeReader.hasAttribute(node, "name") ? NodeReader.getName(node) : "NO NAME";
+        return String.format(FORMAT, name, node.getNodeName(),
+                // nb_children=children / 2 because we don't count #text as children
+                node.getOwnerDocument().hashCode(), node.getChildNodes().getLength() / 2);
     }
 }

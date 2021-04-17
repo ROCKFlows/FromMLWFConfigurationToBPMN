@@ -30,6 +30,10 @@ public final class NodeReader {
         return Optional.empty();
     }
 
+    public static boolean hasAttribute(Node node, String attributeName) {
+        return node.hasAttributes() && node.getAttributes().getNamedItem(attributeName) != null;
+    }
+
     public static String getName(Node node) {
         return getAttribute(node, "name")
                 .orElseThrow(() -> new RuntimeException("Unable to retrieve node name for node : " +
