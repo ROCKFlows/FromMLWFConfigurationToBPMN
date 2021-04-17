@@ -9,16 +9,16 @@ import org.w3c.dom.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorkflowTree extends AbstractTree<WorkflowTask> {
+public class Workflow extends AbstractTree<WorkflowTask> {
 
     private int nbTasks;
 
-    public WorkflowTree(Document document) {
+    public Workflow(Document document) {
         super(document, new WorkflowTaskFactory());
     }
 
-    public static WorkflowTree fromDocument(Document document) {
-        return new WorkflowTree(document);
+    public static Workflow fromDocument(Document document) {
+        return new Workflow(document);
     }
 
     @Override

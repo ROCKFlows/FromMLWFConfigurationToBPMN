@@ -14,18 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
-public class FeatureModelTree extends AbstractTree<FeatureModelTask> {
+public class FeatureModel extends AbstractTree<FeatureModelTask> {
 
     // TODO: store the root UNMANAGED node
     private final List<Constraint> constraints;
 
-    public FeatureModelTree(Document document, List<Constraint> constraints) {
+    public FeatureModel(Document document, List<Constraint> constraints) {
         super(document, new FeatureModelTaskFactory());
         this.constraints = new ArrayList<>(constraints);
     }
 
-    public static FeatureModelTree fromDocument(Document document) {
-        return new FeatureModelTree(document, new ArrayList<>());
+    public static FeatureModel fromDocument(Document document) {
+        return new FeatureModel(document, new ArrayList<>());
     }
 
     @Override
