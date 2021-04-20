@@ -1,37 +1,181 @@
-## Welcome to GitHub Pages
+# FromMLWFConfigurationToBPMN
+![Java CI with Maven](https://github.com/ROCKFlows/FromMLWFConfigurationToBPMN/workflows/Java%20CI%20with%20Maven/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MireilleBF_FromMLWFConfigurationToBPMN&metric=alert_status)](https://sonarcloud.io/dashboard?id=MireilleBF_FromMLWFConfigurationToBPMN)
 
-You can use the [editor on GitHub](https://github.com/ROCKFlows/FromMLWFConfigurationToBPMN/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+## Overview
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+The **ml2wf** project aims at helping **Data Scientists** to create their workflows in the BPMN standard from a FeatureModel and to capitalize on their knowledge from new BPMN workflows.
 
-### Markdown
+You can define your own **constraints** easily by commenting your workflow using a predefined and customizable syntax.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Once created and modified, the data scientist can merge the workflow into the FeatureModel and **reuse** it later.
 
-```markdown
-Syntax highlighted code block
+Furthermore, it will allow data scientists to reduce **meta-learning** space and, over time, **automate** the creation of workflows tailored to a given time series anomaly detection problem.
 
-# Header 1
-## Header 2
-### Header 3
+## Table of contents
 
-- Bulleted
-- List
+- [Overview](#Overview)
+- [Usage](#Usage)
+  - [Command line](#command-line)
+  - [Configuration](#Configuration)
+- [Installation](#Installation)
+  - [Prerequisites](#Prerequisites)
+  - [Build](#Build)
+  - [Run](#Run)
+- [Example](#Example)
 
-1. Numbered
-2. List
+## Usage
 
-**Bold** and _Italic_ and `Code` text
+#### Command line
 
-[Link](url) and ![Image](src)
+##### NAME
+
+<pre>
+ml2wf  Machine Learning problem to Workflow
+</pre>
+##### SYNOPSIS
+
+<pre>ml2wf generate -i <ins>file</ins> -o <ins>directory</ins> [-v level]
+ml2wf build -f <ins>FeatureModel</ins> -m <ins>metaDirectory</ins> -i <ins>instanceDirectory</ins> [-b] [-v level]
+ml2wf merge [--meta|--instance] -i <ins>file</ins> -o <ins>FeatureModel</ins> [-fb] [-v level]
+ml2wf save -i <ins>meta</ins> <ins>instance</ins> -o <ins>FeatureModel</ins> [-b] [-v level]</pre>
+
+##### DESCRIPTION
+
+###### Commands
+
+<pre>generate  generate a workflow
+build     build a FeatureModel from a set of workflows
+merge     import a worklow in a FeatureModel
+save      save a meta-workflow and its instance in a FeatureModel</pre>
+
+###### Arguments
+
+<pre>-i, --input       input path
+-o, --output      output path
+-b, --backup      backup the original FeatureModel file before any modification
+-f, --full		  process a full merge (including meta/instance relationship)
+-v, --verbose     verbose mode (0=OFF,1=FATAL,2=ERROR,3=WARN,4=INFO,5=DEBUG,6=TRACE,7=ALL)</pre>
+
+
+#### Configuration
+
+The default configuration is the following :
+
+```
+# constraints syntax (name : arity : symbol)
+
+before : 2 : >>
+after : 2 : <<
+
+imp : 2 : =>
+equ : 2 : <=>
+
+conj : 2 : &
+disj : 2 : |
+
+not : 1 : !
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+**Note** that you can change this configuration modifying the `configuration.cfg` under the `ml2wf/config` directory
 
-### Jekyll Themes
+## Installation
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/ROCKFlows/FromMLWFConfigurationToBPMN/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+#### Prerequisites
 
-### Support or Contact
+[JDK 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+[Maven](https://maven.apache.org/)
+
+#### Build
+
+```bash
+cd ml2wf
+mvn clean package
+```
+
+The generated `.jar` is located in the `target` directory.
+
+#### Run
+
+```bash
+cd target
+java -jar ml2wf.jar [command] [arguments]
+```
+
+
+## Example
+
+Lets consider this generic workflow : **my_wf.bpmn2** :
+
+![generical_wf](./img/generical_wf.png)
+
+and this initial feature model : **featureModel.xml** :
+
+![initial_fm](./img/initial_fm.png)
+
+#### Step 1 : Instantiation & Modification
+
+We instantiate our generic workflow using the **generate** command :
+
+```bash
+java -jar ml2wf.jar generate -i my_wf.bpmn2 -o result/
+```
+
+> *Note that the resulting instance will be located in the `result` directory with the name `my_wf_instance.bpmn2`.*
+
+We change the tasks names which give us :
+
+![instantiated_wf](./img/instantiated_wf.png)
+
+> *Note that we put some constraints on our tasks (in comments).*
+
+**=> We now have 3 possibilities to create our knowledge database (*FeatureModel*).**
+
+#### Step 2-A : Merging
+
+We can merge our workflows in the *FeatureModel* using the **merge** command :
+
+```bash
+java -jar ml2wf.jar merge --meta -f -i my_wf.bpmn2 -o featureModel.xml
+java -jar ml2wf.jar merge --instance -f -i result/my_wf_instance.bpmn2 -o featureModel.xml
+```
+
+> *Note that the -f argument will merge the meta/instance relationship*
+
+> *Beware a merge-instance only works properly if you use a generated workflow.
+Indeed in the XML (and not directly visible) _<bpmn2:property id="Property_1" name="instance"/></bpmn2:task>_ gives information about the fact that the task must be considered as an instance, which will transform it into a concrete Feature. You can see the properties of a task by double-clicking on it.*
+
+
+
+#### Step 2-B : Saving
+
+We can save the meta and instance relationship in the *FeatureModel* using the **save** command :
+
+```bash
+java -jar ml2wf.jar save -i my_wf.bpmn2 result/my_wf_instance -o featureModel.xml
+```
+
+> *Note that like any other command, unless the --backup (-b) argument is specified, the original FeatureModel will be modified without backing it up.*
+
+#### Step 2-C : Building
+
+We can build the *FeatureModel* using our existing workflows and the **build **command :
+
+```bash
+java -jar ml2wf.jar build -f featureModel.xml -m my_wf.bpmn2 -i result/
+```
+
+> *Note that the -m/-i argument can be a directory. In that case, all workflows in the given directory will be merged in the FeatureModel*.
+
+**=> Here is the result :**
+
+![result_feature_model](img/result_fm.png)
+
+> *Note that the workflows' constraints are translated into FeatureModel constraints in order to keep our knowledge database consistency.*
+
+#### Step 3  : Reusing your generated tasks for other workflows
+
+Using the [*FeatureIDE*](https://featureide.github.io/), you now can select the wished tasks and it will automatically select the needed ones.
+
+![tasks_selection](./img/tasks_selection.png)
