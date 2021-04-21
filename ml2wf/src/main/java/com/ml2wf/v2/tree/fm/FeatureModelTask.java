@@ -64,5 +64,6 @@ public class FeatureModelTask extends FeatureModelStructure {
     @Override
     public void normalize() {
         name = name.trim().replace(" ", "_");
+        super.normalize();
     }
 }
