@@ -4,6 +4,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 @ToString
 public class WorkflowTask implements IInstantiable {
 
@@ -46,6 +48,7 @@ public class WorkflowTask implements IInstantiable {
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     @Setter
+    @EqualsAndHashCode
     @ToString
     static final class Documentation {
 

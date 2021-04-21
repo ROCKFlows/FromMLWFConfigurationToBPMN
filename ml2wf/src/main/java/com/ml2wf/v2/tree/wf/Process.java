@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.ml2wf.v2.tree.ITreeManipulable;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,6 +41,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 @ToString
 public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable {
 
@@ -67,6 +69,7 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable {
     @NoArgsConstructor
     @Getter
     @Setter
+    @EqualsAndHashCode
     @ToString
     static class SequenceFlow {
 

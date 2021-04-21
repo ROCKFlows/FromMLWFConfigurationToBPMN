@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.ml2wf.v2.tree.AbstractTree;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,6 +28,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter(AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class Workflow extends AbstractTree<Process> implements IInstantiable {
 

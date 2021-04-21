@@ -4,6 +4,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.ml2wf.v2.tree.AbstractTree;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,8 +35,10 @@ import java.util.List;
  * @since 1.1
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter(AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = true)
 @ToString
 public class FeatureModelStructure extends AbstractTree<FeatureModelTask>  {
 
