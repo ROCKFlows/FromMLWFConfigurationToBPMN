@@ -9,6 +9,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * A {@link WorkflowTask} is a {@link Workflow} task identified by an {@link #id},
+ * has a {@link #name} and can be documented with a {@link Documentation} instance.
+ *
+ * @see Workflow
+ * @see Documentation
+ *
+ * @since 1.1
+ */
 @NoArgsConstructor
 @Getter
 @Setter
@@ -22,6 +31,17 @@ public class WorkflowTask implements IInstantiable {
     @JacksonXmlProperty(localName = "bpmn2:documentation")
     private Documentation documentation;
 
+    /**
+     * A {@link Documentation} is defined by an {@link #id} and has a {@link #content}.
+     *
+     * <p>
+     *
+     * It provides additional information about a {@link WorkflowTask}.
+     *
+     * @see WorkflowTask
+     *
+     * @since 1.1
+     */
     @NoArgsConstructor
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter

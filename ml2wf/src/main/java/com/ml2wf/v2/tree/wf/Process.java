@@ -12,6 +12,30 @@ import lombok.ToString;
 
 import java.util.List;
 
+/**
+ * A process contains some {@link WorkflowTask}s and their associated {@link SequenceFlow}s.
+ *
+ * <p>
+ *
+ * It is identified by an {@link #id} and has a {@link #name}.
+ *
+ * <p>
+ *
+ * It is an implementation of the {@link ITreeManipulable} which means that it can add
+ * and remove some {@link WorkflowTask}.
+ *
+ * <p>
+ *
+ * It also can instantiated itself by instantiating its {@link #tasks} implementing the
+ * {@link IInstantiable} interface.
+ *
+ * @see WorkflowTask
+ * @see SequenceFlow
+ * @see ITreeManipulable
+ * @see IInstantiable
+ *
+ * @since 1.1
+ */
 @JacksonXmlRootElement(localName = "bpmn2:process")
 @NoArgsConstructor
 @Getter
@@ -32,10 +56,18 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable {
     @Setter(AccessLevel.PRIVATE)
     private List<SequenceFlow> sequenceFlows;
 
+    /**
+     * A {@link SequenceFlow} links two tasks (a source and a target) by referencing
+     * their {@link WorkflowTask#getId()}.
+     *
+     * @see WorkflowTask
+     *
+     * @since 1.1
+     */
     @NoArgsConstructor
-    @ToString
     @Getter
     @Setter
+    @ToString
     static class SequenceFlow {
 
         @JacksonXmlProperty(isAttribute = true)
@@ -54,7 +86,11 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable {
 
     @Override
     public WorkflowTask removeChild(WorkflowTask child) {
-        return (tasks.remove(child)) ? child : null;
+        if (!tasks.remove(child)) {
+            return null;
+        }
+        sequenceFlows.removeIf(s -> s.getSourceRef().equals(child.getId()) || s.getTargetRef().equals(child.getId()));
+        return child;
     }
 
     @Override

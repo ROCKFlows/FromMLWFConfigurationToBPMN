@@ -12,6 +12,26 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link FeatureModelStructure} contains the {@link FeatureModelTask} instances of
+ * a {@link FeatureModel}.
+ *
+ * <p>
+ *
+ * As specified by the {@link FeatureModel} class, three kinds of tasks are differentiated.
+ * These tasks are stored into three distinct collections :
+ *
+ * <ul>
+ *     <li>the {@link #children} contains the <b>and</b> tasks</li>
+ *     <li>the {@link #childrenLeaves} contains the <b>features</b></li>
+ *     <li>the {@link #alternativeChildren} contains the <b>alternative</b> tasks</li>
+ * </ul>
+ *
+ * @see FeatureModel
+ * @see FeatureModelTask
+ *
+ * @since 1.1
+ */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter(AccessLevel.PRIVATE)
@@ -21,12 +41,12 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>  {
     @JacksonXmlProperty(localName="and")
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<FeatureModelTask> children = new ArrayList<>();
-    @JacksonXmlProperty(localName="alt")
-    @JacksonXmlElementWrapper(useWrapping = false)
-    private List<FeatureModelTask> alternativeChildren = new ArrayList<>();
     @JacksonXmlProperty(localName="feature")
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<FeatureModelTask> childrenLeaves = new ArrayList<>();
+    @JacksonXmlProperty(localName="alt")
+    @JacksonXmlElementWrapper(useWrapping = false)
+    private List<FeatureModelTask> alternativeChildren = new ArrayList<>();
 
     @Override
     public FeatureModelTask appendChild(FeatureModelTask child) {

@@ -12,6 +12,17 @@ import lombok.ToString;
 
 import java.util.List;
 
+/**
+ * A {@link Workflow} contains a list of {@link #processes}.
+ *
+ * <p>
+ *
+ * Each {@link Process} contains the workflow's tasks and links.
+ *
+ * @see Process
+ *
+ * @since 1.1
+ */
 @JacksonXmlRootElement(localName = "bpmn2:definitions")
 @NoArgsConstructor
 @Getter
