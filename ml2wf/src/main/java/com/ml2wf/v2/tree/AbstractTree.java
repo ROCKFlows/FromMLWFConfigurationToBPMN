@@ -4,5 +4,5 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
 public abstract class AbstractTree<T> implements ITreeManipulable<T> {
-    // TODO: should we keep this abstraction ?
+
 }

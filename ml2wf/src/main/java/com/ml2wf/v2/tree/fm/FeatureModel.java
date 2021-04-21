@@ -76,4 +76,16 @@ public class FeatureModel extends AbstractTree<FeatureModelTask> {
         // delegates to structure
         return structure.removeChild(child);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     *
+     * <b>Note</b> that this operation is delegated to its {@link #structure}.
+     */
+    @Override
+    public void normalize() {
+        structure.normalize();
+    }
 }

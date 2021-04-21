@@ -60,4 +60,9 @@ public class FeatureModelTask extends FeatureModelStructure {
         @JacksonXmlText
         private String content = "";
     }
+
+    @Override
+    public void normalize() {
+        name = name.trim().replace(" ", "_");
+    }
 }

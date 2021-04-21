@@ -73,4 +73,11 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>  {
         }
         return (childrenLeaves.remove(child)) ? child : null;
     }
+
+    @Override
+    public void normalize() {
+        children.forEach(FeatureModelTask::normalize);
+        childrenLeaves.forEach(FeatureModelTask::normalize);
+        alternativeChildren.forEach(FeatureModelTask::normalize);
+    }
 }

@@ -8,7 +8,7 @@ package com.ml2wf.v2.tree;
  *
  * @since 1.1
  */
-public interface ITreeManipulable<T> {
+public interface ITreeManipulable<T> extends INormalizable {
 
     /**
      * Appends the given child to the current tree implementation.

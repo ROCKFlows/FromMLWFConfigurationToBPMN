@@ -97,6 +97,11 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable {
     }
 
     @Override
+    public void normalize() {
+        tasks.forEach(WorkflowTask::normalize);
+    }
+
+    @Override
     public void instantiate() {
         tasks.forEach(IInstantiable::instantiate);
     }

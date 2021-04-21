@@ -48,6 +48,11 @@ public class Workflow extends AbstractTree<Process> implements IInstantiable {
     }
 
     @Override
+    public void normalize() {
+        processes.forEach(Process::normalize);
+    }
+
+    @Override
     public void instantiate() {
         processes.forEach(IInstantiable::instantiate);
     }

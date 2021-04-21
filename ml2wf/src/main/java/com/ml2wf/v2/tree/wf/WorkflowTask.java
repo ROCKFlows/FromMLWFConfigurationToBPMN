@@ -2,6 +2,7 @@ package com.ml2wf.v2.tree.wf;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
+import com.ml2wf.v2.tree.INormalizable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -24,7 +25,7 @@ import lombok.ToString;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class WorkflowTask implements IInstantiable {
+public class WorkflowTask implements INormalizable, IInstantiable {
 
     @JacksonXmlProperty(isAttribute = true)
     private String id;
@@ -56,6 +57,11 @@ public class WorkflowTask implements IInstantiable {
         private String id;
         @JacksonXmlText
         private String content = "";
+    }
+
+    @Override
+    public void normalize() {
+        name = name.trim().replace(" ", "_");
     }
 
     @Override
