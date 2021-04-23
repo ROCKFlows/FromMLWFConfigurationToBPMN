@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.Optional;
+
 /**
  * A {@link FeatureModel} has a {@link FeatureModelStructure} containing its
  * {@link FeatureModelTask}s.
@@ -31,7 +33,7 @@ import lombok.ToString;
  * @see FeatureModelStructure
  * @see FeatureModelTask
  *
- * @since 1.1
+ * @since 1.1.0
  */
 @JacksonXmlRootElement(localName = "extendedFeatureModel") // TODO: differentiate extended
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -55,7 +57,7 @@ public class FeatureModel extends AbstractTree<FeatureModelTask> {
      * @return the appended child
      */
     @Override
-    public FeatureModelTask appendChild(FeatureModelTask child) {
+    public FeatureModelTask appendChild(final FeatureModelTask child) {
         // delegates to structure
         return structure.appendChild(child);
     }
@@ -72,9 +74,26 @@ public class FeatureModel extends AbstractTree<FeatureModelTask> {
      * @return the removed child
      */
     @Override
-    public FeatureModelTask removeChild(FeatureModelTask child) {
+    public Optional<FeatureModelTask> removeChild(final FeatureModelTask child) {
         // delegates to structure
         return structure.removeChild(child);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     *
+     * <b>Note</b> that this operation is delegated to its {@link #structure}.
+     *
+     * @param name  the name of the requested child
+     *
+     * @return the removed child
+     */
+    @Override
+    public Optional<FeatureModelTask> getChildWithName(final String name) {
+        // delegates to structure
+        return structure.getChildWithName(name);
     }
 
     /**

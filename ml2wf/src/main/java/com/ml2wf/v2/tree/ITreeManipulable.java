@@ -1,21 +1,25 @@
 package com.ml2wf.v2.tree;
 
+import java.util.Optional;
+
 /**
  * This interface defines the main method for tree manipulation like child
  * addition or removal.
  *
  * @param <T> the type of the tree elements
  *
- * @since 1.1
+ * @since 1.1.0
  */
 public interface ITreeManipulable<T> extends INormalizable {
+
+    // TODO: should we define a method to move a child according to the TreeEvent#Events#MOVE event ?
 
     /**
      * Appends the given child to the current tree implementation.
      *
      * @param child the child
      *
-     * @return the appended child to allow chaining.
+     * @return the appended child to allow chaining
      */
     T appendChild(T child);
 
@@ -24,7 +28,16 @@ public interface ITreeManipulable<T> extends INormalizable {
      *
      * @param child the child
      *
-     * @return the removed child to allow chaining.
+     * @return an {@link Optional} containing the removed child
      */
-    T removeChild(T child);
+    Optional<T> removeChild(T child);
+
+    /**
+     * Retrieves the node with the given name.
+     *
+     * @param name  the name of the requested node
+     *
+     * @return the retrieved node
+     */
+    Optional<T> getChildWithName(String name);
 }

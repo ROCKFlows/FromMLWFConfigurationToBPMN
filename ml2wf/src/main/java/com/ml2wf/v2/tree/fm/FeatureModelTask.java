@@ -3,6 +3,8 @@ package com.ml2wf.v2.tree.fm;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
+import com.ml2wf.v2.tree.events.RenamingEvent;
+import com.ml2wf.v2.tree.wf.WorkflowTask;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -11,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,9 +24,10 @@ import java.util.List;
  * @see FeatureModelStructure
  * @see Description
  *
- * @since 1.1
+ * @since 1.1.0
  */
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -47,7 +51,7 @@ public class FeatureModelTask extends FeatureModelStructure {
      *
      * @see FeatureModelTask
      *
-     * @since 1.1
+     * @since 1.1.0
      */
     @NoArgsConstructor
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -55,15 +59,38 @@ public class FeatureModelTask extends FeatureModelStructure {
     @Setter
     @EqualsAndHashCode
     @ToString
-    static final class Description {
+    public static final class Description {
 
         @JacksonXmlText
         private String content = "";
+
+        public static Description fromDocumentation(WorkflowTask.Documentation documentation) {
+            return new Description(documentation.getContent());
+        }
+    }
+
+    /**
+     * Returns a {@link FeatureModelTask} instance based on the given {@link WorkflowTask}.
+     *
+     * @param workflowTask  the {@link WorkflowTask}'s instance
+     *
+     * @return the resulting {@link FeatureModelTask}
+     */
+    public static FeatureModelTask fromWorkflowTask(WorkflowTask workflowTask) {
+        var description = Description.fromDocumentation(workflowTask.getDocumentation());
+        List<Description> descriptions = new ArrayList<>();
+        descriptions.add(description);
+        return new FeatureModelTask(
+                workflowTask.isAbstract(), !workflowTask.isOptional(), workflowTask.getName(), descriptions);
     }
 
     @Override
     public void normalize() {
+        String oldName = name;
         name = name.trim().replace(" ", "_");
+        if (!name.equals(oldName)) {
+            notifyOnChange(new RenamingEvent<>(this, oldName));
+        }
         super.normalize();
     }
 }

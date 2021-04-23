@@ -1,8 +1,11 @@
 package com.ml2wf.v2.tree.wf;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.v2.tree.INormalizable;
+import com.ml2wf.v2.tree.wf.util.WorkflowTaskUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -11,6 +14,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Locale;
+
 /**
  * A {@link WorkflowTask} is a {@link Workflow} task identified by an {@link #id},
  * has a {@link #name} and can be documented with a {@link Documentation} instance.
@@ -18,7 +23,7 @@ import lombok.ToString;
  * @see Workflow
  * @see Documentation
  *
- * @since 1.1
+ * @since 1.1.0
  */
 @NoArgsConstructor
 @Getter
@@ -43,7 +48,7 @@ public class WorkflowTask implements INormalizable, IInstantiable {
      *
      * @see WorkflowTask
      *
-     * @since 1.1
+     * @since 1.1.0
      */
     @NoArgsConstructor
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -51,12 +56,22 @@ public class WorkflowTask implements INormalizable, IInstantiable {
     @Setter
     @EqualsAndHashCode
     @ToString
-    static final class Documentation {
+    public static final class Documentation {
 
         @JacksonXmlProperty(isAttribute = true)
         private String id;
         @JacksonXmlText
         private String content = "";
+    }
+
+    @JsonIgnore
+    public boolean isAbstract() {
+        return name.trim().endsWith(Notation.GENERIC_VOC.toLowerCase(Locale.ROOT));
+    }
+
+    @JsonIgnore
+    public boolean isOptional() {
+        return WorkflowTaskUtil.isOptional(this);
     }
 
     @Override
@@ -72,6 +87,5 @@ public class WorkflowTask implements INormalizable, IInstantiable {
         String formatPattern = (documentation.content.isBlank()) ? "refersTo: %s%s" : "refersTo: %s%n%s";
         documentation.content = String.format(formatPattern, name, documentation.content);
         name = String.format("%s_TODO", name);
-        // TODO: manage optionality
     }
 }

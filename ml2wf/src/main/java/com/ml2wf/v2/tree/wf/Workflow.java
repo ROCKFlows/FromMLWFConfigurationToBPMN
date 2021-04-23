@@ -4,6 +4,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.ml2wf.v2.tree.AbstractTree;
+import com.ml2wf.v2.tree.INormalizable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A {@link Workflow} contains a list of {@link #processes}.
@@ -22,7 +24,7 @@ import java.util.List;
  *
  * @see Process
  *
- * @since 1.1
+ * @since 1.1.0
  */
 @JacksonXmlRootElement(localName = "bpmn2:definitions")
 @NoArgsConstructor
@@ -37,19 +39,26 @@ public class Workflow extends AbstractTree<Process> implements IInstantiable {
     protected List<Process> processes;
 
     @Override
-    public Process appendChild(Process child) {
+    public Process appendChild(final Process child) {
         processes.add(child);
         return child;
     }
 
     @Override
-    public Process removeChild(Process child) {
-        return (processes.remove(child)) ? child : null;
+    public Optional<Process> removeChild(final Process child) {
+        return Optional.ofNullable((processes.remove(child)) ? child : null);
+    }
+
+    @Override
+    public Optional<Process> getChildWithName(final String name) {
+        return processes.stream()
+                .filter(p -> p.getChildWithName(name).isPresent())
+                .findAny();
     }
 
     @Override
     public void normalize() {
-        processes.forEach(Process::normalize);
+        processes.forEach(INormalizable::normalize);
     }
 
     @Override

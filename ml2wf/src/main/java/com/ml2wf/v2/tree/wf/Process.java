@@ -3,6 +3,7 @@ package com.ml2wf.v2.tree.wf;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.ml2wf.v2.tree.INormalizable;
 import com.ml2wf.v2.tree.ITreeManipulable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -12,6 +13,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A process contains some {@link WorkflowTask}s and their associated {@link SequenceFlow}s.
@@ -35,7 +37,7 @@ import java.util.List;
  * @see ITreeManipulable
  * @see IInstantiable
  *
- * @since 1.1
+ * @since 1.1.0
  */
 @JacksonXmlRootElement(localName = "bpmn2:process")
 @NoArgsConstructor
@@ -64,7 +66,7 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable {
      *
      * @see WorkflowTask
      *
-     * @since 1.1
+     * @since 1.1.0
      */
     @NoArgsConstructor
     @Getter
@@ -88,17 +90,24 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable {
     }
 
     @Override
-    public WorkflowTask removeChild(WorkflowTask child) {
+    public Optional<WorkflowTask> removeChild(WorkflowTask child) {
         if (!tasks.remove(child)) {
-            return null;
+            return Optional.empty();
         }
         sequenceFlows.removeIf(s -> s.getSourceRef().equals(child.getId()) || s.getTargetRef().equals(child.getId()));
-        return child;
+        return Optional.ofNullable(child);
+    }
+
+    @Override
+    public Optional<WorkflowTask> getChildWithName(String name) {
+        return tasks.stream()
+                .filter(t -> t.getName().equals(name))
+                .findAny();
     }
 
     @Override
     public void normalize() {
-        tasks.forEach(WorkflowTask::normalize);
+        tasks.forEach(INormalizable::normalize);
     }
 
     @Override

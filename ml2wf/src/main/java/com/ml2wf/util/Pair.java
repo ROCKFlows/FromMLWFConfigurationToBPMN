@@ -1,5 +1,7 @@
 package com.ml2wf.util;
 
+import lombok.Data;
+
 /**
  * This class represents a simple pair association between two objects.
  *
@@ -10,16 +12,17 @@ package com.ml2wf.util;
  *
  * @since 1.0.0
  */
-public class Pair<K, V> {
+@Data
+public final class Pair<K, V> {
 
     /**
      * The associative key.
      */
-    private final K key;
+    private K key;
     /**
      * The associated value.
      */
-    private final V value;
+    private V value;
 
     /**
      * {@code Pair}'s complete constructor.
@@ -27,7 +30,7 @@ public class Pair<K, V> {
      * @param key   the key
      * @param value the associated value
      */
-    public Pair(K key, V value) {
+    public Pair(final K key, final V value) {
         this.key = key;
         this.value = value;
     }
@@ -37,24 +40,6 @@ public class Pair<K, V> {
      */
     public Pair() {
         this(null, null);
-    }
-
-    /**
-     * Returns the current association's {@code key}.
-     *
-     * @return the current association's {@code key}
-     */
-    public K getKey() {
-        return this.key;
-    }
-
-    /**
-     * Returns the current association's {@code value}.
-     *
-     * @return the current association's {@code value}
-     */
-    public V getValue() {
-        return value;
     }
 
     /**
