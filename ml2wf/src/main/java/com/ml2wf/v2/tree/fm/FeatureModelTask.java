@@ -1,5 +1,6 @@
 package com.ml2wf.v2.tree.fm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
@@ -26,20 +27,22 @@ import java.util.List;
  *
  * @since 1.1.0
  */
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-@ToString
+@ToString(of = {"name", "isAbstract", "isMandatory"})
 public class FeatureModelTask extends FeatureModelStructure {
 
+    @JsonIgnore
+    private FeatureModelTask parent;
+    @JacksonXmlProperty(isAttribute = true)
+    private String name;
     @JacksonXmlProperty(localName = "abstract", isAttribute = true)
     private boolean isAbstract;
     @JacksonXmlProperty(localName = "mandatory", isAttribute = true)
     private boolean isMandatory;
-    @JacksonXmlProperty(isAttribute = true)
-    private String name;
     @JacksonXmlProperty(localName = "description")
     @JacksonXmlElementWrapper(useWrapping = false)
     @Setter(AccessLevel.PRIVATE)
@@ -80,8 +83,8 @@ public class FeatureModelTask extends FeatureModelStructure {
         var description = Description.fromDocumentation(workflowTask.getDocumentation());
         List<Description> descriptions = new ArrayList<>();
         descriptions.add(description);
-        return new FeatureModelTask(
-                workflowTask.isAbstract(), !workflowTask.isOptional(), workflowTask.getName(), descriptions);
+        return new FeatureModelTask(null, workflowTask.getName(), workflowTask.isAbstract(),
+                !workflowTask.isOptional(), descriptions);
     }
 
     @Override

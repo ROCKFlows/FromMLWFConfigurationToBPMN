@@ -59,8 +59,8 @@ import java.util.Set;
 @JsonIgnoreProperties({"tasksObservers", "processesObservers", "internalMemory"})
 @Getter
 @Setter // TODO: listen on setters
-@EqualsAndHashCode(exclude = {"tasksObservers", "processesObservers", "internalMemory"})
-@ToString(exclude = {"tasksObservers", "processesObservers", "internalMemory"})
+@EqualsAndHashCode(of = {"id", "name"})
+@ToString(of = {"id", "name"})
 @Log4j2
 public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
         IObserver<AbstractTreeEvent<WorkflowTask>>, IObservable<AbstractTreeEvent<Process>> {
@@ -107,7 +107,7 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
     @Setter
     @EqualsAndHashCode
     @ToString
-    static class SequenceFlow {
+    public static class SequenceFlow {
 
         @JacksonXmlProperty(isAttribute = true)
         private String id;
@@ -173,6 +173,11 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
     }
 
     @Override
+    public boolean hasChildren() {
+        return !tasks.isEmpty();
+    }
+
+    @Override
     public WorkflowTask appendChild(WorkflowTask child) {
         tasks.add(child);
         update(new AdditionEvent<>(child, tasks));
@@ -214,7 +219,7 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
     @Override
     public void subscribe(@NonNull final IObserver<AbstractTreeEvent<Process>> observer) {
         processesObservers.add(observer);
-        log.trace("Observer {} has subscribed to {}", observer.getClass().getSimpleName(), name);
+        log.trace("Observer {} has subscribed to {}", observer.getClass().getSimpleName(), this);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.ml2wf.v2.tree.fm;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.ml2wf.util.Pair;
@@ -12,9 +12,10 @@ import com.ml2wf.v2.tree.events.RemovalEvent;
 import com.ml2wf.v2.tree.events.RenamingEvent;
 import com.ml2wf.v2.util.observer.IObservable;
 import com.ml2wf.v2.util.observer.IObserver;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.experimental.Delegate;
 import lombok.extern.log4j.Log4j2;
 
@@ -53,7 +54,9 @@ import java.util.Set;
  *
  * @since 1.1.0
  */
-@Data // TODO: check data
+@JsonIgnoreProperties({"observers", "internalMemory"})
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @Log4j2
 public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
@@ -71,9 +74,7 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
     @JacksonXmlProperty(localName="alt")
     @JacksonXmlElementWrapper(useWrapping = false)
     private final List<FeatureModelTask> alternativeChildren = new ArrayList<>();
-    @JsonIgnore
     protected final Set<IObserver<AbstractTreeEvent<FeatureModelTask>>> observers = new HashSet<>();
-    @JsonIgnore
     protected final InternalMemory internalMemory = new InternalMemory();
 
     /**
@@ -112,9 +113,13 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
                 case ADDITION:
                     List<FeatureModelTask> location = ((AdditionEvent<FeatureModelTask>) event).getLocation();
                     memory.put(featureModelTask.getName(), new Pair<>(featureModelTask, location));
+                    featureModelTask.subscribe(this);
+                    updateParentLocation(memory.get(featureModelTask.getParent().getName()));
                     break;
                 case REMOVAL:
                     memory.remove(featureModelTask.getName());
+                    featureModelTask.unsubscribe(this);
+                    updateParentLocation(memory.get(featureModelTask.getParent().getName()));
                     break;
                 case RENAMING:
                     String oldName = ((RenamingEvent<FeatureModelTask>) event).getOldName();
@@ -123,11 +128,44 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
                 case MOVED:
                     List<FeatureModelTask> newLocation = ((MovedEvent<FeatureModelTask>) event).getNewLocation();
                     memory.get(featureModelTask.getName()).setValue(newLocation);
-                    return;
+                    break;
                 default:
                     throw new IllegalStateException("Unsupported event for FeatureModelStructure internal memory.");
             }
         }
+
+        /**
+         * Updates the parent location according to its children.
+         *
+         * <p>
+         *
+         * If it has no children, then it is moved to the {@link #childrenLeaves} collection.
+         * If it has any children, then it is moved to the {@link #children} collection.
+         *
+         * @param parentPair    the {@link Pair} containing the parent task information
+         */
+        private void updateParentLocation(final Pair<FeatureModelTask, List<FeatureModelTask>> parentPair) {
+            // TODO: manage alt case
+            FeatureModelTask parent = parentPair.getKey();
+            List<FeatureModelTask> oldLocation = parentPair.getValue();
+            List<FeatureModelTask> newLocation;
+            if (parent.hasChildren() && oldLocation == childrenLeaves) {
+                newLocation = children;
+                parentPair.setValue(children);
+            } else if (!parent.hasChildren() && oldLocation != childrenLeaves) {
+                newLocation = childrenLeaves;
+            } else {
+                return;
+            }
+            oldLocation.remove(parent);
+            newLocation.add(parent);
+            notifyOnChange(new MovedEvent<>(parent, oldLocation, newLocation));
+        }
+    }
+
+    @Override
+    public boolean hasChildren() {
+        return !(children.isEmpty() && childrenLeaves.isEmpty() && alternativeChildren.isEmpty());
     }
 
     @Override
@@ -148,14 +186,19 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
         if (!internalMemory.containsKey(child.getName())) {
             return Optional.empty();
         }
-        internalMemory.get(child.getName()).getValue().remove(child);
+        Pair<FeatureModelTask, List<FeatureModelTask>> childPair = internalMemory.get(child.getName());
+        childPair.getValue().remove(child);
         notifyOnChange(new RemovalEvent<>(child));
+        if (childPair.getValue().isEmpty()) {
+            //moveChild(childPair.getKey(), childrenLeaves);
+        }
         return Optional.of(child);
     }
 
     @Override
     public Optional<FeatureModelTask> getChildWithName(final String name) {
-        return Optional.ofNullable(internalMemory.get(name).getKey());
+        Pair<FeatureModelTask, List<FeatureModelTask>> childPair = internalMemory.get(name);
+        return Optional.ofNullable((childPair.isPresent()) ? childPair.getKey() : null);
     }
 
     @Override
@@ -168,8 +211,7 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
     @Override
     public void subscribe(@NonNull final IObserver<AbstractTreeEvent<FeatureModelTask>> observer) {
         observers.add(observer);
-        log.trace("Observer {} has subscribed to {}", observer.getClass().getSimpleName(),
-                getClass().getSimpleName());
+        log.trace("Observer {} has subscribed to {}", observer, this);
     }
 
     @Override
@@ -180,5 +222,10 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
     @Override
     public void notifyOnChange(@NonNull final AbstractTreeEvent<FeatureModelTask> event) {
         observers.forEach(o -> o.update(event));
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
     }
 }

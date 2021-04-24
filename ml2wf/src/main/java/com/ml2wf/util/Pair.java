@@ -50,4 +50,13 @@ public final class Pair<K, V> {
     public boolean isEmpty() {
         return (key == null) && (value == null);
     }
+
+    /**
+     * Returns whether the current {@code Pair} association is present or not.
+     *
+     * @return whether the current {@code Pair} association is present or not
+     */
+    public boolean isPresent() {
+        return !isEmpty();
+    }
 }

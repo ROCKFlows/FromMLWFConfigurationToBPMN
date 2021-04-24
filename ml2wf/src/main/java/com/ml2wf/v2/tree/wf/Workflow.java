@@ -116,6 +116,11 @@ public class Workflow extends AbstractTree<Process> implements IInstantiable, IO
     }
 
     @Override
+    public boolean hasChildren() {
+        return !processes.isEmpty();
+    }
+
+    @Override
     public Process appendChild(final Process child) {
         processes.add(child);
         notifyOnChange(new AdditionEvent<>(child, processes));
@@ -151,7 +156,7 @@ public class Workflow extends AbstractTree<Process> implements IInstantiable, IO
     @Override
     public void subscribe(@NonNull final IObserver<AbstractTreeEvent<Process>> observer) {
         observers.add(observer);
-        log.trace("Observer {} has subscribed to workflow", observer.getClass().getSimpleName());
+        log.trace("Observer {} has subscribed to workflow", observer);
     }
 
     @Override

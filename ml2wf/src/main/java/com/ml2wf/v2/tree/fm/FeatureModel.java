@@ -51,6 +51,19 @@ public class FeatureModel extends AbstractTree<FeatureModelTask> {
      * <p>
      *
      * <b>Note</b> that this operation is delegated to its {@link #structure}.
+     */
+    @Override
+    public boolean hasChildren() {
+        // delegates to structure
+        return structure.hasChildren();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     *
+     * <b>Note</b> that this operation is delegated to its {@link #structure}.
      *
      * @param child the child
      *

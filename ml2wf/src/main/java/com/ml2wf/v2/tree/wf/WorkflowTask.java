@@ -37,8 +37,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = "observers")
-@ToString(exclude = "observers")
+@EqualsAndHashCode(of = {"id", "name"})
+@ToString(of = {"id", "name"})
 @Log4j2
 public class WorkflowTask implements INormalizable, IInstantiable, IObservable<AbstractTreeEvent<WorkflowTask>> {
 
@@ -109,7 +109,7 @@ public class WorkflowTask implements INormalizable, IInstantiable, IObservable<A
     @Override
     public void subscribe(@NonNull final IObserver<AbstractTreeEvent<WorkflowTask>> observer) {
         observers.add(observer);
-        log.trace("Observer {} has subscribed to {}", observer.getClass().getSimpleName(), name);
+        log.trace("Observer {} has subscribed to {}", observer, this);
     }
 
     @Override
