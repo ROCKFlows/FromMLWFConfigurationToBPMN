@@ -5,16 +5,25 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.v2.tree.INormalizable;
+import com.ml2wf.v2.tree.events.AbstractTreeEvent;
+import com.ml2wf.v2.tree.events.InstantiationEvent;
+import com.ml2wf.v2.tree.events.RenamingEvent;
 import com.ml2wf.v2.tree.wf.util.WorkflowTaskUtil;
+import com.ml2wf.v2.util.observer.IObservable;
+import com.ml2wf.v2.util.observer.IObserver;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * A {@link WorkflowTask} is a {@link Workflow} task identified by an {@link #id},
@@ -28,9 +37,10 @@ import java.util.Locale;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
-@ToString
-public class WorkflowTask implements INormalizable, IInstantiable {
+@EqualsAndHashCode(exclude = "observers")
+@ToString(exclude = "observers")
+@Log4j2
+public class WorkflowTask implements INormalizable, IInstantiable, IObservable<AbstractTreeEvent<WorkflowTask>> {
 
     @JacksonXmlProperty(isAttribute = true)
     private String id;
@@ -38,6 +48,8 @@ public class WorkflowTask implements INormalizable, IInstantiable {
     private String name;
     @JacksonXmlProperty(localName = "bpmn2:documentation")
     private Documentation documentation;
+    @JsonIgnore
+    private final Set<IObserver<AbstractTreeEvent<WorkflowTask>>> observers = new HashSet<>();
 
     /**
      * A {@link Documentation} is defined by an {@link #id} and has a {@link #content}.
@@ -76,7 +88,11 @@ public class WorkflowTask implements INormalizable, IInstantiable {
 
     @Override
     public void normalize() {
+        String oldName = name;
         name = name.trim().replace(" ", "_");
+        if (!name.equals(oldName)) {
+            notifyOnChange(new RenamingEvent<>(this, oldName));
+        }
     }
 
     @Override
@@ -87,5 +103,22 @@ public class WorkflowTask implements INormalizable, IInstantiable {
         String formatPattern = (documentation.content.isBlank()) ? "refersTo: %s%s" : "refersTo: %s%n%s";
         documentation.content = String.format(formatPattern, name, documentation.content);
         name = String.format("%s_TODO", name);
+        notifyOnChange(new InstantiationEvent<>(this));
+    }
+
+    @Override
+    public void subscribe(@NonNull final IObserver<AbstractTreeEvent<WorkflowTask>> observer) {
+        observers.add(observer);
+        log.trace("Observer {} has subscribed to {}", observer.getClass().getSimpleName(), name);
+    }
+
+    @Override
+    public void unsubscribe(@NonNull final IObserver<AbstractTreeEvent<WorkflowTask>> observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyOnChange(@NonNull final AbstractTreeEvent<WorkflowTask> event) {
+        observers.forEach(o -> o.update(event));
     }
 }

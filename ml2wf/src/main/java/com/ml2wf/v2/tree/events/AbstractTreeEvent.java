@@ -22,7 +22,9 @@ import lombok.RequiredArgsConstructor;
  */
 @Data
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractTreeEvent<T extends ITreeManipulable<T>> {
+public abstract class AbstractTreeEvent<T> {
+
+    // TODO: limit T to tree related elements + update implementations + update doc ?
 
     /**
      * The {@link Events}-related event type.
@@ -54,6 +56,10 @@ public abstract class AbstractTreeEvent<T extends ITreeManipulable<T>> {
         /**
          * If a node has been moved in the tree.
          */
-        MOVED
+        MOVED,
+        /**
+         * If a node has been instantiated.
+         */
+        INSTANTIATION
     }
 }

@@ -1,6 +1,5 @@
 package com.ml2wf.v2.tree.events;
 
-import com.ml2wf.v2.tree.ITreeManipulable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -8,16 +7,18 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * An {@link Events#MOVED} related implementation of the {@link AdditionEvent} base class.
+ * An {@link Events#MOVED} related implementation of the {@link AbstractTreeEvent} base class.
  *
  * @param <T> the moved node type
+ *
+ * @see AbstractTreeEvent
  *
  * @since 1.1.0
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class MovedEvent<T extends ITreeManipulable<T>> extends AbstractTreeEvent<T> {
+public class MovedEvent<T> extends AbstractTreeEvent<T> {
 
     /**
      * The old node location.

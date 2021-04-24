@@ -12,14 +12,9 @@ import com.ml2wf.v2.tree.events.RemovalEvent;
 import com.ml2wf.v2.tree.events.RenamingEvent;
 import com.ml2wf.v2.util.observer.IObservable;
 import com.ml2wf.v2.util.observer.IObserver;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.Delegate;
 import lombok.extern.log4j.Log4j2;
 
@@ -58,12 +53,8 @@ import java.util.Set;
  *
  * @since 1.1.0
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-@Setter(AccessLevel.PRIVATE)
+@Data // TODO: check data
 @EqualsAndHashCode(callSuper = true)
-@ToString
 @Log4j2
 public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
         implements IObservable<AbstractTreeEvent<FeatureModelTask>> {
@@ -73,17 +64,17 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
 
     @JacksonXmlProperty(localName="and")
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<FeatureModelTask> children = new ArrayList<>();
+    private final List<FeatureModelTask> children = new ArrayList<>();
     @JacksonXmlProperty(localName="feature")
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<FeatureModelTask> childrenLeaves = new ArrayList<>();
+    private final List<FeatureModelTask> childrenLeaves = new ArrayList<>();
     @JacksonXmlProperty(localName="alt")
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<FeatureModelTask> alternativeChildren = new ArrayList<>();
+    private final List<FeatureModelTask> alternativeChildren = new ArrayList<>();
     @JsonIgnore
     protected final Set<IObserver<AbstractTreeEvent<FeatureModelTask>>> observers = new HashSet<>();
     @JsonIgnore
-    protected InternalMemory internalMemory = new InternalMemory();
+    protected final InternalMemory internalMemory = new InternalMemory();
 
     /**
      * This inner class is the {@link FeatureModelStructure}'s internal memory.
@@ -103,7 +94,7 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
      *
      * @since 1.1.0
      */
-    protected class InternalMemory implements IObserver<AbstractTreeEvent<FeatureModelTask>> {
+    protected final class InternalMemory implements IObserver<AbstractTreeEvent<FeatureModelTask>> {
 
         @Delegate
         private final Map<String, Pair<FeatureModelTask, List<FeatureModelTask>>> memory;
@@ -116,25 +107,25 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
         @Override
         public void update(@NonNull final AbstractTreeEvent<FeatureModelTask> event) {
             log.debug("New FeatureModel event [{}].", event);
-            FeatureModelTask task = event.getNode();
+            var featureModelTask = event.getNode();
             switch (event.getEventType()) {
                 case ADDITION:
                     List<FeatureModelTask> location = ((AdditionEvent<FeatureModelTask>) event).getLocation();
-                    memory.put(task.getName(), new Pair<>(task, location));
+                    memory.put(featureModelTask.getName(), new Pair<>(featureModelTask, location));
                     break;
                 case REMOVAL:
-                    memory.remove(task.getName());
+                    memory.remove(featureModelTask.getName());
                     break;
                 case RENAMING:
                     String oldName = ((RenamingEvent<FeatureModelTask>) event).getOldName();
-                    memory.put(task.getName(), memory.remove(oldName));
+                    memory.put(featureModelTask.getName(), memory.remove(oldName));
                     break;
                 case MOVED:
                     List<FeatureModelTask> newLocation = ((MovedEvent<FeatureModelTask>) event).getNewLocation();
-                    memory.get(task.getName()).setValue(newLocation);
+                    memory.get(featureModelTask.getName()).setValue(newLocation);
                     return;
                 default:
-                    throw new IllegalStateException("Unsupported event for internal memory.");
+                    throw new IllegalStateException("Unsupported event for FeatureModelStructure internal memory.");
             }
         }
     }
@@ -175,17 +166,19 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
     }
 
     @Override
-    public void subscribe(final IObserver<AbstractTreeEvent<FeatureModelTask>> observer) {
+    public void subscribe(@NonNull final IObserver<AbstractTreeEvent<FeatureModelTask>> observer) {
         observers.add(observer);
+        log.trace("Observer {} has subscribed to {}", observer.getClass().getSimpleName(),
+                getClass().getSimpleName());
     }
 
     @Override
-    public void unsubscribe(final IObserver<AbstractTreeEvent<FeatureModelTask>> observer) {
+    public void unsubscribe(@NonNull final IObserver<AbstractTreeEvent<FeatureModelTask>> observer) {
         observers.remove(observer);
     }
 
     @Override
-    public void notifyOnChange(final AbstractTreeEvent<FeatureModelTask> event) {
+    public void notifyOnChange(@NonNull final AbstractTreeEvent<FeatureModelTask> event) {
         observers.forEach(o -> o.update(event));
     }
 }
