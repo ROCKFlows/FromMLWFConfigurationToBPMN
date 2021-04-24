@@ -60,6 +60,24 @@ public class Workflow extends AbstractTree<Process> implements IInstantiable, IO
         processes.forEach(p -> p.subscribe(this));
     }
 
+    /**
+     * This inner class is the {@link Workflow}'s internal memory.
+     *
+     * <p>
+     *
+     * This memory allows avoiding tree search by keeping update a {@link Map} containing
+     * all useful information for manipulating a {@link Workflow}.
+     *
+     * <p>
+     *
+     * It observes the current {@link Workflow} implementation to keep its
+     * structure memory consistent.
+     *
+     * @see Workflow
+     * @see IObserver
+     *
+     * @since 1.1.0
+     */
     protected final class InternalMemory implements IObserver<AbstractTreeEvent<Process>> {
 
         @Delegate

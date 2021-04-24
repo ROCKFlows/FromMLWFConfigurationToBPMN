@@ -58,6 +58,7 @@ import java.util.Set;
 @JacksonXmlRootElement(localName = "bpmn2:process")
 @JsonIgnoreProperties({"tasksObservers", "processesObservers", "internalMemory"})
 @Getter
+@Setter // TODO: listen on setters
 @EqualsAndHashCode(exclude = {"tasksObservers", "processesObservers", "internalMemory"})
 @ToString(exclude = {"tasksObservers", "processesObservers", "internalMemory"})
 @Log4j2
@@ -66,8 +67,8 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
 
     // TODO: create a normalizer
 
-    @Setter private String id;
-    @Setter private String name;
+    private String id;
+    private String name;
     private final List<WorkflowTask> tasks;
     private final List<SequenceFlow> sequenceFlows;
     private final Set<IObserver<AbstractTreeEvent<WorkflowTask>>> tasksObservers;
@@ -116,6 +117,24 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
         private String targetRef;
     }
 
+    /**
+     * This inner class is the {@link Process}'s internal memory.
+     *
+     * <p>
+     *
+     * This memory allows avoiding tree search by keeping update a {@link Map} containing
+     * all useful information for manipulating a {@link Process}.
+     *
+     * <p>
+     *
+     * It observes the current {@link Process} implementation to keep its
+     * structure memory consistent.
+     *
+     * @see Process
+     * @see IObserver
+     *
+     * @since 1.1.0
+     */
     private final class InternalMemory implements IObserver<AbstractTreeEvent<WorkflowTask>> {
 
         @Delegate
