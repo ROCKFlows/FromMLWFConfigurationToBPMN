@@ -1,9 +1,5 @@
 package com.ml2wf.v2.tree.fm;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.ml2wf.util.Pair;
 import com.ml2wf.v2.tree.AbstractTree;
 import com.ml2wf.v2.tree.events.AbstractTreeEvent;
@@ -48,9 +44,6 @@ import java.util.Set;
  *
  * @since 1.1.0
  */
-@JsonIgnoreProperties({"observers", "internalMemory"})
-@Getter
-@Setter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
@@ -61,10 +54,8 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
     // TODO: check if we can change FeatureModelTask to generic T
     // TODO: manage null parameters
 
-    @JacksonXmlProperty(localName = "and")
-    @JacksonXmlElementWrapper(useWrapping = false)
-    @JsonAlias({ "and", "feature", "alt" })
     @Builder.Default
+    @Getter
     private final List<FeatureModelTask> children = new ArrayList<>();
     protected final Set<IObserver<AbstractTreeEvent<FeatureModelTask>>> observers = new HashSet<>();
     protected final InternalMemory internalMemory = new InternalMemory();

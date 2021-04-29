@@ -1,7 +1,5 @@
 package com.ml2wf.v2.tree.fm;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.ml2wf.v2.tree.AbstractTree;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -35,14 +33,12 @@ import java.util.Optional;
  *
  * @since 1.1.0
  */
-@JacksonXmlRootElement(localName = "extendedFeatureModel") // TODO: differentiate extended
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class FeatureModel extends AbstractTree<FeatureModelTask> {
 
-    @JacksonXmlProperty(localName = "struct")
     private FeatureModelStructure structure;
 
     /**

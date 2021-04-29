@@ -1,4 +1,4 @@
-package com.ml2wf.v2.tree.fm.deserializer;
+package com.ml2wf.v2.tree.fm.xml.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -1,4 +1,4 @@
-package com.ml2wf.v2.tree.fm.serializer;
+package com.ml2wf.v2.tree.fm.xml.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

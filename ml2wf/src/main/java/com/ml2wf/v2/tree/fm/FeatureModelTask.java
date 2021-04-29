@@ -1,12 +1,6 @@
 package com.ml2wf.v2.tree.fm;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.ml2wf.v2.tree.events.RenamingEvent;
-import com.ml2wf.v2.tree.fm.serializer.FeatureModelTaskSerializer;
 import com.ml2wf.v2.tree.wf.WorkflowTask;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,7 +25,6 @@ import java.util.List;
  *
  * @since 1.1.0
  */
-@JsonSerialize(using = FeatureModelTaskSerializer.class)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @SuperBuilder
 @Getter
@@ -40,16 +33,10 @@ import java.util.List;
 @ToString(of = {"name", "isAbstract", "isMandatory"})
 public class FeatureModelTask extends FeatureModelStructure {
 
-    @JsonIgnore
     private FeatureModelTask parent;
-    @JacksonXmlProperty(isAttribute = true)
     private String name;
-    @JacksonXmlProperty(localName = "abstract", isAttribute = true)
     private boolean isAbstract;
-    @JacksonXmlProperty(localName = "mandatory", isAttribute = true)
     private boolean isMandatory;
-    @JacksonXmlProperty(localName = "description")
-    @JacksonXmlElementWrapper(useWrapping = false)
     @Builder.Default
     @Setter(AccessLevel.PRIVATE)
     private List<Description> descriptions = new ArrayList<>();
@@ -70,7 +57,6 @@ public class FeatureModelTask extends FeatureModelStructure {
     @ToString
     public static final class Description {
 
-        @JacksonXmlCData
         private String content = "";
 
         public static Description fromDocumentation(WorkflowTask.Documentation documentation) {

@@ -54,10 +54,11 @@ public class Workflow extends AbstractTree<Process> implements IInstantiable, IO
     @JsonCreator
     public Workflow(@JacksonXmlProperty(localName="bpmn2:process")
                     @JacksonXmlElementWrapper(useWrapping = false) List<Process> processes) {
+        System.out.println("processes = " + processes);
         this.processes = new ArrayList<>(processes);
         this.observers = new HashSet<>();
         this.internalMemory = new InternalMemory();
-        processes.forEach(p -> p.subscribe(this));
+        this.processes.forEach(p -> p.subscribe(this));
     }
 
     /**
