@@ -1,5 +1,6 @@
 package com.ml2wf.v2.tree.fm;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -12,11 +13,15 @@ import com.ml2wf.v2.tree.events.RemovalEvent;
 import com.ml2wf.v2.tree.events.RenamingEvent;
 import com.ml2wf.v2.util.observer.IObservable;
 import com.ml2wf.v2.util.observer.IObserver;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Delegate;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
@@ -29,18 +34,7 @@ import java.util.Set;
 
 /**
  * A {@link FeatureModelStructure} contains the {@link FeatureModelTask} instances of
- * a {@link FeatureModel}.
- *
- * <p>
- *
- * As specified by the {@link FeatureModel} class, three kinds of tasks are differentiated.
- * These tasks are stored into three distinct collections :
- *
- * <ul>
- *     <li>the {@link #children} contains the <b>and</b> tasks</li>
- *     <li>the {@link #childrenLeaves} contains the <b>features</b></li>
- *     <li>the {@link #alternativeChildren} contains the <b>alternative</b> tasks</li>
- * </ul>
+ * a {@link FeatureModel}. TODO: to update
  *
  * <p>
  *
@@ -57,6 +51,8 @@ import java.util.Set;
 @JsonIgnoreProperties({"observers", "internalMemory"})
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @Log4j2
 public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
@@ -65,15 +61,11 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
     // TODO: check if we can change FeatureModelTask to generic T
     // TODO: manage null parameters
 
-    @JacksonXmlProperty(localName="and")
+    @JacksonXmlProperty(localName = "and")
     @JacksonXmlElementWrapper(useWrapping = false)
+    @JsonAlias({ "and", "feature", "alt" })
+    @Builder.Default
     private final List<FeatureModelTask> children = new ArrayList<>();
-    @JacksonXmlProperty(localName="feature")
-    @JacksonXmlElementWrapper(useWrapping = false)
-    private final List<FeatureModelTask> childrenLeaves = new ArrayList<>();
-    @JacksonXmlProperty(localName="alt")
-    @JacksonXmlElementWrapper(useWrapping = false)
-    private final List<FeatureModelTask> alternativeChildren = new ArrayList<>();
     protected final Set<IObserver<AbstractTreeEvent<FeatureModelTask>>> observers = new HashSet<>();
     protected final InternalMemory internalMemory = new InternalMemory();
 
@@ -114,12 +106,10 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
                     List<FeatureModelTask> location = ((AdditionEvent<FeatureModelTask>) event).getLocation();
                     memory.put(featureModelTask.getName(), new Pair<>(featureModelTask, location));
                     featureModelTask.subscribe(this);
-                    updateParentLocation(memory.get(featureModelTask.getParent().getName()));
                     break;
                 case REMOVAL:
                     memory.remove(featureModelTask.getName());
                     featureModelTask.unsubscribe(this);
-                    updateParentLocation(memory.get(featureModelTask.getParent().getName()));
                     break;
                 case RENAMING:
                     String oldName = ((RenamingEvent<FeatureModelTask>) event).getOldName();
@@ -133,50 +123,17 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
                     throw new IllegalStateException("Unsupported event for FeatureModelStructure internal memory.");
             }
         }
-
-        /**
-         * Updates the parent location according to its children.
-         *
-         * <p>
-         *
-         * If it has no children, then it is moved to the {@link #childrenLeaves} collection.
-         * If it has any children, then it is moved to the {@link #children} collection.
-         *
-         * @param parentPair    the {@link Pair} containing the parent task information
-         */
-        private void updateParentLocation(final Pair<FeatureModelTask, List<FeatureModelTask>> parentPair) {
-            // TODO: manage alt case
-            FeatureModelTask parent = parentPair.getKey();
-            List<FeatureModelTask> oldLocation = parentPair.getValue();
-            List<FeatureModelTask> newLocation;
-            if (parent.hasChildren() && oldLocation == childrenLeaves) {
-                newLocation = children;
-                parentPair.setValue(children);
-            } else if (!parent.hasChildren() && oldLocation != childrenLeaves) {
-                newLocation = childrenLeaves;
-            } else {
-                return;
-            }
-            oldLocation.remove(parent);
-            newLocation.add(parent);
-            notifyOnChange(new MovedEvent<>(parent, oldLocation, newLocation));
-        }
     }
 
     @Override
     public boolean hasChildren() {
-        return !(children.isEmpty() && childrenLeaves.isEmpty() && alternativeChildren.isEmpty());
+        return !children.isEmpty();
     }
 
     @Override
     public FeatureModelTask appendChild(final FeatureModelTask child) {
-        if (childrenLeaves.isEmpty()) {
-            childrenLeaves.add(child);
-            notifyOnChange(new AdditionEvent<>(child, childrenLeaves));
-        } else {
-            children.add(child);
-            notifyOnChange(new AdditionEvent<>(child, children));
-        }
+        children.add(child);
+        notifyOnChange(new AdditionEvent<>(child, children));
         // TODO: allow capability to add alternative child
         return child;
     }
@@ -189,23 +146,18 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask>
         Pair<FeatureModelTask, List<FeatureModelTask>> childPair = internalMemory.get(child.getName());
         childPair.getValue().remove(child);
         notifyOnChange(new RemovalEvent<>(child));
-        if (childPair.getValue().isEmpty()) {
-            //moveChild(childPair.getKey(), childrenLeaves);
-        }
         return Optional.of(child);
     }
 
     @Override
     public Optional<FeatureModelTask> getChildWithName(final String name) {
         Pair<FeatureModelTask, List<FeatureModelTask>> childPair = internalMemory.get(name);
-        return Optional.ofNullable((childPair.isPresent()) ? childPair.getKey() : null);
+        return Optional.ofNullable((childPair != null && childPair.isPresent()) ? childPair.getKey() : null);
     }
 
     @Override
     public void normalize() {
         children.forEach(FeatureModelTask::normalize);
-        childrenLeaves.forEach(FeatureModelTask::normalize);
-        alternativeChildren.forEach(FeatureModelTask::normalize);
     }
 
     @Override

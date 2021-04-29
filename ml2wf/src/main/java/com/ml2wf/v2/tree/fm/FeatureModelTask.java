@@ -1,18 +1,22 @@
 package com.ml2wf.v2.tree.fm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 import com.ml2wf.v2.tree.events.RenamingEvent;
+import com.ml2wf.v2.tree.fm.serializer.FeatureModelTaskSerializer;
 import com.ml2wf.v2.tree.wf.WorkflowTask;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +31,9 @@ import java.util.List;
  *
  * @since 1.1.0
  */
+@JsonSerialize(using = FeatureModelTaskSerializer.class)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor
+@SuperBuilder
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -45,8 +50,9 @@ public class FeatureModelTask extends FeatureModelStructure {
     private boolean isMandatory;
     @JacksonXmlProperty(localName = "description")
     @JacksonXmlElementWrapper(useWrapping = false)
+    @Builder.Default
     @Setter(AccessLevel.PRIVATE)
-    private List<Description> descriptions;
+    private List<Description> descriptions = new ArrayList<>();
 
     /**
      * A {@link Description} has a {@link #content} providing additional
@@ -64,7 +70,7 @@ public class FeatureModelTask extends FeatureModelStructure {
     @ToString
     public static final class Description {
 
-        @JacksonXmlText
+        @JacksonXmlCData
         private String content = "";
 
         public static Description fromDocumentation(WorkflowTask.Documentation documentation) {
@@ -83,8 +89,13 @@ public class FeatureModelTask extends FeatureModelStructure {
         var description = Description.fromDocumentation(workflowTask.getDocumentation());
         List<Description> descriptions = new ArrayList<>();
         descriptions.add(description);
-        return new FeatureModelTask(null, workflowTask.getName(), workflowTask.isAbstract(),
-                !workflowTask.isOptional(), descriptions);
+        return ((FeatureModelTaskBuilder) FeatureModelStructure.builder())
+                .parent(null)
+                .name(workflowTask.getName())
+                .isAbstract(workflowTask.isAbstract())
+                .isMandatory(!workflowTask.isOptional())
+                .descriptions(descriptions)
+                .build();
     }
 
     @Override
