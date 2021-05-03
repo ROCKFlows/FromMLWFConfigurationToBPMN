@@ -7,6 +7,8 @@ package com.ml2wf.v2.util.observer;
  * @param <E>   the returned type on notification
  *
  * @see IObserver
+ *
+ * @since 1.1.0
  */
 public interface IObservable<E> {
 

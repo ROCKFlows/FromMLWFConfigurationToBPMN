@@ -1,10 +1,8 @@
 package com.ml2wf.v2.tree.wf;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.ml2wf.util.Pair;
 import com.ml2wf.v2.tree.INormalizable;
 import com.ml2wf.v2.tree.ITreeManipulable;
@@ -55,8 +53,6 @@ import java.util.Set;
  *
  * @since 1.1.0
  */
-@JacksonXmlRootElement(localName = "bpmn2:process")
-@JsonIgnoreProperties({"tasksObservers", "processesObservers", "internalMemory"})
 @Getter
 @Setter // TODO: listen on setters
 @EqualsAndHashCode(of = {"id", "name"})
@@ -77,6 +73,23 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
 
     // TODO: find why we have to specify localName for id and name
 
+    /**
+     * {@code Process}'s constructor with and id, a name, some {@link WorkflowTask}s and their
+     * associated {@link SequenceFlow}s.
+     *
+     * <p>
+     *
+     * <b>Note</b> that this constructor is also a {@link JsonCreator}.
+     *
+     * @param id            the new process's id
+     * @param name          the new process's name
+     * @param tasks         the new process's tasks
+     * @param sequenceFlows the new process's sequence flows
+     *
+     * @see WorkflowTask
+     * @see SequenceFlow
+     * @see JsonCreator
+     */
     @JsonCreator
     public Process(@JacksonXmlProperty(localName = "id", isAttribute = true) String id,
                    @JacksonXmlProperty(localName = "name", isAttribute = true) String name,
@@ -109,11 +122,8 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
     @ToString
     public static class SequenceFlow {
 
-        @JacksonXmlProperty(isAttribute = true)
         private String id;
-        @JacksonXmlProperty(isAttribute = true)
         private String sourceRef;
-        @JacksonXmlProperty(isAttribute = true)
         private String targetRef;
     }
 
@@ -122,7 +132,7 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
      *
      * <p>
      *
-     * This memory allows avoiding tree search by keeping update a {@link Map} containing
+     * This memory allows avoiding time-consuming tree search by keeping update a {@link Map} containing
      * all useful information for manipulating a {@link Process}.
      *
      * <p>
@@ -137,8 +147,9 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
      */
     private final class InternalMemory implements IObserver<AbstractTreeEvent<WorkflowTask>> {
 
-        @Delegate
-        private final Map<String, Pair<WorkflowTask, List<WorkflowTask>>> memory;
+        // TODO: merge with abstract tree
+
+        @Delegate private final Map<String, Pair<WorkflowTask, List<WorkflowTask>>> memory;
 
         private InternalMemory() {
             memory = new HashMap<>();

@@ -4,13 +4,12 @@ import com.ml2wf.v2.tree.events.RenamingEvent;
 import com.ml2wf.v2.tree.wf.WorkflowTask;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.List;
  * @since 1.1.0
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@SuperBuilder
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -37,9 +35,28 @@ public class FeatureModelTask extends FeatureModelStructure {
     private String name;
     private boolean isAbstract;
     private boolean isMandatory;
-    @Builder.Default
-    @Setter(AccessLevel.PRIVATE)
     private List<Description> descriptions = new ArrayList<>();
+
+    /**
+     * {@code FeatureModelTask}'s constructor with a nullable parent, a name, the {@link #isAbstract} and
+     * {@link #isMandatory} status, some {@link Description}s and its children {@link FeatureModelTask}s.
+     *
+     * @param parent        the new task's parent
+     * @param name          the new task's parent
+     * @param isAbstract    the new task's {@link #isAbstract} status
+     * @param isMandatory   the new task's {@link #isMandatory} status
+     * @param descriptions  the new task's descriptions
+     * @param children      the new task's children
+     */
+    public FeatureModelTask(FeatureModelTask parent, @NonNull String name, boolean isAbstract, boolean isMandatory,
+                            @NonNull List<Description> descriptions, @NonNull List<FeatureModelTask> children) {
+        super(children);
+        this.parent = parent;
+        this.name = name;
+        this.isAbstract = isAbstract;
+        this.isMandatory = isMandatory;
+        this.descriptions = new ArrayList<>(descriptions);
+    }
 
     /**
      * A {@link Description} has a {@link #content} providing additional
@@ -75,13 +92,8 @@ public class FeatureModelTask extends FeatureModelStructure {
         var description = Description.fromDocumentation(workflowTask.getDocumentation());
         List<Description> descriptions = new ArrayList<>();
         descriptions.add(description);
-        return ((FeatureModelTaskBuilder) FeatureModelStructure.builder())
-                .parent(null)
-                .name(workflowTask.getName())
-                .isAbstract(workflowTask.isAbstract())
-                .isMandatory(!workflowTask.isOptional())
-                .descriptions(descriptions)
-                .build();
+        return new FeatureModelTask(null, workflowTask.getName(), workflowTask.isAbstract(),
+                workflowTask.isOptional(), descriptions, new ArrayList<>());
     }
 
     @Override

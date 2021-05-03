@@ -15,19 +15,10 @@ import java.util.Optional;
  *
  * <p>
  *
- * It is an extension of the {@link AbstractTree} class but delegated its contract methods
+ * It is an extension of the {@link AbstractTree} class but delegates its contract methods
  * to its {@link #structure}.
  *
- * <p>
- *
- * Three kinds of tasks are differentiated :
- *
- * <ul>
- *     <li>a <b>feature</b> is a leaf</li>
- *     <li>an <b>and</b> task is a task specified by another task</li>
- *     <li>an <b>alternative</b> task contains an alternative group of tasks</li>
- * </ul>
- *
+ * @see AbstractTree
  * @see FeatureModelStructure
  * @see FeatureModelTask
  *
