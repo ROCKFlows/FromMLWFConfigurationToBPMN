@@ -82,4 +82,25 @@
 			</and>
 		</and>
 	</struct>
+	<constraints>
+		<rule>
+			<description>To be review</description>
+			<imp>
+				<conj>
+					<var>OC_SVM</var>
+					<var>Benkabou2018</var>
+				</conj>
+				<var>OnlyNormalTimeSeriesInTrainingSet_Criteria</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<conj>
+					<var>Yassine</var>
+					<var>OC_SVM</var>
+				</conj>
+				<var>fewAnomaliesInTrainsingSet_Criteria</var>
+			</imp>
+		</rule>
+	</constraints>
 </extendedFeatureModel>

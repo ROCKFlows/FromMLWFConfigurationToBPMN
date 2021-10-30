@@ -37,6 +37,11 @@ local.properties
 .loadpath
 .recommenders
 
+### IntellIJ part
+
+.idea/
+*.iml
+
 # External tool builders
 .externalToolBuilders/
 

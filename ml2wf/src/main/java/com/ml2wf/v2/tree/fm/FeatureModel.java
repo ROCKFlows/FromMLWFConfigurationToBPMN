@@ -1,13 +1,12 @@
 package com.ml2wf.v2.tree.fm;
 
 import com.ml2wf.v2.tree.AbstractTree;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A {@link FeatureModel} has a {@link FeatureModelStructure} containing its
@@ -31,6 +30,13 @@ import java.util.Optional;
 public class FeatureModel extends AbstractTree<FeatureModelTask> {
 
     private FeatureModelStructure structure;
+    @Getter @NonNull private final Set<FeatureModelRule> constraints = new LinkedHashSet<>();
+
+    @Override
+    public @NonNull List<FeatureModelTask> getChildren() {
+        // delegates to structure
+        return structure.getChildren();
+    }
 
     /**
      * {@inheritDoc}
@@ -105,6 +111,7 @@ public class FeatureModel extends AbstractTree<FeatureModelTask> {
      */
     @Override
     public void normalize() {
+        // delegates to structure
         structure.normalize();
     }
 }
