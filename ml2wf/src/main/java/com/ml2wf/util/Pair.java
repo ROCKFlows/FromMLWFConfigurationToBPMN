@@ -2,6 +2,8 @@ package com.ml2wf.util;
 
 import lombok.Data;
 
+import java.util.function.BiConsumer;
+
 /**
  * This class represents a simple pair association between two objects.
  *
@@ -58,5 +60,16 @@ public final class Pair<K, V> {
      */
     public boolean isPresent() {
         return !isEmpty();
+    }
+
+    /**
+     * Passes the {@link #key}, {@link #value} to the given {@link BiConsumer}.
+     *
+     * @param consumer  the consumer to pass the key/value
+     *
+     * @since 1.1.0
+     */
+    public void passTo(BiConsumer<K, V> consumer) {
+        consumer.accept(key, value);
     }
 }
