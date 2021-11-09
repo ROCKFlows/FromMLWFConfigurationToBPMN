@@ -1,9 +1,8 @@
-package com.ml2wf.generation;
+package com.ml2wf.v2.tree.wf;
 
 import com.ml2wf.testutils.assertions.ForEachTaskAssertion;
 import com.ml2wf.testutils.XMLTestBase;
 import com.ml2wf.util.Pair;
-import com.ml2wf.v2.tree.wf.Workflow;
 import com.ml2wf.v2.tree.wf.factory.IWorkflowFactory;
 import com.ml2wf.v2.xml.XMLWorkflowFactory;
 import io.vavr.control.Try;
