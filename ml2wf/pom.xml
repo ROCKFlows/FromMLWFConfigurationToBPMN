@@ -20,6 +20,7 @@
         <version.commons-io>2.7</version.commons-io>
         <version.jansi>1.18</version.jansi>
         <version.lombok>1.18.20</version.lombok>
+        <version.vavr>0.10.4</version.vavr>
         <dependency.directory>dependency/</dependency.directory>
         <sonar.projectKey>MireilleBF_FromMLWFConfigurationToBPMN</sonar.projectKey>
         <sonar.organization>mireillebf-github</sonar.organization>
@@ -166,6 +167,12 @@
             <artifactId>lombok</artifactId>
             <version>${version.lombok}</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.vavr/vavr -->
+        <dependency>
+            <groupId>io.vavr</groupId>
+            <artifactId>vavr</artifactId>
+            <version>${version.vavr}</version>
         </dependency>
     </dependencies>
 </project>
