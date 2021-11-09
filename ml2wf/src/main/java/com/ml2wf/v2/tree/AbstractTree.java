@@ -12,13 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * An {@link AbstractTree} is a base class for any tree implementation.
@@ -60,8 +54,6 @@ public abstract class AbstractTree<T> implements ITreeManipulable<T>, IObservabl
      *
      * @see AbstractTree
      * @see IObserver
-     *
-     * @since 1.1.0
      */
     protected abstract class AbstractInternalMemory implements IObserver<AbstractTreeEvent<T>> {
 
@@ -78,6 +70,37 @@ public abstract class AbstractTree<T> implements ITreeManipulable<T>, IObservabl
         protected AbstractInternalMemory() {
             subscribe(this);
         }
+    }
+
+    /**
+     * An {@link ITreeIterator} implementation providing a {@link #children}'s iterator.
+     *
+     * <p>
+     *
+     * <b>Note</b> that the {@link ITreeIterator}'s methods implementations are delegated
+     * to its {@link #innerIterator}.
+     *
+     * @see ITreeIterator
+     */
+    public class TreeIterator implements ITreeIterator<T> {
+
+        @Delegate private final Iterator<T> innerIterator;
+
+        /**
+         * {@code TreeIterator}'s default constructor.
+         *
+         * <p>
+         *
+         * Instantiates its {@link #innerIterator} as a new {@link #children}'s iterator.
+         */
+        private TreeIterator() {
+            innerIterator = children.iterator();
+        }
+    }
+
+    @Override
+    public ITreeIterator<T> iterator() {
+        return new TreeIterator();
     }
 
     @Override

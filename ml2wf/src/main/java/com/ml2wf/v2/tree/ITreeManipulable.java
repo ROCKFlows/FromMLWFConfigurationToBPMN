@@ -15,6 +15,15 @@ public interface ITreeManipulable<T> extends INormalizable {
     // TODO: should we define a method to move a child according to the TreeEvent#Events#MOVE event ?
 
     /**
+     * Returns an {@link ITreeIterator} for iterating over the tree's children.
+     *
+     * @return an {@link ITreeIterator} for iterating over the tree's children
+     *
+     * @see ITreeIterator
+     */
+    ITreeIterator<T> iterator();
+
+    /**
      * Returns whether the current tree implementation has any child.
      *
      * @return whether the current tree implementation has any child

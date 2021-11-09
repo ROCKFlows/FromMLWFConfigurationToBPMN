@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.ml2wf.util.Pair;
 import com.ml2wf.v2.tree.INormalizable;
+import com.ml2wf.v2.tree.ITreeIterator;
 import com.ml2wf.v2.tree.ITreeManipulable;
 import com.ml2wf.v2.tree.events.AbstractTreeEvent;
 import com.ml2wf.v2.tree.events.AdditionEvent;
@@ -21,13 +22,7 @@ import lombok.ToString;
 import lombok.experimental.Delegate;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A process contains some {@link WorkflowTask}s and their associated {@link SequenceFlow}s.
@@ -181,6 +176,37 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
                     throw new IllegalStateException("Unsupported event for Workflow's process internal memory.");
             }
         }
+    }
+
+    /**
+     * An {@link ProcessIterator} implementation providing a {@link #tasks}'s iterator.
+     *
+     * <p>
+     *
+     * <b>Note</b> that the {@link ProcessIterator}'s methods implementations are delegated
+     * to its {@link #innerIterator}.
+     *
+     * @see ITreeIterator
+     */
+    public class ProcessIterator implements ITreeIterator<WorkflowTask> {
+
+        @Delegate private final Iterator<WorkflowTask> innerIterator;
+
+        /**
+         * {@code ProcessIterator}'s default constructor.
+         *
+         * <p>
+         *
+         * Instantiates its {@link #innerIterator} as a new {@link #tasks}'s iterator.
+         */
+        private ProcessIterator() {
+            innerIterator = tasks.iterator();
+        }
+    }
+
+    @Override
+    public ITreeIterator<WorkflowTask> iterator() {
+        return new ProcessIterator();
     }
 
     @Override
