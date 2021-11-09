@@ -1,4 +1,4 @@
-package com.ml2wf.v2.constraints.operators.xml.serializer;
+package com.ml2wf.v2.xml.constraints.operators.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

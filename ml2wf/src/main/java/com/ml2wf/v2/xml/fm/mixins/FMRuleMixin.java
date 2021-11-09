@@ -1,8 +1,8 @@
-package com.ml2wf.v2.tree.fm.xml.mixins;
+package com.ml2wf.v2.xml.fm.mixins;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ml2wf.v2.tree.fm.xml.serializer.FeatureModelRuleSerializer;
+import com.ml2wf.v2.xml.fm.serializers.FeatureModelRuleSerializer;
 
 import java.util.Map;
 

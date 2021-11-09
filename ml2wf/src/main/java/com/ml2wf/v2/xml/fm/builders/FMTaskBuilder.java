@@ -1,4 +1,4 @@
-package com.ml2wf.v2.tree.fm.xml.builders;
+package com.ml2wf.v2.xml.fm.builders;
 
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.ml2wf.v2.tree.fm.FeatureModelTask;

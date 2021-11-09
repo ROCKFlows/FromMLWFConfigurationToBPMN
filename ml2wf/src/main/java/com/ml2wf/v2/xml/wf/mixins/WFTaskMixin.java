@@ -1,4 +1,4 @@
-package com.ml2wf.v2.tree.wf.xml.mixins;
+package com.ml2wf.v2.xml.wf.mixins;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

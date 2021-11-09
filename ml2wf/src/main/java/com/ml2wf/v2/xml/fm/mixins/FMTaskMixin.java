@@ -1,11 +1,11 @@
-package com.ml2wf.v2.tree.fm.xml.mixins;
+package com.ml2wf.v2.xml.fm.mixins;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.ml2wf.v2.tree.fm.FeatureModelTask;
-import com.ml2wf.v2.tree.fm.xml.serializer.FeatureModelTaskSerializer;
+import com.ml2wf.v2.xml.fm.serializers.FeatureModelTaskSerializer;
 
 import java.util.List;
 
