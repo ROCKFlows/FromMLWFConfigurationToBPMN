@@ -64,21 +64,21 @@ class TestOperAssociation {
 
 	@BeforeEach
 	public void setUp() {
-		this.emptyAssociation = new OperAssociation();
-		this.soloOperatorAssociation = new OperAssociation(operator);
-		this.leftOperandOperatorAssociation = new OperAssociation(operator, Arrays.asList(leftOperand, ""));
-		this.rightOperandOperatorAssociation = new OperAssociation(operator, Arrays.asList("", rightOperand));
-		this.fullOperatorAssociation = new OperAssociation(operator,
+		emptyAssociation = new OperAssociation();
+		soloOperatorAssociation = new OperAssociation(operator);
+		leftOperandOperatorAssociation = new OperAssociation(operator, Arrays.asList(leftOperand, ""));
+		rightOperandOperatorAssociation = new OperAssociation(operator, Arrays.asList("", rightOperand));
+		fullOperatorAssociation = new OperAssociation(operator,
 				Arrays.asList(leftOperand, rightOperand));
 
 	}
 
 	@AfterEach
 	public void clean() {
-		this.emptyAssociation = null;
-		this.soloOperatorAssociation = null;
-		this.leftOperandOperatorAssociation = null;
-		this.rightOperandOperatorAssociation = null;
+		emptyAssociation = null;
+		soloOperatorAssociation = null;
+		leftOperandOperatorAssociation = null;
+		rightOperandOperatorAssociation = null;
 	}
 
 	/**
@@ -87,14 +87,14 @@ class TestOperAssociation {
 	@Test
 	@DisplayName("Test of getters")
 	void testGetters() {
-		assertNull(this.emptyAssociation.getOperator());
-		assertNull(this.emptyAssociation.getLeftOperand());
-		assertNull(this.emptyAssociation.getRightOperand());
-		assertTrue(this.emptyAssociation.getOperands().isEmpty());
-		assertEquals(operator, this.soloOperatorAssociation.getOperator());
-		assertEquals(leftOperand, this.leftOperandOperatorAssociation.getLeftOperand());
-		assertEquals(rightOperand, this.rightOperandOperatorAssociation.getRightOperand());
-		assertEquals(2, this.fullOperatorAssociation.getOperands().size());
+		assertNull(emptyAssociation.getOperator());
+		assertNull(emptyAssociation.getLeftOperand());
+		assertNull(emptyAssociation.getRightOperand());
+		assertTrue(emptyAssociation.getOperands().isEmpty());
+		assertEquals(operator, soloOperatorAssociation.getOperator());
+		assertEquals(leftOperand, leftOperandOperatorAssociation.getLeftOperand());
+		assertEquals(rightOperand, rightOperandOperatorAssociation.getRightOperand());
+		assertEquals(2, fullOperatorAssociation.getOperands().size());
 	}
 
 	/**
@@ -103,14 +103,14 @@ class TestOperAssociation {
 	@Test
 	@DisplayName("Test of setters")
 	void testSetters() {
-		this.emptyAssociation.setOperator(operator);
-		assertEquals(operator, this.emptyAssociation.getOperator());
-		this.emptyAssociation.addOperand(leftOperand);
-		this.emptyAssociation.addOperand(rightOperand);
-		assertEquals(2, this.emptyAssociation.getOperands().size());
-		assertEquals(leftOperand, this.emptyAssociation.getLeftOperand());
-		assertEquals(rightOperand, this.emptyAssociation.getRightOperand());
-		assertFalse(this.emptyAssociation.addOperand(leftOperand));
+		emptyAssociation.setOperator(operator);
+		assertEquals(operator, emptyAssociation.getOperator());
+		emptyAssociation.addOperand(leftOperand);
+		emptyAssociation.addOperand(rightOperand);
+		assertEquals(2, emptyAssociation.getOperands().size());
+		assertEquals(leftOperand, emptyAssociation.getLeftOperand());
+		assertEquals(rightOperand, emptyAssociation.getRightOperand());
+		assertFalse(emptyAssociation.addOperand(leftOperand));
 	}
 
 	/**
@@ -120,8 +120,8 @@ class TestOperAssociation {
 	@Test
 	@DisplayName("Test of hasLeft() and hasRight() methods")
 	void hasLeftRigthOperand() {
-		assertTrue(this.fullOperatorAssociation.hasLeftOperand());
-		assertTrue(this.fullOperatorAssociation.hasRightOperand());
+		assertTrue(fullOperatorAssociation.hasLeftOperand());
+		assertTrue(fullOperatorAssociation.hasRightOperand());
 	}
 
 }

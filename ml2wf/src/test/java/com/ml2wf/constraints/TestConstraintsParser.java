@@ -11,31 +11,31 @@ import com.ml2wf.constraints.config.ConfigImpl;
 import com.ml2wf.constraints.parser.ConstraintParser;
 import com.ml2wf.constraints.parser.IParser;
 
-public class TestConstraintsParser {
+class TestConstraintsParser {
 
-	private static String emptyExpression = "";
-	private static String blankExpression = "   ";
-	private static String simpleExpression = "A & B";
-	private static String complexExpression = "A => !(B | (C & !(D & E) | F) & G) & H";
+	private static final String emptyExpression = "";
+	private static final String blankExpression = "   ";
+	private static final String simpleExpression = "A & B";
+	private static final String complexExpression = "A => !(B | (C & !(D & E) | F) & G) & H";
 
 	private IParser parser;
 
 	@BeforeEach
 	public void setUp() {
-		this.parser = new ConstraintParser(ConfigImpl.getInstance());
+		parser = new ConstraintParser(ConfigImpl.getInstance());
 	}
 
 	@AfterEach
 	public void clean() {
-		this.parser = null;
+		parser = null;
 	}
 
 	@Test
-	public void testParseExpression() {
-		assertTrue(this.parser.parseExpression(emptyExpression).isEmpty());
-		assertTrue(this.parser.parseExpression(blankExpression).isEmpty());
-		assertEquals(1, this.parser.parseExpression(simpleExpression).size());
-		assertEquals(9, this.parser.parseExpression(complexExpression).size());
+	void testParseExpression() {
+		assertTrue(parser.parseExpression(emptyExpression).isEmpty());
+		assertTrue(parser.parseExpression(blankExpression).isEmpty());
+		assertEquals(1, parser.parseExpression(simpleExpression).size());
+		assertEquals(9, parser.parseExpression(complexExpression).size());
 	}
 
 }
