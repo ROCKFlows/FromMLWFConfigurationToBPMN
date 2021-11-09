@@ -10,23 +10,25 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestWorkflowInstantiation extends XMLWorkflowTestBase {
+class TestWorkflowNormalization extends XMLWorkflowTestBase {
 
     @ParameterizedTest
     @MethodSource("metaFiles")
-    @DisplayName("Testing that the instantiation updates the workflow's tasks names as expected")
-    void testInstantiationUpdatesNames(File file) {
+    @DisplayName("Testing that the normalization updates the workflow's tasks names as expected")
+    void testNormalizationUpdatesNames(File file) {
         ForEachTaskAssertion.builder()
-                .workflowPair(getReferenceInstanceWorkflows(file))
+                .workflowPair(getReferenceNormalizedWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
-                    assertEquals(instantiatedTask.getName().replace("_TODO", ""), referenceTask.getName());
+                    assertFalse(instantiatedTask.getName().contains(" "));
+                    assertEquals(referenceTask.getName().replace(" ", "_"),
+                            instantiatedTask.getName());
                 })
                 .afterTasksIteration((referenceProcessIterator, instanceProcessIterator) ->
-                    assertFalse(referenceProcessIterator.hasNext() || instanceProcessIterator.hasNext())
+                        assertFalse(referenceProcessIterator.hasNext() || instanceProcessIterator.hasNext())
                 )
                 .afterProcessesIteration((referenceInstanceProcess, referenceInstanceWorkflows) ->
-                    assertFalse(referenceInstanceProcess.hasNext() || referenceInstanceWorkflows.hasNext())
+                        assertFalse(referenceInstanceProcess.hasNext() || referenceInstanceWorkflows.hasNext())
                 )
                 .build()
                 .verify();
@@ -34,10 +36,10 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
 
     @ParameterizedTest
     @MethodSource("metaFiles")
-    @DisplayName("Testing that the instantiation does not impact the iteration")
-    void testInstantiationDoesNotImpactIteration(File file) {
+    @DisplayName("Testing that the normalization does not impact the iteration")
+    void testNormalizationDoesNotImpactIteration(File file) {
         ForEachTaskAssertion.builder()
-                .workflowPair(getReferenceInstanceWorkflows(file))
+                .workflowPair(getReferenceNormalizedWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
                     // note that we don't test the tasks' names as it is not the purpose of this test
@@ -54,10 +56,10 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
 
     @ParameterizedTest
     @MethodSource("metaFiles")
-    @DisplayName("Testing that the instantiation does not loose the documentation")
-    void testInstantiationDoesNotLooseTheDocumentation(File file) {
+    @DisplayName("Testing that the normalization does not impact the documentation")
+    void testNormalizationDoesNotImpactTheDocumentation(File file) {
         ForEachTaskAssertion.builder()
-                .workflowPair(getReferenceInstanceWorkflows(file))
+                .workflowPair(getReferenceNormalizedWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
                     if (referenceTask.getDocumentation() != null) {
@@ -66,28 +68,6 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
                         assertTrue(instantiatedTask.getDocumentation().getContent()
                                 .contains(referenceTask.getDocumentation().getContent()));
                     }
-                })
-                .afterTasksIteration((referenceProcessIterator, instanceProcessIterator) ->
-                        assertFalse(referenceProcessIterator.hasNext() || instanceProcessIterator.hasNext())
-                )
-                .afterProcessesIteration((referenceInstanceProcess, referenceInstanceWorkflows) ->
-                        assertFalse(referenceInstanceProcess.hasNext() || referenceInstanceWorkflows.hasNext())
-                )
-                .build()
-                .verify();
-    }
-
-    @ParameterizedTest
-    @MethodSource("metaFiles")
-    @DisplayName("Testing that the instantiation sets the right references")
-    void testInstantiationSetsTheRightReferences(File file) {
-        ForEachTaskAssertion.builder()
-                .workflowPair(getReferenceInstanceWorkflows(file))
-                .forEachTask((referenceTask, instantiatedTask) -> {
-                    assertEquals(referenceTask.getId(), instantiatedTask.getId());
-                    assertNotNull(instantiatedTask.getDocumentation());
-                    assertTrue(instantiatedTask.getDocumentation().getContent()
-                            .contains(String.format("refersTo: %s", referenceTask.getName())));
                 })
                 .afterTasksIteration((referenceProcessIterator, instanceProcessIterator) ->
                         assertFalse(referenceProcessIterator.hasNext() || instanceProcessIterator.hasNext())

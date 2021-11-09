@@ -1,4 +1,4 @@
-package com.ml2wf.testutils.assertions;
+package com.ml2wf.v2.testutils.assertions;
 
 import com.ml2wf.util.Pair;
 import com.ml2wf.v2.tree.ITreeIterator;
@@ -24,15 +24,15 @@ public class ForEachTaskAssertion {
             ITreeIterator<Process> workflow1Iterator = workflow1.iterator();
             ITreeIterator<Process> workflow2Iterator = workflow2.iterator();
             while (workflow1Iterator.hasNext() && workflow2Iterator.hasNext()) {
-                ITreeIterator<WorkflowTask> referenceTasksIterator = workflow1Iterator.next().iterator();
-                ITreeIterator<WorkflowTask> instantiatedTasksIterator = workflow2Iterator.next().iterator();
-                while (referenceTasksIterator.hasNext() && instantiatedTasksIterator.hasNext()) {
-                    WorkflowTask referenceTask = referenceTasksIterator.next();
-                    WorkflowTask instantiatedTask = instantiatedTasksIterator.next();
-                    Optional.ofNullable(forEachTask).ifPresent(c -> c.accept(referenceTask, instantiatedTask));
+                ITreeIterator<WorkflowTask> workflow1TasksIterator = workflow1Iterator.next().iterator();
+                ITreeIterator<WorkflowTask> workflow2TasksIterator = workflow2Iterator.next().iterator();
+                while (workflow1TasksIterator.hasNext() && workflow2TasksIterator.hasNext()) {
+                    WorkflowTask workflow1Task = workflow1TasksIterator.next();
+                    WorkflowTask workflow2Task = workflow2TasksIterator.next();
+                    Optional.ofNullable(forEachTask).ifPresent(c -> c.accept(workflow1Task, workflow2Task));
                 }
                 Optional.ofNullable(afterTasksIteration)
-                        .ifPresent(c -> c.accept(referenceTasksIterator, instantiatedTasksIterator));
+                        .ifPresent(c -> c.accept(workflow1TasksIterator, workflow2TasksIterator));
             }
             Optional.ofNullable(afterProcessesIteration).ifPresent(c -> c.accept(workflow1Iterator, workflow2Iterator));
         });
