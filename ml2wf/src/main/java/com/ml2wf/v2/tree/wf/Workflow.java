@@ -11,6 +11,7 @@ import com.ml2wf.v2.tree.events.AdditionEvent;
 import com.ml2wf.v2.tree.events.RemovalEvent;
 import com.ml2wf.v2.tree.events.RenamingEvent;
 import com.ml2wf.v2.util.observer.IObserver;
+import io.vavr.control.Either;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -104,15 +105,35 @@ public class Workflow extends AbstractTree<Process> implements IInstantiable, IO
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     *
+     * This method does not allow adding duplicated process in a workflow.
+     *
+     * @param child the child
+     *
+     * @return {@link Either#left(Object)} if any children has the same id or name as the given child
+     */
+    @Override
+    public Either<String, Process> appendChild(Process child) {
+        if (children.stream().anyMatch(p -> p.getName().equals(child.getName()) || p.getId().equals(child.getId()))) {
+            return Either.left("Can't add duplicated process in a workflow.");
+        }
+        return super.appendChild(child);
+    }
+
     @Override
     public Optional<Process> removeChild(@NonNull final Process child) {
-        if (!internalMemory.containsKey(child.getName())) {
+        // TODO: implement internal memory
+        /* if (!internalMemory.containsKey(child.getName())) {
             return Optional.empty();
         }
         Pair<Process, List<Process>> childPair = internalMemory.get(child.getName());
         childPair.getValue().remove(child);
-        notifyOnChange(new RemovalEvent<>(child));
-        return Optional.of(child);
+        notifyOnChange(new RemovalEvent<>(child));*/
+        return Optional.ofNullable((children.remove(child)) ? child : null);
     }
 
     @Override

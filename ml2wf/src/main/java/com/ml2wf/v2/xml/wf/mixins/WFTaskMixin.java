@@ -6,7 +6,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.ml2wf.v2.tree.wf.WorkflowTask;
 
-@JsonIgnoreProperties({"observers"})
+@JsonIgnoreProperties({"ID_COUNTER", "observers"})
 public interface WFTaskMixin {
 
     @JacksonXmlProperty(isAttribute = true)

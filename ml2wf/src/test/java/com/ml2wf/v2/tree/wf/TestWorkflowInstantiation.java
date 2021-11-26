@@ -1,7 +1,9 @@
 package com.ml2wf.v2.tree.wf;
 
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.v2.testutils.XMLWorkflowTestBase;
-import com.ml2wf.v2.testutils.assertions.ForEachTaskAssertion;
+import com.ml2wf.v2.testutils.assertions.tree.wf.ForEachProcessAssertion;
+import com.ml2wf.v2.testutils.assertions.tree.wf.ForEachTaskAssertion;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -15,7 +17,7 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
     @ParameterizedTest
     @MethodSource("metaFiles")
     @DisplayName("Testing that the instantiation updates the workflow's tasks names as expected")
-    void testInstantiationUpdatesNames(File file) {
+    void testInstantiationUpdatesWorkflowsNames(File file) {
         ForEachTaskAssertion.builder()
                 .workflowPair(getReferenceInstanceWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
@@ -27,6 +29,23 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
                 )
                 .afterProcessesIteration((referenceInstanceProcess, referenceInstanceWorkflows) ->
                     assertFalse(referenceInstanceProcess.hasNext() || referenceInstanceWorkflows.hasNext())
+                )
+                .build()
+                .verify();
+    }
+
+    @ParameterizedTest
+    @MethodSource("metaFiles")
+    @DisplayName("Testing that the instantiation does not update the workflow's processes names")
+    void testInstantiationDoesNotUpdateProcessesNames(File file) {
+        ForEachProcessAssertion.builder()
+                .workflowPair(getReferenceInstanceWorkflows(file))
+                .forEachProcess((referenceProcess, instantiatedProcess) -> {
+                    assertEquals(referenceProcess.getId(), instantiatedProcess.getId());
+                    assertEquals(referenceProcess.getName(), instantiatedProcess.getName());
+                })
+                .afterProcessesIteration((referenceProcessIterator, instanceProcessIterator) ->
+                        assertFalse(referenceProcessIterator.hasNext() || instanceProcessIterator.hasNext())
                 )
                 .build()
                 .verify();
@@ -87,7 +106,7 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
                     assertNotNull(instantiatedTask.getDocumentation());
                     assertTrue(instantiatedTask.getDocumentation().getContent()
-                            .contains(String.format("refersTo: %s", referenceTask.getName())));
+                            .contains(Notation.REFERENCE_VOC + referenceTask.getName()));
                 })
                 .afterTasksIteration((referenceProcessIterator, instanceProcessIterator) ->
                         assertFalse(referenceProcessIterator.hasNext() || instanceProcessIterator.hasNext())

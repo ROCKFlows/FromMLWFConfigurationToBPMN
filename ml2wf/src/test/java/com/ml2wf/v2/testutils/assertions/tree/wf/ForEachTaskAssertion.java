@@ -1,4 +1,4 @@
-package com.ml2wf.v2.testutils.assertions;
+package com.ml2wf.v2.testutils.assertions.tree.wf;
 
 import com.ml2wf.util.Pair;
 import com.ml2wf.v2.tree.ITreeIterator;
@@ -16,7 +16,9 @@ public class ForEachTaskAssertion {
 
     @NonNull final Pair<Workflow, Workflow> workflowPair;
     BiConsumer<WorkflowTask, WorkflowTask> forEachTask;
+    BiConsumer<ITreeIterator<WorkflowTask>, ITreeIterator<WorkflowTask>> forEachTaskIteration;
     BiConsumer<ITreeIterator<WorkflowTask>, ITreeIterator<WorkflowTask>> afterTasksIteration;
+    BiConsumer<ITreeIterator<Process>, ITreeIterator<Process>> afterEachProcessIteration;
     BiConsumer<ITreeIterator<Process>, ITreeIterator<Process>> afterProcessesIteration;
 
     public void verify() {
@@ -30,9 +32,13 @@ public class ForEachTaskAssertion {
                     WorkflowTask workflow1Task = workflow1TasksIterator.next();
                     WorkflowTask workflow2Task = workflow2TasksIterator.next();
                     Optional.ofNullable(forEachTask).ifPresent(c -> c.accept(workflow1Task, workflow2Task));
+                    Optional.ofNullable(forEachTaskIteration)
+                            .ifPresent(c -> c.accept(workflow1TasksIterator, workflow2TasksIterator));
                 }
                 Optional.ofNullable(afterTasksIteration)
                         .ifPresent(c -> c.accept(workflow1TasksIterator, workflow2TasksIterator));
+                Optional.ofNullable(afterEachProcessIteration)
+                        .ifPresent(c -> c.accept(workflow1Iterator, workflow2Iterator));
             }
             Optional.ofNullable(afterProcessesIteration).ifPresent(c -> c.accept(workflow1Iterator, workflow2Iterator));
         });

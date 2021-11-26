@@ -1,6 +1,7 @@
 package com.ml2wf.v2.tree.fm;
 
 import com.ml2wf.v2.tree.AbstractTree;
+import io.vavr.control.Either;
 import lombok.*;
 
 import java.util.LinkedHashSet;
@@ -63,7 +64,7 @@ public class FeatureModel extends AbstractTree<FeatureModelTask> {
      * @return the appended child
      */
     @Override
-    public FeatureModelTask appendChild(final FeatureModelTask child) {
+    public Either<String, FeatureModelTask> appendChild(final FeatureModelTask child) {
         // delegates to structure
         return structure.appendChild(child);
     }

@@ -9,7 +9,6 @@ import com.ml2wf.v2.tree.wf.util.WorkflowTaskUtil;
 import com.ml2wf.v2.util.observer.IObservable;
 import com.ml2wf.v2.util.observer.IObserver;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -30,7 +29,7 @@ import java.util.Set;
  *
  * @since 1.1.0
  */
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Data
 @EqualsAndHashCode(of = {"id", "name"})
 @ToString(of = {"id", "name"})
@@ -41,6 +40,28 @@ public class WorkflowTask implements INormalizable, IInstantiable, IObservable<A
     private String name;
     private Documentation documentation;
     private final Set<IObserver<AbstractTreeEvent<WorkflowTask>>> observers = new HashSet<>();
+
+    private WorkflowTask(String name, String documentation) {
+        this.id = Notation.TASK_ID_PREFIX + name;
+        this.name = name;
+        this.documentation = new Documentation(this.name, documentation);
+    }
+
+    private WorkflowTask(String name) {
+        this(name, "");
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class WorkflowTaskFactory {
+
+        public static WorkflowTask createTask(String name) {
+            return new WorkflowTask(name);
+        }
+
+        public static WorkflowTask createTask(String name, String documentation) {
+            return new WorkflowTask(name, documentation);
+        }
+    }
 
     /**
      * A {@link Documentation} is defined by an {@link #id} and has a {@link #content}.
@@ -53,13 +74,17 @@ public class WorkflowTask implements INormalizable, IInstantiable, IObservable<A
      *
      * @since 1.1.0
      */
-    @NoArgsConstructor
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Data
     public static final class Documentation {
 
         private String id;
-        private String content = "";
+        private String content;
+
+        private Documentation(String name, String content) {
+            id = Notation.DOCUMENTATION_VOC + name;
+            this.content = content;
+        }
     }
 
     public boolean isAbstract() {
@@ -81,12 +106,12 @@ public class WorkflowTask implements INormalizable, IInstantiable, IObservable<A
 
     @Override
     public void instantiate() {
-        if (documentation == null) {
-            documentation = new Documentation(String.format("documentation_%s", name), "");
-        }
-        String formatPattern = (documentation.content.isBlank()) ? "refersTo: %s%s" : "refersTo: %s%n%s";
-        documentation.content = String.format(formatPattern, name, documentation.content);
         name = String.format("%s_TODO", name);
+        if (documentation == null) {
+            documentation = new Documentation(name, "");
+        }
+        String formatPattern = (documentation.content.isBlank()) ? "%s%s%s" : "%s%s%n%s";
+        documentation.content = String.format(formatPattern, Notation.REFERENCE_VOC, name, documentation.content);
         notifyOnChange(new InstantiationEvent<>(this));
     }
 

@@ -59,6 +59,7 @@ public final class Notation {
      * The <b>BPMN property</b> perfix.
      */
     public static final String BPMN_PROPERTY_PREFIX = "Property_";
+    public static final String TASK_ID_PREFIX = "Task_";
     /**
      * The <b>BPMN "instance" property</b> notation.
      */

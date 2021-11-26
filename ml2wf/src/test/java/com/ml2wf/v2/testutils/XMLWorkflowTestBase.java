@@ -21,6 +21,10 @@ public class XMLWorkflowTestBase extends TreeTestBase {
      * Meta workflows' directory.
      */
     protected static final String META_DIRECTORY = "./wf_meta/";
+    /**
+     * Instance workflows' directory.
+     */
+    protected static final String INSTANCES_DIRECTORY = "./wf_instances/";
 
     public XMLWorkflowTestBase() {
         super(new XMLWorkflowFactory());
@@ -43,27 +47,39 @@ public class XMLWorkflowTestBase extends TreeTestBase {
         return new HashSet<>(FileUtils.listFiles(instanceDir, FileHandler.getWfExtensions(), true)).stream();
     }
 
+    /**
+     * Returns a {@code Stream} containing all instance-workflows located under the
+     * {@link #INSTANCES_DIRECTORY} directory.
+     *
+     * @return a {@code Stream} containing all instance-workflows located under the
+     *         {@link #INSTANCES_DIRECTORY} directory
+     *
+     * @throws URISyntaxException
+     *
+     * @see FileUtils
+     */
+    protected static Stream<File> instancesFiles() throws URISyntaxException {
+        File instanceDir = new File(
+                Objects.requireNonNull(classLoader.getResource(INSTANCES_DIRECTORY)).toURI());
+        return new HashSet<>(FileUtils.listFiles(instanceDir, FileHandler.getWfExtensions(), true)).stream();
+    }
+
     protected Pair<Workflow, Workflow> getReferenceInstanceWorkflows(File file) {
-        Try<Workflow> tryReferenceWorkflow = workflowFactory.workflowFromFile(file);
-        assertTrue(tryReferenceWorkflow.isSuccess());
-        // the workflow to instantiate that will be compared to the reference one
-        Try<Workflow> tryWorkflowToInstantiate = workflowFactory.workflowFromFile(file);
-        assertTrue(tryWorkflowToInstantiate.isSuccess());
-        Workflow workflowToInstantiate = tryWorkflowToInstantiate.get();
-        // instantiating
-        workflowToInstantiate.instantiate();
-        return new Pair<>(tryReferenceWorkflow.get(), workflowToInstantiate);
+        Workflow workflowToNormalize = getWorkflowFromFile(file);
+        workflowToNormalize.instantiate();
+        return new Pair<>(getWorkflowFromFile(file), workflowToNormalize);
     }
 
     protected Pair<Workflow, Workflow> getReferenceNormalizedWorkflows(File file) {
-        Try<Workflow> tryReferenceWorkflow = workflowFactory.workflowFromFile(file);
-        assertTrue(tryReferenceWorkflow.isSuccess());
-        // the workflow to instantiate that will be compared to the reference one
-        Try<Workflow> tryWorkflowToInstantiate = workflowFactory.workflowFromFile(file);
-        assertTrue(tryWorkflowToInstantiate.isSuccess());
-        Workflow workflowToInstantiate = tryWorkflowToInstantiate.get();
-        // instantiating
+        Workflow workflowToInstantiate = getWorkflowFromFile(file);
         workflowToInstantiate.normalize();
-        return new Pair<>(tryReferenceWorkflow.get(), workflowToInstantiate);
+        return new Pair<>(getWorkflowFromFile(file), workflowToInstantiate);
+    }
+
+    protected Workflow getWorkflowFromFile(File file) {
+        Try<Workflow> tryWorkflow = workflowFactory.workflowFromFile(file);
+        tryWorkflow.onFailure(f -> f.getCause().printStackTrace());
+        assertTrue(tryWorkflow.isSuccess());
+        return tryWorkflow.get();
     }
 }

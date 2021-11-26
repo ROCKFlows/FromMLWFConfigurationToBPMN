@@ -13,6 +13,7 @@ import com.ml2wf.v2.tree.events.RemovalEvent;
 import com.ml2wf.v2.tree.events.RenamingEvent;
 import com.ml2wf.v2.util.observer.IObservable;
 import com.ml2wf.v2.util.observer.IObserver;
+import io.vavr.control.Either;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -215,14 +216,14 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
     }
 
     @Override
-    public WorkflowTask appendChild(WorkflowTask child) {
-        tasks.add(child);
+    public Either<String, WorkflowTask> appendChild(final WorkflowTask child) {
+        tasks.add(child); // TODO: should we clone it ?
         update(new AdditionEvent<>(child, tasks));
-        return child;
+        return Either.right(child);
     }
 
     @Override
-    public Optional<WorkflowTask> removeChild(WorkflowTask child) {
+    public Optional<WorkflowTask> removeChild(final WorkflowTask child) {
         if (!tasks.remove(child)) {
             return Optional.empty();
         }

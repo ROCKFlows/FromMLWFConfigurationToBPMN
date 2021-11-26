@@ -1,5 +1,7 @@
 package com.ml2wf.v2.tree;
 
+import io.vavr.control.Either;
+
 import java.util.Optional;
 
 /**
@@ -35,9 +37,9 @@ public interface ITreeManipulable<T> extends INormalizable {
      *
      * @param child the child
      *
-     * @return the appended child to allow chaining
+     * @return an {@link Either} instance containing the appended child if success else the error message
      */
-    T appendChild(T child);
+    Either<String, T> appendChild(T child);
 
     /**
      * Removes the given child from the current tree implementation.

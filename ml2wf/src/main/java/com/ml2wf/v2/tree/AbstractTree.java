@@ -5,6 +5,7 @@ import com.ml2wf.v2.tree.events.AbstractTreeEvent;
 import com.ml2wf.v2.tree.events.AdditionEvent;
 import com.ml2wf.v2.util.observer.IObservable;
 import com.ml2wf.v2.util.observer.IObserver;
+import io.vavr.control.Either;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -109,16 +110,17 @@ public abstract class AbstractTree<T> implements ITreeManipulable<T>, IObservabl
     }
 
     @Override
-    public T appendChild(final T child) {
+    public Either<String, T> appendChild(final T child) {
         children.add(child);
         notifyOnChange(new AdditionEvent<>(child, children));
-        return child;
+        return Either.right(child);
     }
 
     @Override
     public Optional<T> getChildWithName(final String name) {
-        Pair<T, List<T>> childPair = internalMemory.get(name);
-        return Optional.ofNullable((childPair != null && childPair.isPresent()) ? childPair.getKey() : null);
+        // TODO: Pair<T, List<T>> childPair = internalMemory.get(name);
+        // return Optional.ofNullable((childPair != null && childPair.isPresent()) ? childPair.getKey() : null);
+        throw new UnsupportedOperationException("TODO: waiting for internalMemory implementation");
     }
 
     @Override
