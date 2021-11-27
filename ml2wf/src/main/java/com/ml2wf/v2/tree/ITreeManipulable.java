@@ -1,6 +1,7 @@
 package com.ml2wf.v2.tree;
 
 import io.vavr.control.Either;
+import lombok.NonNull;
 
 import java.util.Optional;
 
@@ -10,11 +11,13 @@ import java.util.Optional;
  *
  * @param <T> the type of the tree elements
  *
+ * @see ITreeIterator
+ * @see Identifiable
+ * @see INormalizable
+ *
  * @since 1.1.0
  */
-public interface ITreeManipulable<T> extends INormalizable {
-
-    // TODO: should we define a method to move a child according to the TreeEvent#Events#MOVE event ?
+public interface ITreeManipulable<T extends Identifiable<I>, I> extends INormalizable {
 
     /**
      * Returns an {@link ITreeIterator} for iterating over the tree's children.
@@ -51,11 +54,11 @@ public interface ITreeManipulable<T> extends INormalizable {
     Optional<T> removeChild(T child);
 
     /**
-     * Retrieves the node with the given name.
+     * Retrieves the node with the given identity.
      *
-     * @param name  the name of the requested node
+     * @param identity  the identity of the requested node
      *
      * @return the retrieved node
      */
-    Optional<T> getChildWithName(String name);
+    Optional<T> getChildWithIdentity(@NonNull I identity);
 }

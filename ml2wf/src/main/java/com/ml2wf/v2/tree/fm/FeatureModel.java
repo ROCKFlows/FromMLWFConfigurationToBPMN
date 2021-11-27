@@ -2,10 +2,15 @@ package com.ml2wf.v2.tree.fm;
 
 import com.ml2wf.v2.tree.AbstractTree;
 import io.vavr.control.Either;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,13 +33,13 @@ import java.util.Set;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FeatureModel extends AbstractTree<FeatureModelTask> {
+public class FeatureModel extends AbstractTree<FeatureModelTask, String> {
 
     private FeatureModelStructure structure;
     @Getter @NonNull private final Set<FeatureModelRule> constraints = new LinkedHashSet<>();
 
     @Override
-    public @NonNull List<FeatureModelTask> getChildren() {
+    public @NonNull Collection<FeatureModelTask> getChildren() {
         // delegates to structure
         return structure.getChildren();
     }
@@ -50,6 +55,11 @@ public class FeatureModel extends AbstractTree<FeatureModelTask> {
     public boolean hasChildren() {
         // delegates to structure
         return structure.hasChildren();
+    }
+
+    @Override
+    public boolean hasChildWithIdentity(@NonNull String identity) {
+        return super.hasChildWithIdentity(identity);
     }
 
     /**
@@ -98,9 +108,9 @@ public class FeatureModel extends AbstractTree<FeatureModelTask> {
      * @return the removed child
      */
     @Override
-    public Optional<FeatureModelTask> getChildWithName(final String name) {
+    public Optional<FeatureModelTask> getChildWithIdentity(final String name) {
         // delegates to structure
-        return structure.getChildWithName(name);
+        return structure.getChildWithIdentity(name);
     }
 
     /**

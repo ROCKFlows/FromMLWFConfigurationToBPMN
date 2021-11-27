@@ -2,6 +2,7 @@ package com.ml2wf.v2.tree.wf;
 
 import com.ml2wf.conventions.Notation;
 import com.ml2wf.v2.tree.INormalizable;
+import com.ml2wf.v2.tree.Identifiable;
 import com.ml2wf.v2.tree.events.AbstractTreeEvent;
 import com.ml2wf.v2.tree.events.InstantiationEvent;
 import com.ml2wf.v2.tree.events.RenamingEvent;
@@ -34,15 +35,17 @@ import java.util.Set;
 @EqualsAndHashCode(of = {"id", "name"})
 @ToString(of = {"id", "name"})
 @Log4j2
-public class WorkflowTask implements INormalizable, IInstantiable, IObservable<AbstractTreeEvent<WorkflowTask>> {
+public class WorkflowTask implements INormalizable, IInstantiable, Identifiable<String>,
+        IObservable<AbstractTreeEvent<WorkflowTask>> {
 
+    private static int taskCounter = 0;
     private String id;
     private String name;
     private Documentation documentation;
     private final Set<IObserver<AbstractTreeEvent<WorkflowTask>>> observers = new HashSet<>();
 
     private WorkflowTask(String name, String documentation) {
-        this.id = Notation.TASK_ID_PREFIX + name;
+        this.id = Notation.TASK_ID_PREFIX + (++taskCounter) + name;
         this.name = name;
         this.documentation = new Documentation(this.name, documentation);
     }
@@ -93,6 +96,11 @@ public class WorkflowTask implements INormalizable, IInstantiable, IObservable<A
 
     public boolean isOptional() {
         return WorkflowTaskUtil.isOptional(this);
+    }
+
+    @Override
+    public String getIdentity() {
+        return id;
     }
 
     @Override

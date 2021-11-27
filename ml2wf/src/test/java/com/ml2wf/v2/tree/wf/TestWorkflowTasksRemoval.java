@@ -1,15 +1,13 @@
 package com.ml2wf.v2.tree.wf;
 
 import com.ml2wf.v2.testutils.XMLWorkflowTestBase;
-import com.ml2wf.v2.testutils.assertions.tree.wf.ForEachProcessAssertion;
-import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,14 +19,14 @@ class TestWorkflowTasksRemoval extends XMLWorkflowTestBase {
     @DisplayName("Testing the removal of an instance workflow task from an instance workflow's process.")
     void testInstanceWorkflowRemoveTaskFromProcess(File file) {
         Workflow workflow = getWorkflowFromFile(file);
-        List<Process> workflowProcesses = workflow.getChildren();
+        Collection<Process> workflowProcesses = workflow.getChildren();
         for (Process workflowProcess : workflowProcesses) {
-            for (WorkflowTask task : new ArrayList<>(workflowProcess.getTasks())) {
-                assertTrue(workflowProcess.getTasks().contains(task));
+            for (WorkflowTask task : new ArrayList<>(workflowProcess.getChildren())) {
+                assertTrue(workflowProcess.getChildren().contains(task));
                 workflowProcess.removeChild(task);
-                assertFalse(workflowProcess.getTasks().contains(task));
+                assertFalse(workflowProcess.getChildren().contains(task));
             }
-            assertTrue(workflowProcess.getTasks().isEmpty());
+            assertTrue(workflowProcess.getChildren().isEmpty());
         }
     }
 
@@ -38,7 +36,8 @@ class TestWorkflowTasksRemoval extends XMLWorkflowTestBase {
     void testInstanceWorkflowRemoveUnknownTaskFromProcess(File file) {
         Workflow workflow = getWorkflowFromFile(file);
         WorkflowTask unknownWorkflow = WorkflowTask.WorkflowTaskFactory.createTask("UNKNOWN TASK dzs41514sq");
-        Optional<WorkflowTask> optRemovedTask = workflow.getChildren().get(0).removeChild(unknownWorkflow);
+        Optional<WorkflowTask> optRemovedTask = new ArrayList<>(workflow.getChildren()).get(0)
+                .removeChild(unknownWorkflow);
         assertTrue(optRemovedTask.isEmpty());
     }
 
@@ -49,14 +48,14 @@ class TestWorkflowTasksRemoval extends XMLWorkflowTestBase {
     @DisplayName("Testing the removal of an instance workflow task from a meta-workflow's process.")
     void testMetaWorkflowRemoveTaskFromProcess(File file) {
         Workflow workflow = getWorkflowFromFile(file);
-        List<Process> workflowProcesses = workflow.getChildren();
+        Collection<Process> workflowProcesses = workflow.getChildren();
         for (Process workflowProcess : workflowProcesses) {
-            for (WorkflowTask task : new ArrayList<>(workflowProcess.getTasks())) {
-                assertTrue(workflowProcess.getTasks().contains(task));
+            for (WorkflowTask task : new ArrayList<>(workflowProcess.getChildren())) {
+                assertTrue(workflowProcess.getChildren().contains(task));
                 workflowProcess.removeChild(task);
-                assertFalse(workflowProcess.getTasks().contains(task));
+                assertFalse(workflowProcess.getChildren().contains(task));
             }
-            assertTrue(workflowProcess.getTasks().isEmpty());
+            assertTrue(workflowProcess.getChildren().isEmpty());
         }
     }
 
@@ -66,7 +65,8 @@ class TestWorkflowTasksRemoval extends XMLWorkflowTestBase {
     void testMetaWorkflowRemoveDuplicatedTaskFromProcess(File file) {
         Workflow workflow = getWorkflowFromFile(file);
         WorkflowTask unknownWorkflow = WorkflowTask.WorkflowTaskFactory.createTask("UNKNOWN TASK dzs41514sq");
-        Optional<WorkflowTask> optRemovedTask = workflow.getChildren().get(0).removeChild(unknownWorkflow);
+        Optional<WorkflowTask> optRemovedTask = new ArrayList<>(workflow.getChildren()).get(0)
+                .removeChild(unknownWorkflow);
         assertTrue(optRemovedTask.isEmpty());
     }
 }

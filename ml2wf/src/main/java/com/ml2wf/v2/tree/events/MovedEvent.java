@@ -4,8 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.List;
-
 /**
  * An {@link Events#MOVED} related implementation of the {@link AbstractTreeEvent} base class.
  *
@@ -21,24 +19,12 @@ import java.util.List;
 public class MovedEvent<T> extends AbstractTreeEvent<T> {
 
     /**
-     * The old node location.
-     */
-    private final List<T> oldLocation;
-    /**
-     * The new node location.
-     */
-    private final List<T> newLocation;
-
-    /**
      * {@code MovedEvent}'s constructor with the moved node, its old and new locations.
      *
      * @param node          the old node location
-     * @param oldLocation   the old node location
-     * @param newLocation   the new node location
      */
-    public MovedEvent(T node, final List<T> oldLocation, final List<T> newLocation) {
+    public MovedEvent(T node) {
         super(Events.MOVED, node);
-        this.oldLocation = oldLocation; // TODO: fix sonarlint issue
-        this.newLocation = newLocation; // TODO: fix sonarlint issue
+        throw new UnsupportedOperationException("TODO");
     }
 }

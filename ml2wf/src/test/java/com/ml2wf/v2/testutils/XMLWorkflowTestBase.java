@@ -5,6 +5,7 @@ import com.ml2wf.util.Pair;
 import com.ml2wf.v2.tree.wf.Workflow;
 import com.ml2wf.v2.xml.XMLWorkflowFactory;
 import io.vavr.control.Try;
+import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -76,10 +77,9 @@ public class XMLWorkflowTestBase extends TreeTestBase {
         return new Pair<>(getWorkflowFromFile(file), workflowToInstantiate);
     }
 
+    @SneakyThrows
     protected Workflow getWorkflowFromFile(File file) {
         Try<Workflow> tryWorkflow = workflowFactory.workflowFromFile(file);
-        tryWorkflow.onFailure(f -> f.getCause().printStackTrace());
-        assertTrue(tryWorkflow.isSuccess());
-        return tryWorkflow.get();
+        return tryWorkflow.getOrElseThrow(f -> f);
     }
 }

@@ -4,8 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.List;
-
 /**
  * An {@link Events#ADDITION} related implementation of the {@link AbstractTreeEvent} base class.
  *
@@ -21,18 +19,11 @@ import java.util.List;
 public class AdditionEvent<T> extends AbstractTreeEvent<T> {
 
     /**
-     * The node location.
-     */
-    private final List<T> location;
-
-    /**
      * {@code AdditionEvent}'s constructor with the added node and its location.
      *
      * @param node      the added node
-     * @param location  the node location
      */
-    public AdditionEvent(final T node, final List<T> location) {
+    public AdditionEvent(final T node) {
         super(Events.ADDITION, node);
-        this.location = location; // TODO: fix sonarlint issue
     }
 }

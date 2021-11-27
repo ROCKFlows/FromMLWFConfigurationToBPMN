@@ -15,7 +15,7 @@ public interface ProcessMixin {
 
     @JacksonXmlProperty(localName = "bpmn2:task")
     @JacksonXmlElementWrapper(useWrapping = false)
-    List<WorkflowTask> getTasks();
+    List<WorkflowTask> getChildren();
 
     @JacksonXmlProperty(localName = "bpmn2:sequenceFlow")
     @JacksonXmlElementWrapper(useWrapping = false)

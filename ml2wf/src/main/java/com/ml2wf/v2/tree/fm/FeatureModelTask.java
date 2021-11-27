@@ -1,5 +1,6 @@
 package com.ml2wf.v2.tree.fm;
 
+import com.ml2wf.v2.tree.Identifiable;
 import com.ml2wf.v2.tree.events.RenamingEvent;
 import com.ml2wf.v2.tree.wf.WorkflowTask;
 import lombok.AccessLevel;
@@ -29,7 +30,7 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(of = {"name", "isAbstract", "isMandatory"})
-public class FeatureModelTask extends FeatureModelStructure {
+public class FeatureModelTask extends FeatureModelStructure implements Identifiable<String> {
 
     private FeatureModelTask parent;
     private String name;
@@ -94,6 +95,11 @@ public class FeatureModelTask extends FeatureModelStructure {
         descriptions.add(description);
         return new FeatureModelTask(null, workflowTask.getName(), workflowTask.isAbstract(),
                 workflowTask.isOptional(), descriptions, new ArrayList<>());
+    }
+
+    @Override
+    public String getIdentity() {
+        return name;
     }
 
     @Override

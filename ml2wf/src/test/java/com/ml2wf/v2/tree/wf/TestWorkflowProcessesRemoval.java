@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,7 +20,7 @@ class TestWorkflowProcessesRemoval extends XMLWorkflowTestBase {
     @DisplayName("Testing the removal of an instance workflow process from an instance workflow.")
     void testInstanceWorkflowRemoveProcessFromWorkflow(File file) {
         Workflow workflow = getWorkflowFromFile(file);
-        List<Process> workflowProcesses = workflow.getChildren();
+        Collection<Process> workflowProcesses = workflow.getChildren();
         for (Process workflowProcess : new ArrayList<>(workflowProcesses)) {
             assertTrue(workflow.getChildren().contains(workflowProcess));
             workflow.removeChild(workflowProcess);
@@ -46,7 +46,7 @@ class TestWorkflowProcessesRemoval extends XMLWorkflowTestBase {
     @DisplayName("Testing the removal of a meta workflow process from a meta-workflow workflow.")
     void testMetaWorkflowRemoveProcessFromWorkflow(File file) {
         Workflow workflow = getWorkflowFromFile(file);
-        List<Process> workflowProcesses = workflow.getChildren();
+        Collection<Process> workflowProcesses = workflow.getChildren();
         for (Process workflowProcess : new ArrayList<>(workflowProcesses)) {
             assertTrue(workflow.getChildren().contains(workflowProcess));
             workflow.removeChild(workflowProcess);

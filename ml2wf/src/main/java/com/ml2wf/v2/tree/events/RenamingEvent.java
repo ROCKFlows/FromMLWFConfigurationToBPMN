@@ -1,5 +1,6 @@
 package com.ml2wf.v2.tree.events;
 
+import com.ml2wf.v2.tree.Identifiable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -16,21 +17,21 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class RenamingEvent<T> extends AbstractTreeEvent<T> {
+public class RenamingEvent<T extends Identifiable<I>, I> extends AbstractTreeEvent<T> { // TODO: to rename
 
     /**
-     * The old node's name.
+     * The old node's identity.
      */
-    private final String oldName;
+    private final I oldIdentity;
 
     /**
      * {@code RenamingEvent}'s constructor with the removed node.
      *
      * @param node      the renamed node
-     * @param oldName   the old node's name
+     * @param oldIdentity   the old node's name
      */
-    public RenamingEvent(final T node, final String oldName) {
+    public RenamingEvent(final T node, final I oldIdentity) {
         super(Events.RENAMING, node);
-        this.oldName = oldName;
+        this.oldIdentity = oldIdentity;
     }
 }

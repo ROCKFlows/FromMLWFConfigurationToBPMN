@@ -3,13 +3,9 @@ package com.ml2wf.v2.tree.wf;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.ml2wf.util.Pair;
 import com.ml2wf.v2.tree.AbstractTree;
 import com.ml2wf.v2.tree.INormalizable;
 import com.ml2wf.v2.tree.events.AbstractTreeEvent;
-import com.ml2wf.v2.tree.events.AdditionEvent;
-import com.ml2wf.v2.tree.events.RemovalEvent;
-import com.ml2wf.v2.tree.events.RenamingEvent;
 import com.ml2wf.v2.util.observer.IObserver;
 import io.vavr.control.Either;
 import lombok.EqualsAndHashCode;
@@ -17,8 +13,6 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * A {@link Workflow} is an {@link AbstractTree} extension containing a list of {@link Process}es.
@@ -34,7 +28,8 @@ import java.util.Optional;
  */
 @EqualsAndHashCode(callSuper = true)
 @Log4j2
-public class Workflow extends AbstractTree<Process> implements IInstantiable, IObserver<AbstractTreeEvent<Process>> {
+public class Workflow extends AbstractTree<Process, String> implements IInstantiable,
+        IObserver<AbstractTreeEvent<Process>> {
 
     /**
      * {@code Workflow}'s constructor with a list of {@link Process}es.
@@ -52,57 +47,13 @@ public class Workflow extends AbstractTree<Process> implements IInstantiable, IO
     public Workflow(@NonNull
                     @JacksonXmlProperty(localName="bpmn2:process")
                     @JacksonXmlElementWrapper(useWrapping = false) List<Process> processes) {
-        this.children.addAll(processes);
-        this.internalMemory = new WorkflowInternalMemory();
-        this.children.forEach(p -> p.subscribe(this));
-    }
-
-    /**
-     * This inner class is the {@link Workflow}'s internal memory.
-     *
-     * <p>
-     *
-     * This memory allows avoiding time-consuming tree search by keeping update a {@link Map} containing
-     * all useful information for manipulating a {@link Workflow}.
-     *
-     * <p>
-     *
-     * It observes the current {@link Workflow} implementation to keep its
-     * structure memory consistent.
-     *
-     * @see Workflow
-     * @see IObserver
-     *
-     * @since 1.1.0
-     */
-    protected final class WorkflowInternalMemory extends AbstractInternalMemory {
-
-        @Override
-        public void update(@NonNull final AbstractTreeEvent<Process> event) {
-            log.debug("New Workflow event [{}].", event);
-            var process = event.getNode();
-            switch (event.getEventType()) {
-                case ADDITION:
-                    List<Process> location = ((AdditionEvent<Process>) event).getLocation();
-                    memory.put(process.getName(), new Pair<>(process, location));
-                    process.subscribe(this);
-                    break;
-                case REMOVAL:
-                    memory.remove(process.getName());
-                    process.unsubscribe(this);
-                    break;
-                case RENAMING:
-                    String oldName = ((RenamingEvent<Process>) event).getOldName();
-                    memory.put(process.getName(), memory.remove(oldName));
-                    break;
-                case INSTANTIATION:
-                    // TODO: should we do something else ?
-                    log.trace("{} has been instantiated", process.getName());
-                    return;
-                default:
-                    throw new IllegalStateException("Unsupported event for Workflow internal memory.");
+        getChildren().addAll(processes);
+        for (Process process : processes) {
+            if (appendChild(process).isLeft()) {
+                log.error("Can't add task {} for workflow.", process.getIdentity());
             }
         }
+        // TODO: getChildren().forEach(p -> p.subscribe(this));
     }
 
     /**
@@ -118,32 +69,20 @@ public class Workflow extends AbstractTree<Process> implements IInstantiable, IO
      */
     @Override
     public Either<String, Process> appendChild(Process child) {
-        if (children.stream().anyMatch(p -> p.getName().equals(child.getName()) || p.getId().equals(child.getId()))) {
+        if (hasChildWithIdentity(child.getIdentity())) {
             return Either.left("Can't add duplicated process in a workflow.");
         }
         return super.appendChild(child);
     }
 
     @Override
-    public Optional<Process> removeChild(@NonNull final Process child) {
-        // TODO: implement internal memory
-        /* if (!internalMemory.containsKey(child.getName())) {
-            return Optional.empty();
-        }
-        Pair<Process, List<Process>> childPair = internalMemory.get(child.getName());
-        childPair.getValue().remove(child);
-        notifyOnChange(new RemovalEvent<>(child));*/
-        return Optional.ofNullable((children.remove(child)) ? child : null);
-    }
-
-    @Override
     public void normalize() {
-        children.forEach(INormalizable::normalize);
+        getChildren().forEach(INormalizable::normalize);
     }
 
     @Override
     public void instantiate() {
-        children.forEach(IInstantiable::instantiate);
+        getChildren().forEach(IInstantiable::instantiate);
     }
 
     @Override

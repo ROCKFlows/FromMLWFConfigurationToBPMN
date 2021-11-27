@@ -3,27 +3,20 @@ package com.ml2wf.v2.tree.wf;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.ml2wf.util.Pair;
+import com.ml2wf.v2.tree.AbstractTree;
 import com.ml2wf.v2.tree.INormalizable;
-import com.ml2wf.v2.tree.ITreeIterator;
 import com.ml2wf.v2.tree.ITreeManipulable;
-import com.ml2wf.v2.tree.events.AbstractTreeEvent;
-import com.ml2wf.v2.tree.events.AdditionEvent;
-import com.ml2wf.v2.tree.events.RemovalEvent;
-import com.ml2wf.v2.tree.events.RenamingEvent;
-import com.ml2wf.v2.util.observer.IObservable;
-import com.ml2wf.v2.util.observer.IObserver;
-import io.vavr.control.Either;
+import com.ml2wf.v2.tree.Identifiable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Delegate;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * A process contains some {@link WorkflowTask}s and their associated {@link SequenceFlow}s.
@@ -39,7 +32,7 @@ import java.util.*;
  *
  * <p>
  *
- * It also can instantiated itself by instantiating its {@link #tasks} implementing the
+ * It also can instantiate itself by instantiating its {@link #getChildren()} implementing the
  * {@link IInstantiable} interface.
  *
  * @see WorkflowTask
@@ -54,18 +47,13 @@ import java.util.*;
 @EqualsAndHashCode(of = {"id", "name"})
 @ToString(of = {"id", "name"})
 @Log4j2
-public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
-        IObserver<AbstractTreeEvent<WorkflowTask>>, IObservable<AbstractTreeEvent<Process>> {
+public class Process extends AbstractTree<WorkflowTask, String> implements IInstantiable, Identifiable<String> {
 
     // TODO: create a normalizer
 
     private String id;
     private String name;
-    private final List<WorkflowTask> tasks;
     private final List<SequenceFlow> sequenceFlows;
-    private final Set<IObserver<AbstractTreeEvent<WorkflowTask>>> tasksObservers;
-    private final Set<IObserver<AbstractTreeEvent<Process>>> processesObservers;
-    private final InternalMemory internalMemory;
 
     // TODO: find why we have to specify localName for id and name
 
@@ -95,12 +83,12 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
                    @JacksonXmlElementWrapper(useWrapping = false) List<SequenceFlow> sequenceFlows) {
         this.id = id;
         this.name = name;
-        this.tasks = new ArrayList<>(tasks);
+        for (WorkflowTask task : tasks) {
+            if (appendChild(task).isLeft()) {
+                log.error("Can't add task {} for process {}.", task.getIdentity(), name);
+            }
+        }
         this.sequenceFlows = new ArrayList<>(sequenceFlows);
-        this.tasksObservers = new HashSet<>();
-        this.processesObservers = new HashSet<>();
-        this.internalMemory = new InternalMemory();
-        this.tasks.forEach(p -> p.subscribe(this));
     }
 
     /**
@@ -123,120 +111,19 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
         private String targetRef;
     }
 
-    /**
-     * This inner class is the {@link Process}'s internal memory.
-     *
-     * <p>
-     *
-     * This memory allows avoiding time-consuming tree search by keeping update a {@link Map} containing
-     * all useful information for manipulating a {@link Process}.
-     *
-     * <p>
-     *
-     * It observes the current {@link Process} implementation to keep its
-     * structure memory consistent.
-     *
-     * @see Process
-     * @see IObserver
-     *
-     * @since 1.1.0
-     */
-    private final class InternalMemory implements IObserver<AbstractTreeEvent<WorkflowTask>> {
-
-        // TODO: merge with abstract tree
-
-        @Delegate private final Map<String, Pair<WorkflowTask, List<WorkflowTask>>> memory;
-
-        private InternalMemory() {
-            memory = new HashMap<>();
-            tasks.forEach(t -> t.subscribe(this));
-        }
-
-        @Override
-        public void update(@NonNull final AbstractTreeEvent<WorkflowTask> event) {
-            log.debug("New Process event [{}].", event);
-            var workflowTask = event.getNode();
-            switch (event.getEventType()) {
-                case ADDITION:
-                    List<WorkflowTask> location = ((AdditionEvent<WorkflowTask>) event).getLocation();
-                    memory.put(workflowTask.getName(), new Pair<>(workflowTask, location));
-                    workflowTask.subscribe(this);
-                    break;
-                case REMOVAL:
-                    memory.remove(workflowTask.getName());
-                    workflowTask.unsubscribe(this);
-                    break;
-                case RENAMING:
-                    String oldName = ((RenamingEvent<WorkflowTask>) event).getOldName();
-                    memory.put(workflowTask.getName(), memory.remove(oldName));
-                    break;
-                case INSTANTIATION:
-                    // TODO: should we do something ?
-                    break;
-                default:
-                    throw new IllegalStateException("Unsupported event for Workflow's process internal memory.");
-            }
-        }
-    }
-
-    /**
-     * An {@link ProcessIterator} implementation providing a {@link #tasks}'s iterator.
-     *
-     * <p>
-     *
-     * <b>Note</b> that the {@link ProcessIterator}'s methods implementations are delegated
-     * to its {@link #innerIterator}.
-     *
-     * @see ITreeIterator
-     */
-    public class ProcessIterator implements ITreeIterator<WorkflowTask> {
-
-        @Delegate private final Iterator<WorkflowTask> innerIterator;
-
-        /**
-         * {@code ProcessIterator}'s default constructor.
-         *
-         * <p>
-         *
-         * Instantiates its {@link #innerIterator} as a new {@link #tasks}'s iterator.
-         */
-        private ProcessIterator() {
-            innerIterator = tasks.iterator();
-        }
-    }
-
     @Override
-    public ITreeIterator<WorkflowTask> iterator() {
-        return new ProcessIterator();
-    }
-
-    @Override
-    public boolean hasChildren() {
-        return !tasks.isEmpty();
-    }
-
-    @Override
-    public Either<String, WorkflowTask> appendChild(final WorkflowTask child) {
-        tasks.add(child); // TODO: should we clone it ?
-        update(new AdditionEvent<>(child, tasks));
-        return Either.right(child);
+    public String getIdentity() {
+        return name;
     }
 
     @Override
     public Optional<WorkflowTask> removeChild(final WorkflowTask child) {
-        if (!tasks.remove(child)) {
-            return Optional.empty();
+        Optional<WorkflowTask> optRemovedChild = super.removeChild(child);
+        if (optRemovedChild.isPresent()) {
+            sequenceFlows.removeIf(s -> s.getSourceRef().equals(child.getId()) ||
+                    s.getTargetRef().equals(child.getId())); // TODO: check id or name ?
         }
-        update(new RemovalEvent<>(child));
-        sequenceFlows.removeIf(s -> s.getSourceRef().equals(child.getId()) || s.getTargetRef().equals(child.getId()));
-        return Optional.ofNullable(child);
-    }
-
-    @Override
-    public Optional<WorkflowTask> getChildWithName(String name) {
-        return tasks.stream()
-                .filter(t -> t.getName().equals(name))
-                .findAny();
+        return optRemovedChild;
     }
 
     @Override
@@ -244,34 +131,13 @@ public class Process implements ITreeManipulable<WorkflowTask>, IInstantiable,
         String oldName = name;
         name = name.trim().replace(" ", "_");
         if (!name.equals(oldName)) {
-            notifyOnChange(new RenamingEvent<>(this, oldName));
+            // TODO: notifyOnChange(new RenamingEvent<>(this, oldName));
         }
-        tasks.forEach(INormalizable::normalize);
+        getChildren().forEach(INormalizable::normalize);
     }
 
     @Override
     public void instantiate() {
-        tasks.forEach(IInstantiable::instantiate);
-    }
-
-    @Override
-    public void subscribe(@NonNull final IObserver<AbstractTreeEvent<Process>> observer) {
-        processesObservers.add(observer);
-        log.trace("Observer {} has subscribed to {}", observer.getClass().getSimpleName(), this);
-    }
-
-    @Override
-    public void unsubscribe(@NonNull final IObserver<AbstractTreeEvent<Process>> observer) {
-        processesObservers.remove(observer);
-    }
-
-    @Override
-    public void notifyOnChange(@NonNull final AbstractTreeEvent<Process> event) {
-        processesObservers.forEach(o -> o.update(event));
-    }
-
-    @Override
-    public void update(@NonNull final AbstractTreeEvent<WorkflowTask> event) {
-        tasksObservers.forEach(o -> o.update(event));
+        getChildren().forEach(IInstantiable::instantiate);
     }
 }

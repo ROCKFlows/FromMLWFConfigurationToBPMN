@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Data
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractTreeEvent<T> {
+public abstract class AbstractTreeEvent<T> extends AbstractEvent {
 
     // TODO: limit T to tree related elements + update implementations + update doc ?
 
