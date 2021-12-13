@@ -16,7 +16,7 @@
         <version.surefire>3.0.0-M1</version.surefire>
         <version.shade.plugin>3.2.3</version.shade.plugin>
         <version.picocli>4.3.2</version.picocli>
-        <version.log4j>2.13.3</version.log4j>
+        <version.log4j>2.16.0</version.log4j>
         <version.commons-io>2.7</version.commons-io>
         <version.jansi>1.18</version.jansi>
         <dependency.directory>dependency/</dependency.directory>
