@@ -24,7 +24,10 @@ class TestWorkflowTasksSearch extends XMLWorkflowTestBase {
         for (Process workflowProcess : new ArrayList<>(workflowProcesses)) {
             for (WorkflowTask task : new ArrayList<>(workflowProcess.getChildren())) {
                 assertTrue(workflowProcess.getChildren().contains(task));
-                Optional<WorkflowTask> optTask = workflowProcess.getChildWithIdentity(task.getName());
+                Optional<WorkflowTask> optTask = workflowProcess.getChildWithIdentity(task.getIdentity());
+                assertTrue(optTask.isPresent());
+                assertEquals(task, optTask.get());
+                optTask = workflowProcess.getChildMatching(t -> t.getName().equals(task.getName()));
                 assertTrue(optTask.isPresent());
                 assertEquals(task, optTask.get());
             }
@@ -37,7 +40,9 @@ class TestWorkflowTasksSearch extends XMLWorkflowTestBase {
     void testInstanceWorkflowRemoveUnknownTaskFromWorkflow(File file) {
         Workflow workflow = getWorkflowFromFile(file);
         Process process = new ArrayList<>(workflow.getChildren()).get(0);
-        Optional<WorkflowTask> optSearchedProcess = process.getChildWithIdentity("unknown workflow name");
+        Optional<WorkflowTask> optSearchedProcess = process.getChildWithIdentity("unknown workflow identity");
+        assertTrue(optSearchedProcess.isEmpty());
+        optSearchedProcess = process.getChildMatching(p -> p.getName().equals("unknown workflow name"));
         assertTrue(optSearchedProcess.isEmpty());
     }
 
@@ -52,7 +57,10 @@ class TestWorkflowTasksSearch extends XMLWorkflowTestBase {
         for (Process workflowProcess : new ArrayList<>(workflowProcesses)) {
             for (WorkflowTask task : new ArrayList<>(workflowProcess.getChildren())) {
                 assertTrue(workflowProcess.getChildren().contains(task));
-                Optional<WorkflowTask> optTask = workflowProcess.getChildWithIdentity(task.getName());
+                Optional<WorkflowTask> optTask = workflowProcess.getChildWithIdentity(task.getIdentity());
+                assertTrue(optTask.isPresent());
+                assertEquals(task, optTask.get());
+                optTask = workflowProcess.getChildMatching(t -> t.getName().equals(task.getName()));
                 assertTrue(optTask.isPresent());
                 assertEquals(task, optTask.get());
             }
@@ -65,7 +73,9 @@ class TestWorkflowTasksSearch extends XMLWorkflowTestBase {
     void testMetaWorkflowSearchUnknownTaskFromWorkflow(File file) {
         Workflow workflow = getWorkflowFromFile(file);
         Process process = new ArrayList<>(workflow.getChildren()).get(0);
-        Optional<WorkflowTask> optSearchedProcess = process.getChildWithIdentity("unknown workflow name");
+        Optional<WorkflowTask> optSearchedProcess = process.getChildWithIdentity("unknown workflow identity");
+        assertTrue(optSearchedProcess.isEmpty());
+        optSearchedProcess = process.getChildMatching(p -> p.getName().equals("unknown workflow name"));
         assertTrue(optSearchedProcess.isEmpty());
     }
 
@@ -81,7 +91,10 @@ class TestWorkflowTasksSearch extends XMLWorkflowTestBase {
         for (Process workflowProcess : new ArrayList<>(workflowProcesses)) {
             for (WorkflowTask task : new ArrayList<>(workflowProcess.getChildren())) {
                 assertTrue(workflowProcess.getChildren().contains(task));
-                Optional<WorkflowTask> optTask = workflowProcess.getChildWithIdentity(task.getName());
+                Optional<WorkflowTask> optTask = workflowProcess.getChildWithIdentity(task.getIdentity());
+                assertTrue(optTask.isPresent());
+                assertEquals(task, optTask.get());
+                optTask = workflowProcess.getChildMatching(t -> t.getName().equals(task.getName()));
                 assertTrue(optTask.isPresent());
                 assertEquals(task, optTask.get());
             }
@@ -95,7 +108,9 @@ class TestWorkflowTasksSearch extends XMLWorkflowTestBase {
         Workflow workflow = getWorkflowFromFile(file);
         workflow.instantiate();
         Process process = new ArrayList<>(workflow.getChildren()).get(0);
-        Optional<WorkflowTask> optSearchedProcess = process.getChildWithIdentity("unknown workflow name");
+        Optional<WorkflowTask> optSearchedProcess = process.getChildWithIdentity("unknown workflow identity");
+        assertTrue(optSearchedProcess.isEmpty());
+        optSearchedProcess = process.getChildMatching(p -> p.getName().equals("unknown workflow name"));
         assertTrue(optSearchedProcess.isEmpty());
     }
 }

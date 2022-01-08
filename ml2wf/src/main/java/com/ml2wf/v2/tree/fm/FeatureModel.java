@@ -2,14 +2,12 @@ package com.ml2wf.v2.tree.fm;
 
 import com.ml2wf.v2.tree.AbstractTree;
 import io.vavr.control.Either;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -29,19 +27,18 @@ import java.util.Set;
  *
  * @since 1.1.0
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class FeatureModel extends AbstractTree<FeatureModelTask, String> {
 
-    private FeatureModelStructure structure;
+    @SuppressWarnings("unused") private FeatureModelStructure structure; // used through delegation
     @Getter @NonNull private final Set<FeatureModelRule> constraints = new LinkedHashSet<>();
 
-    @Override
-    public @NonNull Collection<FeatureModelTask> getChildren() {
-        // delegates to structure
-        return structure.getChildren();
+    @SuppressWarnings("unused")
+    private FeatureModel() {
+        // used by Jackson for deserialization
+        super(new ArrayList<>());
     }
 
     /**
@@ -55,11 +52,6 @@ public class FeatureModel extends AbstractTree<FeatureModelTask, String> {
     public boolean hasChildren() {
         // delegates to structure
         return structure.hasChildren();
-    }
-
-    @Override
-    public boolean hasChildWithIdentity(@NonNull String identity) {
-        return super.hasChildWithIdentity(identity);
     }
 
     /**

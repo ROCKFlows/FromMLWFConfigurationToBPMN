@@ -23,9 +23,10 @@ import java.util.List;
  * @see FeatureModelStructure
  * @see Description
  *
+ * TODO: improve doc (Identifiable part)
+ *
  * @since 1.1.0
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -36,7 +37,14 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
     private String name;
     private boolean isAbstract;
     private boolean isMandatory;
-    private List<Description> descriptions = new ArrayList<>();
+    private List<Description> descriptions;
+
+    @SuppressWarnings("unused")
+    private FeatureModelTask() {
+        // used by Jackson for deserialization
+        super(new ArrayList<>());
+        this.descriptions = new ArrayList<>();
+    }
 
     /**
      * {@code FeatureModelTask}'s constructor with a nullable parent, a name, the {@link #isAbstract} and
@@ -57,6 +65,7 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
         this.isAbstract = isAbstract;
         this.isMandatory = isMandatory;
         this.descriptions = new ArrayList<>(descriptions);
+        children.forEach(c -> c.setParent(this));
     }
 
     /**

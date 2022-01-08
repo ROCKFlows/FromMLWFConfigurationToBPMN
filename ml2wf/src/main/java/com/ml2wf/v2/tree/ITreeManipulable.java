@@ -3,7 +3,9 @@ package com.ml2wf.v2.tree;
 import io.vavr.control.Either;
 import lombok.NonNull;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * This interface defines the main method for tree manipulation like child
@@ -11,7 +13,6 @@ import java.util.Optional;
  *
  * @param <T> the type of the tree elements
  *
- * @see ITreeIterator
  * @see Identifiable
  * @see INormalizable
  *
@@ -20,13 +21,22 @@ import java.util.Optional;
 public interface ITreeManipulable<T extends Identifiable<I>, I> extends INormalizable {
 
     /**
-     * Returns an {@link ITreeIterator} for iterating over the tree's children.
+     * Returns a {@link Collection} containing the tree's children.
      *
-     * @return an {@link ITreeIterator} for iterating over the tree's children
-     *
-     * @see ITreeIterator
+     * @return a {@link Collection} containing the tree's children.
      */
-    ITreeIterator<T> iterator();
+    Collection<T> getChildren();
+
+    /**
+     * Returns a {@link Collection} containing the tree's children matching the given {@link Predicate}.
+     *
+     * @param predicate  the predicate to match
+     *
+     * @return a {@link Collection} containing the tree's children matching the given {@link Predicate}
+     *
+     * @see Predicate
+     */
+    Collection<T> getChildrenMatching(@NonNull Predicate<T> predicate);
 
     /**
      * Returns whether the current tree implementation has any child.
@@ -54,11 +64,31 @@ public interface ITreeManipulable<T extends Identifiable<I>, I> extends INormali
     Optional<T> removeChild(T child);
 
     /**
-     * Retrieves the node with the given identity.
+     * Retrieves child node with the given identity.
+     *
+     * @param identity  the identity of the requested child
+     *
+     * @return the retrieved child
+     */
+    Optional<T> getChildWithIdentity(@NonNull I identity);
+
+    /**
+     * Retrieves the child matching the given predicate.
+     *
+     * @param predicate  the {@link Predicate} to match
+     *
+     * @return the matching child
+     *
+     * @see Predicate
+     */
+    Optional<T> getChildMatching(@NonNull Predicate<T> predicate);
+
+    /**
+     * Returns whether the current tree implementation has any child with the given identity.
      *
      * @param identity  the identity of the requested node
      *
-     * @return the retrieved node
+     * @return whether the current tree implementation has any child with the given identity.
      */
-    Optional<T> getChildWithIdentity(@NonNull I identity);
+    boolean hasChildWithIdentity(@NonNull I identity);
 }

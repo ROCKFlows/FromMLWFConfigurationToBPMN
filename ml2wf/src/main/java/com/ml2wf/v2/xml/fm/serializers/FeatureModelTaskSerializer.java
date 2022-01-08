@@ -8,20 +8,15 @@ import com.ml2wf.v2.tree.fm.FeatureModelTask;
 
 import java.io.IOException;
 
+import static java.util.stream.Collectors.groupingBy;
+
 public class FeatureModelTaskSerializer extends StdSerializer<FeatureModelTask> {
 
     public FeatureModelTaskSerializer() {
         super(FeatureModelTask.class);
     }
 
-    @Override
-    public void serialize(FeatureModelTask task, JsonGenerator gen, SerializerProvider provider) throws IOException {
-        // TODO: fix multiple documentation issues
-        // TODO: add alt support
-        if (!(gen instanceof ToXmlGenerator)) {
-            throw new IllegalStateException("Serialization only support XML format.");
-        }
-        ToXmlGenerator generator = (ToXmlGenerator) gen;
+    public void xmlSerialize(FeatureModelTask task, ToXmlGenerator generator) throws IOException {
         generator.writeStartObject();
         generator.setNextIsAttribute(true);
         generator.writeStringField("name", task.getName());
@@ -37,5 +32,40 @@ public class FeatureModelTaskSerializer extends StdSerializer<FeatureModelTask> 
             generator.writeObjectField((child.hasChildren()) ? "and" : "feature", child);
         }
         generator.writeEndObject();
+    }
+
+    public void jsonSerialize(FeatureModelTask task, JsonGenerator generator) throws IOException {
+        generator.writeStartObject();
+        generator.writeStringField("_name", task.getName());
+        generator.writeBooleanField("_abstract", task.isAbstract());
+        generator.writeBooleanField("_mandatory", task.isMandatory());
+        for (FeatureModelTask.Description description : task.getDescriptions()) {
+            generator.writeObjectField("description", description);
+        }
+        task.getChildren().stream().collect(
+                groupingBy(c -> c.hasChildren() ? "ands" : "features") // TODO , mapping(c -> c, toList()))
+        ).forEach((n, c) -> {
+            try {
+                generator.writeArrayFieldStart(n);
+                for (FeatureModelTask child : c) {
+                    generator.writeObject(child);
+                }
+                generator.writeEndArray();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        });
+        generator.writeEndObject();
+    }
+
+    @Override
+    public void serialize(FeatureModelTask task, JsonGenerator gen, SerializerProvider provider) throws IOException {
+        // TODO: fix multiple documentation issues
+        // TODO: add alt support
+        if (gen instanceof ToXmlGenerator) {
+            xmlSerialize(task, (ToXmlGenerator) gen);
+        } else {
+            jsonSerialize(task, gen);
+        }
     }
 }

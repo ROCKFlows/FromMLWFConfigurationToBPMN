@@ -35,6 +35,9 @@ class TreeInternalMemory<I, T extends Identifiable<I>> {
     }
 
     public Either<String, T> appendChild(final T child) {
+        if (internalMemory.containsKey(child.getIdentity())) {
+            return Either.left("Given element is already a child.");
+        }
         internalMemory.put(child.getIdentity(), child);
         return Either.right(child);
     }

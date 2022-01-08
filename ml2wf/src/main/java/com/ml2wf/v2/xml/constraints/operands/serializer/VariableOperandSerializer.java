@@ -14,12 +14,20 @@ public class VariableOperandSerializer extends StdSerializer<VariableOperand> {
         super(VariableOperand.class);
     }
 
+    public void xmlSerialize(VariableOperand operand, JsonGenerator generator) throws IOException {
+        generator.writeStringField("var", operand.getValue());
+    }
+
+    public void jsonSerialize(VariableOperand operand, JsonGenerator generator) throws IOException {
+        generator.writeString(operand.getValue());
+    }
+
     @Override
     public void serialize(VariableOperand operand, JsonGenerator gen, SerializerProvider provider) throws IOException {
-        if (!(gen instanceof ToXmlGenerator)) {
-            throw new IllegalStateException("Serialization only support XML format.");
+        if (gen instanceof ToXmlGenerator) {
+            xmlSerialize(operand, gen);
+        } else {
+            jsonSerialize(operand, gen);
         }
-        ToXmlGenerator generator = (ToXmlGenerator) gen;
-        generator.writeStringField("var", operand.getValue());
     }
 }

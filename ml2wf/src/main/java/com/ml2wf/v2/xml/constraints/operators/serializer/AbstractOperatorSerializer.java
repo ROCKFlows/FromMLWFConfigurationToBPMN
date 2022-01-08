@@ -9,22 +9,50 @@ import com.ml2wf.v2.constraints.operators.AbstractOperator;
 
 import java.io.IOException;
 
+import static java.util.stream.Collectors.groupingBy;
+
 public class AbstractOperatorSerializer extends StdSerializer<AbstractOperator> {
 
     public AbstractOperatorSerializer() {
         super(AbstractOperator.class);
     }
 
-    @Override
-    public void serialize(AbstractOperator operator, JsonGenerator gen, SerializerProvider provider) throws IOException {
-        if (!(gen instanceof ToXmlGenerator)) {
-            throw new IllegalStateException("Serialization only support XML format.");
-        }
-        ToXmlGenerator generator = (ToXmlGenerator) gen;
+    public void xmlSerialize(AbstractOperator operator, JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart(AbstractOperator.Operators.getShortNameForClass(operator.getClass()));
         for (AbstractOperand operand : operator.getOperands())  {
             generator.writeObject(operand);
         }
         generator.writeEndObject();
+    }
+
+    public void jsonSerialize(AbstractOperator operator, JsonGenerator generator) throws IOException {
+        generator.writeObjectFieldStart(AbstractOperator.Operators.getShortNameForClass(operator.getClass()));
+        operator.getOperands().stream().collect(
+                groupingBy(o -> (o instanceof AbstractOperator) ?
+                        AbstractOperator.Operators.getShortNameForClass((Class<? extends AbstractOperator>) o.getClass()) : // TODO: to improve
+                        AbstractOperand.Operands.getShortNameForClass(o.getClass())
+                )
+        ).forEach((n, o) -> {
+            try {
+                generator.writeStartArray();
+                for (AbstractOperand operand : o) {
+                    generator.writeObject(operand);
+                }
+                generator.writeEndArray();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        });
+        generator.writeEndObject();
+    }
+
+    @Override
+    public void serialize(AbstractOperator operator, JsonGenerator gen, SerializerProvider provider)
+            throws IOException {
+        if (gen instanceof ToXmlGenerator) {
+            xmlSerialize(operator, gen);
+        } else {
+            jsonSerialize(operator, gen);
+        }
     }
 }

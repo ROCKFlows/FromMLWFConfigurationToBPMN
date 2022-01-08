@@ -47,12 +47,7 @@ public class Workflow extends AbstractTree<Process, String> implements IInstanti
     public Workflow(@NonNull
                     @JacksonXmlProperty(localName="bpmn2:process")
                     @JacksonXmlElementWrapper(useWrapping = false) List<Process> processes) {
-        getChildren().addAll(processes);
-        for (Process process : processes) {
-            if (appendChild(process).isLeft()) {
-                log.error("Can't add task {} for workflow.", process.getIdentity());
-            }
-        }
+        super(processes);
         // TODO: getChildren().forEach(p -> p.subscribe(this));
     }
 

@@ -81,13 +81,9 @@ public class Process extends AbstractTree<WorkflowTask, String> implements IInst
                    @JacksonXmlElementWrapper(useWrapping = false) List<WorkflowTask> tasks,
                    @JacksonXmlProperty(localName = "bpmn2:sequenceFlow")
                    @JacksonXmlElementWrapper(useWrapping = false) List<SequenceFlow> sequenceFlows) {
+        super(tasks);
         this.id = id;
         this.name = name;
-        for (WorkflowTask task : tasks) {
-            if (appendChild(task).isLeft()) {
-                log.error("Can't add task {} for process {}.", task.getIdentity(), name);
-            }
-        }
         this.sequenceFlows = new ArrayList<>(sequenceFlows);
     }
 

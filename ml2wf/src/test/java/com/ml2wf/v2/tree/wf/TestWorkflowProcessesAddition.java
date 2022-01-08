@@ -17,7 +17,9 @@ class TestWorkflowProcessesAddition extends XMLWorkflowTestBase {
     @MethodSource("instancesFiles")
     @DisplayName("Testing the addition of an empty workflow process to an instance workflow.")
     void testInstanceWorkflowAddEmptyProcessToWorkflow(File file) {
+        System.out.println("file = " + file);
         Workflow workflow = getWorkflowFromFile(file);
+        System.out.println(workflow.getChildren());
         // adding a new empty process
         Process emptyProcessToAdd = new Process("id", "name", new ArrayList<>(), new ArrayList<>());
         Either<String, Process> emptyProcessAdded = workflow.appendChild(emptyProcessToAdd);
