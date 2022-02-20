@@ -1,16 +1,14 @@
 package com.ml2wf.v2.tree.fm;
 
 import com.ml2wf.v2.tree.AbstractTree;
+import com.ml2wf.v2.tree.events.AbstractTreeEvent;
+import com.ml2wf.v2.util.observer.IObserver;
 import io.vavr.control.Either;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
+import lombok.experimental.Delegate;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * A {@link FeatureModel} has a {@link FeatureModelStructure} containing its
@@ -32,89 +30,119 @@ import java.util.Set;
 @ToString(callSuper = true)
 public class FeatureModel extends AbstractTree<FeatureModelTask, String> {
 
-    @SuppressWarnings("unused") private FeatureModelStructure structure; // used through delegation
+    private FeatureModelStructure structure;
     @Getter @NonNull private final Set<FeatureModelRule> constraints = new LinkedHashSet<>();
 
-    @SuppressWarnings("unused")
+    /**
+     * {@code FeatureModel}'s empty private constructor.
+     *
+     * <p>
+     *
+     * <b>Note</b> that this class is used by Jackson for deserialization.
+     */
     private FeatureModel() {
         // used by Jackson for deserialization
         super(new ArrayList<>());
     }
 
     /**
-     * {@inheritDoc}
+     * {@code FeatureModel}'s private constructor with a {@link FeatureModelStructure}.
      *
      * <p>
      *
-     * <b>Note</b> that this operation is delegated to its {@link #structure}.
+     * Only used by the {@link FeatureModelFactory}.
+     *
+     * @param structure the {@link FeatureModelStructure}
+     *
+     * @see FeatureModelStructure
+     * @see FeatureModelFactory
      */
+    private FeatureModel(@NonNull FeatureModelStructure structure) {
+        this();
+        this.structure = structure;
+    }
+
+    /**
+     * {@link FeatureModel}'s factory.
+     *
+     * @see FeatureModel
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class FeatureModelFactory {
+        public static FeatureModel createFeatureModel() {
+            return new FeatureModel(new FeatureModelStructure());
+        }
+    }
+
+    @Override
+    public List<FeatureModelTask> getChildren() {
+        // delegates to structure
+        return structure.getChildren();
+    }
+
+    @Override
+    public Collection<FeatureModelTask> getChildrenMatching(@NonNull Predicate<FeatureModelTask> predicate) {
+        // delegates to structure
+        return structure.getChildrenMatching(predicate);
+    }
+
     @Override
     public boolean hasChildren() {
         // delegates to structure
         return structure.hasChildren();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     *
-     * <b>Note</b> that this operation is delegated to its {@link #structure}.
-     *
-     * @param child the child
-     *
-     * @return the appended child
-     */
     @Override
-    public Either<String, FeatureModelTask> appendChild(final FeatureModelTask child) {
+    public Either<String, FeatureModelTask> appendChild(FeatureModelTask child) {
         // delegates to structure
         return structure.appendChild(child);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     *
-     * <b>Note</b> that this operation is delegated to its {@link #structure}.
-     *
-     * @param child the child
-     *
-     * @return the removed child
-     */
     @Override
-    public Optional<FeatureModelTask> removeChild(final FeatureModelTask child) {
+    public Optional<FeatureModelTask> removeChild(FeatureModelTask child) {
         // delegates to structure
         return structure.removeChild(child);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     *
-     * <b>Note</b> that this operation is delegated to its {@link #structure}.
-     *
-     * @param name  the name of the requested child
-     *
-     * @return the removed child
-     */
     @Override
-    public Optional<FeatureModelTask> getChildWithIdentity(final String name) {
+    public Optional<FeatureModelTask> getChildWithIdentity(@NonNull String identity) {
         // delegates to structure
-        return structure.getChildWithIdentity(name);
+        return structure.getChildWithIdentity(identity);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     *
-     * <b>Note</b> that this operation is delegated to its {@link #structure}.
-     */
+    @Override
+    public Optional<FeatureModelTask> getChildMatching(@NonNull Predicate<FeatureModelTask> predicate) {
+        // delegates to structure
+        return structure.getChildMatching(predicate);
+    }
+
+    @Override
+    public boolean hasChildWithIdentity(@NonNull String identity) {
+        // delegates to structure
+        return structure.hasChildWithIdentity(identity);
+    }
+
     @Override
     public void normalize() {
         // delegates to structure
         structure.normalize();
+    }
+
+    @Override
+    public void subscribe(@NonNull IObserver<AbstractTreeEvent<FeatureModelTask>> observer) {
+        // delegates to structure
+        structure.subscribe(observer);
+    }
+
+    @Override
+    public void unsubscribe(@NonNull IObserver<AbstractTreeEvent<FeatureModelTask>> observer) {
+        // delegates to structure
+        structure.unsubscribe(observer);
+    }
+
+    @Override
+    public void notifyOnChange(@NonNull AbstractTreeEvent<FeatureModelTask> event) {
+        // delegates to structure
+        structure.notifyOnChange(event);
     }
 }

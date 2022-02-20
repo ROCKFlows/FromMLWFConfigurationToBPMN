@@ -1,9 +1,9 @@
 package com.ml2wf.v2.tree.wf;
 
 import com.ml2wf.conventions.Notation;
-import com.ml2wf.v2.testutils.XMLWorkflowTestBase;
+import com.ml2wf.v2.testutils.assertions.tree.wf.XMLWorkflowTestBase;
 import com.ml2wf.v2.testutils.assertions.tree.wf.ForEachProcessAssertion;
-import com.ml2wf.v2.testutils.assertions.tree.wf.ForEachTaskAssertion;
+import com.ml2wf.v2.testutils.assertions.tree.wf.ForEachWFTaskAssertion;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,7 +18,7 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
     @MethodSource("metaFiles")
     @DisplayName("Testing that the instantiation updates the workflow's tasks names as expected")
     void testInstantiationUpdatesWorkflowsNames(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceInstanceWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
@@ -55,7 +55,7 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
     @MethodSource("metaFiles")
     @DisplayName("Testing that the instantiation does not impact the iteration")
     void testInstantiationDoesNotImpactIteration(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceInstanceWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
@@ -75,7 +75,7 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
     @MethodSource("metaFiles")
     @DisplayName("Testing that the instantiation does not loose the documentation")
     void testInstantiationDoesNotLooseTheDocumentation(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceInstanceWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
@@ -100,7 +100,7 @@ class TestWorkflowInstantiation extends XMLWorkflowTestBase {
     @MethodSource("metaFiles")
     @DisplayName("Testing that the instantiation sets the right references")
     void testInstantiationSetsTheRightReferences(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceInstanceWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());

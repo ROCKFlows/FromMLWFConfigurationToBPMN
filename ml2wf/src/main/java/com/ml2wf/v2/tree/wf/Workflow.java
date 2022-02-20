@@ -8,10 +8,13 @@ import com.ml2wf.v2.tree.INormalizable;
 import com.ml2wf.v2.tree.events.AbstractTreeEvent;
 import com.ml2wf.v2.util.observer.IObserver;
 import io.vavr.control.Either;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,7 +31,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Log4j2
-public class Workflow extends AbstractTree<Process, String> implements IInstantiable,
+public class Workflow extends AbstractTree<Process, String> implements Instantiable,
         IObserver<AbstractTreeEvent<Process>> {
 
     /**
@@ -44,11 +47,23 @@ public class Workflow extends AbstractTree<Process, String> implements IInstanti
      * @see JsonCreator
      */
     @JsonCreator
-    public Workflow(@NonNull
+    public Workflow(@NonNull // TODO: try private
                     @JacksonXmlProperty(localName="bpmn2:process")
                     @JacksonXmlElementWrapper(useWrapping = false) List<Process> processes) {
         super(processes);
         // TODO: getChildren().forEach(p -> p.subscribe(this));
+    }
+
+    /**
+     * {@link Workflow}'s factory.
+     *
+     * @see Workflow
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class WorkflowFactory {
+        public static Workflow createWorkflow() {
+            return new Workflow(new ArrayList<>());
+        }
     }
 
     /**
@@ -77,7 +92,7 @@ public class Workflow extends AbstractTree<Process, String> implements IInstanti
 
     @Override
     public void instantiate() {
-        getChildren().forEach(IInstantiable::instantiate);
+        getChildren().forEach(Instantiable::instantiate);
     }
 
     @Override

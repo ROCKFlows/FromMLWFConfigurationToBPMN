@@ -1,8 +1,10 @@
-package com.ml2wf.v2.testutils;
+package com.ml2wf.v2.testutils.assertions.tree.wf;
 
 import com.ml2wf.util.FileHandler;
 import com.ml2wf.util.Pair;
+import com.ml2wf.v2.testutils.TreeTestBase;
 import com.ml2wf.v2.tree.wf.Workflow;
+import com.ml2wf.v2.tree.wf.factory.IWorkflowFactory;
 import com.ml2wf.v2.xml.XMLWorkflowFactory;
 import io.vavr.control.Try;
 import lombok.SneakyThrows;
@@ -14,9 +16,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public class XMLWorkflowTestBase extends TreeTestBase {
+public class XMLWorkflowTestBase extends TreeTestBase<IWorkflowFactory> {
 
     /**
      * Meta workflows' directory.
@@ -27,6 +27,9 @@ public class XMLWorkflowTestBase extends TreeTestBase {
      */
     protected static final String INSTANCES_DIRECTORY = "./wf_instances/";
 
+    /**
+     * {@code XMLWorkflowTestBase}'s default constructor.
+     */
     public XMLWorkflowTestBase() {
         super(new XMLWorkflowFactory());
     }
@@ -43,8 +46,7 @@ public class XMLWorkflowTestBase extends TreeTestBase {
      * @see FileUtils
      */
     protected static Stream<File> metaFiles() throws URISyntaxException {
-        File instanceDir = new File(
-                Objects.requireNonNull(classLoader.getResource(META_DIRECTORY)).toURI());
+        File instanceDir = new File(Objects.requireNonNull(classLoader.getResource(META_DIRECTORY)).toURI());
         return new HashSet<>(FileUtils.listFiles(instanceDir, FileHandler.getWfExtensions(), true)).stream();
     }
 
@@ -79,7 +81,7 @@ public class XMLWorkflowTestBase extends TreeTestBase {
 
     @SneakyThrows
     protected Workflow getWorkflowFromFile(File file) {
-        Try<Workflow> tryWorkflow = workflowFactory.workflowFromFile(file);
+        Try<Workflow> tryWorkflow = factory.workflowFromFile(file);
         return tryWorkflow.getOrElseThrow(f -> f);
     }
 }

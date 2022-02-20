@@ -23,6 +23,8 @@ import java.util.List;
 @Log4j2
 public class FeatureModelStructure extends AbstractTree<FeatureModelTask, String> {
 
+    // TODO: add global annotation
+
     /**
      * {@code FeatureModelStructure}'s empty constructor used by jackson for deserialization.
      */

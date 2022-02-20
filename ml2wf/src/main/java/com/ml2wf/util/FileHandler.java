@@ -55,6 +55,11 @@ public final class FileHandler {
      * TODO: manage considering used norm (e.g. BPMN)
      */
     private static final String[] WF_EXTENSIONS = { "bpmn", "bpmn2" };
+    /**
+     * FeatureModel's extensions.
+     * TODO: manage considering used norm (e.g. BPMN)
+     */
+    private static final String[] FM_EXTENSIONS = { "xml" };
 
     /**
      * Returns the default file name.
@@ -90,6 +95,10 @@ public final class FileHandler {
      */
     public static String[] getWfExtensions() {
         return WF_EXTENSIONS.clone();
+    }
+
+    public static String[] getFMExtensions() {
+        return FM_EXTENSIONS.clone();
     }
 
     /**

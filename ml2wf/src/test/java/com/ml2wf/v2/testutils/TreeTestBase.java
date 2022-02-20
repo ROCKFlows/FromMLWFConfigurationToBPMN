@@ -1,10 +1,9 @@
 package com.ml2wf.v2.testutils;
 
-import com.ml2wf.v2.tree.wf.factory.IWorkflowFactory;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public abstract class TreeTestBase {
+public abstract class TreeTestBase<F> {
 
     /**
      * {@code ClassLoader}'s instance used to get resources.
@@ -13,5 +12,5 @@ public abstract class TreeTestBase {
      */
     protected static ClassLoader classLoader = TreeTestBase.class.getClassLoader();
 
-    protected final IWorkflowFactory workflowFactory;
+    protected final F factory;
 }

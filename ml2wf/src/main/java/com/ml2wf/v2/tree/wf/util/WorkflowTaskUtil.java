@@ -1,9 +1,15 @@
 package com.ml2wf.v2.tree.wf.util;
 
+import com.ml2wf.conventions.Notation;
 import com.ml2wf.util.RegexManager;
+import com.ml2wf.util.XMLManager;
 import com.ml2wf.v2.tree.wf.WorkflowTask;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * An utilitarian class dedicated to the {@link WorkflowTask} class.
@@ -35,5 +41,16 @@ public final class WorkflowTaskUtil {
             return Boolean.parseBoolean(matcher.group(1));
         }
         return false;
+    }
+
+    public static boolean isAbstract(WorkflowTask workflowTask) {
+        String regex = String.format("%s(\\w*)", Notation.GENERIC_VOC);
+        final Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(workflowTask.getName());
+        return matcher.find();
+    }
+
+    public static Optional<String> getReferenceName(WorkflowTask workflowTask) {
+        return XMLManager.getReferredTask(workflowTask.getDocumentation().getContent());
     }
 }

@@ -1,7 +1,7 @@
 package com.ml2wf.v2.tree.wf;
 
-import com.ml2wf.v2.testutils.XMLWorkflowTestBase;
-import com.ml2wf.v2.testutils.assertions.tree.wf.ForEachTaskAssertion;
+import com.ml2wf.v2.testutils.assertions.tree.wf.XMLWorkflowTestBase;
+import com.ml2wf.v2.testutils.assertions.tree.wf.ForEachWFTaskAssertion;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,7 +16,7 @@ class TestWorkflowNormalization extends XMLWorkflowTestBase {
     @MethodSource("metaFiles")
     @DisplayName("Testing that the normalization updates the meta workflow's tasks names as expected")
     void testNormalizationUpdatesNamesForMetaWorkflows(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceNormalizedWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
@@ -38,7 +38,7 @@ class TestWorkflowNormalization extends XMLWorkflowTestBase {
     @MethodSource("instancesFiles")
     @DisplayName("Testing that the normalization updates the instance workflow's tasks names as expected")
     void testNormalizationUpdatesNamesForInstanceWorkflows(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceNormalizedWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
@@ -60,10 +60,11 @@ class TestWorkflowNormalization extends XMLWorkflowTestBase {
     @MethodSource("metaFiles")
     @DisplayName("Testing that the normalization does not impact the meta workflow iteration")
     void testNormalizationDoesNotImpactIterationForMetaWorkflows(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceNormalizedWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
+                    assertEquals(referenceTask.getIdentity(), instantiatedTask.getIdentity());
                     // note that we don't test the tasks' names as it is not the purpose of this test
                 })
                 .afterTasksIteration((referenceProcessIterator, instanceProcessIterator) ->
@@ -80,10 +81,11 @@ class TestWorkflowNormalization extends XMLWorkflowTestBase {
     @MethodSource("instancesFiles")
     @DisplayName("Testing that the normalization does not impact the instance workflow iteration")
     void testNormalizationDoesNotImpactIterationForInstanceWorkflows(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceNormalizedWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
+                    assertEquals(referenceTask.getIdentity(), instantiatedTask.getIdentity());
                     // note that we don't test the tasks' names as it is not the purpose of this test
                 })
                 .afterTasksIteration((referenceProcessIterator, instanceProcessIterator) ->
@@ -100,7 +102,7 @@ class TestWorkflowNormalization extends XMLWorkflowTestBase {
     @MethodSource("metaFiles")
     @DisplayName("Testing that the normalization does not impact the meta workflow documentation")
     void testNormalizationDoesNotImpactTheDocumentationForMetaWorkflows(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceNormalizedWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());
@@ -125,7 +127,7 @@ class TestWorkflowNormalization extends XMLWorkflowTestBase {
     @MethodSource("instancesFiles")
     @DisplayName("Testing that the normalization does not impact the meta instance documentation")
     void testNormalizationDoesNotImpactTheDocumentationForInstanceWorkflows(File file) {
-        ForEachTaskAssertion.builder()
+        ForEachWFTaskAssertion.builder()
                 .workflowPair(getReferenceNormalizedWorkflows(file))
                 .forEachTask((referenceTask, instantiatedTask) -> {
                     assertEquals(referenceTask.getId(), instantiatedTask.getId());

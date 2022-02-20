@@ -1,6 +1,9 @@
-package com.ml2wf.v2.tree.wf;
+package com.ml2wf.v2.tree.wf.task;
 
-import com.ml2wf.v2.testutils.XMLWorkflowTestBase;
+import com.ml2wf.v2.testutils.assertions.tree.wf.XMLWorkflowTestBase;
+import com.ml2wf.v2.tree.wf.Process;
+import com.ml2wf.v2.tree.wf.Workflow;
+import com.ml2wf.v2.tree.wf.WorkflowTask;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

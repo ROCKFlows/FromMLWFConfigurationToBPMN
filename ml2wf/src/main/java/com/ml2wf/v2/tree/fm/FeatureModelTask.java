@@ -2,9 +2,9 @@ package com.ml2wf.v2.tree.fm;
 
 import com.ml2wf.v2.tree.Identifiable;
 import com.ml2wf.v2.tree.events.RenamingEvent;
-import com.ml2wf.v2.tree.wf.WorkflowTask;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A {@link FeatureModelTask} is an extension of a {@link FeatureModelStructure} that
@@ -29,7 +31,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, of = {"parent", "name", "isAbstract", "isMandatory", "descriptions"})
 @ToString(of = {"name", "isAbstract", "isMandatory"})
 public class FeatureModelTask extends FeatureModelStructure implements Identifiable<String> {
 
@@ -57,7 +59,7 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
      * @param descriptions  the new task's descriptions
      * @param children      the new task's children
      */
-    public FeatureModelTask(FeatureModelTask parent, @NonNull String name, boolean isAbstract, boolean isMandatory,
+    private FeatureModelTask(FeatureModelTask parent, @NonNull String name, boolean isAbstract, boolean isMandatory,
                             @NonNull List<Description> descriptions, @NonNull List<FeatureModelTask> children) {
         super(children);
         this.parent = parent;
@@ -68,6 +70,22 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
         children.forEach(c -> c.setParent(this));
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class FeatureModelTaskFactory {
+
+        public static FeatureModelTask createTask(@NonNull String name, boolean isAbstract, boolean isMandatory) {
+            return new FeatureModelTask(null, name, isAbstract, isMandatory, new ArrayList<>(), new ArrayList<>());
+        }
+
+        public static FeatureModelTask createTask(@NonNull String name, boolean isAbstract, boolean isMandatory,
+                                                  @NonNull Collection<String> descriptions) {
+            List<Description> fmDescriptions = descriptions.stream()
+                    .map(Description::new)
+                    .collect(Collectors.toList());
+            return new FeatureModelTask(null, name, isAbstract, isMandatory, fmDescriptions, new ArrayList<>());
+        }
+    }
+
     /**
      * A {@link Description} has a {@link #content} providing additional
      * information about a {@link FeatureModelTask}.
@@ -76,34 +94,16 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
      *
      * @since 1.1.0
      */
-    @NoArgsConstructor
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    @Getter
-    @Setter
-    @EqualsAndHashCode
-    @ToString
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Data
     public static final class Description {
 
         private String content = "";
 
-        public static Description fromDocumentation(WorkflowTask.Documentation documentation) {
-            return new Description(documentation.getContent());
+        public String toString() {
+            return content;
         }
-    }
-
-    /**
-     * Returns a {@link FeatureModelTask} instance based on the given {@link WorkflowTask}.
-     *
-     * @param workflowTask  the {@link WorkflowTask}'s instance
-     *
-     * @return the resulting {@link FeatureModelTask}
-     */
-    public static FeatureModelTask fromWorkflowTask(WorkflowTask workflowTask) {
-        var description = Description.fromDocumentation(workflowTask.getDocumentation());
-        List<Description> descriptions = new ArrayList<>();
-        descriptions.add(description);
-        return new FeatureModelTask(null, workflowTask.getName(), workflowTask.isAbstract(),
-                workflowTask.isOptional(), descriptions, new ArrayList<>());
     }
 
     @Override

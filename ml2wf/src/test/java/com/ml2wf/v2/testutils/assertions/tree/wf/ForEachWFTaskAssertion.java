@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 @Builder
-public class ForEachTaskAssertion {
+public class ForEachWFTaskAssertion {
 
     @NonNull final Pair<Workflow, Workflow> workflowPair;
     BiConsumer<WorkflowTask, WorkflowTask> forEachTask;

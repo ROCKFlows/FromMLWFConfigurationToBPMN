@@ -604,6 +604,7 @@ public abstract class XMLManager {
         name = name.replaceFirst(Notation.DOCUMENTATION_VOC, "");
         name = name.replaceFirst(Notation.REFERENCE_VOC, "");
         name = name.replace(Notation.OPTIONALITY, "");
+        name = name.replace(Notation.GENERIC_VOC, "");
         name = name.trim();
         name = name.replace(" ", "_");
         Pattern validNamePattern = RegexManager.getValidFeatureNamePattern();

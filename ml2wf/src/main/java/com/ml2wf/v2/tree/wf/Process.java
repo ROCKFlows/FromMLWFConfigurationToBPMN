@@ -33,12 +33,12 @@ import java.util.Optional;
  * <p>
  *
  * It also can instantiate itself by instantiating its {@link #getChildren()} implementing the
- * {@link IInstantiable} interface.
+ * {@link Instantiable} interface.
  *
  * @see WorkflowTask
  * @see SequenceFlow
  * @see ITreeManipulable
- * @see IInstantiable
+ * @see Instantiable
  *
  * @since 1.1.0
  */
@@ -47,7 +47,7 @@ import java.util.Optional;
 @EqualsAndHashCode(of = {"id", "name"})
 @ToString(of = {"id", "name"})
 @Log4j2
-public class Process extends AbstractTree<WorkflowTask, String> implements IInstantiable, Identifiable<String> {
+public class Process extends AbstractTree<WorkflowTask, String> implements Instantiable, Identifiable<String> {
 
     // TODO: create a normalizer
 
@@ -134,6 +134,6 @@ public class Process extends AbstractTree<WorkflowTask, String> implements IInst
 
     @Override
     public void instantiate() {
-        getChildren().forEach(IInstantiable::instantiate);
+        getChildren().forEach(Instantiable::instantiate);
     }
 }

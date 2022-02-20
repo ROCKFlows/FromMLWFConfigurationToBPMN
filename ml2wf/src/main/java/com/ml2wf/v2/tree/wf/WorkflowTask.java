@@ -18,7 +18,6 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -32,10 +31,10 @@ import java.util.Set;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Data
-@EqualsAndHashCode(of = {"id", "name"})
-@ToString(of = {"id", "name"})
+@EqualsAndHashCode(of = {"name", "documentation"})
+@ToString(of = {"id", "name", "documentation"})
 @Log4j2
-public class WorkflowTask implements INormalizable, IInstantiable, Identifiable<String>,
+public class WorkflowTask implements INormalizable, Instantiable, Identifiable<String>,
         IObservable<AbstractTreeEvent<WorkflowTask>> {
 
     private static int taskCounter = 0;
@@ -66,6 +65,10 @@ public class WorkflowTask implements INormalizable, IInstantiable, Identifiable<
         }
     }
 
+    public static int getTaskCounter() {
+        return taskCounter;
+    }
+
     /**
      * A {@link Documentation} is defined by an {@link #id} and has a {@link #content}.
      *
@@ -88,10 +91,14 @@ public class WorkflowTask implements INormalizable, IInstantiable, Identifiable<
             id = Notation.DOCUMENTATION_VOC + name;
             this.content = content;
         }
+
+        public String toString() {
+            return content;
+        }
     }
 
     public boolean isAbstract() {
-        return name.trim().endsWith(Notation.GENERIC_VOC.toLowerCase(Locale.ROOT));
+        return WorkflowTaskUtil.isAbstract(this);
     }
 
     public boolean isOptional() {

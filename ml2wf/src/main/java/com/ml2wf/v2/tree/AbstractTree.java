@@ -25,23 +25,17 @@ import java.util.stream.Collectors;
  * It implements the {@link ITreeManipulable} interface defining the main tree operations
  * and is {@link IObservable} to facilitate its manipulation.
  *
- * <p>
- *
- * An {@link AbstractTree} contains {@link Identifiable} children which allows it to use an
- * {@link TreeInternalMemory} to improve its performances when manipulating them.
- *
  * @param <T> the type of the tree's nodes
  *
  * @see ITreeManipulable
  * @see IObservable
- * @see Identifiable
  * @see AbstractTreeEvent
  *
  * @since 1.1.0
  */
 @EqualsAndHashCode
 @Log4j2
-public abstract class AbstractTree<T extends Identifiable<I>, I> implements ITreeManipulable<T, I>,
+public abstract class AbstractTree<T extends Identifiable<I>, I> implements ITreeManipulable<T, I>, // TODO: rework extend Identifiable to have access cf parent
         IObservable<AbstractTreeEvent<T>> {
 
     @NonNull protected final Set<IObserver<AbstractTreeEvent<T>>> observers = new HashSet<>();
@@ -74,12 +68,15 @@ public abstract class AbstractTree<T extends Identifiable<I>, I> implements ITre
 
     @Override
     public Either<String, T> appendChild(T child) {
+        // TODO: check if already have a parent
         children.add(child);
+        // TODO: set parent
         return Either.right(child);
     }
 
     @Override
     public Optional<T> removeChild(T child) {
+        // TODO: set parent to null if is child of this
         return (children.remove(child)) ? Optional.of(child) : Optional.empty();
     }
 

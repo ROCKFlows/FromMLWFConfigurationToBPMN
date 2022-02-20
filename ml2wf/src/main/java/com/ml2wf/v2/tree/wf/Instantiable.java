@@ -7,7 +7,7 @@ package com.ml2wf.v2.tree.wf;
  * @since 1.1.0
  */
 @FunctionalInterface
-public interface IInstantiable {
+public interface Instantiable {
 
     /**
      * Instantiates the current implementation.
