@@ -9,6 +9,7 @@ import lombok.experimental.Delegate;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A {@link FeatureModel} has a {@link FeatureModelStructure} containing its
@@ -28,9 +29,10 @@ import java.util.function.Predicate;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FeatureModel extends AbstractTree<FeatureModelTask, String> {
+public class FeatureModel extends AbstractTree<FeatureModelTask, String> implements Iterable<FeatureModelTask> {
 
     private FeatureModelStructure structure;
+    @Delegate private final FeatureModelTasksIterator iterator;
     @Getter @NonNull private final Set<FeatureModelRule> constraints = new LinkedHashSet<>();
 
     /**
@@ -43,6 +45,7 @@ public class FeatureModel extends AbstractTree<FeatureModelTask, String> {
     private FeatureModel() {
         // used by Jackson for deserialization
         super(new ArrayList<>());
+        iterator = new FeatureModelTasksIterator();
     }
 
     /**
@@ -60,6 +63,21 @@ public class FeatureModel extends AbstractTree<FeatureModelTask, String> {
     private FeatureModel(@NonNull FeatureModelStructure structure) {
         this();
         this.structure = structure;
+    }
+
+    /**
+     * An iterator for the {@link #getChildren()}.
+     *
+     * <p>
+     *
+     * Because of the tree structure, the iterator was designed for providing an in-depth iteration.
+     */
+    public class FeatureModelTasksIterator implements Iterable<FeatureModelTask> {
+
+        @Override
+        public Iterator<FeatureModelTask> iterator() {
+            return getChildren().stream().flatMap(c -> c.getChildren().stream()).iterator();
+        }
     }
 
     /**

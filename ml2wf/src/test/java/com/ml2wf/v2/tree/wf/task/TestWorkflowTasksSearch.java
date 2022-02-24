@@ -39,8 +39,8 @@ class TestWorkflowTasksSearch extends XMLWorkflowTestBase {
 
     @ParameterizedTest
     @MethodSource("instancesFiles")
-    @DisplayName("Testing the removal of an unknown workflow task from an instance workflow.")
-    void testInstanceWorkflowRemoveUnknownTaskFromWorkflow(File file) {
+    @DisplayName("Testing the search of an unknown workflow task from an instance workflow.")
+    void testInstanceWorkflowSearchUnknownTaskFromWorkflow(File file) {
         Workflow workflow = getWorkflowFromFile(file);
         Process process = new ArrayList<>(workflow.getChildren()).get(0);
         Optional<WorkflowTask> optSearchedProcess = process.getChildWithIdentity("unknown workflow identity");

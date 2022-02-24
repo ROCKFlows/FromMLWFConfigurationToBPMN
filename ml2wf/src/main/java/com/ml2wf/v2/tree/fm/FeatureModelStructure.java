@@ -23,17 +23,6 @@ import java.util.List;
 @Log4j2
 public class FeatureModelStructure extends AbstractTree<FeatureModelTask, String> {
 
-    // TODO: add global annotation
-
-    /**
-     * {@code FeatureModelStructure}'s empty constructor used by jackson for deserialization.
-     */
-    @SuppressWarnings("unused")
-    protected FeatureModelStructure() {
-        // used by Jackson for deserialization
-        super(new ArrayList<>());
-    }
-
     /**
      * {@code FeatureModelStructure}'s constructor with some children {@link FeatureModelTask}s.
      *
@@ -41,6 +30,15 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask, String
      */
     public FeatureModelStructure(List<FeatureModelTask> children) {
         super(children);
+    }
+
+    /**
+     * {@code FeatureModelStructure}'s empty constructor used by jackson for deserialization.
+     */
+    @SuppressWarnings("unused")
+    protected FeatureModelStructure() {
+        // used by Jackson for deserialization
+        this(new ArrayList<>());
     }
 
     @Override

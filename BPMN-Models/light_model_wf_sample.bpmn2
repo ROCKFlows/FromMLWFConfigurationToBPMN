@@ -1,0 +1,22 @@
+<bpmn2:definitions>
+  <bpmn2:process id="Process_1" name="Process_1">
+    <bpmn2:task id="Task_1" name="Preprocessing_step_TODO">
+      <identity>Task_1</identity>
+      <bpmn2:documentation id="Documentation_Preprocessing_step_TODO">refersTo: Preprocessing_step_TODO</bpmn2:documentation>
+    </bpmn2:task>
+    <bpmn2:task id="Task_2" name="Training_step_TODO">
+      <identity>Task_2</identity>
+      <bpmn2:documentation id="Documentation_1">refersTo: Training_step_TODO
+Training_step => MLAlgorithm</bpmn2:documentation>
+    </bpmn2:task>
+    <bpmn2:task id="Task_3" name="Evaluating_step_TODO">
+      <identity>Task_3</identity>
+      <bpmn2:documentation id="Documentation_Evaluating_step_TODO">refersTo: Evaluating_step_TODO</bpmn2:documentation>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="Task_1" targetRef="Task_2"/>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="Task_2" targetRef="Task_3"/>
+    <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="Task_3" targetRef="EndEvent_1"/>
+    <bpmn2:sequenceFlow id="SequenceFlow_4" sourceRef="StartEvent_1" targetRef="Task_1"/>
+    <identity>Process_1</identity>
+  </bpmn2:process>
+</bpmn2:definitions>
