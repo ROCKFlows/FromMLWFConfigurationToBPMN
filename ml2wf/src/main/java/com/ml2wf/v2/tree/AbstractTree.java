@@ -44,14 +44,14 @@ public abstract class AbstractTree<T extends Identifiable<I>, I> implements ITre
 
     protected AbstractTree(@NonNull Collection<T> children) {
         for (T child : children) {
-            if (appendChild(child).isLeft()) {
+            if (appendDirectChild(child).isLeft()) {
                 log.error("Can't add task {} for workflow.", child.getIdentity());
             }
         }
     }
 
     @Override
-    public List<T> getChildren() {
+    public @NonNull List<T> getChildren() {
         // do not return a copy as jackson needs the reference
         return children;
     }
@@ -67,7 +67,7 @@ public abstract class AbstractTree<T extends Identifiable<I>, I> implements ITre
     }
 
     @Override
-    public Either<String, T> appendChild(T child) {
+    public Either<String, T> appendDirectChild(T child) {
         // TODO: check if already have a parent
         children.add(child);
         // TODO: set parent
@@ -75,7 +75,7 @@ public abstract class AbstractTree<T extends Identifiable<I>, I> implements ITre
     }
 
     @Override
-    public Optional<T> removeChild(T child) {
+    public Optional<T> removeDirectChild(T child) {
         // TODO: set parent to null if is child of this
         return (children.remove(child)) ? Optional.of(child) : Optional.empty();
     }

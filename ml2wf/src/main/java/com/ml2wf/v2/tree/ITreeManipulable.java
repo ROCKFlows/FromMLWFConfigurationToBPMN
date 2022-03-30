@@ -30,6 +30,11 @@ public interface ITreeManipulable<T extends Identifiable<I>, I> extends INormali
     /**
      * Returns a {@link Collection} containing the tree's children matching the given {@link Predicate}.
      *
+     * <p>
+     *
+     * As opposed to {@link #appendDirectChild(Identifiable)} and {@link #removeDirectChild(Identifiable)},
+     * this method will recursively search for the given match.
+     *
      * @param predicate  the predicate to match
      *
      * @return a {@link Collection} containing the tree's children matching the given {@link Predicate}
@@ -46,25 +51,30 @@ public interface ITreeManipulable<T extends Identifiable<I>, I> extends INormali
     boolean hasChildren();
 
     /**
-     * Appends the given child to the current tree implementation.
+     * Appends the given child to the current tree's direct children.
      *
      * @param child the child
      *
      * @return an {@link Either} instance containing the appended child if success else the error message
      */
-    Either<String, T> appendChild(T child);
+    Either<String, T> appendDirectChild(T child);
 
     /**
-     * Removes the given child from the current tree implementation.
+     * Removes the given child from the current tree's direct children.
      *
      * @param child the child
      *
      * @return an {@link Optional} containing the removed child
      */
-    Optional<T> removeChild(T child);
+    Optional<T> removeDirectChild(T child);
 
     /**
      * Retrieves child node with the given identity.
+     *
+     * <p>
+     *
+     * As opposed to {@link #appendDirectChild(Identifiable)} and {@link #removeDirectChild(Identifiable)},
+     * this method will recursively search for the given identity.
      *
      * @param identity  the identity of the requested child
      *
@@ -74,6 +84,11 @@ public interface ITreeManipulable<T extends Identifiable<I>, I> extends INormali
 
     /**
      * Retrieves the child matching the given predicate.
+     *
+     * <p>
+     *
+     * As opposed to {@link #appendDirectChild(Identifiable)} and {@link #removeDirectChild(Identifiable)},
+     * this method will recursively search for the given match.
      *
      * @param predicate  the {@link Predicate} to match
      *
@@ -85,6 +100,11 @@ public interface ITreeManipulable<T extends Identifiable<I>, I> extends INormali
 
     /**
      * Returns whether the current tree implementation has any child with the given identity.
+     *
+     * <p>
+     *
+     * As opposed to {@link #appendDirectChild(Identifiable)} and {@link #removeDirectChild(Identifiable)},
+     * this method will recursively search for the given identity.
      *
      * @param identity  the identity of the requested node
      *

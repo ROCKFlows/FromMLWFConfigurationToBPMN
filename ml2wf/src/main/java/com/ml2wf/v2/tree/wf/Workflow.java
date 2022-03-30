@@ -78,11 +78,11 @@ public class Workflow extends AbstractTree<Process, String> implements Instantia
      * @return {@link Either#left(Object)} if any children has the same id or name as the given child
      */
     @Override
-    public Either<String, Process> appendChild(Process child) {
+    public Either<String, Process> appendDirectChild(Process child) {
         if (hasChildWithIdentity(child.getIdentity())) {
             return Either.left("Can't add duplicated process in a workflow.");
         }
-        return super.appendChild(child);
+        return super.appendDirectChild(child);
     }
 
     @Override

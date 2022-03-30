@@ -2,6 +2,7 @@ package com.ml2wf.v2.tree.fm.task;
 
 import com.ml2wf.v2.testutils.assertions.tree.fm.XMLFeatureModelTestBase;
 import com.ml2wf.v2.tree.fm.FeatureModel;
+import com.ml2wf.v2.tree.fm.FeatureModelTask;
 import com.ml2wf.v2.tree.wf.Process;
 import com.ml2wf.v2.tree.wf.Workflow;
 import com.ml2wf.v2.tree.wf.WorkflowTask;
@@ -14,42 +15,37 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TestFeatureModelTasksSearch extends XMLFeatureModelTestBase {
 
     @ParameterizedTest
     @MethodSource("fmFiles")
-    @DisplayName("Testing the search of a known feature model task from a feature model.")
-    void testInstanceWorkflowKnownSearchTaskFromWorkflow(File file) {
+    @DisplayName("Testing the search of a known feature model task from a featuremodel.")
+    void testFeatureModeSearchKnownTaskFromFeatureModel(File file) {
         FeatureModel featureModel = getFeatureModelFromFile(file);
-
+        System.out.println("featureModel.getChildren() = " + featureModel.getChildren());
         featureModel.iterator().forEachRemaining(System.out::println);
-        /*Collection<Process> workflowProcesses = featureModel.getChildren();
-        for (Process workflowProcess : new ArrayList<>(workflowProcesses)) {
-            for (WorkflowTask task : new ArrayList<>(workflowProcess.getChildren())) {
-                assertTrue(workflowProcess.getChildren().contains(task));
-                Optional<WorkflowTask> optTask = workflowProcess.getChildWithIdentity(task.getIdentity());
-                assertTrue(optTask.isPresent());
-                assertEquals(task, optTask.get());
-                optTask = workflowProcess.getChildMatching(t -> t.getName().equals(task.getName()));
-                assertTrue(optTask.isPresent());
-                assertEquals(task, optTask.get());
-            }
-        }*/
+        featureModel.iterator().forEachRemaining(task -> {
+            System.out.println("featureModel.getChildren() = " + featureModel.getChildren());
+            System.out.println("task = " + task);
+            Optional<FeatureModelTask> optTask = featureModel.getChildWithIdentity(task.getIdentity());
+            assertTrue(optTask.isPresent());
+            assertEquals(task, optTask.get());
+            optTask = featureModel.getChildMatching(t -> t.getName().equals(task.getName()));
+            assertTrue(optTask.isPresent());
+            assertEquals(task, optTask.get());
+        });
     }
 
     @ParameterizedTest
     @MethodSource("fmFiles")
-    @DisplayName("Testing the search of an unknown workflow task from an instance workflow.")
-    void testInstanceWorkflowSearchUnknownTaskFromWorkflow(File file) {
+    @DisplayName("Testing the search of an unknown feature model task from a featuremodel.")
+    void testFeatureModeSearchUnknownTaskFromFeatureModel(File file) {
         FeatureModel featureModel = getFeatureModelFromFile(file);
-
-        /*Process process = new ArrayList<>(workflow.getChildren()).get(0);
-        Optional<WorkflowTask> optSearchedProcess = process.getChildWithIdentity("unknown workflow identity");
-        assertTrue(optSearchedProcess.isEmpty());
-        optSearchedProcess = process.getChildMatching(p -> p.getName().equals("unknown workflow name"));
-        assertTrue(optSearchedProcess.isEmpty());*/
+        Optional<FeatureModelTask> optTask = featureModel.getChildWithIdentity("Unknown identity");
+        assertFalse(optTask.isPresent());
+        optTask = featureModel.getChildMatching(t -> t.getName().equals("Unknown name"));
+        assertFalse(optTask.isPresent());
     }
 }

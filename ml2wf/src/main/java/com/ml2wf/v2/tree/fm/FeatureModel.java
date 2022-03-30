@@ -4,12 +4,21 @@ import com.ml2wf.v2.tree.AbstractTree;
 import com.ml2wf.v2.tree.events.AbstractTreeEvent;
 import com.ml2wf.v2.util.observer.IObserver;
 import io.vavr.control.Either;
-import lombok.*;
-import lombok.experimental.Delegate;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * A {@link FeatureModel} has a {@link FeatureModelStructure} containing its
@@ -32,7 +41,6 @@ import java.util.stream.Collectors;
 public class FeatureModel extends AbstractTree<FeatureModelTask, String> implements Iterable<FeatureModelTask> {
 
     private FeatureModelStructure structure;
-    @Delegate private final FeatureModelTasksIterator iterator;
     @Getter @NonNull private final Set<FeatureModelRule> constraints = new LinkedHashSet<>();
 
     /**
@@ -45,7 +53,6 @@ public class FeatureModel extends AbstractTree<FeatureModelTask, String> impleme
     private FeatureModel() {
         // used by Jackson for deserialization
         super(new ArrayList<>());
-        iterator = new FeatureModelTasksIterator();
     }
 
     /**
@@ -66,21 +73,6 @@ public class FeatureModel extends AbstractTree<FeatureModelTask, String> impleme
     }
 
     /**
-     * An iterator for the {@link #getChildren()}.
-     *
-     * <p>
-     *
-     * Because of the tree structure, the iterator was designed for providing an in-depth iteration.
-     */
-    public class FeatureModelTasksIterator implements Iterable<FeatureModelTask> {
-
-        @Override
-        public Iterator<FeatureModelTask> iterator() {
-            return getChildren().stream().flatMap(c -> c.getChildren().stream()).iterator();
-        }
-    }
-
-    /**
      * {@link FeatureModel}'s factory.
      *
      * @see FeatureModel
@@ -93,7 +85,13 @@ public class FeatureModel extends AbstractTree<FeatureModelTask, String> impleme
     }
 
     @Override
-    public List<FeatureModelTask> getChildren() {
+    public Iterator<FeatureModelTask> iterator() {
+        // delegates to structure
+        return structure.iterator();
+    }
+
+    @Override
+    public @NonNull List<FeatureModelTask> getChildren() {
         // delegates to structure
         return structure.getChildren();
     }
@@ -111,15 +109,15 @@ public class FeatureModel extends AbstractTree<FeatureModelTask, String> impleme
     }
 
     @Override
-    public Either<String, FeatureModelTask> appendChild(FeatureModelTask child) {
+    public Either<String, FeatureModelTask> appendDirectChild(FeatureModelTask child) {
         // delegates to structure
-        return structure.appendChild(child);
+        return structure.appendDirectChild(child);
     }
 
     @Override
-    public Optional<FeatureModelTask> removeChild(FeatureModelTask child) {
+    public Optional<FeatureModelTask> removeDirectChild(FeatureModelTask child) {
         // delegates to structure
-        return structure.removeChild(child);
+        return structure.removeDirectChild(child);
     }
 
     @Override

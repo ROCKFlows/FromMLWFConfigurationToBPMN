@@ -25,7 +25,7 @@ class TestWorkflowProcessesRemoval extends XMLWorkflowTestBase {
         Collection<Process> workflowProcesses = workflow.getChildren();
         for (Process workflowProcess : new ArrayList<>(workflowProcesses)) {
             assertTrue(workflow.getChildren().contains(workflowProcess));
-            workflow.removeChild(workflowProcess);
+            workflow.removeDirectChild(workflowProcess);
             assertFalse(workflow.getChildren().contains(workflowProcess));
         }
         assertTrue(workflow.getChildren().isEmpty());
@@ -37,7 +37,7 @@ class TestWorkflowProcessesRemoval extends XMLWorkflowTestBase {
     void testInstanceWorkflowRemoveUnknownProcessFromWorkflow(File file) {
         Workflow workflow = getWorkflowFromFile(file);
         Process unknownProcess = new Process("1545165781", "dz51sf4sq", new ArrayList<>(), new ArrayList<>());
-        Optional<Process> optRemovedProcess = workflow.removeChild(unknownProcess);
+        Optional<Process> optRemovedProcess = workflow.removeDirectChild(unknownProcess);
         assertTrue(optRemovedProcess.isEmpty());
     }
 
@@ -51,7 +51,7 @@ class TestWorkflowProcessesRemoval extends XMLWorkflowTestBase {
         Collection<Process> workflowProcesses = workflow.getChildren();
         for (Process workflowProcess : new ArrayList<>(workflowProcesses)) {
             assertTrue(workflow.getChildren().contains(workflowProcess));
-            workflow.removeChild(workflowProcess);
+            workflow.removeDirectChild(workflowProcess);
             assertFalse(workflow.getChildren().contains(workflowProcess));
         }
         assertTrue(workflow.getChildren().isEmpty());
@@ -63,7 +63,7 @@ class TestWorkflowProcessesRemoval extends XMLWorkflowTestBase {
     void testMetaWorkflowRemoveUnknownProcessFromWorkflow(File file) {
         Workflow workflow = getWorkflowFromFile(file);
         Process unknownProcess = new Process("1545165781", "dz51sf4sq", new ArrayList<>(), new ArrayList<>());
-        Optional<Process> optRemovedProcess = workflow.removeChild(unknownProcess);
+        Optional<Process> optRemovedProcess = workflow.removeDirectChild(unknownProcess);
         assertTrue(optRemovedProcess.isEmpty());
     }
 }

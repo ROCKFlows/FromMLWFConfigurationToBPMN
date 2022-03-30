@@ -26,7 +26,7 @@ class TestWorkflowTasksRemoval extends XMLWorkflowTestBase {
         for (Process workflowProcess : workflowProcesses) {
             for (WorkflowTask task : new ArrayList<>(workflowProcess.getChildren())) {
                 assertTrue(workflowProcess.getChildren().contains(task));
-                workflowProcess.removeChild(task);
+                workflowProcess.removeDirectChild(task);
                 assertFalse(workflowProcess.getChildren().contains(task));
             }
             assertTrue(workflowProcess.getChildren().isEmpty());
@@ -40,7 +40,7 @@ class TestWorkflowTasksRemoval extends XMLWorkflowTestBase {
         Workflow workflow = getWorkflowFromFile(file);
         WorkflowTask unknownWorkflow = WorkflowTask.WorkflowTaskFactory.createTask("UNKNOWN TASK dzs41514sq");
         Optional<WorkflowTask> optRemovedTask = new ArrayList<>(workflow.getChildren()).get(0)
-                .removeChild(unknownWorkflow);
+                .removeDirectChild(unknownWorkflow);
         assertTrue(optRemovedTask.isEmpty());
     }
 
@@ -55,7 +55,7 @@ class TestWorkflowTasksRemoval extends XMLWorkflowTestBase {
         for (Process workflowProcess : workflowProcesses) {
             for (WorkflowTask task : new ArrayList<>(workflowProcess.getChildren())) {
                 assertTrue(workflowProcess.getChildren().contains(task));
-                workflowProcess.removeChild(task);
+                workflowProcess.removeDirectChild(task);
                 assertFalse(workflowProcess.getChildren().contains(task));
             }
             assertTrue(workflowProcess.getChildren().isEmpty());
@@ -69,7 +69,7 @@ class TestWorkflowTasksRemoval extends XMLWorkflowTestBase {
         Workflow workflow = getWorkflowFromFile(file);
         WorkflowTask unknownWorkflow = WorkflowTask.WorkflowTaskFactory.createTask("UNKNOWN TASK dzs41514sq");
         Optional<WorkflowTask> optRemovedTask = new ArrayList<>(workflow.getChildren()).get(0)
-                .removeChild(unknownWorkflow);
+                .removeDirectChild(unknownWorkflow);
         assertTrue(optRemovedTask.isEmpty());
     }
 }

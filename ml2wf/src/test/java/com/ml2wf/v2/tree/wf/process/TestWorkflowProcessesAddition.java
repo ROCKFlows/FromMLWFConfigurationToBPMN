@@ -25,7 +25,7 @@ class TestWorkflowProcessesAddition extends XMLWorkflowTestBase {
         System.out.println(workflow.getChildren());
         // adding a new empty process
         Process emptyProcessToAdd = new Process("id", "name", new ArrayList<>(), new ArrayList<>());
-        Either<String, Process> emptyProcessAdded = workflow.appendChild(emptyProcessToAdd);
+        Either<String, Process> emptyProcessAdded = workflow.appendDirectChild(emptyProcessToAdd);
         assertTrue(emptyProcessAdded.isRight());
         assertSame(emptyProcessToAdd, emptyProcessAdded.get());
         assertTrue(workflow.getChildren().contains(emptyProcessToAdd));
@@ -38,13 +38,13 @@ class TestWorkflowProcessesAddition extends XMLWorkflowTestBase {
         Workflow workflow = getWorkflowFromFile(file);
         // adding a new empty process
         Process emptyProcessToAdd = new Process("id", "name", new ArrayList<>(), new ArrayList<>());
-        Either<String, Process> emptyProcessAdded = workflow.appendChild(emptyProcessToAdd);
+        Either<String, Process> emptyProcessAdded = workflow.appendDirectChild(emptyProcessToAdd);
         assertTrue(emptyProcessAdded.isRight());
         assertSame(emptyProcessToAdd, emptyProcessAdded.get());
         assertTrue(workflow.getChildren().contains(emptyProcessToAdd));
         // adding a duplicated empty process
         Process emptyProcessToAddDuplicate = new Process("id", "name", new ArrayList<>(), new ArrayList<>());
-        Either<String, Process> emptyProcessAddedDuplicate = workflow.appendChild(emptyProcessToAddDuplicate);
+        Either<String, Process> emptyProcessAddedDuplicate = workflow.appendDirectChild(emptyProcessToAddDuplicate);
         assertTrue(emptyProcessAddedDuplicate.isLeft());
         assertEquals("Can't add duplicated process in a workflow.", emptyProcessAddedDuplicate.getLeft());
         assertTrue(workflow.getChildren().contains(emptyProcessToAdd)); // should not remove original process
@@ -57,9 +57,9 @@ class TestWorkflowProcessesAddition extends XMLWorkflowTestBase {
         Workflow workflow = getWorkflowFromFile(file);
         // adding a new empty process
         Process processToAdd = new Process("id", "name", new ArrayList<>(), new ArrayList<>());
-        processToAdd.appendChild(WorkflowTask.WorkflowTaskFactory.createTask("a task"));
-        processToAdd.appendChild(WorkflowTask.WorkflowTaskFactory.createTask("another task"));
-        Either<String, Process> processAdded = workflow.appendChild(processToAdd);
+        processToAdd.appendDirectChild(WorkflowTask.WorkflowTaskFactory.createTask("a task"));
+        processToAdd.appendDirectChild(WorkflowTask.WorkflowTaskFactory.createTask("another task"));
+        Either<String, Process> processAdded = workflow.appendDirectChild(processToAdd);
         assertTrue(processAdded.isRight());
         assertSame(processToAdd, processAdded.get());
         assertTrue(workflow.getChildren().contains(processToAdd));
@@ -74,7 +74,7 @@ class TestWorkflowProcessesAddition extends XMLWorkflowTestBase {
         Workflow workflow = getWorkflowFromFile(file);
         // adding a new empty process
         Process emptyProcessToAdd = new Process("id", "name", new ArrayList<>(), new ArrayList<>());
-        Either<String, Process> emptyProcessAdded = workflow.appendChild(emptyProcessToAdd);
+        Either<String, Process> emptyProcessAdded = workflow.appendDirectChild(emptyProcessToAdd);
         assertTrue(emptyProcessAdded.isRight());
         assertSame(emptyProcessToAdd, emptyProcessAdded.get());
         assertTrue(workflow.getChildren().contains(emptyProcessToAdd));
@@ -87,13 +87,13 @@ class TestWorkflowProcessesAddition extends XMLWorkflowTestBase {
         Workflow workflow = getWorkflowFromFile(file);
         // adding a new empty process
         Process emptyProcessToAdd = new Process("id", "name", new ArrayList<>(), new ArrayList<>());
-        Either<String, Process> emptyProcessAdded = workflow.appendChild(emptyProcessToAdd);
+        Either<String, Process> emptyProcessAdded = workflow.appendDirectChild(emptyProcessToAdd);
         assertTrue(emptyProcessAdded.isRight());
         assertSame(emptyProcessToAdd, emptyProcessAdded.get());
         assertTrue(workflow.getChildren().contains(emptyProcessToAdd));
         // adding a duplicated empty process
         Process emptyProcessToAddDuplicate = new Process("id", "name", new ArrayList<>(), new ArrayList<>());
-        Either<String, Process> emptyProcessAddedDuplicate = workflow.appendChild(emptyProcessToAddDuplicate);
+        Either<String, Process> emptyProcessAddedDuplicate = workflow.appendDirectChild(emptyProcessToAddDuplicate);
         assertTrue(emptyProcessAddedDuplicate.isLeft());
         assertEquals("Can't add duplicated process in a workflow.", emptyProcessAddedDuplicate.getLeft());
         assertTrue(workflow.getChildren().contains(emptyProcessToAdd)); // should not remove original process
@@ -106,9 +106,9 @@ class TestWorkflowProcessesAddition extends XMLWorkflowTestBase {
         Workflow workflow = getWorkflowFromFile(file);
         // adding a new empty process
         Process processToAdd = new Process("id", "name", new ArrayList<>(), new ArrayList<>());
-        processToAdd.appendChild(WorkflowTask.WorkflowTaskFactory.createTask("a task"));
-        processToAdd.appendChild(WorkflowTask.WorkflowTaskFactory.createTask("another task"));
-        Either<String, Process> processAdded = workflow.appendChild(processToAdd);
+        processToAdd.appendDirectChild(WorkflowTask.WorkflowTaskFactory.createTask("a task"));
+        processToAdd.appendDirectChild(WorkflowTask.WorkflowTaskFactory.createTask("another task"));
+        Either<String, Process> processAdded = workflow.appendDirectChild(processToAdd);
         assertTrue(processAdded.isRight());
         assertSame(processToAdd, processAdded.get());
         assertTrue(workflow.getChildren().contains(processToAdd));

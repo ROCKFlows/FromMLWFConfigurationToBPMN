@@ -69,7 +69,7 @@ public final class TaskConverter {
                 workflowTask.getName(), workflowTask.isAbstract(), !workflowTask.isOptional(), descriptions);
         if (optReferenceName.isPresent()) {
             Optional<FeatureModelTask> optReferenceFMTask = featureModel.getChildWithIdentity(optReferenceName.get());
-            optReferenceFMTask.ifPresentOrElse(r -> r.appendChild(createdFmTask), () -> {
+            optReferenceFMTask.ifPresentOrElse(r -> r.appendDirectChild(createdFmTask), () -> {
                 log.error("Unknown reference {}. Skipping...", optReferenceName);
                 // TODO: attach to Unmanaged node once implemented
             });

@@ -27,7 +27,7 @@ class TestWorkflowTasksAddition extends XMLWorkflowTestBase {
         // adding to first process
         Process process = new ArrayList<>(workflowProcesses).get(0);
         WorkflowTask taskToAddA = WorkflowTask.WorkflowTaskFactory.createTask("ADDED_A");
-        Either<String, WorkflowTask> addedTaskA = process.appendChild(taskToAddA);
+        Either<String, WorkflowTask> addedTaskA = process.appendDirectChild(taskToAddA);
         assertTrue(addedTaskA.isRight());
         assertSame(taskToAddA, addedTaskA.get());
         assertTrue(process.getChildren().contains(taskToAddA));
@@ -43,13 +43,13 @@ class TestWorkflowTasksAddition extends XMLWorkflowTestBase {
         // adding to first process
         Process process = new ArrayList<>(workflowProcesses).get(0);
         WorkflowTask taskToAddA = WorkflowTask.WorkflowTaskFactory.createTask("ADDED_A");
-        Either<String, WorkflowTask> addedTaskA = process.appendChild(taskToAddA);
+        Either<String, WorkflowTask> addedTaskA = process.appendDirectChild(taskToAddA);
         assertTrue(addedTaskA.isRight());
         assertSame(taskToAddA, addedTaskA.get());
         assertTrue(process.getChildren().contains(taskToAddA));
         // adding a second task with same name is accepted
         WorkflowTask taskToAddADuplicate = WorkflowTask.WorkflowTaskFactory.createTask("ADDED_A");
-        Either<String, WorkflowTask> addedTaskADuplicate = process.appendChild(taskToAddADuplicate);
+        Either<String, WorkflowTask> addedTaskADuplicate = process.appendDirectChild(taskToAddADuplicate);
         assertTrue(addedTaskADuplicate.isRight());
         assertSame(taskToAddADuplicate, addedTaskADuplicate.get());
         assertSame(taskToAddADuplicate, addedTaskADuplicate.get());
@@ -70,7 +70,7 @@ class TestWorkflowTasksAddition extends XMLWorkflowTestBase {
         // adding to first process
         Process process = new ArrayList<>(workflowProcesses).get(0);
         WorkflowTask taskToAddA = WorkflowTask.WorkflowTaskFactory.createTask("ADDED_A");
-        Either<String, WorkflowTask> addedTaskA = process.appendChild(taskToAddA);
+        Either<String, WorkflowTask> addedTaskA = process.appendDirectChild(taskToAddA);
         assertTrue(addedTaskA.isRight());
         assertSame(taskToAddA, addedTaskA.get());
         assertTrue(process.getChildren().contains(taskToAddA));
@@ -86,13 +86,13 @@ class TestWorkflowTasksAddition extends XMLWorkflowTestBase {
         // adding to first process
         Process process = new ArrayList<>(workflowProcesses).get(0);
         WorkflowTask taskToAddA = WorkflowTask.WorkflowTaskFactory.createTask("ADDED_A");
-        Either<String, WorkflowTask> addedTaskA = process.appendChild(taskToAddA);
+        Either<String, WorkflowTask> addedTaskA = process.appendDirectChild(taskToAddA);
         assertTrue(addedTaskA.isRight());
         assertSame(taskToAddA, addedTaskA.get());
         assertTrue(process.getChildren().contains(taskToAddA));
         // adding a second task with same name is accepted
         WorkflowTask taskToAddADuplicate = WorkflowTask.WorkflowTaskFactory.createTask("ADDED_A");
-        Either<String, WorkflowTask> addedTaskADuplicate = process.appendChild(taskToAddADuplicate);
+        Either<String, WorkflowTask> addedTaskADuplicate = process.appendDirectChild(taskToAddADuplicate);
         assertTrue(addedTaskADuplicate.isRight());
         assertSame(taskToAddADuplicate, addedTaskADuplicate.get());
         assertSame(taskToAddADuplicate, addedTaskADuplicate.get());

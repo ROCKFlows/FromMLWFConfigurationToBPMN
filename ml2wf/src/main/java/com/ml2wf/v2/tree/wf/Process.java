@@ -10,6 +10,7 @@ import com.ml2wf.v2.tree.Identifiable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
@@ -44,7 +45,7 @@ import java.util.Optional;
  */
 @Getter
 @Setter // TODO: listen on setters
-@EqualsAndHashCode(of = {"id", "name"})
+@EqualsAndHashCode(of = {"id", "name"}, callSuper = true)
 @ToString(of = {"id", "name"})
 @Log4j2
 public class Process extends AbstractTree<WorkflowTask, String> implements Instantiable, Identifiable<String> {
@@ -108,13 +109,13 @@ public class Process extends AbstractTree<WorkflowTask, String> implements Insta
     }
 
     @Override
-    public String getIdentity() {
+    public @NonNull String getIdentity() {
         return name;
     }
 
     @Override
-    public Optional<WorkflowTask> removeChild(final WorkflowTask child) {
-        Optional<WorkflowTask> optRemovedChild = super.removeChild(child);
+    public Optional<WorkflowTask> removeDirectChild(final WorkflowTask child) {
+        Optional<WorkflowTask> optRemovedChild = super.removeDirectChild(child);
         if (optRemovedChild.isPresent()) {
             sequenceFlows.removeIf(s -> s.getSourceRef().equals(child.getId()) ||
                     s.getTargetRef().equals(child.getId())); // TODO: check id or name ?

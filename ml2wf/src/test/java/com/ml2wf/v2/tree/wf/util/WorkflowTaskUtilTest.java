@@ -55,28 +55,17 @@ class WorkflowTaskUtilTest {
     void testIsAbstract_noDocumentation() {
         var wfTask = WorkflowTask.WorkflowTaskFactory.createTask("Task_1");
         assertFalse(WorkflowTaskUtil.isAbstract(wfTask));
-    }
-
-    @Test
-    void testIsAbstract_noDocumentation_referenceNotationInName() {
-        var name = String.format("Task_1 %s%s", Notation.REFERENCE_VOC, "MetaTask_A");
-        var wfTask = WorkflowTask.WorkflowTaskFactory.createTask(name);
-        assertFalse(WorkflowTaskUtil.isAbstract(wfTask));
+        wfTask = WorkflowTask.WorkflowTaskFactory.createTask("Task_1" + Notation.GENERIC_VOC);
+        assertTrue(WorkflowTaskUtil.isAbstract(wfTask));
     }
 
     @Test
     void testIsAbstract_withDocumentation() {
-        var description = "a description";
-        var wfTask = WorkflowTask.WorkflowTaskFactory.createTask("Task_1", description);
+        var wfTask = WorkflowTask.WorkflowTaskFactory.createTask("Task_1", "a description");
         assertFalse(WorkflowTaskUtil.isAbstract(wfTask));
-        description = String.format("a task that refers to %s", "MetaTask_B");
-        wfTask = WorkflowTask.WorkflowTaskFactory.createTask("Task_2", description);
+        wfTask = WorkflowTask.WorkflowTaskFactory.createTask("Task_2", "a description for Task_B_Step");
         assertFalse(WorkflowTaskUtil.isAbstract(wfTask));
-        description = String.format("a task that %s%s", Notation.REFERENCE_VOC, "MetaTask_C");
-        wfTask = WorkflowTask.WorkflowTaskFactory.createTask("Task_3", description);
-        assertTrue(WorkflowTaskUtil.isAbstract(wfTask));
-        description = String.format("a task that %s%s and another information", Notation.REFERENCE_VOC, "MetaTask_D");
-        wfTask = WorkflowTask.WorkflowTaskFactory.createTask("Task_4", description);
+        wfTask = WorkflowTask.WorkflowTaskFactory.createTask("Task_3" + Notation.GENERIC_VOC, "a description");
         assertTrue(WorkflowTaskUtil.isAbstract(wfTask));
     }
 
