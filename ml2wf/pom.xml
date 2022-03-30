@@ -5,7 +5,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>ml2wf</name>
-    <url>http://maven.apache.org</url>
+    <url>https://maven.apache.org</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
@@ -18,6 +18,7 @@
         <version.picocli>4.3.2</version.picocli>
         <version.log4j>2.13.3</version.log4j>
         <version.commons-io>2.7</version.commons-io>
+        <version.guava>31.0.1-jre</version.guava>
         <version.jansi>1.18</version.jansi>
         <version.lombok>1.18.20</version.lombok>
         <version.vavr>0.10.4</version.vavr>
@@ -161,6 +162,12 @@
 		    <artifactId>commons-io</artifactId>
 		    <version>${version.commons-io}</version>
 		</dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${version.guava}</version>
+        </dependency>
 		<!-- https://mvnrepository.com/artifact/org.fusesource.jansi/jansi -->
 		<dependency>
 		    <groupId>org.fusesource.jansi</groupId>
