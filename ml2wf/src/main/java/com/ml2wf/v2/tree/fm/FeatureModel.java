@@ -13,6 +13,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -79,8 +80,13 @@ public class FeatureModel extends AbstractTree<FeatureModelTask, String> impleme
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class FeatureModelFactory {
-        public static FeatureModel createFeatureModel() {
+
+        public static FeatureModel empty() {
             return new FeatureModel(new FeatureModelStructure());
+        }
+
+        public static FeatureModel fromFeatureModelTask(FeatureModelTask featureModelTask) {
+            return new FeatureModel(new FeatureModelStructure(Collections.singletonList(featureModelTask)));
         }
     }
 

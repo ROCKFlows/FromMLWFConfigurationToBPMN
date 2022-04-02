@@ -82,11 +82,12 @@ public abstract class AbstractTree<T extends Identifiable<I>, I> implements ITre
 
     @Override
     public Optional<T> getChildWithIdentity(@NonNull I identity) {
-        return children.stream().filter(c -> c.getIdentity().equals(identity)).findAny();
+        return getChildMatching(t -> t.getIdentity().equals(identity));
     }
 
     @Override
     public Optional<T> getChildMatching(@NonNull Predicate<T> predicate) {
+        // TODO: tmp: a non-recursive version
         return children.stream().filter(predicate).findAny();
     }
 

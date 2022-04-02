@@ -24,11 +24,7 @@ class TestFeatureModelTasksSearch extends XMLFeatureModelTestBase {
     @DisplayName("Testing the search of a known feature model task from a featuremodel.")
     void testFeatureModeSearchKnownTaskFromFeatureModel(File file) {
         FeatureModel featureModel = getFeatureModelFromFile(file);
-        System.out.println("featureModel.getChildren() = " + featureModel.getChildren());
-        featureModel.iterator().forEachRemaining(System.out::println);
         featureModel.iterator().forEachRemaining(task -> {
-            System.out.println("featureModel.getChildren() = " + featureModel.getChildren());
-            System.out.println("task = " + task);
             Optional<FeatureModelTask> optTask = featureModel.getChildWithIdentity(task.getIdentity());
             assertTrue(optTask.isPresent());
             assertEquals(task, optTask.get());

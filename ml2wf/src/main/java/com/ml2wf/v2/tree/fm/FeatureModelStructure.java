@@ -5,11 +5,14 @@ import com.ml2wf.v2.tree.AbstractTree;
 import com.ml2wf.v2.tree.INormalizable;
 import com.ml2wf.v2.util.observer.IObservable;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * A {@link FeatureModelStructure} is an {@link AbstractTree} extension containing the
@@ -41,6 +44,21 @@ public class FeatureModelStructure extends AbstractTree<FeatureModelTask, String
     protected FeatureModelStructure() {
         // used by Jackson for deserialization
         this(new ArrayList<>());
+    }
+
+    @Override
+    public Optional<FeatureModelTask> getChildMatching(@NonNull final Predicate<FeatureModelTask> predicate) {
+        // TODO: tmp: a recursive version
+        Optional<FeatureModelTask> optMatchedChild = super.getChildMatching(predicate);
+        if (optMatchedChild.isPresent()) {
+            return optMatchedChild;
+        }
+        // recursive part
+        return getChildren().stream()
+                .map(c -> c.getChildMatching(predicate))
+                .filter(Optional::isPresent)
+                .findAny()
+                .orElse(Optional.empty());
     }
 
     @Override
