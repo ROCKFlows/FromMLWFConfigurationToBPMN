@@ -24,7 +24,7 @@ class TestTaskConverter extends XMLWorkflowTestBase {
 
     @BeforeEach
     private void setUp() {
-        featureModel = FeatureModel.FeatureModelFactory.createFeatureModel();
+        featureModel = FeatureModel.FeatureModelFactory.empty();
         workflow = Workflow.WorkflowFactory.createWorkflow();
         taskConverter = new TaskConverter(featureModel, workflow);
     }

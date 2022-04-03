@@ -1,5 +1,7 @@
 package com.ml2wf.v2.tree.fm;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.ml2wf.v2.tree.Identifiable;
 import com.ml2wf.v2.tree.events.RenamingEvent;
 import lombok.AccessLevel;
@@ -14,6 +16,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,9 +27,8 @@ import java.util.stream.Collectors;
  *
  * @see FeatureModelStructure
  * @see Description
- *
+ * <p>
  * TODO: improve doc (Identifiable part)
- *
  * @since 1.1.0
  */
 @Getter
@@ -52,15 +54,15 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
      * {@code FeatureModelTask}'s constructor with a nullable parent, a name, the {@link #isAbstract} and
      * {@link #isMandatory} status, some {@link Description}s and its children {@link FeatureModelTask}s.
      *
-     * @param parent        the new task's parent
-     * @param name          the new task's parent
-     * @param isAbstract    the new task's {@link #isAbstract} status
-     * @param isMandatory   the new task's {@link #isMandatory} status
-     * @param descriptions  the new task's descriptions
-     * @param children      the new task's children
+     * @param parent       the new task's parent
+     * @param name         the new task's parent
+     * @param isAbstract   the new task's {@link #isAbstract} status
+     * @param isMandatory  the new task's {@link #isMandatory} status
+     * @param descriptions the new task's descriptions
+     * @param children     the new task's children
      */
     private FeatureModelTask(FeatureModelTask parent, @NonNull String name, boolean isAbstract, boolean isMandatory,
-                            @NonNull List<Description> descriptions, @NonNull List<FeatureModelTask> children) {
+                             @NonNull List<Description> descriptions, @NonNull List<FeatureModelTask> children) {
         super(children);
         this.parent = parent;
         this.name = name;
@@ -91,7 +93,6 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
      * information about a {@link FeatureModelTask}.
      *
      * @see FeatureModelTask
-     *
      * @since 1.1.0
      */
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -107,7 +108,7 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
     }
 
     @Override
-    public String getIdentity() {
+    public @NonNull String getIdentity() {
         return name;
     }
 
@@ -119,5 +120,11 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
             notifyOnChange(new RenamingEvent<>(this, oldName));
         }
         super.normalize();
+    }
+
+    @Override
+    public Iterator<FeatureModelTask> iterator() {
+        return (hasChildren()) ? Iterables.concat(getChildren()).iterator() :
+                Iterators.singletonIterator(FeatureModelTask.this);
     }
 }

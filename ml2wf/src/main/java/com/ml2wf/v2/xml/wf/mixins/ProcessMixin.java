@@ -10,7 +10,7 @@ import com.ml2wf.v2.tree.wf.WorkflowTask;
 import java.util.List;
 
 @JacksonXmlRootElement(localName = "bpmn2:process")
-@JsonIgnoreProperties({"internalMemory"})
+@JsonIgnoreProperties({"internalMemory", "identity"})
 public interface ProcessMixin {
 
     @JacksonXmlProperty(localName = "bpmn2:task")

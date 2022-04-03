@@ -106,7 +106,7 @@ public class WorkflowTask implements INormalizable, Instantiable, Identifiable<S
     }
 
     @Override
-    public String getIdentity() {
+    public @NonNull String getIdentity() {
         return id;
     }
 
