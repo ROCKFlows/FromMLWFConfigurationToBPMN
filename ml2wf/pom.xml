@@ -18,17 +18,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <version.junit>5.6.2</version.junit>
+        <version.junit>5.8.2</version.junit>
         <version.jar.plugin>3.2.0</version.jar.plugin>
         <version.assembly.plugin>3.3.0</version.assembly.plugin>
         <version.surefire>3.0.0-M1</version.surefire>
         <version.shade.plugin>3.3.0</version.shade.plugin>
-        <version.picocli>4.3.2</version.picocli>
-        <version.log4j>2.13.3</version.log4j>
-        <version.commons-io>2.7</version.commons-io>
+        <version.jackson>2.13.3</version.jackson>
+        <version.jackson.woodstox>6.2.8</version.jackson.woodstox>
+        <version.arangodb>3.7.0</version.arangodb>
+        <version.picocli>4.6.3</version.picocli>
+        <version.log4j>2.17.2</version.log4j>
+        <version.commons-io>2.11.0</version.commons-io>
         <version.guava>31.1-jre</version.guava>
-        <version.jansi>1.18</version.jansi>
-        <version.lombok>1.18.20</version.lombok>
+        <version.jansi>2.4.0</version.jansi>
+        <version.lombok>1.18.24</version.lombok>
         <version.vavr>0.10.4</version.vavr>
         <dependency.directory>dependency/</dependency.directory>
         <sonar.projectKey>MireilleBF_FromMLWFConfigurationToBPMN</sonar.projectKey>
@@ -97,7 +100,7 @@
         <dependency>
             <groupId>com.arangodb</groupId>
             <artifactId>arangodb-spring-data</artifactId>
-            <version>3.7.0</version>
+            <version>${version.arangodb}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
         <dependency>
@@ -114,19 +117,19 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
-            <version>2.12.3</version>
+            <version>${version.jackson}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.13.1</version>
+            <version>${version.jackson}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core -->
         <dependency>
             <groupId>com.fasterxml.woodstox</groupId>
             <artifactId>woodstox-core</artifactId>
-            <version>6.2.5</version>
+            <version>${version.jackson.woodstox}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <dependency>
@@ -159,7 +162,7 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.13.3</version>
+            <version>${version.log4j}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
         <dependency>
@@ -185,23 +188,6 @@
             <artifactId>jansi</artifactId>
             <version>${version.jansi}</version>
         </dependency>
-		<dependency>
-		    <groupId>commons-io</groupId>
-		    <artifactId>commons-io</artifactId>
-		    <version>${version.commons-io}</version>
-		</dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${version.guava}</version>
-        </dependency>
-		<!-- https://mvnrepository.com/artifact/org.fusesource.jansi/jansi -->
-		<dependency>
-		    <groupId>org.fusesource.jansi</groupId>
-		    <artifactId>jansi</artifactId>
-		    <version>${version.jansi}</version>
-		</dependency>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
