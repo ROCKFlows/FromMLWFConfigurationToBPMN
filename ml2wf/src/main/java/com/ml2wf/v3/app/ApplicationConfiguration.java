@@ -1,10 +1,10 @@
-package com.ml2wf.v2.app;
+package com.ml2wf.v3.app;
 
 import com.arangodb.ArangoDB;
 import com.arangodb.springframework.annotation.EnableArangoRepositories;
 import com.arangodb.springframework.config.ArangoConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ml2wf.v2.xml.XMLObjectMapperFactory;
+import com.ml2wf.v3.xml.XMLObjectMapperFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-@EnableArangoRepositories(basePackages = "com.ml2wf.v2.app.business.storage.graph")
+@EnableArangoRepositories(basePackages = "com.ml2wf.v3.app.business.storage.graph")
 public class ApplicationConfiguration implements ArangoConfiguration {
 
     @Override

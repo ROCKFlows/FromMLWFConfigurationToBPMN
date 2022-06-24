@@ -2,16 +2,16 @@
 
 echo "Compiling project..."
 cd ml2wf
-mvn clean package -Dtest='com.ml2wf.v2.**'
+mvn clean package -Dtest='com.ml2wf.v3.**' -DfailIfNoTests=false
 echo "Done."
 
 echo "Building docker images..."
 cd ..
-docker-compose build
+docker compose build
 echo "Done."
 
 echo "Deploying infrastructure..."
-docker-compose up -d
+docker compose up -d
 echo "Done."
 echo "Waiting 10 seconds to make sure everything is ready..."
 sleep 10

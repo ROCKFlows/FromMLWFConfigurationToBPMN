@@ -1,4 +1,4 @@
-package com.ml2wf.v2.app;
+package com.ml2wf.v3.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.ml2wf.v2.app.business.storage.graph.dto;
+package com.ml2wf.v3.app.business.storage.graph.dto;
 
 import com.arangodb.springframework.annotation.ArangoId;
 import com.arangodb.springframework.annotation.Document;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
-@Document("FeatureModelTask")
-public class ArangoFeatureModelTask {
+@Document("StandardKnowledgeTask")
+public class ArangoStandardKnowledgeTask {
 
     @Id
     private String id;
@@ -21,10 +21,10 @@ public class ArangoFeatureModelTask {
     private boolean isAbstract;
     private boolean isMandatory;
     private String description;
-    @Relations(edges = ArangoFeatureModelTaskLink.class, lazy = true)
-    private Collection<ArangoFeatureModelTask> children;
+    @Relations(edges = ArangoStandardKnowledgeTaskLink.class, lazy = true)
+    private Collection<ArangoStandardKnowledgeTask> children;
 
-    public ArangoFeatureModelTask(String name, boolean isAbstract, boolean isMandatory, String description) {
+    public ArangoStandardKnowledgeTask(String name, boolean isAbstract, boolean isMandatory, String description) {
         this.name = name;
         this.isAbstract = isAbstract;
         this.isMandatory = isMandatory;
