@@ -3,6 +3,7 @@ package com.ml2wf.v2.tree.fm.task;
 import com.ml2wf.v2.testutils.assertions.tree.fm.XMLFeatureModelTestBase;
 import com.ml2wf.v2.tree.fm.FeatureModel;
 import com.ml2wf.v2.tree.fm.FeatureModelTask;
+import com.ml2wf.v2.tree.fm.FeatureModelTask;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
