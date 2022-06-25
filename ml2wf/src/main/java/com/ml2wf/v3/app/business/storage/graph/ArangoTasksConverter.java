@@ -10,9 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Component
-public class ArangoFeatureModelConverter implements IArangoStandardKnowledgeConverter {
+public class ArangoTasksConverter implements IArangoStandardKnowledgeConverter {
 
     @Override
     public StandardKnowledgeTree toStandardKnowledgeTree(ArangoStandardKnowledgeTask arangoTreeTask) {
