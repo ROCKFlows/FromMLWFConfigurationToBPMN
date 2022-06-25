@@ -17,14 +17,15 @@ import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true, of = {"parent", "name", "isAbstract", "isMandatory", "descriptions"})
-@ToString(of = {"name", "isAbstract", "isMandatory"})
+@EqualsAndHashCode(callSuper = true, of = {"parent", "name", "isAbstract", "isMandatory", "descriptions", "version"})
+@ToString(of = {"name", "isAbstract", "isMandatory", "version"})
 public class FeatureModelTask extends FeatureModelStructure implements Identifiable<String> {
 
     private FeatureModelTask parent;
     private String name;
     private boolean isAbstract;
     private boolean isMandatory;
+    private String version;
     private List<Description> descriptions;
 
     @SuppressWarnings("unused")
@@ -34,12 +35,13 @@ public class FeatureModelTask extends FeatureModelStructure implements Identifia
         this.descriptions = new ArrayList<>();
     }
 
-    public FeatureModelTask(String name, boolean isAbstract, boolean isMandatory, Description description,
-                            List<FeatureModelTask> children) {
+    public FeatureModelTask(String name, boolean isAbstract, boolean isMandatory, String version,
+                            Description description, List<FeatureModelTask> children) {
         super(children);
         this.name = name;
         this.isAbstract = isAbstract;
         this.isMandatory = isMandatory;
+        this.version = version;
         this.descriptions = new ArrayList<>(Collections.singletonList(description));
     }
 

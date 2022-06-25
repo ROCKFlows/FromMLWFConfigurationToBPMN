@@ -23,6 +23,9 @@ public interface FMTaskMixin {
     @JacksonXmlProperty(localName = "mandatory", isAttribute = true)
     boolean isMandatory();
 
+    @JacksonXmlProperty(localName = "version", isAttribute = true)
+    boolean getVersion();
+
     @JacksonXmlProperty(localName = "description")
     @JacksonXmlElementWrapper(useWrapping = false)
     List<FeatureModelTask.Description> getDescriptions();

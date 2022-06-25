@@ -22,7 +22,7 @@ public class FeatureModelConverter implements IKnowledgeTreeConverter<FeatureMod
                     .map(FeatureModelTaskConverter::toStandardKnowledgeTask)
                     .collect(Collectors.toList());
             return new StandardKnowledgeTask(featureModelTask.getName(), description, featureModelTask.isAbstract(),
-                    !featureModelTask.isMandatory(), subTasks);
+                    !featureModelTask.isMandatory(), featureModelTask.getVersion(), subTasks);
         }
 
         private static FeatureModelTask toFeatureModelTask(StandardKnowledgeTask standardKnowledgeTask) {
@@ -32,7 +32,7 @@ public class FeatureModelConverter implements IKnowledgeTreeConverter<FeatureMod
                     .map(FeatureModelTaskConverter::toFeatureModelTask)
                     .collect(Collectors.toList());
             return new FeatureModelTask(standardKnowledgeTask.getName(), standardKnowledgeTask.isAbstract(),
-                    !standardKnowledgeTask.isOptional(), description, subTasks);
+                    !standardKnowledgeTask.isOptional(), "version TODO", description, subTasks);
         }
     }
 

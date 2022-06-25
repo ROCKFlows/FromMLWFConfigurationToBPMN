@@ -1,5 +1,6 @@
 package com.ml2wf.v3.app.business.storage.graph;
 
+import com.ml2wf.v3.app.business.storage.graph.dto.ArangoTaskVersion;
 import com.ml2wf.v3.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.tree.StandardKnowledgeTree;
 import com.ml2wf.v3.app.business.storage.graph.dto.ArangoStandardKnowledgeTask;
@@ -18,15 +19,18 @@ public class ArangoTasksConverter implements IArangoStandardKnowledgeConverter {
         return new StandardKnowledgeTree(Collections.singletonList(toStandardKnowledgeTask(arangoTreeTask)), Collections.emptyList()); // TODO: process constraints
     }
 
+    private String formatVersion(ArangoTaskVersion version) {
+        return String.format("v%d.%d.%d <%s>", version.getMajor(), version.getMinor(), version.getPatch(), version.getName());
+    }
+
     @Override
     public StandardKnowledgeTask toStandardKnowledgeTask(ArangoStandardKnowledgeTask arangoTreeTask) {
-        System.out.println("arangoTreeTask.getName() = " + arangoTreeTask.getName());
-        System.out.println("arangoTreeTask.getChildren() = " + arangoTreeTask.getChildren().stream().map(ArangoStandardKnowledgeTask::getName).collect(Collectors.toList()));
         return new StandardKnowledgeTask(
                 arangoTreeTask.getName(),
                 arangoTreeTask.getDescription(),
                 arangoTreeTask.isAbstract(),
                 !arangoTreeTask.isMandatory(),
+                formatVersion(arangoTreeTask.getVersion()),
                 arangoTreeTask.getChildren().stream()
                         .map(this::toStandardKnowledgeTask)
                         .collect(Collectors.toList())
@@ -47,6 +51,7 @@ public class ArangoTasksConverter implements IArangoStandardKnowledgeConverter {
                 standardKnowledgeTask.getName(),
                 standardKnowledgeTask.isAbstract(),
                 !standardKnowledgeTask.isOptional(),
+                new ArangoTaskVersion(0, 0, 0, "unversioned"), // TODO: take source task version in consideration
                 standardKnowledgeTask.getDocumentation());
         if (standardKnowledgeTask.getTasks().isEmpty()) {
             return Collections.singletonList(newArangoTask);

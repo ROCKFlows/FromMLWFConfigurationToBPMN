@@ -17,6 +17,7 @@ public class StandardKnowledgeTask implements ITree, INamedElement {
     private String documentation;
     private boolean isAbstract;
     private boolean isOptional;
+    private String version;
     private List<StandardKnowledgeTask> tasks;
 
     @Override

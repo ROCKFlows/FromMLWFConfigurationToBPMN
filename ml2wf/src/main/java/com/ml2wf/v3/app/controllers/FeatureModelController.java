@@ -20,24 +20,24 @@ public class FeatureModelController {
         this.featureModelComponent = featureModelComponent;
     }
 
-    @GetMapping(value = {"", "/"})
-    FeatureModel getFeatureModel() {
-        return featureModelComponent.getFeatureModel();
+    @GetMapping(value = {""})
+    FeatureModel getFeatureModel(@RequestParam String versionName) {
+        return featureModelComponent.getFeatureModel(versionName);
     }
 
     @GetMapping(value = {"/{name}"})
-    FeatureModel getFeatureModelTask(@PathVariable String name) {
-        return featureModelComponent.getFeatureModelTaskWithName(name);
+    FeatureModel getFeatureModelTask(@PathVariable String name, @RequestParam String versionName) {
+        return featureModelComponent.getFeatureModelTaskWithName(name, versionName);
     }
 
     @PostMapping(value = {"", "/"},
-            consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity<String> importFeatureModel(@RequestBody String featureModelString) throws Exception {
+            consumes = {MediaType.APPLICATION_XML_VALUE})
+    ResponseEntity<String> importFeatureModel(@RequestParam String versionName, @RequestBody String featureModelString) throws Exception {
         // TODO: use jackson to automatically convert requestbody to featureModel
         FeatureModel featureModel = XMLObjectMapperFactory.getInstance()
                 .createNewObjectMapper()
                 .readValue(featureModelString, FeatureModel.class);
-        featureModelComponent.importFeatureModel(featureModel); // TODO: check result
+        featureModelComponent.importFeatureModel(versionName, featureModel); // TODO: check result
         return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
     }
 }

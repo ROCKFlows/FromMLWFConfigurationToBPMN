@@ -1,11 +1,10 @@
 package com.ml2wf.v3.app.business.components;
 
-import com.ml2wf.v3.app.business.storage.graph.ArangoTasksConverter;
-import com.ml2wf.v3.app.business.storage.graph.IArangoStandardKnowledgeConverter;
-import com.ml2wf.v3.app.business.storage.graph.StandardKnowledgeTasksLinkRepository;
-import com.ml2wf.v3.app.business.storage.graph.StandardKnowledgeTasksRepository;
+import com.ml2wf.v3.app.business.storage.graph.*;
 import com.ml2wf.v3.app.business.storage.graph.dto.ArangoStandardKnowledgeTask;
 import com.ml2wf.v3.app.business.storage.graph.dto.ArangoStandardKnowledgeTaskLink;
+import com.ml2wf.v3.app.business.storage.graph.dto.ArangoTaskVersion;
+import com.ml2wf.v3.app.exceptions.NotFoundException;
 import com.ml2wf.v3.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.tree.StandardKnowledgeTree;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,30 +23,32 @@ public class StandardKnowledgeComponent {
 
     private final StandardKnowledgeTasksRepository standardKnowledgeTasksRepository;
     private final StandardKnowledgeTasksLinkRepository standardKnowledgeTasksLinkRepository;
+    private final VersionsRepository versionsRepository;
     private final IArangoStandardKnowledgeConverter arangoStandardKnowledgeConverter;
     private final ArangoTasksConverter arangoTasksConverter; // TODO: make autowirable
 
     public StandardKnowledgeComponent(@Autowired StandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
                                       @Autowired StandardKnowledgeTasksLinkRepository standardKnowledgeTasksLinkRepository,
+                                      @Autowired VersionsRepository versionsRepository,
                                       @Autowired IArangoStandardKnowledgeConverter arangoStandardKnowledgeConverter) {
         this.standardKnowledgeTasksRepository = standardKnowledgeTasksRepository;
         this.standardKnowledgeTasksLinkRepository = standardKnowledgeTasksLinkRepository;
+        this.versionsRepository = versionsRepository;
         this.arangoStandardKnowledgeConverter = arangoStandardKnowledgeConverter;
         this.arangoTasksConverter = new ArangoTasksConverter();
     }
 
-    public StandardKnowledgeTree getStandardKnowledgeTree() {
-        ArangoStandardKnowledgeTask arangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByName(ROOT_NODE_NAME);
-        System.out.println("arangoStandardKnowledgeTask = " + arangoStandardKnowledgeTask); // TODO: manage possible missing -> null
+    public StandardKnowledgeTree getStandardKnowledgeTree(String versionName) {
+        var optArangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersion_Name(ROOT_NODE_NAME, versionName);
+        var arangoStandardKnowledgeTask = optArangoStandardKnowledgeTask.orElseThrow(NotFoundException::new);
         // __ROOT node is for internal use only and should not be exported
         var firstArangoTreeTask = new ArrayList<>(arangoStandardKnowledgeTask.getChildren()).get(0);
         return arangoTasksConverter.toStandardKnowledgeTree(firstArangoTreeTask);
     }
 
-    public StandardKnowledgeTree getStandardKnowledgeTaskWithName(String taskName) {
-        ArangoStandardKnowledgeTask arangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByName(taskName);
-        System.out.println("arangoStandardKnowledgeTask = " + arangoStandardKnowledgeTask); // TODO: manage possible missing -> null
-        return arangoTasksConverter.toStandardKnowledgeTree(arangoStandardKnowledgeTask);
+    public StandardKnowledgeTree getStandardKnowledgeTaskWithName(String taskName, String versionName) {
+        var optArangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersion_Name(taskName, versionName);
+        return arangoTasksConverter.toStandardKnowledgeTree(optArangoStandardKnowledgeTask.orElseThrow(NotFoundException::new));
     }
 
     private Optional<StandardKnowledgeTask> containsTaskWithName(StandardKnowledgeTask task, String name) {
@@ -80,9 +81,16 @@ public class StandardKnowledgeComponent {
         standardKnowledgeTasksLinkRepository.save(new ArangoStandardKnowledgeTaskLink(root, map.get(standardKnowledgeTree.getTasks().get(0).getName())));
     }
 
-    public boolean importStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree) {
+    public boolean importStandardKnowledgeTree(String versionName, StandardKnowledgeTree standardKnowledgeTree) {
+        var lastVersion = versionsRepository.getLastVersion().orElseGet(() -> new ArangoTaskVersion(0, 0, 0, "unversioned"));
         var arangoStandardKnowledgeTasks = arangoStandardKnowledgeConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
-        var rootTask = new ArangoStandardKnowledgeTask(ROOT_NODE_NAME, true, true, "reserved tree root. internal use only. not exported.");
+        arangoStandardKnowledgeTasks.forEach(t -> {
+            t.getVersion().setMajor(lastVersion.getMajor() + 1);
+            t.getVersion().setName(versionName);
+        });
+        var newRootVersion = new ArangoTaskVersion(lastVersion.getMajor() + 1, 0, 0, versionName);
+        versionsRepository.save(newRootVersion);
+        var rootTask = new ArangoStandardKnowledgeTask(ROOT_NODE_NAME, true, true, newRootVersion, "reserved tree root. internal use only. not exported.");
         standardKnowledgeTasksRepository.save(rootTask); // saving reserved tree root
         var iterableUpdatedArangoTasks = standardKnowledgeTasksRepository.saveAll(arangoStandardKnowledgeTasks);
         saveRootLink(standardKnowledgeTree, arangoStandardKnowledgeTasks, rootTask); // saving reserved tree root link to first knowledge tree task

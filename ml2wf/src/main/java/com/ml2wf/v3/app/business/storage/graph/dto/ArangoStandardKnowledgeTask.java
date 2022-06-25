@@ -9,7 +9,7 @@ import java.util.Collection;
 
 @Data
 @Document("StandardKnowledgeTask")
-@PersistentIndex(fields = { "name" })
+@PersistentIndex(fields = { "name", "version" })
 public class ArangoStandardKnowledgeTask {
 
     @Id
@@ -19,14 +19,17 @@ public class ArangoStandardKnowledgeTask {
     private String name;
     private boolean isAbstract;
     private boolean isMandatory;
+    private ArangoTaskVersion version;
     private String description;
     @Relations(edges = ArangoStandardKnowledgeTaskLink.class, direction = Relations.Direction.OUTBOUND, lazy = true)
     private Collection<ArangoStandardKnowledgeTask> children;
 
-    public ArangoStandardKnowledgeTask(String name, boolean isAbstract, boolean isMandatory, String description) {
+    public ArangoStandardKnowledgeTask(String name, boolean isAbstract, boolean isMandatory, ArangoTaskVersion version,
+                                       String description) {
         this.name = name;
         this.isAbstract = isAbstract;
         this.isMandatory = isMandatory;
+        this.version = version;
         this.description = description;
         children = new ArrayList<>();
     }
