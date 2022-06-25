@@ -33,6 +33,7 @@
         <version.jansi>2.4.0</version.jansi>
         <version.lombok>1.18.24</version.lombok>
         <version.vavr>0.10.4</version.vavr>
+        <version.springdoc>1.6.9</version.springdoc>
         <dependency.directory>dependency/</dependency.directory>
         <sonar.projectKey>MireilleBF_FromMLWFConfigurationToBPMN</sonar.projectKey>
         <sonar.organization>mireillebf-github</sonar.organization>
@@ -118,6 +119,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${version.springdoc}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml -->
         <dependency>

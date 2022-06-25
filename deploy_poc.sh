@@ -1,12 +1,6 @@
 #!/bin/bash
 
-echo "Compiling project..."
-cd ml2wf
-mvn clean package -Dtest='com.ml2wf.v3.**' -DfailIfNoTests=false
-echo "Done."
-
 echo "Building docker images..."
-cd ..
 docker compose build
 echo "Done."
 
@@ -19,7 +13,7 @@ echo "Done."
 
 echo "Importing feature model into arangodb..."
 curl -X POST "http://localhost:8080/fm/" -H  "accept: application/json" -H  "Content-Type: application/xml" -d '@BPMN-Models/light_model_sample.xml'
-echo "\nDone."
+echo -e "\nDone."
 
 echo "To visualize the imported feature model:"
 echo "   - go to http://localhost:8529/"

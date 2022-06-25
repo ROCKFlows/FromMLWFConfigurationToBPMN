@@ -1,13 +1,21 @@
-FROM openjdk:11
+FROM maven:3.8.6-jdk-11 as builder
 
-RUN addgroup --system ml2wf && adduser --system --ingroup ml2wf ml2wf
+WORKDIR /ml2wf-build
 
-WORKDIR /ml2wf
+COPY ./ml2wf/pom.xml .
 
-COPY ./ml2wf/target/ml2wf.jar /ml2wf/ml2wf.jar
+COPY ./ml2wf/src/ ./src/
 
-RUN chmod 007 ml2wf.jar
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests # tmp disable tests
 
-USER ml2wf:ml2wf
+# RUN mvn clean package -DskipTests
 
-ENTRYPOINT ["java","-jar","/ml2wf/ml2wf.jar"]
+FROM openjdk:11 as runner
+
+WORKDIR /ml2wf-runner
+
+COPY --from=builder /ml2wf-build/target/ml2wf.jar .
+
+EXPOSE 8080
+
+ENTRYPOINT ["java","-jar","ml2wf.jar"]
