@@ -20,6 +20,8 @@ public class ArangoTasksConverter implements IArangoStandardKnowledgeConverter {
 
     @Override
     public StandardKnowledgeTask toStandardKnowledgeTask(ArangoStandardKnowledgeTask arangoTreeTask) {
+        System.out.println("arangoTreeTask.getName() = " + arangoTreeTask.getName());
+        System.out.println("arangoTreeTask.getChildren() = " + arangoTreeTask.getChildren().stream().map(ArangoStandardKnowledgeTask::getName).collect(Collectors.toList()));
         return new StandardKnowledgeTask(
                 arangoTreeTask.getName(),
                 arangoTreeTask.getDescription(),

@@ -18,10 +18,16 @@ public class FeatureModelComponent {
         featureModelConverter = new FeatureModelConverter();
     }
 
-    public FeatureModel getFeatureModelWithName(String name) {
-        var standardKnowledgeTree = standardKnowledgeComponent.getStandardKnowledgeTreeWithName(name);
+    public FeatureModel getFeatureModel() {
+        var standardKnowledgeTree = standardKnowledgeComponent.getStandardKnowledgeTree();
         return featureModelConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
     }
+
+    public FeatureModel getFeatureModelTaskWithName(String taskName) {
+        var standardKnowledgeTree = standardKnowledgeComponent.getStandardKnowledgeTaskWithName(taskName);
+        return featureModelConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
+    }
+
 
     public boolean importFeatureModel(FeatureModel featureModel) {
         var standardKnowledgeTree = featureModelConverter.toStandardKnowledgeTree(featureModel);

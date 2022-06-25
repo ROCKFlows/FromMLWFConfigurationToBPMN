@@ -11,6 +11,7 @@ import com.ml2wf.v3.tree.StandardKnowledgeTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,6 +19,8 @@ import java.util.stream.StreamSupport;
 
 @Component
 public class StandardKnowledgeComponent {
+
+    private static final String ROOT_NODE_NAME = "__ROOT";
 
     private final StandardKnowledgeTasksRepository standardKnowledgeTasksRepository;
     private final StandardKnowledgeTasksLinkRepository standardKnowledgeTasksLinkRepository;
@@ -33,8 +36,17 @@ public class StandardKnowledgeComponent {
         this.arangoTasksConverter = new ArangoTasksConverter();
     }
 
-    public StandardKnowledgeTree getStandardKnowledgeTreeWithName(String name) {
-        ArangoStandardKnowledgeTask arangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByName(name);
+    public StandardKnowledgeTree getStandardKnowledgeTree() {
+        ArangoStandardKnowledgeTask arangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByName(ROOT_NODE_NAME);
+        System.out.println("arangoStandardKnowledgeTask = " + arangoStandardKnowledgeTask); // TODO: manage possible missing -> null
+        // __ROOT node is for internal use only and should not be exported
+        var firstArangoTreeTask = new ArrayList<>(arangoStandardKnowledgeTask.getChildren()).get(0);
+        return arangoTasksConverter.toStandardKnowledgeTree(firstArangoTreeTask);
+    }
+
+    public StandardKnowledgeTree getStandardKnowledgeTaskWithName(String taskName) {
+        ArangoStandardKnowledgeTask arangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByName(taskName);
+        System.out.println("arangoStandardKnowledgeTask = " + arangoStandardKnowledgeTask); // TODO: manage possible missing -> null
         return arangoTasksConverter.toStandardKnowledgeTree(arangoStandardKnowledgeTask);
     }
 
@@ -49,10 +61,10 @@ public class StandardKnowledgeComponent {
 
     private void saveLinks(
             StandardKnowledgeTree knowledgeTree,
-            Iterable<ArangoStandardKnowledgeTask> arangoFeatureModelTasksIterable
+            Iterable<ArangoStandardKnowledgeTask> arangoStandardKnowledgeTasks
     ) {
         // TODO: move to dedicated component
-        Map<String, ArangoStandardKnowledgeTask> map = StreamSupport.stream(arangoFeatureModelTasksIterable.spliterator(), false)
+        Map<String, ArangoStandardKnowledgeTask> map = StreamSupport.stream(arangoStandardKnowledgeTasks.spliterator(), false)
                 .collect(Collectors.toMap(ArangoStandardKnowledgeTask::getName, t -> t));
         map.forEach((k, v) -> {
             var knowledgeTask = containsTaskWithName(knowledgeTree.getTasks().get(0), k).orElseThrow();
@@ -60,9 +72,20 @@ public class StandardKnowledgeComponent {
         });
     }
 
+    private void saveRootLink(StandardKnowledgeTree standardKnowledgeTree,
+                              Iterable<ArangoStandardKnowledgeTask> arangoStandardKnowledgeTasks,
+                              ArangoStandardKnowledgeTask root) {
+        Map<String, ArangoStandardKnowledgeTask> map = StreamSupport.stream(arangoStandardKnowledgeTasks.spliterator(), false)
+                .collect(Collectors.toMap(ArangoStandardKnowledgeTask::getName, t -> t));
+        standardKnowledgeTasksLinkRepository.save(new ArangoStandardKnowledgeTaskLink(root, map.get(standardKnowledgeTree.getTasks().get(0).getName())));
+    }
+
     public boolean importStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree) {
-        var arangoFeatureModelTasks = arangoStandardKnowledgeConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
-        var iterableUpdatedArangoTasks = standardKnowledgeTasksRepository.saveAll(arangoFeatureModelTasks);
+        var arangoStandardKnowledgeTasks = arangoStandardKnowledgeConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
+        var rootTask = new ArangoStandardKnowledgeTask(ROOT_NODE_NAME, true, true, "reserved tree root. internal use only. not exported.");
+        standardKnowledgeTasksRepository.save(rootTask); // saving reserved tree root
+        var iterableUpdatedArangoTasks = standardKnowledgeTasksRepository.saveAll(arangoStandardKnowledgeTasks);
+        saveRootLink(standardKnowledgeTree, arangoStandardKnowledgeTasks, rootTask); // saving reserved tree root link to first knowledge tree task
         saveLinks(standardKnowledgeTree, iterableUpdatedArangoTasks);
         return true;
     }

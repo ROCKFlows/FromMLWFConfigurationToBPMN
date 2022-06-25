@@ -1,8 +1,6 @@
 package com.ml2wf.v3.app.business.storage.graph.dto;
 
-import com.arangodb.springframework.annotation.ArangoId;
-import com.arangodb.springframework.annotation.Document;
-import com.arangodb.springframework.annotation.Relations;
+import com.arangodb.springframework.annotation.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -11,6 +9,7 @@ import java.util.Collection;
 
 @Data
 @Document("StandardKnowledgeTask")
+@PersistentIndex(fields = { "name" })
 public class ArangoStandardKnowledgeTask {
 
     @Id
@@ -21,7 +20,7 @@ public class ArangoStandardKnowledgeTask {
     private boolean isAbstract;
     private boolean isMandatory;
     private String description;
-    @Relations(edges = ArangoStandardKnowledgeTaskLink.class, lazy = true)
+    @Relations(edges = ArangoStandardKnowledgeTaskLink.class, direction = Relations.Direction.OUTBOUND, lazy = true)
     private Collection<ArangoStandardKnowledgeTask> children;
 
     public ArangoStandardKnowledgeTask(String name, boolean isAbstract, boolean isMandatory, String description) {

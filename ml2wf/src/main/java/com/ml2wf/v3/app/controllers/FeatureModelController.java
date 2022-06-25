@@ -20,9 +20,14 @@ public class FeatureModelController {
         this.featureModelComponent = featureModelComponent;
     }
 
+    @GetMapping(value = {"", "/"})
+    FeatureModel getFeatureModel() {
+        return featureModelComponent.getFeatureModel();
+    }
+
     @GetMapping(value = {"/{name}"})
-    FeatureModel getFeatureModel(@PathVariable String name) {
-        return featureModelComponent.getFeatureModelWithName(name);
+    FeatureModel getFeatureModelTask(@PathVariable String name) {
+        return featureModelComponent.getFeatureModelTaskWithName(name);
     }
 
     @PostMapping(value = {"", "/"},
