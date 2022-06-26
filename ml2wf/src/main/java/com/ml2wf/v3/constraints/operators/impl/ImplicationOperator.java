@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ImplicationOperator extends AbstractOperator {
@@ -21,5 +22,10 @@ public class ImplicationOperator extends AbstractOperator {
             return operands.subList(1, operands.size()).stream().allMatch(o -> o.isWorkflowConsistent(workflow));
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("(%s)", operands.stream().map(Object::toString).collect(Collectors.joining(" => ")));
     }
 }

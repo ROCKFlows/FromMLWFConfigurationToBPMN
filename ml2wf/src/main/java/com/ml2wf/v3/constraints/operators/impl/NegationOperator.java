@@ -22,6 +22,11 @@ public class NegationOperator extends AbstractUnaryOperator {
 
     @Override
     public boolean isWorkflowConsistent(StandardWorkflow workflow) {
-        return operands.stream().noneMatch(o -> o.isWorkflowConsistent(workflow));
+        return !operands.get(0).isWorkflowConsistent(workflow);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("!(%s)", operands.get(0).toString());
     }
 }

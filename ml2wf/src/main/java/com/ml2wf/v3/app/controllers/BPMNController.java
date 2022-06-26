@@ -35,13 +35,12 @@ public class BPMNController {
     @PostMapping(value = {"/consistency"},
             consumes = {MediaType.APPLICATION_XML_VALUE})
     ResponseEntity<String> isBPMNWorkflowConsistent(@RequestParam String versionName,
-                                                    @RequestBody String bpmnWorkflowString)
-            throws Exception {
+                                                    @RequestBody String bpmnWorkflowString) throws Exception {
         // TODO: use jackson to automatically convert requestbody to featureModel
         BPMNWorkflow bpmnWorkflow = XMLObjectMapperFactory.getInstance()
                 .createNewObjectMapper()
                 .readValue(bpmnWorkflowString, BPMNWorkflow.class);
-        bpmnComponent.isBPMNWorkflowConsistent(versionName, bpmnWorkflow); // TODO: check result
-        return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(String.valueOf(bpmnComponent.isBPMNWorkflowConsistent(versionName, bpmnWorkflow)),
+                HttpStatus.ACCEPTED);
     }
 }

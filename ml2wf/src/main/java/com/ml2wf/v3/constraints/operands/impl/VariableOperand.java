@@ -20,4 +20,9 @@ public class VariableOperand implements AbstractOperand {
     public boolean isWorkflowConsistent(StandardWorkflow workflow) {
         return workflow.getTasks().stream().anyMatch(this::isConsistent);
     }
+
+    @Override
+    public String toString() {
+        return value;
+    }
 }
