@@ -1,7 +1,7 @@
 package com.ml2wf.v3.app.business.components;
 
-import com.ml2wf.v3.tree.custom.featuremodel.FeatureModel;
-import com.ml2wf.v3.tree.converter.FeatureModelConverter;
+import com.ml2wf.v3.app.tree.custom.featuremodel.FeatureModel;
+import com.ml2wf.v3.app.tree.converter.FeatureModelConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

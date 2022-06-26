@@ -4,7 +4,7 @@ import com.arangodb.ArangoDB;
 import com.arangodb.springframework.annotation.EnableArangoRepositories;
 import com.arangodb.springframework.config.ArangoConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ml2wf.v3.xml.XMLObjectMapperFactory;
+import com.ml2wf.v3.app.xml.XMLObjectMapperFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

@@ -1,8 +1,8 @@
 package com.ml2wf.v3.app.controllers;
 
 import com.ml2wf.v3.app.business.components.BPMNComponent;
-import com.ml2wf.v3.workflow.custom.bpmn.BPMNWorkflow;
-import com.ml2wf.v3.xml.XMLObjectMapperFactory;
+import com.ml2wf.v3.app.workflow.custom.bpmn.BPMNWorkflow;
+import com.ml2wf.v3.app.xml.XMLObjectMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

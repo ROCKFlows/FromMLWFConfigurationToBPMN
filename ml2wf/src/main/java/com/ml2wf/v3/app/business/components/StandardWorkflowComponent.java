@@ -1,8 +1,8 @@
 package com.ml2wf.v3.app.business.components;
 
-import com.ml2wf.v3.app.business.storage.graph.ConstraintsRepository;
-import com.ml2wf.v3.app.business.storage.graph.IArangoConstraintsConverter;
-import com.ml2wf.v3.workflow.StandardWorkflow;
+import com.ml2wf.v3.app.business.storage.graph.repository.ConstraintsRepository;
+import com.ml2wf.v3.app.business.storage.graph.converter.IArangoConstraintsConverter;
+import com.ml2wf.v3.app.workflow.StandardWorkflow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,10 +34,6 @@ public class StandardWorkflowComponent {
                 ROOT_CONSTRAINT_NODE_NAME, versionName).get(0).getOperands();
         return operands.stream()
                 .map(constraintsConverter::toConstraintTree)
-                .peek(t -> {
-                    System.out.println("t = " + t);
-                    System.out.println(t.isWorkflowConsistent(standardWorkflow));
-                })
                 .allMatch(c -> c.isWorkflowConsistent(standardWorkflow));
     }
 }

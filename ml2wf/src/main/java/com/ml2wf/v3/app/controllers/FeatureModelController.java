@@ -1,8 +1,8 @@
 package com.ml2wf.v3.app.controllers;
 
 import com.ml2wf.v3.app.business.components.FeatureModelComponent;
-import com.ml2wf.v3.tree.custom.featuremodel.FeatureModel;
-import com.ml2wf.v3.xml.XMLObjectMapperFactory;
+import com.ml2wf.v3.app.tree.custom.featuremodel.FeatureModel;
+import com.ml2wf.v3.app.xml.XMLObjectMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,8 +30,7 @@ public class FeatureModelController {
         return featureModelComponent.getFeatureModelTaskWithName(name, versionName);
     }
 
-    @PostMapping(value = {"", "/"},
-            consumes = {MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE})
     ResponseEntity<String> importFeatureModel(@RequestParam String versionName, @RequestBody String featureModelString) throws Exception {
         // TODO: use jackson to automatically convert requestbody to featureModel
         FeatureModel featureModel = XMLObjectMapperFactory.getInstance()

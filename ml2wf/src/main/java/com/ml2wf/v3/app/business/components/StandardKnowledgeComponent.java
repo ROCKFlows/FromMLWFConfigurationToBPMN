@@ -1,11 +1,14 @@
 package com.ml2wf.v3.app.business.components;
 
 import com.google.common.collect.ImmutableList;
-import com.ml2wf.v3.app.business.storage.graph.*;
+import com.ml2wf.v3.app.business.storage.graph.converter.impl.ArangoTasksConverter;
+import com.ml2wf.v3.app.business.storage.graph.converter.IArangoConstraintsConverter;
+import com.ml2wf.v3.app.business.storage.graph.converter.IArangoStandardKnowledgeConverter;
 import com.ml2wf.v3.app.business.storage.graph.dto.*;
+import com.ml2wf.v3.app.business.storage.graph.repository.*;
 import com.ml2wf.v3.app.exceptions.NotFoundException;
-import com.ml2wf.v3.tree.StandardKnowledgeTask;
-import com.ml2wf.v3.tree.StandardKnowledgeTree;
+import com.ml2wf.v3.app.tree.StandardKnowledgeTask;
+import com.ml2wf.v3.app.tree.StandardKnowledgeTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

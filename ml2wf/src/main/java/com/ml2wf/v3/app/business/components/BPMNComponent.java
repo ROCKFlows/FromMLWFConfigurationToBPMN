@@ -1,7 +1,7 @@
 package com.ml2wf.v3.app.business.components;
 
-import com.ml2wf.v3.workflow.converter.BPMNWorkflowConverter;
-import com.ml2wf.v3.workflow.custom.bpmn.BPMNWorkflow;
+import com.ml2wf.v3.app.workflow.converter.BPMNWorkflowConverter;
+import com.ml2wf.v3.app.workflow.custom.bpmn.BPMNWorkflow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
