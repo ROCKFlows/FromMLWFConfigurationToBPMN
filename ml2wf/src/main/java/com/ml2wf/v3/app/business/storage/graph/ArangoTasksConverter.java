@@ -1,6 +1,7 @@
 package com.ml2wf.v3.app.business.storage.graph;
 
 import com.ml2wf.v3.app.business.storage.graph.dto.ArangoTaskVersion;
+import com.ml2wf.v3.constraints.ConstraintTree;
 import com.ml2wf.v3.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.tree.StandardKnowledgeTree;
 import com.ml2wf.v3.app.business.storage.graph.dto.ArangoStandardKnowledgeTask;
@@ -16,7 +17,19 @@ public class ArangoTasksConverter implements IArangoStandardKnowledgeConverter {
 
     @Override
     public StandardKnowledgeTree toStandardKnowledgeTree(ArangoStandardKnowledgeTask arangoTreeTask) {
-        return new StandardKnowledgeTree(Collections.singletonList(toStandardKnowledgeTask(arangoTreeTask)), Collections.emptyList()); // TODO: process constraints
+        return new StandardKnowledgeTree(
+                Collections.singletonList(toStandardKnowledgeTask(arangoTreeTask)),
+                Collections.emptyList()
+        );
+    }
+
+    @Override
+    public StandardKnowledgeTree toStandardKnowledgeTree(ArangoStandardKnowledgeTask arangoTreeTask,
+                                                         ConstraintTree constraintTree) {
+        return new StandardKnowledgeTree(
+                Collections.singletonList(toStandardKnowledgeTask(arangoTreeTask)),
+                Collections.singletonList(constraintTree)
+        );
     }
 
     private String formatVersion(ArangoTaskVersion version) {

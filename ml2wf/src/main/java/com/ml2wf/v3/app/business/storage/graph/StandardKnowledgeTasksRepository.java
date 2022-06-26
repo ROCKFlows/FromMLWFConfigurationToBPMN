@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface StandardKnowledgeTasksRepository extends ArangoRepository<ArangoStandardKnowledgeTask, String> {
+
     Optional<ArangoStandardKnowledgeTask> findOneByNameAndVersion_Name(String name, String versionName);
 }

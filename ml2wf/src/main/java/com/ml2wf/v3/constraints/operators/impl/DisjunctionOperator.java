@@ -2,6 +2,7 @@ package com.ml2wf.v3.constraints.operators.impl;
 
 import com.ml2wf.v3.constraints.operands.AbstractOperand;
 import com.ml2wf.v3.constraints.operators.AbstractOperator;
+import com.ml2wf.v3.workflow.StandardWorkflow;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -12,5 +13,10 @@ public class DisjunctionOperator extends AbstractOperator {
 
     public DisjunctionOperator(final List<AbstractOperand> operands) {
         super(operands);
+    }
+
+    @Override
+    public boolean isWorkflowConsistent(StandardWorkflow workflow) {
+        return operands.stream().anyMatch(o -> o.isWorkflowConsistent(workflow));
     }
 }

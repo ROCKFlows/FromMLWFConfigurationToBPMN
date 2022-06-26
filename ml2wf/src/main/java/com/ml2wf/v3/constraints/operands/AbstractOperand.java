@@ -1,12 +1,13 @@
 package com.ml2wf.v3.constraints.operands;
 
 import com.ml2wf.v3.constraints.operands.impl.VariableOperand;
+import com.ml2wf.v3.constraints.operators.ConsistencyChecker;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
-public interface  AbstractOperand {
+public interface  AbstractOperand extends ConsistencyChecker  {
 
     @RequiredArgsConstructor
     @Getter

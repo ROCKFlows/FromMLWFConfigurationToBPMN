@@ -1,18 +1,15 @@
 package com.ml2wf.v3.app.business.components;
 
+import com.google.common.collect.ImmutableList;
 import com.ml2wf.v3.app.business.storage.graph.*;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoStandardKnowledgeTask;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoStandardKnowledgeTaskLink;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoTaskVersion;
+import com.ml2wf.v3.app.business.storage.graph.dto.*;
 import com.ml2wf.v3.app.exceptions.NotFoundException;
 import com.ml2wf.v3.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.tree.StandardKnowledgeTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -20,22 +17,36 @@ import java.util.stream.StreamSupport;
 public class StandardKnowledgeComponent {
 
     private static final String ROOT_NODE_NAME = "__ROOT";
+    private static final String ROOT_CONSTRAINT_NODE_NAME = "__ROOT_CONSTRAINT";
 
     private final StandardKnowledgeTasksRepository standardKnowledgeTasksRepository;
     private final StandardKnowledgeTasksLinkRepository standardKnowledgeTasksLinkRepository;
+    private final ConstraintsRepository constraintsRepository;
+    private final ConstraintsLinksRepository constraintsLinksRepository;
+    private final ConstraintsToTaskLinksRepository constraintsToTaskLinksRepository;
     private final VersionsRepository versionsRepository;
     private final IArangoStandardKnowledgeConverter arangoStandardKnowledgeConverter;
-    private final ArangoTasksConverter arangoTasksConverter; // TODO: make autowirable
+    private final IArangoConstraintsConverter arangoConstraintsConverter;
+    private final ArangoTasksConverter arangoTasksConverter;
 
     public StandardKnowledgeComponent(@Autowired StandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
                                       @Autowired StandardKnowledgeTasksLinkRepository standardKnowledgeTasksLinkRepository,
+                                      @Autowired ConstraintsRepository constraintsRepository,
+                                      @Autowired ConstraintsLinksRepository constraintsLinksRepository,
+                                      @Autowired ConstraintsToTaskLinksRepository constraintsToTaskLinksRepository,
                                       @Autowired VersionsRepository versionsRepository,
-                                      @Autowired IArangoStandardKnowledgeConverter arangoStandardKnowledgeConverter) {
+                                      @Autowired IArangoStandardKnowledgeConverter arangoStandardKnowledgeConverter,
+                                      @Autowired IArangoConstraintsConverter arangoConstraintsConverter,
+                                      @Autowired ArangoTasksConverter arangoTasksConverter) {
         this.standardKnowledgeTasksRepository = standardKnowledgeTasksRepository;
         this.standardKnowledgeTasksLinkRepository = standardKnowledgeTasksLinkRepository;
+        this.constraintsRepository = constraintsRepository;
+        this.constraintsLinksRepository = constraintsLinksRepository;
+        this.constraintsToTaskLinksRepository = constraintsToTaskLinksRepository;
         this.versionsRepository = versionsRepository;
         this.arangoStandardKnowledgeConverter = arangoStandardKnowledgeConverter;
-        this.arangoTasksConverter = new ArangoTasksConverter();
+        this.arangoConstraintsConverter = arangoConstraintsConverter;
+        this.arangoTasksConverter = arangoTasksConverter;
     }
 
     public StandardKnowledgeTree getStandardKnowledgeTree(String versionName) {
@@ -43,7 +54,8 @@ public class StandardKnowledgeComponent {
         var arangoStandardKnowledgeTask = optArangoStandardKnowledgeTask.orElseThrow(NotFoundException::new);
         // __ROOT node is for internal use only and should not be exported
         var firstArangoTreeTask = new ArrayList<>(arangoStandardKnowledgeTask.getChildren()).get(0);
-        return arangoTasksConverter.toStandardKnowledgeTree(firstArangoTreeTask);
+        System.out.println(constraintsRepository.findAllByTypeEqualsAndVersion_Name(ROOT_CONSTRAINT_NODE_NAME, firstArangoTreeTask.getVersion().getName()));
+        return arangoTasksConverter.toStandardKnowledgeTree(firstArangoTreeTask); // TODO: pass retrieves constraint tree as last parameter
     }
 
     public StandardKnowledgeTree getStandardKnowledgeTaskWithName(String taskName, String versionName) {
@@ -81,8 +93,27 @@ public class StandardKnowledgeComponent {
         standardKnowledgeTasksLinkRepository.save(new ArangoStandardKnowledgeTaskLink(root, map.get(standardKnowledgeTree.getTasks().get(0).getName())));
     }
 
+    private Collection<ArangoConstraintOperand> saveConstraints(Collection<ArangoConstraintOperand> operands) {
+        var updatedParentsOperands = ImmutableList.copyOf(constraintsRepository.saveAll(operands));
+        for (var parentOperand : updatedParentsOperands) {
+            for (var childOperand : saveConstraints(parentOperand.getOperands())) {
+                constraintsLinksRepository.save(new ArangoConstraintLink(parentOperand, childOperand));
+            }
+            if (parentOperand.getTask() != null) {
+                constraintsToTaskLinksRepository.save(new ArangoConstraintToTaskLink(parentOperand, parentOperand.getTask()));
+            }
+        }
+        return updatedParentsOperands;
+    }
+
+    private void saveConstraintRootLinks(Iterable<ArangoConstraintOperand> operands, ArangoConstraintOperand root) {
+        operands.forEach(o -> constraintsLinksRepository.save(new ArangoConstraintLink(root, o)));
+    }
+
     public boolean importStandardKnowledgeTree(String versionName, StandardKnowledgeTree standardKnowledgeTree) {
+        // TODO: split into dedicated components (one for tasks, one for constraints...)
         var lastVersion = versionsRepository.getLastVersion().orElseGet(() -> new ArangoTaskVersion(0, 0, 0, "unversioned"));
+        // converting and saving tasks
         var arangoStandardKnowledgeTasks = arangoStandardKnowledgeConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
         arangoStandardKnowledgeTasks.forEach(t -> {
             t.getVersion().setMajor(lastVersion.getMajor() + 1);
@@ -95,6 +126,18 @@ public class StandardKnowledgeComponent {
         var iterableUpdatedArangoTasks = standardKnowledgeTasksRepository.saveAll(arangoStandardKnowledgeTasks);
         saveRootLink(standardKnowledgeTree, arangoStandardKnowledgeTasks, rootTask); // saving reserved tree root link to first knowledge tree task
         saveLinks(standardKnowledgeTree, iterableUpdatedArangoTasks);
+        // converting and saving constraints
+        var rootConstraint = new ArangoConstraintOperand(ROOT_CONSTRAINT_NODE_NAME, new ArangoTaskVersion(lastVersion.getMajor() + 1, 0, 0, versionName), Collections.emptyList());
+        constraintsRepository.save(rootConstraint); // saving reserved constraint tree root
+        var arangoConstraintOperands = arangoConstraintsConverter.fromStandardKnowledgeTree(
+                standardKnowledgeTree, ImmutableList.copyOf(iterableUpdatedArangoTasks)
+        );
+        arangoConstraintOperands.forEach(t -> {
+            t.getVersion().setMajor(lastVersion.getMajor() + 1);
+            t.getVersion().setName(versionName);
+        });
+        var iterableUpdatedArangoConstraints = saveConstraints(arangoConstraintOperands);
+        saveConstraintRootLinks(iterableUpdatedArangoConstraints, rootConstraint);
         return true;
     }
 }

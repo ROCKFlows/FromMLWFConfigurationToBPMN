@@ -2,6 +2,7 @@ package com.ml2wf.v3.constraints.operators.impl;
 
 import com.ml2wf.v3.constraints.operands.AbstractOperand;
 import com.ml2wf.v3.constraints.operators.AbstractUnaryOperator;
+import com.ml2wf.v3.workflow.StandardWorkflow;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -17,5 +18,10 @@ public class NegationOperator extends AbstractUnaryOperator {
     public NegationOperator(final List<AbstractOperand> singleOperandList) {
         super(singleOperandList);
         // this constructor only accept a single valued list
+    }
+
+    @Override
+    public boolean isWorkflowConsistent(StandardWorkflow workflow) {
+        return operands.stream().noneMatch(o -> o.isWorkflowConsistent(workflow));
     }
 }
