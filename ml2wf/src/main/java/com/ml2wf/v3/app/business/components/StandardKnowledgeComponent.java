@@ -54,8 +54,10 @@ public class StandardKnowledgeComponent {
         var arangoStandardKnowledgeTask = optArangoStandardKnowledgeTask.orElseThrow(NotFoundException::new);
         // __ROOT node is for internal use only and should not be exported
         var firstArangoTreeTask = new ArrayList<>(arangoStandardKnowledgeTask.getChildren()).get(0);
-        System.out.println(constraintsRepository.findAllByTypeEqualsAndVersion_Name(ROOT_CONSTRAINT_NODE_NAME, firstArangoTreeTask.getVersion().getName()));
-        return arangoTasksConverter.toStandardKnowledgeTree(firstArangoTreeTask); // TODO: pass retrieves constraint tree as last parameter
+        var rootConstraint = constraintsRepository.findAllByTypeEqualsAndVersion_Name(ROOT_CONSTRAINT_NODE_NAME, firstArangoTreeTask.getVersion().getName());
+        return arangoTasksConverter.toStandardKnowledgeTree(firstArangoTreeTask, rootConstraint.get(0).getOperands().stream()
+                .map(arangoConstraintsConverter::toConstraintTree)
+                .collect(Collectors.toList()));
     }
 
     public StandardKnowledgeTree getStandardKnowledgeTaskWithName(String taskName, String versionName) {

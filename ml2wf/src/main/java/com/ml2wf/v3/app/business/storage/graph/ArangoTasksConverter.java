@@ -25,10 +25,10 @@ public class ArangoTasksConverter implements IArangoStandardKnowledgeConverter {
 
     @Override
     public StandardKnowledgeTree toStandardKnowledgeTree(ArangoStandardKnowledgeTask arangoTreeTask,
-                                                         ConstraintTree constraintTree) {
+                                                         List<ConstraintTree> constraintTrees) {
         return new StandardKnowledgeTree(
                 Collections.singletonList(toStandardKnowledgeTask(arangoTreeTask)),
-                Collections.singletonList(constraintTree)
+                constraintTrees
         );
     }
 

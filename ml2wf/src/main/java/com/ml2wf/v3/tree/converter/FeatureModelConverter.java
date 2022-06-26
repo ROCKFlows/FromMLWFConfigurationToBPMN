@@ -26,7 +26,8 @@ public class FeatureModelConverter implements IKnowledgeTreeConverter<FeatureMod
         }
 
         private static FeatureModelTask toFeatureModelTask(StandardKnowledgeTask standardKnowledgeTask) {
-            var description = new FeatureModelTask.Description(standardKnowledgeTask.getDocumentation());
+            var description = standardKnowledgeTask.getDocumentation().isBlank() ? null :
+                    new FeatureModelTask.Description(standardKnowledgeTask.getDocumentation());
             var subTasks = standardKnowledgeTask.getTasks()
                     .stream()
                     .map(FeatureModelTaskConverter::toFeatureModelTask)
@@ -44,7 +45,7 @@ public class FeatureModelConverter implements IKnowledgeTreeConverter<FeatureMod
                 .collect(Collectors.toList());
         var convertedConstraints = standardKnowledgeTree.getConstraints()
                 .stream()
-                .map(c -> new FeatureModelRule(c, new FeatureModelRule.Description()))
+                .map(c -> new FeatureModelRule(c, new FeatureModelRule.Description())) // TODO: we don't support rules description yet
                 .collect(Collectors.toList());
         var structure = new FeatureModelStructure(convertedSubTasks);
         return new FeatureModel(structure, convertedConstraints);

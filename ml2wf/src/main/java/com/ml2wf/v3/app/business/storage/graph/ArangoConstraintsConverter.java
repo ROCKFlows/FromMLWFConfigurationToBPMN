@@ -27,15 +27,19 @@ public class ArangoConstraintsConverter implements IArangoConstraintsConverter {
         }
     }
 
-    private AbstractOperand toOperand(ArangoConstraintOperand arangoConstraintOperand) {
+    private AbstractOperand toAbstractOperand(ArangoConstraintOperand arangoConstraintOperand) {
         // TODO: use AbstractOperandFactory
-        return callUsingReflection(AbstractOperand.Operands.getClassForShortName(arangoConstraintOperand.getType()),
-                new Class<?>[] { String.class }, arangoConstraintOperand.getOperands().stream().map(this::toOperand).collect(Collectors.toList()));
+        if (arangoConstraintOperand.getType().equals("var")) { // TODO: improve (should not rely only on var)
+            return callUsingReflection(AbstractOperand.Operands.getClassForShortName(arangoConstraintOperand.getType()),
+                    new Class<?>[] { String.class }, arangoConstraintOperand.getTask().getName());
+        }
+        return callUsingReflection(AbstractOperator.Operators.getClassForShortName(arangoConstraintOperand.getType()),
+                new Class<?>[] { List.class }, arangoConstraintOperand.getOperands().stream().map(this::toAbstractOperand).collect(Collectors.toList()));
     }
 
     @Override
     public ConstraintTree toConstraintTree(ArangoConstraintOperand arangoConstraintOperand) {
-        return new ConstraintTree((AbstractOperator) toOperand(arangoConstraintOperand));
+        return new ConstraintTree((AbstractOperator) toAbstractOperand(arangoConstraintOperand));
     }
 
     public ArangoConstraintOperand fromAbstractOperand(AbstractOperand abstractOperand,

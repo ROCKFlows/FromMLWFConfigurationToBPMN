@@ -14,7 +14,7 @@ public interface IArangoStandardKnowledgeConverter {
     StandardKnowledgeTree toStandardKnowledgeTree(ArangoStandardKnowledgeTask arangoTreeTask);
 
     StandardKnowledgeTree toStandardKnowledgeTree(ArangoStandardKnowledgeTask arangoTreeTask,
-                                                  ConstraintTree constraintTree);
+                                                  List<ConstraintTree> constraintTrees);
 
     StandardKnowledgeTask toStandardKnowledgeTask(ArangoStandardKnowledgeTask arangoTreeTask);
 

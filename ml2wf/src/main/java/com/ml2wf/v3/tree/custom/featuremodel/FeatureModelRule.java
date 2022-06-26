@@ -36,6 +36,6 @@ public class FeatureModelRule {
     @Data
     public static final class Description {
 
-        @NonNull private String content;
+        @NonNull private String content = "";
     }
 }
