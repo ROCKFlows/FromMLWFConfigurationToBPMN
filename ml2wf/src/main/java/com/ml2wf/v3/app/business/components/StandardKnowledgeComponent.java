@@ -6,7 +6,7 @@ import com.ml2wf.v3.app.business.storage.graph.converter.IArangoConstraintsConve
 import com.ml2wf.v3.app.business.storage.graph.converter.IArangoStandardKnowledgeConverter;
 import com.ml2wf.v3.app.business.storage.graph.dto.*;
 import com.ml2wf.v3.app.business.storage.graph.repository.*;
-import com.ml2wf.v3.app.exceptions.NotFoundException;
+import com.ml2wf.v3.app.exceptions.BadRequestException;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTree;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,8 @@ public class StandardKnowledgeComponent {
 
     public StandardKnowledgeTree getStandardKnowledgeTree(String versionName) {
         var optArangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersion_Name(ROOT_NODE_NAME, versionName);
-        var arangoStandardKnowledgeTask = optArangoStandardKnowledgeTask.orElseThrow(NotFoundException::new);
+        var arangoStandardKnowledgeTask = optArangoStandardKnowledgeTask.orElseThrow(
+                () -> new BadRequestException("No task found for version " + versionName));
         // __ROOT node is for internal use only and should not be exported
         var firstArangoTreeTask = new ArrayList<>(arangoStandardKnowledgeTask.getChildren()).get(0);
         var rootConstraint = constraintsRepository.findAllByTypeEqualsAndVersion_Name(ROOT_CONSTRAINT_NODE_NAME, firstArangoTreeTask.getVersion().getName());
@@ -63,9 +64,15 @@ public class StandardKnowledgeComponent {
                 .collect(Collectors.toList()));
     }
 
+    public Optional<ArangoStandardKnowledgeTask> getArangoTaskWithName(String taskName, String versionName) {
+        return standardKnowledgeTasksRepository.findOneByNameAndVersion_Name(taskName, versionName);
+    }
+
     public StandardKnowledgeTree getStandardKnowledgeTaskWithName(String taskName, String versionName) {
-        var optArangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersion_Name(taskName, versionName);
-        return arangoTasksConverter.toStandardKnowledgeTree(optArangoStandardKnowledgeTask.orElseThrow(NotFoundException::new));
+        var optArangoStandardKnowledgeTask = getArangoTaskWithName(taskName, versionName);
+        return arangoTasksConverter.toStandardKnowledgeTree(optArangoStandardKnowledgeTask.orElseThrow(
+                () -> new BadRequestException(String.format("No task found for name %s and version %s.", taskName, versionName))
+        ));
     }
 
     private Optional<StandardKnowledgeTask> containsTaskWithName(StandardKnowledgeTask task, String name) {

@@ -31,7 +31,8 @@ public class FeatureModelController {
     }
 
     @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE})
-    ResponseEntity<String> importFeatureModel(@RequestParam String versionName, @RequestBody String featureModelString) throws Exception {
+    ResponseEntity<String> importFeatureModel(@RequestParam String versionName, @RequestBody String featureModelString)
+            throws Exception {
         // TODO: use jackson to automatically convert requestbody to featureModel
         FeatureModel featureModel = XMLObjectMapperFactory.getInstance()
                 .createNewObjectMapper()
