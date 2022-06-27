@@ -9,6 +9,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.ml2wf.v3.app.configurations.Configuration;
+import com.ml2wf.v3.app.configurations.ConfigurationFeature;
+import com.ml2wf.v3.app.xml.mixins.configurations.ConfigurationFeatureMixin;
+import com.ml2wf.v3.app.xml.mixins.configurations.ConfigurationFeatureStatusMixin;
+import com.ml2wf.v3.app.xml.mixins.configurations.ConfigurationMixin;
 import com.ml2wf.v3.app.xml.mixins.constraints.operands.VariableOperandMixin;
 import com.ml2wf.v3.app.xml.mixins.constraints.operands.serializer.VariableOperandSerializer;
 import com.ml2wf.v3.app.xml.mixins.constraints.operators.AbstractOperatorMixin;
@@ -91,6 +96,10 @@ public class XMLObjectMapperFactory {
                 .addMixIn(BPMNProcess.SequenceFlow.class, BPMNProcessSequenceFlowMixin.class)
                 // Operands related mixins
                 .addMixIn(AbstractOperator.class, AbstractOperatorMixin.class)
-                .addMixIn(VariableOperand.class, VariableOperandMixin.class);
+                .addMixIn(VariableOperand.class, VariableOperandMixin.class)
+                // Configurations related mixins
+                .addMixIn(Configuration.class, ConfigurationMixin.class)
+                .addMixIn(ConfigurationFeature.class, ConfigurationFeatureMixin.class)
+                .addMixIn(ConfigurationFeature.Status.class, ConfigurationFeatureStatusMixin.class);
     }
 }
