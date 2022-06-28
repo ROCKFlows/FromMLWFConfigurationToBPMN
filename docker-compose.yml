@@ -14,4 +14,11 @@ services:
     environment:
       - ARANGO_ROOT_USER=ml2wf_user
       - ARANGO_ROOT_PASSWORD=ml2wf_password
+  neo4j:
+    image: neo4j:4.4.8
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/ml2wf_password
 
