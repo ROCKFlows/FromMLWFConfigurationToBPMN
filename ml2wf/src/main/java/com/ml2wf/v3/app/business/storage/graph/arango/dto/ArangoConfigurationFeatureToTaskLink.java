@@ -1,4 +1,4 @@
-package com.ml2wf.v3.app.business.storage.graph.dto;
+package com.ml2wf.v3.app.business.storage.graph.arango.dto;
 
 import com.arangodb.springframework.annotation.Edge;
 import com.arangodb.springframework.annotation.From;
@@ -8,17 +8,17 @@ import org.springframework.data.annotation.Id;
 
 @Data
 @Edge
-public class ArangoConstraintToTaskLink {
+public class ArangoConfigurationFeatureToTaskLink {
 
     @Id
     private String id;
     @From
-    private ArangoConstraintOperand operand;
+    private ArangoConfigurationFeature configuration;
     @To
     private ArangoStandardKnowledgeTask task;
 
-    public ArangoConstraintToTaskLink(ArangoConstraintOperand operand, ArangoStandardKnowledgeTask task) {
-        this.operand = operand;
+    public ArangoConfigurationFeatureToTaskLink(ArangoConfigurationFeature configuration, ArangoStandardKnowledgeTask task) {
+        this.configuration = configuration;
         this.task = task;
     }
 }

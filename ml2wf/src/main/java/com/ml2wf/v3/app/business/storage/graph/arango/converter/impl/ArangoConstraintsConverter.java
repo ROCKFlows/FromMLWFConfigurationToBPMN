@@ -1,9 +1,9 @@
-package com.ml2wf.v3.app.business.storage.graph.converter.impl;
+package com.ml2wf.v3.app.business.storage.graph.arango.converter.impl;
 
-import com.ml2wf.v3.app.business.storage.graph.converter.IArangoConstraintsConverter;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoConstraintOperand;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoStandardKnowledgeTask;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoTaskVersion;
+import com.ml2wf.v3.app.business.storage.graph.arango.converter.IArangoConstraintsConverter;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConstraintOperand;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoStandardKnowledgeTask;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoTaskVersion;
 import com.ml2wf.v3.app.constraints.ConstraintTree;
 import com.ml2wf.v3.app.constraints.operands.AbstractOperand;
 import com.ml2wf.v3.app.constraints.operands.impl.VariableOperand;

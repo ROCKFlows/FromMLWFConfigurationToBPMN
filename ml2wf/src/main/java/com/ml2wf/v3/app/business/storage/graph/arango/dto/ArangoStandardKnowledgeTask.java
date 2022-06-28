@@ -1,4 +1,4 @@
-package com.ml2wf.v3.app.business.storage.graph.dto;
+package com.ml2wf.v3.app.business.storage.graph.arango.dto;
 
 import com.arangodb.springframework.annotation.*;
 import lombok.Data;

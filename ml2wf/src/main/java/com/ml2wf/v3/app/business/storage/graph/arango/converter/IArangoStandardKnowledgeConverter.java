@@ -1,9 +1,9 @@
-package com.ml2wf.v3.app.business.storage.graph.converter;
+package com.ml2wf.v3.app.business.storage.graph.arango.converter;
 
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoStandardKnowledgeTask;
 import com.ml2wf.v3.app.constraints.ConstraintTree;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTree;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoStandardKnowledgeTask;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

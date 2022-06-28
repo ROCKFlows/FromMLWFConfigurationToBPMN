@@ -1,14 +1,14 @@
 package com.ml2wf.v3.app.business.components;
 
 import com.google.common.collect.ImmutableList;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoConfiguration;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoConfigurationFeature;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoConfigurationFeatureToTaskLink;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoConfigurationToFeatureLink;
-import com.ml2wf.v3.app.business.storage.graph.repository.ConfigurationFeaturesRepository;
-import com.ml2wf.v3.app.business.storage.graph.repository.ConfigurationFeaturesToTaskLinksRepository;
-import com.ml2wf.v3.app.business.storage.graph.repository.ConfigurationRepository;
-import com.ml2wf.v3.app.business.storage.graph.repository.ConfigurationToFeaturesRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfiguration;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationFeature;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationFeatureToTaskLink;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationToFeatureLink;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConfigurationFeaturesRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConfigurationFeaturesToTaskLinksRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConfigurationRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConfigurationToFeaturesRepository;
 import com.ml2wf.v3.app.configurations.Configuration;
 import com.ml2wf.v3.app.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;

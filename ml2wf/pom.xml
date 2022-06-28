@@ -26,6 +26,7 @@
         <version.jackson>2.13.3</version.jackson>
         <version.jackson.woodstox>6.2.8</version.jackson.woodstox>
         <version.arangodb>3.7.0</version.arangodb>
+        <version.neo4j>6.3.1</version.neo4j>
         <version.picocli>4.6.3</version.picocli>
         <version.log4j>2.17.2</version.log4j>
         <version.commons-io>2.11.0</version.commons-io>
@@ -97,6 +98,12 @@
         </resources>
     </build>
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-neo4j -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-neo4j</artifactId>
+            <version>${version.neo4j}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.arangodb/arangodb-spring-data -->
         <dependency>
             <groupId>com.arangodb</groupId>

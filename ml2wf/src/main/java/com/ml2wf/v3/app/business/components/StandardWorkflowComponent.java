@@ -1,7 +1,7 @@
 package com.ml2wf.v3.app.business.components;
 
-import com.ml2wf.v3.app.business.storage.graph.repository.ConstraintsRepository;
-import com.ml2wf.v3.app.business.storage.graph.converter.IArangoConstraintsConverter;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConstraintsRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.converter.IArangoConstraintsConverter;
 import com.ml2wf.v3.app.workflow.StandardWorkflow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,7 +1,7 @@
 package com.ml2wf.v3.app.business.components;
 
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoTaskVersion;
-import com.ml2wf.v3.app.business.storage.graph.repository.VersionsRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoTaskVersion;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.VersionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

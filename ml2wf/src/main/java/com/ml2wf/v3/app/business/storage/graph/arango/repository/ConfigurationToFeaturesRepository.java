@@ -1,8 +1,7 @@
-package com.ml2wf.v3.app.business.storage.graph.repository;
+package com.ml2wf.v3.app.business.storage.graph.arango.repository;
 
 import com.arangodb.springframework.repository.ArangoRepository;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoConfigurationFeatureToTaskLink;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoConfigurationToFeatureLink;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationToFeatureLink;
 import org.springframework.stereotype.Repository;
 
 @Repository

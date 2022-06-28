@@ -1,11 +1,11 @@
-package com.ml2wf.v3.app.business.storage.graph.converter.impl;
+package com.ml2wf.v3.app.business.storage.graph.arango.converter.impl;
 
-import com.ml2wf.v3.app.business.storage.graph.converter.IArangoStandardKnowledgeConverter;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoTaskVersion;
+import com.ml2wf.v3.app.business.storage.graph.arango.converter.IArangoStandardKnowledgeConverter;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoStandardKnowledgeTask;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoTaskVersion;
 import com.ml2wf.v3.app.constraints.ConstraintTree;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTree;
-import com.ml2wf.v3.app.business.storage.graph.dto.ArangoStandardKnowledgeTask;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
