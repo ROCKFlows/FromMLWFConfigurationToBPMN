@@ -82,23 +82,10 @@ public class Neo4JStandardKnowledgeComponent {
         var newVersion = versionsRepository.save(new Neo4JTaskVersion(lastVersion.getMajor() + 1, 0, 0, versionName));
         // converting and saving tasks
         var neo4JStandardKnowledgeTasks = neo4JStandardKnowledgeConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
-        System.out.println("neo4JStandardKnowledgeTasks = " + neo4JStandardKnowledgeTasks);
         neo4JStandardKnowledgeTasks.forEach(t -> t.setVersion(newVersion));
         var iterableUpdatedNeo4JTasks = standardKnowledgeTasksRepository.saveAll(neo4JStandardKnowledgeTasks);
         var rootTask = new Neo4JStandardKnowledgeTask(ROOT_NODE_NAME, true, true, newVersion, "reserved tree root. internal use only. not exported.", Collections.singletonList(iterableUpdatedNeo4JTasks.get(0)));
         standardKnowledgeTasksRepository.save(rootTask); // saving reserved tree root
-        /*standardKnowledgeTasksRepository.save(
-                new Neo4JStandardKnowledgeTask(
-                        ROOT_NODE_NAME,
-                        true,
-                        true,
-                        newVersion,
-                        "reserved tree root. internal use only. not exported.",
-                        Collections.singletonList(standardKnowledgeTasksRepository.save(neo4JStandardKnowledgeTasks.get(0)))
-                )
-        );*/
-
-        /*
         // converting and saving constraints
         var neo4jConstraintOperands = neo4JConstraintsConverter.fromStandardKnowledgeTree(
                 standardKnowledgeTree, ImmutableList.copyOf(iterableUpdatedNeo4JTasks)
@@ -106,7 +93,7 @@ public class Neo4JStandardKnowledgeComponent {
         neo4jConstraintOperands.forEach(t -> t.setVersion(newVersion));
         var iterableUpdatedNeo4JOperands = constraintsRepository.saveAll(neo4jConstraintOperands);
         var rootConstraint = new Neo4JConstraintOperand(ROOT_CONSTRAINT_NODE_NAME, newVersion, new ArrayList<>(iterableUpdatedNeo4JOperands));
-        constraintsRepository.save(rootConstraint); // saving reserved constraint tree root*/
+        constraintsRepository.save(rootConstraint); // saving reserved constraint tree root
         return true;
     }
 }
