@@ -16,6 +16,10 @@ WORKDIR /ml2wf-runner
 
 COPY --from=builder /ml2wf-build/target/ml2wf.jar .
 
+COPY wait-for-it.sh /ml2wf-runner/wait-for-it.sh
+
+COPY wait-for-them.sh /ml2wf-runner/wait-for-them.sh
+
 EXPOSE 8080
 
 ENTRYPOINT ["java","-jar","ml2wf.jar"]

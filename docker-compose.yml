@@ -4,8 +4,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - ARANGO_URL=arango:8529
+      - NEO4J_URL=neo4j:7474
     ports:
       - "8080:8080"
+    entrypoint: "sh -c '/ml2wf-runner/wait-for-them.sh $${ARANGO_URL} $${NEO4J_URL} -- java -jar /ml2wf-runner/ml2wf.jar'"
+    depends_on:
+      - arango
+      - neo4j
   arango:
     image: arangodb:3.9.0
     ports:
