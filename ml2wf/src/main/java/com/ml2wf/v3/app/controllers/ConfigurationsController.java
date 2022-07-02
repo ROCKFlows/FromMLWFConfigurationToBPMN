@@ -1,6 +1,5 @@
 package com.ml2wf.v3.app.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ml2wf.v3.app.business.components.ConfigurationsComponent;
 import com.ml2wf.v3.app.configurations.Configuration;
 import com.ml2wf.v3.app.xml.XMLObjectMapperFactory;

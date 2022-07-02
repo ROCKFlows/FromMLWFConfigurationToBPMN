@@ -1,5 +1,6 @@
 package com.ml2wf.v3.app.business.components;
 
+import com.ml2wf.v3.app.business.components.neo4j.Neo4JStandardKnowledgeComponent;
 import com.ml2wf.v3.app.tree.custom.featuremodel.FeatureModel;
 import com.ml2wf.v3.app.tree.converter.FeatureModelConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,10 @@ public class FeatureModelComponent {
 
     // TODO: intercept this method return and convert automatically standard knowledge tree to feature model (Aspect4J ?)
 
-    private final StandardKnowledgeComponent standardKnowledgeComponent;
+    private final Neo4JStandardKnowledgeComponent standardKnowledgeComponent;
     private final FeatureModelConverter featureModelConverter; // TODO: make autowirable
 
-    public FeatureModelComponent(@Autowired StandardKnowledgeComponent standardKnowledgeComponent) {
+    public FeatureModelComponent(@Autowired Neo4JStandardKnowledgeComponent standardKnowledgeComponent) {
         this.standardKnowledgeComponent = standardKnowledgeComponent;
         featureModelConverter = new FeatureModelConverter();
     }

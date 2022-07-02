@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-@EnableArangoRepositories(basePackages = "com.ml2wf.v3.app.business.storage.graph")
+@EnableArangoRepositories(basePackages = "com.ml2wf.v3.app.business.storage.graph.arango")
 public class ApplicationConfiguration implements ArangoConfiguration {
 
     @Override

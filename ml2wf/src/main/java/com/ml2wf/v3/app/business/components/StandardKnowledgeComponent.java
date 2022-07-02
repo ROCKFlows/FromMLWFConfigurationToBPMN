@@ -6,8 +6,6 @@ import com.ml2wf.v3.app.business.storage.graph.arango.converter.IArangoConstrain
 import com.ml2wf.v3.app.business.storage.graph.arango.converter.IArangoStandardKnowledgeConverter;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.*;
 import com.ml2wf.v3.app.business.storage.graph.arango.repository.*;
-import com.ml2wf.v3.app.business.storage.graph.dto.*;
-import com.ml2wf.v3.app.business.storage.graph.repository.*;
 import com.ml2wf.v3.app.exceptions.BadRequestException;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTree;
