@@ -1,5 +1,6 @@
 package com.ml2wf.v3.app.business.storage.graph.neo4j.dto;
 
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.GraphStandardKnowledgeTask;
 import lombok.Data;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
@@ -11,7 +12,7 @@ import java.util.Collection;
 
 @Data
 @Node("Task")
-public class Neo4JStandardKnowledgeTask {
+public class Neo4JStandardKnowledgeTask implements GraphStandardKnowledgeTask<Neo4JStandardKnowledgeTask, Neo4JTaskVersion> {
 
     @Id @GeneratedValue
     private Long id;

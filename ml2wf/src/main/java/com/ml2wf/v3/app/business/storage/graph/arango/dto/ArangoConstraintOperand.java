@@ -4,6 +4,7 @@ import com.arangodb.springframework.annotation.ArangoId;
 import com.arangodb.springframework.annotation.Document;
 import com.arangodb.springframework.annotation.PersistentIndex;
 import com.arangodb.springframework.annotation.Relations;
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.GraphConstraintOperand;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -15,7 +16,7 @@ import java.util.Collection;
 @NoArgsConstructor
 @Document("Constraints")
 @PersistentIndex(fields = { "version" })
-public class ArangoConstraintOperand {
+public class ArangoConstraintOperand implements GraphConstraintOperand<ArangoStandardKnowledgeTask, ArangoTaskVersion, ArangoConstraintOperand> {
 
     // TODO: support description
 
@@ -37,11 +38,14 @@ public class ArangoConstraintOperand {
         task = null;
     }
 
-
     public ArangoConstraintOperand(String type, ArangoTaskVersion version, ArangoStandardKnowledgeTask task) {
         this.type = type;
         this.version = version;
         operands = new ArrayList<>();
         this.task = task;
+    }
+
+    public Collection<ArangoConstraintOperand> getOperands() {
+        return operands;
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/configuration")
 public class ConfigurationsController {
 
-    private final ConfigurationsComponent configurationsComponent;
+    /*private final ConfigurationsComponent configurationsComponent;
 
     @Autowired
     public ConfigurationsController(@Autowired ConfigurationsComponent configurationsComponent) {
@@ -30,5 +30,5 @@ public class ConfigurationsController {
                 .readValue(configurationString, Configuration.class);
         configurationsComponent.importConfiguration(name, configuration); // TODO: check result
         return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
-    }
+    }*/
 }

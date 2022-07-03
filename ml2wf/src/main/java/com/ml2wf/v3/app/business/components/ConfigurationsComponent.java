@@ -1,6 +1,7 @@
 package com.ml2wf.v3.app.business.components;
 
 import com.google.common.collect.ImmutableList;
+import com.ml2wf.v3.app.business.components.arango.ArangoStandardKnowledgeComponent;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfiguration;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationFeature;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationFeatureToTaskLink;
@@ -17,21 +18,21 @@ import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@Component
+//@Component
 public class ConfigurationsComponent {
-
+/*
     private final ConfigurationRepository configurationRepository;
     private final ConfigurationToFeaturesRepository configurationToFeaturesRepository;
     private final ConfigurationFeaturesRepository configurationFeaturesRepository;
     private final ConfigurationFeaturesToTaskLinksRepository configurationFeaturesToTaskLinksRepository;
-    private final StandardKnowledgeComponent standardKnowledgeComponent;
+    private final ArangoStandardKnowledgeComponent standardKnowledgeComponent;
     private final VersionsComponent versionsComponent;
 
     public ConfigurationsComponent(@Autowired ConfigurationRepository configurationRepository,
                                    @Autowired ConfigurationFeaturesRepository configurationFeaturesRepository,
                                    @Autowired ConfigurationToFeaturesRepository configurationToFeaturesRepository,
                                    @Autowired ConfigurationFeaturesToTaskLinksRepository configurationFeaturesToTaskLinksRepository,
-                                   @Autowired StandardKnowledgeComponent standardKnowledgeComponent,
+                                   @Autowired ArangoStandardKnowledgeComponent standardKnowledgeComponent,
                                    @Autowired VersionsComponent versionsComponent) {
         this.configurationRepository = configurationRepository;
         this.configurationToFeaturesRepository = configurationToFeaturesRepository;
@@ -62,5 +63,5 @@ public class ConfigurationsComponent {
                 .collect(Collectors.toList());
         configurationToFeaturesRepository.saveAll(configurationToFeaturesLink);
         return true;
-    }
+    }*/
 }

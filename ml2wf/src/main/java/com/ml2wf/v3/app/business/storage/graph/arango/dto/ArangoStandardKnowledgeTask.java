@@ -1,6 +1,7 @@
 package com.ml2wf.v3.app.business.storage.graph.arango.dto;
 
 import com.arangodb.springframework.annotation.*;
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.GraphStandardKnowledgeTask;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -10,7 +11,7 @@ import java.util.Collection;
 @Data
 @Document("StandardKnowledgeTask")
 @PersistentIndex(fields = { "name", "version" })
-public class ArangoStandardKnowledgeTask {
+public class ArangoStandardKnowledgeTask implements GraphStandardKnowledgeTask<ArangoStandardKnowledgeTask, ArangoTaskVersion> {
 
     @Id
     private String id;

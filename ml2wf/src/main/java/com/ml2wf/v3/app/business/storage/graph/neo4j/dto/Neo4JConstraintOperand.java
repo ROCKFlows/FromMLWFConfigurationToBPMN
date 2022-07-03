@@ -1,5 +1,6 @@
 package com.ml2wf.v3.app.business.storage.graph.neo4j.dto;
 
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.GraphConstraintOperand;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.neo4j.core.schema.Id;
@@ -13,7 +14,7 @@ import java.util.Collection;
 @Data
 @NoArgsConstructor
 @Node("Constraint")
-public class Neo4JConstraintOperand {
+public class Neo4JConstraintOperand implements GraphConstraintOperand<Neo4JStandardKnowledgeTask, Neo4JTaskVersion, Neo4JConstraintOperand> {
 
     // TODO: support description
 

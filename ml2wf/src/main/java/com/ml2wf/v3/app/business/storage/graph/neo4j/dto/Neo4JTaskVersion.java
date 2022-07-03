@@ -1,12 +1,13 @@
 package com.ml2wf.v3.app.business.storage.graph.neo4j.dto;
 
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.GraphTaskVersion;
 import lombok.Data;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
 @Data
 @Node("Version")
-public class Neo4JTaskVersion {
+public class Neo4JTaskVersion implements GraphTaskVersion {
 
     @Id
     private String name;

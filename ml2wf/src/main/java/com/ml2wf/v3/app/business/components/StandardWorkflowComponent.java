@@ -1,21 +1,22 @@
 package com.ml2wf.v3.app.business.components;
 
+import com.ml2wf.v3.app.business.components.arango.ArangoStandardKnowledgeComponent;
 import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConstraintsRepository;
 import com.ml2wf.v3.app.business.storage.graph.arango.converter.IArangoConstraintsConverter;
 import com.ml2wf.v3.app.workflow.StandardWorkflow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class StandardWorkflowComponent {
 
     private static final String ROOT_CONSTRAINT_NODE_NAME = "__ROOT_CONSTRAINT";
 
-    private final StandardKnowledgeComponent standardKnowledgeComponent;
+    /*private final ArangoStandardKnowledgeComponent standardKnowledgeComponent;
     private final ConstraintsRepository constraintsRepository;
     private final IArangoConstraintsConverter constraintsConverter;
 
-    public StandardWorkflowComponent(@Autowired StandardKnowledgeComponent standardKnowledgeComponent,
+    public StandardWorkflowComponent(@Autowired ArangoStandardKnowledgeComponent standardKnowledgeComponent,
                                      @Autowired ConstraintsRepository constraintsRepository,
                                      @Autowired IArangoConstraintsConverter constraintsConverter) {
         this.standardKnowledgeComponent = standardKnowledgeComponent;
@@ -35,5 +36,5 @@ public class StandardWorkflowComponent {
         return operands.stream()
                 .map(constraintsConverter::toConstraintTree)
                 .allMatch(c -> c.isWorkflowConsistent(standardWorkflow));
-    }
+    }*/
 }

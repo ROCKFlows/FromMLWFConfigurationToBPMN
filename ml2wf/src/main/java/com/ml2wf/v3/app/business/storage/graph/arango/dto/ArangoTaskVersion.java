@@ -3,13 +3,14 @@ package com.ml2wf.v3.app.business.storage.graph.arango.dto;
 import com.arangodb.springframework.annotation.ArangoId;
 import com.arangodb.springframework.annotation.Document;
 import com.arangodb.springframework.annotation.PersistentIndex;
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.GraphTaskVersion;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
 @Data
 @Document("Versions")
 @PersistentIndex(fields = { "name" })
-public class ArangoTaskVersion {
+public class ArangoTaskVersion implements GraphTaskVersion {
 
     @Id
     private String id;

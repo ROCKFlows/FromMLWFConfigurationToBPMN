@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/bpmn")
 public class BPMNController {
 
-    private final BPMNComponent bpmnComponent;
+    /*private final BPMNComponent bpmnComponent;
 
     @Autowired
     public BPMNController(@Autowired BPMNComponent bpmnComponent) {
@@ -42,5 +42,5 @@ public class BPMNController {
                 .readValue(bpmnWorkflowString, BPMNWorkflow.class);
         return new ResponseEntity<>(String.valueOf(bpmnComponent.isBPMNWorkflowConsistent(versionName, bpmnWorkflow)),
                 HttpStatus.ACCEPTED);
-    }
+    }*/
 }
