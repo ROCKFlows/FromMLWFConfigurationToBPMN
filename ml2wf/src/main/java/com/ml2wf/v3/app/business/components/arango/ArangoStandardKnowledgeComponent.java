@@ -3,9 +3,9 @@ package com.ml2wf.v3.app.business.components.arango;
 import com.google.common.collect.ImmutableList;
 import com.ml2wf.v3.app.business.components.StandardKnowledgeComponent;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.*;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConstraintsLinksRepository;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConstraintsToTaskLinksRepository;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.StandardKnowledgeTasksLinkRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.ArangoConstraintsLinksRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.ArangoConstraintsToTaskLinksRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.ArangoStandardKnowledgeTasksLinksRepository;
 import com.ml2wf.v3.app.business.storage.graph.contracts.converter.IGraphConstraintsConverter;
 import com.ml2wf.v3.app.business.storage.graph.contracts.converter.IGraphStandardKnowledgeConverter;
 import com.ml2wf.v3.app.business.storage.graph.contracts.repository.ConstraintsRepository;
@@ -13,8 +13,6 @@ import com.ml2wf.v3.app.business.storage.graph.contracts.repository.StandardKnow
 import com.ml2wf.v3.app.business.storage.graph.contracts.repository.VersionsRepository;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTree;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,11 +22,11 @@ import java.util.stream.StreamSupport;
 public class ArangoStandardKnowledgeComponent extends StandardKnowledgeComponent<ArangoStandardKnowledgeTask, ArangoConstraintOperand, ArangoTaskVersion> {
 
     // @Autowired
-    StandardKnowledgeTasksLinkRepository standardKnowledgeTasksLinkRepository;
+    ArangoStandardKnowledgeTasksLinksRepository standardKnowledgeTasksLinkRepository;
     // @Autowired
-    ConstraintsLinksRepository constraintsLinksRepository;
+    ArangoConstraintsLinksRepository constraintsLinksRepository;
     // @Autowired
-    ConstraintsToTaskLinksRepository constraintsToTaskLinksRepository;
+    ArangoConstraintsToTaskLinksRepository constraintsToTaskLinksRepository;
 
     protected ArangoStandardKnowledgeComponent(StandardKnowledgeTasksRepository<ArangoStandardKnowledgeTask, ArangoTaskVersion, Long> standardKnowledgeTasksRepository, ConstraintsRepository<ArangoConstraintOperand, ArangoStandardKnowledgeTask, ArangoTaskVersion, Long> constraintsRepository, VersionsRepository<ArangoTaskVersion, String> versionsRepository, IGraphConstraintsConverter<ArangoStandardKnowledgeTask, ArangoConstraintOperand, ArangoTaskVersion> constraintsConverter, IGraphStandardKnowledgeConverter<ArangoStandardKnowledgeTask, ArangoTaskVersion> tasksConverter) {
         super(standardKnowledgeTasksRepository, constraintsRepository, versionsRepository, constraintsConverter, tasksConverter);

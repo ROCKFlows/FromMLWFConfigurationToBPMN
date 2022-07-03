@@ -3,12 +3,13 @@ package com.ml2wf.v3.app.business.storage.graph.arango.dto;
 import com.arangodb.springframework.annotation.ArangoId;
 import com.arangodb.springframework.annotation.Document;
 import com.arangodb.springframework.annotation.Relations;
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.GraphConfigurationFeature;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
 @Data
 @Document("ConfigurationFeatures")
-public class ArangoConfigurationFeature {
+public class ArangoConfigurationFeature implements GraphConfigurationFeature<ArangoStandardKnowledgeTask, ArangoTaskVersion> {
 
     @Id
     private String id;

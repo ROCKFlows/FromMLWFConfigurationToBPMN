@@ -4,6 +4,7 @@ import com.arangodb.springframework.annotation.ArangoId;
 import com.arangodb.springframework.annotation.Document;
 import com.arangodb.springframework.annotation.PersistentIndex;
 import com.arangodb.springframework.annotation.Relations;
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.GraphConfiguration;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -13,7 +14,7 @@ import java.util.List;
 @Data
 @Document("Configurations")
 @PersistentIndex(fields = { "name" })
-public class ArangoConfiguration {
+public class ArangoConfiguration implements GraphConfiguration<ArangoStandardKnowledgeTask, ArangoTaskVersion, ArangoConfigurationFeature> {
 
     @Id
     private String id;

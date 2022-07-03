@@ -2,24 +2,12 @@ package com.ml2wf.v3.app.business.storage.graph.arango.converter;
 
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConstraintOperand;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoStandardKnowledgeTask;
-import com.ml2wf.v3.app.constraints.ConstraintTree;
-import com.ml2wf.v3.app.constraints.operands.AbstractOperand;
-import com.ml2wf.v3.app.tree.StandardKnowledgeTree;
+import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoTaskVersion;
+import com.ml2wf.v3.app.business.storage.graph.contracts.converter.IGraphConstraintsConverter;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
-public interface IArangoConstraintsConverter {
+public interface IArangoConstraintsConverter extends IGraphConstraintsConverter<ArangoStandardKnowledgeTask,
+        ArangoConstraintOperand, ArangoTaskVersion> {
 
-    ConstraintTree toConstraintTree(ArangoConstraintOperand arangoConstraintOperand);
-
-    ArangoConstraintOperand fromAbstractOperand(AbstractOperand abstractOperand,
-                                                List<ArangoStandardKnowledgeTask> arangoStandardKnowledgeTasks);
-
-    ArangoConstraintOperand fromConstraintTree(ConstraintTree constraintTree,
-                                               List<ArangoStandardKnowledgeTask> arangoStandardKnowledgeTasks);
-
-    List<ArangoConstraintOperand> fromStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree,
-                                                            List<ArangoStandardKnowledgeTask> arangoStandardKnowledgeTasks);
 }

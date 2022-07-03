@@ -5,6 +5,6 @@ import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoStandardKnowledg
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StandardKnowledgeTasksLinkRepository extends ArangoRepository<ArangoStandardKnowledgeTaskLink, String> {
+public interface ArangoStandardKnowledgeTasksLinksRepository extends ArangoRepository<ArangoStandardKnowledgeTaskLink, String> {
 
 }

@@ -5,6 +5,6 @@ import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConstraintToTask
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ConstraintsToTaskLinksRepository extends ArangoRepository<ArangoConstraintToTaskLink, String> {
+public interface ArangoConstraintsToTaskLinksRepository extends ArangoRepository<ArangoConstraintToTaskLink, String> {
 
 }

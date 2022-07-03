@@ -5,6 +5,6 @@ import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationToF
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ConfigurationToFeaturesRepository extends ArangoRepository<ArangoConfigurationToFeatureLink, String> {
+public interface ArangoConfigurationToFeaturesLinksRepository extends ArangoRepository<ArangoConfigurationToFeatureLink, String> {
 
 }

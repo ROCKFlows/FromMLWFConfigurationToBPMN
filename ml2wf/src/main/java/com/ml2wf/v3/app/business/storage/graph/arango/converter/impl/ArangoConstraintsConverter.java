@@ -1,9 +1,9 @@
 package com.ml2wf.v3.app.business.storage.graph.arango.converter.impl;
 
+import com.ml2wf.v3.app.business.storage.graph.arango.converter.IArangoConstraintsConverter;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConstraintOperand;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoStandardKnowledgeTask;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoTaskVersion;
-import com.ml2wf.v3.app.business.storage.graph.contracts.converter.IGraphConstraintsConverter;
 import com.ml2wf.v3.app.constraints.operands.AbstractOperand;
 import com.ml2wf.v3.app.constraints.operands.impl.VariableOperand;
 import com.ml2wf.v3.app.constraints.operators.AbstractOperator;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class ArangoConstraintsConverter implements IGraphConstraintsConverter<ArangoStandardKnowledgeTask, ArangoConstraintOperand, ArangoTaskVersion> {
+public class ArangoConstraintsConverter implements IArangoConstraintsConverter {
 
     public ArangoConstraintOperand fromAbstractOperand(AbstractOperand abstractOperand,
                                                        List<ArangoStandardKnowledgeTask> arangoStandardKnowledgeTasks) {

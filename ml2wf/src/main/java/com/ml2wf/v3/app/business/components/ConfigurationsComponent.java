@@ -1,23 +1,5 @@
 package com.ml2wf.v3.app.business.components;
 
-import com.google.common.collect.ImmutableList;
-import com.ml2wf.v3.app.business.components.arango.ArangoStandardKnowledgeComponent;
-import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfiguration;
-import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationFeature;
-import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationFeatureToTaskLink;
-import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoConfigurationToFeatureLink;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConfigurationFeaturesRepository;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConfigurationFeaturesToTaskLinksRepository;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConfigurationRepository;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.ConfigurationToFeaturesRepository;
-import com.ml2wf.v3.app.configurations.Configuration;
-import com.ml2wf.v3.app.exceptions.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 //@Component
 public class ConfigurationsComponent {
 /*

@@ -1,6 +1,6 @@
 package com.ml2wf.v3.app.business.storage.graph.neo4j.converter.impl;
 
-import com.ml2wf.v3.app.business.storage.graph.contracts.converter.IGraphConstraintsConverter;
+import com.ml2wf.v3.app.business.storage.graph.neo4j.converter.INeo4JConstraintsConverter;
 import com.ml2wf.v3.app.business.storage.graph.neo4j.dto.Neo4JConstraintOperand;
 import com.ml2wf.v3.app.business.storage.graph.neo4j.dto.Neo4JStandardKnowledgeTask;
 import com.ml2wf.v3.app.business.storage.graph.neo4j.dto.Neo4JTaskVersion;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class Neo4JConstraintsConverter implements IGraphConstraintsConverter<Neo4JStandardKnowledgeTask, Neo4JConstraintOperand, Neo4JTaskVersion> {
+public class Neo4JConstraintsConverter implements INeo4JConstraintsConverter {
 
     @Override
     public Neo4JConstraintOperand fromAbstractOperand(AbstractOperand abstractOperand,

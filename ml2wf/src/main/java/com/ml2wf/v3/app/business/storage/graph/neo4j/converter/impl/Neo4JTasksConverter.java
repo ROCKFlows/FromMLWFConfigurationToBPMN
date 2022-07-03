@@ -1,6 +1,6 @@
 package com.ml2wf.v3.app.business.storage.graph.neo4j.converter.impl;
 
-import com.ml2wf.v3.app.business.storage.graph.contracts.converter.IGraphStandardKnowledgeConverter;
+import com.ml2wf.v3.app.business.storage.graph.neo4j.converter.INeo4JStandardKnowledgeConverter;
 import com.ml2wf.v3.app.business.storage.graph.neo4j.dto.Neo4JStandardKnowledgeTask;
 import com.ml2wf.v3.app.business.storage.graph.neo4j.dto.Neo4JTaskVersion;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTask;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class Neo4JTasksConverter implements IGraphStandardKnowledgeConverter<Neo4JStandardKnowledgeTask, Neo4JTaskVersion> {
+public class Neo4JTasksConverter implements INeo4JStandardKnowledgeConverter {
 
     @Override
     public List<Neo4JStandardKnowledgeTask> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask) {

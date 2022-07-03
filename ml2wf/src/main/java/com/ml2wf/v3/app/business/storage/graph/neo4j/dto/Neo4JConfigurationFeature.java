@@ -1,5 +1,6 @@
 package com.ml2wf.v3.app.business.storage.graph.neo4j.dto;
 
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.GraphConfigurationFeature;
 import lombok.Data;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
@@ -8,7 +9,7 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 
 @Data
 @Node("ConfigurationFeature")
-public class Neo4JConfigurationFeature {
+public class Neo4JConfigurationFeature implements GraphConfigurationFeature<Neo4JStandardKnowledgeTask, Neo4JTaskVersion> {
 
     @Id @GeneratedValue
     private Long id;
