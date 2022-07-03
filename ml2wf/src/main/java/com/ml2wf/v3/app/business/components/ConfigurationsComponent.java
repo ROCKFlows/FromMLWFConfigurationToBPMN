@@ -29,7 +29,7 @@ public class ConfigurationsComponent {
                 () -> new BadRequestException("No version found. Please import some tasks before saving a configuration."));
         var convertedConfigurationFeatures = configuration.getFeatures().stream()
                 .map(c -> {
-                    var correspondingTask = standardKnowledgeComponent.getArangoTaskWithName(c.getName(), version.getName())
+                    var correspondingTask = standardKnowledgeComponent.getTaskWithName(c.getName(), version.getName())
                             .orElseThrow(() -> new BadRequestException(String.format("No task found for name %s and version %s.", c.getName(), version.getName())));
             return new ArangoConfigurationFeature(c.getAutomatic().getLowercaseName(), c.getManual().getLowercaseName(), correspondingTask, version);
             })
