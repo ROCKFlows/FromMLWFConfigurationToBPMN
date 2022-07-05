@@ -1,13 +1,13 @@
 package com.ml2wf.v3.app.exceptions;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class BadRequestException extends RuntimeException {
-    private final String message;
+public class BadRequestException extends ResponseStatusException {
+
+    public BadRequestException(String message) {
+        super(HttpStatus.NOT_FOUND, message);
+    }
 }

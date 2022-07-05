@@ -29,6 +29,11 @@ import com.ml2wf.v2.xml.fm.mixins.FMTaskMixin;
 import com.ml2wf.v2.xml.fm.serializers.FeatureModelRuleSerializer;
 import com.ml2wf.v2.xml.fm.serializers.FeatureModelTaskSerializer;
 import com.ml2wf.v2.xml.wf.mixins.*;
+import com.ml2wf.v3.app.configurations.Configuration;
+import com.ml2wf.v3.app.configurations.ConfigurationFeature;
+import com.ml2wf.v3.app.xml.mixins.configurations.ConfigurationFeatureMixin;
+import com.ml2wf.v3.app.xml.mixins.configurations.ConfigurationFeatureStatusMixin;
+import com.ml2wf.v3.app.xml.mixins.configurations.ConfigurationMixin;
 
 import javax.xml.stream.XMLInputFactory;
 
@@ -87,6 +92,10 @@ public class XMLObjectMapperFactory {
                 .addMixIn(Process.SequenceFlow.class, ProcessSequenceFlowMixin.class)
                 // Operands related mixins
                 .addMixIn(AbstractOperator.class, AbstractOperatorMixin.class)
-                .addMixIn(VariableOperand.class, VariableOperandMixin.class);
+                .addMixIn(VariableOperand.class, VariableOperandMixin.class)
+                // Configurations related mixins
+                .addMixIn(Configuration.class, ConfigurationMixin.class)
+                .addMixIn(ConfigurationFeature.class, ConfigurationFeatureMixin.class)
+                .addMixIn(ConfigurationFeature.Status.class, ConfigurationFeatureStatusMixin.class);
     }
 }

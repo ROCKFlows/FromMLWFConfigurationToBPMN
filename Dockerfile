@@ -22,4 +22,4 @@ COPY wait-for-them.sh /ml2wf-runner/wait-for-them.sh
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-Dspring.profiles.active=$SPRING_PROFILE","-jar","ml2wf.jar"]
+ENTRYPOINT ["java","-Dspring.profiles.active=neo4j","-jar","ml2wf.jar"]
