@@ -1,49 +1,31 @@
 package com.ml2wf.v3.app.business.components;
 
-//@Component
-public class ConfigurationsComponent {
-/*
-    private final ConfigurationRepository configurationRepository;
-    private final ConfigurationToFeaturesRepository configurationToFeaturesRepository;
-    private final ConfigurationFeaturesRepository configurationFeaturesRepository;
-    private final ConfigurationFeaturesToTaskLinksRepository configurationFeaturesToTaskLinksRepository;
-    private final ArangoStandardKnowledgeComponent standardKnowledgeComponent;
-    private final VersionsComponent versionsComponent;
+import com.ml2wf.v3.app.business.storage.graph.contracts.converter.IGraphStandardKnowledgeConverter;
+import com.ml2wf.v3.app.business.storage.graph.contracts.dto.*;
+import com.ml2wf.v3.app.business.storage.graph.contracts.repository.ConfigurationFeaturesRepository;
+import com.ml2wf.v3.app.business.storage.graph.contracts.repository.ConfigurationRepository;
+import org.springframework.stereotype.Component;
 
-    public ConfigurationsComponent(@Autowired ConfigurationRepository configurationRepository,
-                                   @Autowired ConfigurationFeaturesRepository configurationFeaturesRepository,
-                                   @Autowired ConfigurationToFeaturesRepository configurationToFeaturesRepository,
-                                   @Autowired ConfigurationFeaturesToTaskLinksRepository configurationFeaturesToTaskLinksRepository,
-                                   @Autowired ArangoStandardKnowledgeComponent standardKnowledgeComponent,
-                                   @Autowired VersionsComponent versionsComponent) {
+@Component
+public abstract class ConfigurationsComponent<C extends GraphConfiguration<T, V, F>, T extends GraphStandardKnowledgeTask<T, V>,
+        V extends GraphTaskVersion, F extends GraphConfigurationFeature<T, V>, O extends GraphConstraintOperand<T, V, O>>
+        implements IConfigurationComponent {
+
+    protected final ConfigurationRepository<C, T, V, F, String> configurationRepository;
+    protected final ConfigurationFeaturesRepository<F, T, V, Long> configurationFeaturesRepository;
+    protected final StandardKnowledgeComponent<T, O, V> standardKnowledgeComponent;
+    protected final VersionsComponent<V> versionsComponent;
+    protected final IGraphStandardKnowledgeConverter<T, V> standardKnowledgeConverter;
+
+    protected ConfigurationsComponent(ConfigurationRepository<C, T, V, F, String> configurationRepository,
+                                      ConfigurationFeaturesRepository<F, T, V, Long> configurationFeaturesRepository,
+                                      StandardKnowledgeComponent<T, O, V> standardKnowledgeComponent,
+                                      VersionsComponent<V> versionsComponent,
+                                      IGraphStandardKnowledgeConverter<T, V> standardKnowledgeConverter) {
         this.configurationRepository = configurationRepository;
-        this.configurationToFeaturesRepository = configurationToFeaturesRepository;
         this.configurationFeaturesRepository = configurationFeaturesRepository;
-        this.configurationFeaturesToTaskLinksRepository = configurationFeaturesToTaskLinksRepository;
         this.standardKnowledgeComponent = standardKnowledgeComponent;
         this.versionsComponent = versionsComponent;
+        this.standardKnowledgeConverter = standardKnowledgeConverter;
     }
-
-    public boolean importConfiguration(String name, Configuration configuration) {
-        var version = versionsComponent.getLastVersion().orElseThrow(
-                () -> new BadRequestException("No version found. Please import some tasks before saving a configuration."));
-        var convertedConfigurationFeatures = configuration.getFeatures().stream()
-                .map(c -> {
-                    var correspondingTask = standardKnowledgeComponent.getTaskWithName(c.getName(), version.getName())
-                            .orElseThrow(() -> new BadRequestException(String.format("No task found for name %s and version %s.", c.getName(), version.getName())));
-            return new ArangoConfigurationFeature(c.getAutomatic().getLowercaseName(), c.getManual().getLowercaseName(), correspondingTask, version);
-            })
-                .collect(Collectors.toList());
-        var storedConfigFeatures = configurationFeaturesRepository.saveAll(convertedConfigurationFeatures);
-        var configFeaturesToTaskLinks = StreamSupport.stream(storedConfigFeatures.spliterator(), false)
-                .map(c -> new ArangoConfigurationFeatureToTaskLink(c, c.getTask()))
-                .collect(Collectors.toList());
-        configurationFeaturesToTaskLinksRepository.saveAll(configFeaturesToTaskLinks);
-        var storedConfiguration = configurationRepository.save(new ArangoConfiguration(name, version, ImmutableList.copyOf(storedConfigFeatures)));
-        var configurationToFeaturesLink = storedConfiguration.getFeatures().stream()
-                .map(f -> new ArangoConfigurationToFeatureLink(storedConfiguration, f))
-                .collect(Collectors.toList());
-        configurationToFeaturesRepository.saveAll(configurationToFeaturesLink);
-        return true;
-    }*/
 }

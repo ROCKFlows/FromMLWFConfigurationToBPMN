@@ -8,7 +8,7 @@ import com.ml2wf.v3.app.business.storage.graph.contracts.repository.Configuratio
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ArangoConfigurationFeaturesRepository extends ArangoRepository<ArangoConfigurationFeature, String>,
-        ConfigurationFeaturesRepository<ArangoConfigurationFeature, ArangoStandardKnowledgeTask, ArangoTaskVersion, String> {
+public interface ArangoConfigurationFeaturesRepository extends ArangoRepository<ArangoConfigurationFeature, Long>,
+        ConfigurationFeaturesRepository<ArangoConfigurationFeature, ArangoStandardKnowledgeTask, ArangoTaskVersion, Long> {
 
 }

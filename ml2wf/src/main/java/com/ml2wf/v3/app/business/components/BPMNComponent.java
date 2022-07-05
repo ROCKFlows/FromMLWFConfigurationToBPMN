@@ -10,10 +10,10 @@ public class BPMNComponent {
 
     // TODO: intercept this method return and convert automatically standard workflow to bpmn (Aspect4J ?)
 
-    private final StandardWorkflowComponent standardWorkflowComponent;
+    private final IStandardWorkflowComponent standardWorkflowComponent;
     private final BPMNWorkflowConverter bpmnWorkflowConverter; // TODO: make autowirable
 
-    public BPMNComponent(@Autowired StandardWorkflowComponent standardWorkflowComponent) {
+    public BPMNComponent(@Autowired IStandardWorkflowComponent standardWorkflowComponent) {
         this.standardWorkflowComponent = standardWorkflowComponent;
         bpmnWorkflowConverter = new BPMNWorkflowConverter();
     }
