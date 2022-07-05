@@ -21,15 +21,15 @@ public abstract class StandardKnowledgeComponent<T extends GraphStandardKnowledg
     protected static final String ROOT_NODE_NAME = "__ROOT";
     protected static final String ROOT_CONSTRAINT_NODE_NAME = "__ROOT_CONSTRAINT";
 
-    protected final StandardKnowledgeTasksRepository<T, V, Long> standardKnowledgeTasksRepository;
-    protected final ConstraintsRepository<C, T, V, Long> constraintsRepository;
+    protected final StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTasksRepository;
+    protected final ConstraintsRepository<C, T, V, ?> constraintsRepository;
     protected final VersionsRepository<V, String> versionsRepository;
     protected final IGraphConstraintsConverter<T, C, V> constraintsConverter;
     protected final IGraphStandardKnowledgeConverter<T, V> tasksConverter;
 
     protected StandardKnowledgeComponent(
-            StandardKnowledgeTasksRepository<T, V, Long> standardKnowledgeTasksRepository,
-            ConstraintsRepository<C, T, V, Long> constraintsRepository,
+            StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTasksRepository,
+            ConstraintsRepository<C, T, V, ?> constraintsRepository,
             VersionsRepository<V, String> versionsRepository,
             IGraphConstraintsConverter<T, C, V> constraintsConverter,
             IGraphStandardKnowledgeConverter<T, V> tasksConverter

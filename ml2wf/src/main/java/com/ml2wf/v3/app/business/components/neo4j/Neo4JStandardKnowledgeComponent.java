@@ -12,10 +12,12 @@ import com.ml2wf.v3.app.business.storage.graph.neo4j.repository.Neo4JStandardKno
 import com.ml2wf.v3.app.business.storage.graph.neo4j.repository.Neo4JVersionsRepository;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTree;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Profile("neo4j")
 @Component
 public class Neo4JStandardKnowledgeComponent extends StandardKnowledgeComponent<Neo4JStandardKnowledgeTask, Neo4JConstraintOperand, Neo4JTaskVersion> {
 

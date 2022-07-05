@@ -2,34 +2,42 @@ package com.ml2wf.v3.app.business.components.arango;
 
 import com.google.common.collect.ImmutableList;
 import com.ml2wf.v3.app.business.components.StandardKnowledgeComponent;
+import com.ml2wf.v3.app.business.storage.graph.arango.converter.IArangoStandardKnowledgeConverter;
+import com.ml2wf.v3.app.business.storage.graph.arango.converter.impl.ArangoConstraintsConverter;
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.*;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.ArangoConstraintsLinksRepository;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.ArangoConstraintsToTaskLinksRepository;
-import com.ml2wf.v3.app.business.storage.graph.arango.repository.ArangoStandardKnowledgeTasksLinksRepository;
-import com.ml2wf.v3.app.business.storage.graph.contracts.converter.IGraphConstraintsConverter;
-import com.ml2wf.v3.app.business.storage.graph.contracts.converter.IGraphStandardKnowledgeConverter;
-import com.ml2wf.v3.app.business.storage.graph.contracts.repository.ConstraintsRepository;
-import com.ml2wf.v3.app.business.storage.graph.contracts.repository.StandardKnowledgeTasksRepository;
-import com.ml2wf.v3.app.business.storage.graph.contracts.repository.VersionsRepository;
+import com.ml2wf.v3.app.business.storage.graph.arango.repository.*;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTask;
 import com.ml2wf.v3.app.tree.StandardKnowledgeTree;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-// @Component
+@Profile("arango")
+@Component
 public class ArangoStandardKnowledgeComponent extends StandardKnowledgeComponent<ArangoStandardKnowledgeTask, ArangoConstraintOperand, ArangoTaskVersion> {
 
-    // @Autowired
-    ArangoStandardKnowledgeTasksLinksRepository standardKnowledgeTasksLinkRepository;
-    // @Autowired
-    ArangoConstraintsLinksRepository constraintsLinksRepository;
-    // @Autowired
-    ArangoConstraintsToTaskLinksRepository constraintsToTaskLinksRepository;
+    private final ArangoStandardKnowledgeTasksLinksRepository standardKnowledgeTasksLinkRepository;
+    private final ArangoConstraintsLinksRepository constraintsLinksRepository;
+    private final ArangoConstraintsToTaskLinksRepository constraintsToTaskLinksRepository;
 
-    protected ArangoStandardKnowledgeComponent(StandardKnowledgeTasksRepository<ArangoStandardKnowledgeTask, ArangoTaskVersion, Long> standardKnowledgeTasksRepository, ConstraintsRepository<ArangoConstraintOperand, ArangoStandardKnowledgeTask, ArangoTaskVersion, Long> constraintsRepository, VersionsRepository<ArangoTaskVersion, String> versionsRepository, IGraphConstraintsConverter<ArangoStandardKnowledgeTask, ArangoConstraintOperand, ArangoTaskVersion> constraintsConverter, IGraphStandardKnowledgeConverter<ArangoStandardKnowledgeTask, ArangoTaskVersion> tasksConverter) {
+    public ArangoStandardKnowledgeComponent(
+            @Autowired ArangoStandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
+            @Autowired ArangoConstraintsRepository constraintsRepository,
+            @Autowired ArangoVersionsRepository versionsRepository,
+            @Autowired ArangoConstraintsConverter constraintsConverter,
+            @Autowired IArangoStandardKnowledgeConverter tasksConverter,
+            @Autowired ArangoStandardKnowledgeTasksLinksRepository standardKnowledgeTasksLinkRepository,
+            @Autowired ArangoConstraintsLinksRepository constraintsLinksRepository,
+            @Autowired ArangoConstraintsToTaskLinksRepository constraintsToTaskLinksRepository
+    ) {
         super(standardKnowledgeTasksRepository, constraintsRepository, versionsRepository, constraintsConverter, tasksConverter);
+        this.standardKnowledgeTasksLinkRepository = standardKnowledgeTasksLinkRepository;
+        this.constraintsLinksRepository = constraintsLinksRepository;
+        this.constraintsToTaskLinksRepository = constraintsToTaskLinksRepository;
     }
 
     private Optional<StandardKnowledgeTask> containsTaskWithName(StandardKnowledgeTask task, String name) {

@@ -7,6 +7,7 @@ services:
     environment:
       - ARANGO_URL=arango:8529
       - NEO4J_URL=neo4j:7474
+      - SPRING_PROFILE=neo4j
     ports:
       - "8080:8080"
     entrypoint: "sh -c '/ml2wf-runner/wait-for-them.sh $${ARANGO_URL} $${NEO4J_URL} -- java -jar /ml2wf-runner/ml2wf.jar'"

@@ -2,7 +2,6 @@ package com.ml2wf.v3.app.business.components.neo4j;
 
 import com.google.common.collect.ImmutableList;
 import com.ml2wf.v3.app.business.components.ConfigurationsComponent;
-import com.ml2wf.v3.app.business.storage.graph.arango.dto.*;
 import com.ml2wf.v3.app.business.storage.graph.neo4j.converter.impl.Neo4JTasksConverter;
 import com.ml2wf.v3.app.business.storage.graph.neo4j.dto.*;
 import com.ml2wf.v3.app.business.storage.graph.neo4j.repository.Neo4JConfigurationFeaturesRepository;
@@ -10,10 +9,12 @@ import com.ml2wf.v3.app.business.storage.graph.neo4j.repository.Neo4JConfigurati
 import com.ml2wf.v3.app.configurations.Configuration;
 import com.ml2wf.v3.app.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
+@Profile("neo4j")
 @Component
 public class Neo4JConfigurationsComponent
         extends ConfigurationsComponent<Neo4JConfiguration, Neo4JStandardKnowledgeTask, Neo4JTaskVersion, Neo4JConfigurationFeature, Neo4JConstraintOperand> {

@@ -7,11 +7,13 @@ import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoStandardKnowledg
 import com.ml2wf.v3.app.business.storage.graph.arango.dto.ArangoTaskVersion;
 import com.ml2wf.v3.app.business.storage.graph.arango.repository.ArangoConstraintsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+@Profile("arango")
 @Component
 public class ArangoStandardWorkflowComponent extends StandardWorkflowComponent<ArangoStandardKnowledgeTask,
-        ArangoConstraintOperand, ArangoTaskVersion, String> {
+        ArangoConstraintOperand, ArangoTaskVersion> {
 
     public ArangoStandardWorkflowComponent(@Autowired ArangoStandardKnowledgeComponent standardKnowledgeComponent,
                                            @Autowired ArangoConstraintsRepository constraintsRepository,

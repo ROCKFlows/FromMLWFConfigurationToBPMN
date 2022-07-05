@@ -11,7 +11,7 @@ public class FeatureModelComponent {
 
     // TODO: intercept this method return and convert automatically standard knowledge tree to feature model (Aspect4J ?)
 
-    private final Neo4JStandardKnowledgeComponent standardKnowledgeComponent;
+    private final IStandardKnowledgeComponent standardKnowledgeComponent;
     private final FeatureModelConverter featureModelConverter; // TODO: make autowirable
 
     public FeatureModelComponent(@Autowired Neo4JStandardKnowledgeComponent standardKnowledgeComponent) {

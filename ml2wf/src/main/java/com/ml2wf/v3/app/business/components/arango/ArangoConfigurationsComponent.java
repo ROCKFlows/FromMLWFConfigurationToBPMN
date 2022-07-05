@@ -8,11 +8,13 @@ import com.ml2wf.v3.app.business.storage.graph.arango.repository.*;
 import com.ml2wf.v3.app.configurations.Configuration;
 import com.ml2wf.v3.app.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Profile("arango")
 @Component
 public class ArangoConfigurationsComponent
         extends ConfigurationsComponent<ArangoConfiguration, ArangoStandardKnowledgeTask, ArangoTaskVersion, ArangoConfigurationFeature, ArangoConstraintOperand> {
