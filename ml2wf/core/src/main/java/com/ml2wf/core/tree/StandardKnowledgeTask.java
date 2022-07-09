@@ -1,6 +1,6 @@
 package com.ml2wf.core.tree;
 
-import com.ml2wf.v3.app.INamedElement;
+import com.ml2wf.core.INamedElement;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

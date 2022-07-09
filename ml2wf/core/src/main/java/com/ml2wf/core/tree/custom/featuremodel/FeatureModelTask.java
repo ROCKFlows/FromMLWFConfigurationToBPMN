@@ -1,6 +1,6 @@
 package com.ml2wf.core.tree.custom.featuremodel;
 
-import com.ml2wf.v2.tree.Identifiable;
+import com.ml2wf.core.tree.Identifiable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -2,12 +2,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <modules>
-        <module>arango</module>
-        <module>contract</module>
-        <module>core</module>
-        <module>xml</module>
-        <module>neo4j</module>
         <module>app</module>
+        <module>core</module>
+        <module>contract</module>
+        <module>xml</module>
+        <module>arango</module>
+        <module>neo4j</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -17,7 +17,7 @@
     </parent>
     <groupId>com.ml2wf</groupId>
     <artifactId>ml2wf</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>ml2wf</name>
     <url>https://maven.apache.org</url>
@@ -52,19 +52,6 @@
     <build>
         <finalName>ml2wf</finalName>
         <plugins>
-            <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-maven-plugin -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -98,8 +85,6 @@
                 <includes>
                     <include>**/*.properties</include>
                     <include>**/*.cfg</include>
-                    <include>**/*.bpmn</include>
-                    <include>**/*.bpmn2</include>
                     <include>**/*.xml</include>
                     <include>**/log4j2.xml</include>
                 </includes>

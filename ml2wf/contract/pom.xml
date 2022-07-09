@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ml2wf</artifactId>
         <groupId>com.ml2wf</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,13 +20,7 @@
         <dependency>
             <groupId>com.ml2wf</groupId>
             <artifactId>core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ml2wf</groupId>
-            <artifactId>ml2wf</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

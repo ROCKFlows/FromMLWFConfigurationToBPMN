@@ -1,4 +1,4 @@
-package com.ml2wf.v2.tree;
+package com.ml2wf.core.tree;
 
 import lombok.NonNull;
 

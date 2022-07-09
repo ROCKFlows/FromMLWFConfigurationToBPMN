@@ -1,10 +1,10 @@
 package com.ml2wf.core.constraints.operands.factory;
 
-import com.ml2wf.util.Pair;
 import com.ml2wf.core.constraints.operands.AbstractOperand;
 import com.ml2wf.core.constraints.operators.AbstractOperator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,10 +37,10 @@ public final class AbstractOperandFactory {
                 .map(e -> {
                     if (e.getValue() instanceof List) {
                         return ((List<?>) e.getValue()).stream()
-                                .map(v -> new Pair<>(e.getKey(), v))
+                                .map(v -> Pair.of(e.getKey(), v))
                                 .collect(Collectors.toList());
                     }
-                    return List.of(new Pair<>(e.getKey(), e.getValue())); // TODO : remove List.of
+                    return List.of(Pair.of(e.getKey(), e.getValue())); // TODO : remove List.of
                 })
                 .flatMap(Collection::stream)
                 .map(e -> AbstractOperandFactory.createOperand((String) e.getKey(), e.getValue()))
