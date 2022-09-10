@@ -8,9 +8,11 @@ import com.ml2wf.core.tree.custom.featuremodel.FeatureModelStructure;
 import com.ml2wf.core.tree.custom.featuremodel.FeatureModelTask;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
+@Component
 public class FeatureModelConverter implements IKnowledgeTreeConverter<FeatureModel> {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

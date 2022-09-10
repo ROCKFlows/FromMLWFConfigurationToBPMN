@@ -50,7 +50,6 @@
         <sonar.login>475220e893ddcfd86b7a8088d9b6ef7d77a98e34</sonar.login>
     </properties>
     <build>
-        <finalName>ml2wf</finalName>
         <plugins>
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
             <plugin>
@@ -79,17 +78,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/main/resources</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.cfg</include>
-                    <include>**/*.xml</include>
-                    <include>**/log4j2.xml</include>
-                </includes>
-            </resource>
-        </resources>
     </build>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-neo4j -->

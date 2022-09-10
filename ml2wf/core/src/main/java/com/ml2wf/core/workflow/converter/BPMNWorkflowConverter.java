@@ -6,6 +6,7 @@ import com.ml2wf.core.workflow.custom.bpmn.BPMNProcess;
 import com.ml2wf.core.workflow.custom.bpmn.BPMNWorkflow;
 import com.ml2wf.core.workflow.custom.bpmn.BPMNWorkflowTask;
 import lombok.NonNull;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
+@Component
 public class BPMNWorkflowConverter implements IWorkflowConverter<BPMNWorkflow> {
 
     @Override

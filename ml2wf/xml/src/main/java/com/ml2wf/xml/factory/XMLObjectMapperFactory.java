@@ -39,9 +39,11 @@ import com.ml2wf.xml.mixins.workflow.custom.bpmn.BPMNWFDocumentationMixin;
 import com.ml2wf.xml.mixins.workflow.custom.bpmn.BPMNWFTaskMixin;
 import com.ml2wf.xml.mixins.workflow.custom.bpmn.BPMNProcessMixin;
 import com.ml2wf.xml.mixins.workflow.custom.bpmn.BPMNProcessSequenceFlowMixin;
+import org.springframework.stereotype.Component;
 
 import javax.xml.stream.XMLInputFactory;
 
+@Component
 public class XMLObjectMapperFactory implements IObjectMapperFactory {
 
     private final XMLInputFactory xmlInputFactory;

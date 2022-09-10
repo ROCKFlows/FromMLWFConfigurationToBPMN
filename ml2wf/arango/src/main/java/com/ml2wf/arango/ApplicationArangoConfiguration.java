@@ -3,20 +3,16 @@ package com.ml2wf.arango;
 import com.arangodb.ArangoDB;
 import com.arangodb.springframework.annotation.EnableArangoRepositories;
 import com.arangodb.springframework.config.ArangoConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableAutoConfiguration
-@ComponentScan
 @EnableArangoRepositories(basePackages = "com.ml2wf.arango.storage.repository")
 public class ApplicationArangoConfiguration implements ArangoConfiguration {
 
     @Override
     public ArangoDB.Builder arango() {
         return new ArangoDB.Builder()
-                .host("arango", 8529)
+                .host("0.0.0.0", 8529)
                 .user("root")
                 .password("ml2wf_password");
     }
