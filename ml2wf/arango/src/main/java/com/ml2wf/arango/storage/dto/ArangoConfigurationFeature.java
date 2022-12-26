@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 
 @Data
 @Document("ConfigurationFeatures")
-public class ArangoConfigurationFeature implements GraphConfigurationFeature<ArangoStandardKnowledgeTask, ArangoTaskVersion> {
+public class ArangoConfigurationFeature implements GraphConfigurationFeature<ArangoTaskVersion> {
 
     @Id
     private String id;

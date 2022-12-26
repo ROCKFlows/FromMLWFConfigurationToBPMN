@@ -8,18 +8,18 @@ import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
 import com.ml2wf.contract.storage.graph.repository.ConstraintsRepository;
 import com.ml2wf.core.workflow.StandardWorkflow;
 
-public abstract class AbstractStandardWorkflowComponent<T extends GraphStandardKnowledgeTask<T, V>,
-        C extends GraphConstraintOperand<T, V, C>, V extends GraphTaskVersion> implements IStandardWorkflowComponent {
+public abstract class AbstractStandardWorkflowComponent<T extends GraphStandardKnowledgeTask<V>,
+        C extends GraphConstraintOperand<V>, V extends GraphTaskVersion> implements IStandardWorkflowComponent {
 
     private static final String ROOT_CONSTRAINT_NODE_NAME = "__ROOT_CONSTRAINT";
 
     private final IStandardKnowledgeComponent standardKnowledgeComponent;
-    private final ConstraintsRepository<C, T, V, ?> constraintsRepository;
-    private final IGraphConstraintsConverter<T, C, V> constraintsConverter;
+    private final ConstraintsRepository<C, V, ?> constraintsRepository;
+    private final IGraphConstraintsConverter<T, V> constraintsConverter;
 
     protected AbstractStandardWorkflowComponent(IStandardKnowledgeComponent standardKnowledgeComponent,
-                                                ConstraintsRepository<C, T, V, ?> constraintsRepository,
-                                                IGraphConstraintsConverter<T, C, V> constraintsConverter) {
+                                                ConstraintsRepository<C, V, ?> constraintsRepository,
+                                                IGraphConstraintsConverter<T, V> constraintsConverter) {
         this.standardKnowledgeComponent = standardKnowledgeComponent;
         this.constraintsRepository = constraintsRepository;
         this.constraintsConverter = constraintsConverter;

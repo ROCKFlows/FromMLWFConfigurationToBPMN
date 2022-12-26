@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ConstraintsRepository<C extends GraphConstraintOperand<T, V, C>, T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion, ID>
+public interface ConstraintsRepository<C extends GraphConstraintOperand<V>, V extends GraphTaskVersion, ID>
         extends PagingAndSortingRepository<C, ID>, QueryByExampleExecutor<C> {
 
     List<C> findAllByTypeEqualsAndVersion_Name(String name, String versionName);

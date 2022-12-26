@@ -2,14 +2,15 @@ package com.ml2wf.contract.storage.graph.dto;
 
 import java.util.Collection;
 
-public interface GraphConstraintOperand<T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion,
-        C extends GraphConstraintOperand<T, V, C>> {
+public interface GraphConstraintOperand<V extends GraphTaskVersion> {
 
     String getType();
 
     V getVersion();
 
-    Collection<C> getOperands();
+    void setVersion(V version);
 
-    T getTask();
+    Collection<? extends GraphConstraintOperand<V>> getOperands();
+
+    GraphStandardKnowledgeTask<V> getTask();
 }

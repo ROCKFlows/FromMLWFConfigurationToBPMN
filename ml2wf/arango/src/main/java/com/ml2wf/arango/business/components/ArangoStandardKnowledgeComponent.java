@@ -18,7 +18,8 @@ import java.util.stream.StreamSupport;
 
 @Profile("arango")
 @Component
-public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeComponent<ArangoStandardKnowledgeTask, ArangoConstraintOperand, ArangoTaskVersion> {
+public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeComponent<ArangoStandardKnowledgeTask,
+        ArangoConstraintOperand, ArangoTaskVersion> {
 
     private final ArangoStandardKnowledgeTasksLinksRepository standardKnowledgeTasksLinkRepository;
     private final ArangoConstraintsLinksRepository constraintsLinksRepository;
@@ -91,7 +92,8 @@ public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeC
         // TODO: split into dedicated components (one for tasks, one for constraints...)
         var lastVersion = versionsRepository.getLastVersion().orElseGet(() -> new ArangoTaskVersion(0, 0, 0, "unversioned"));
         // converting and saving tasks
-        var arangoStandardKnowledgeTasks = tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
+        // TODO: fix this unsafe cast
+        var arangoStandardKnowledgeTasks = (List<ArangoStandardKnowledgeTask>) tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
         arangoStandardKnowledgeTasks.forEach(t -> {
             t.getVersion().setMajor(lastVersion.getMajor() + 1);
             t.getVersion().setName(versionName);
@@ -106,7 +108,8 @@ public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeC
         // converting and saving constraints
         var rootConstraint = new ArangoConstraintOperand(ROOT_CONSTRAINT_NODE_NAME, new ArangoTaskVersion(lastVersion.getMajor() + 1, 0, 0, versionName), Collections.emptyList());
         constraintsRepository.save(rootConstraint); // saving reserved constraint tree root
-        var arangoConstraintOperands = constraintsConverter.fromStandardKnowledgeTree(
+        // TODO: fix this unsafe cast
+        var arangoConstraintOperands = (List<ArangoConstraintOperand>) constraintsConverter.fromStandardKnowledgeTree(
                 standardKnowledgeTree, ImmutableList.copyOf(iterableUpdatedArangoTasks)
         );
         arangoConstraintOperands.forEach(t -> {

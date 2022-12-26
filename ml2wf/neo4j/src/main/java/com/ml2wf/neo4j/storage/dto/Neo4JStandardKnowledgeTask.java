@@ -12,7 +12,7 @@ import java.util.Collection;
 
 @Data
 @Node("Task")
-public class Neo4JStandardKnowledgeTask implements GraphStandardKnowledgeTask<Neo4JStandardKnowledgeTask, Neo4JTaskVersion> {
+public class Neo4JStandardKnowledgeTask implements GraphStandardKnowledgeTask<Neo4JTaskVersion> {
 
     @Id @GeneratedValue
     private Long id;

@@ -14,7 +14,7 @@ import java.util.Collection;
 @Data
 @NoArgsConstructor
 @Node("Constraint")
-public class Neo4JConstraintOperand implements GraphConstraintOperand<Neo4JStandardKnowledgeTask, Neo4JTaskVersion, Neo4JConstraintOperand> {
+public class Neo4JConstraintOperand implements GraphConstraintOperand<Neo4JTaskVersion> {
 
     // TODO: support description
 

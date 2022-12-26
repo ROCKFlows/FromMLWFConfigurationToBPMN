@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @Document("Configurations")
 @PersistentIndex(fields = { "name" })
-public class ArangoConfiguration implements GraphConfiguration<ArangoStandardKnowledgeTask, ArangoTaskVersion, ArangoConfigurationFeature> {
+public class ArangoConfiguration implements GraphConfiguration<ArangoTaskVersion> {
 
     @Id
     private String id;

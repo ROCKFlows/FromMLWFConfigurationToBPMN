@@ -42,7 +42,7 @@
         <version.jansi>2.4.0</version.jansi>
         <version.lombok>1.18.24</version.lombok>
         <version.vavr>0.10.4</version.vavr>
-        <version.springdoc>1.6.9</version.springdoc>
+        <version.springdoc>1.6.14</version.springdoc>
         <dependency.directory>dependency/</dependency.directory>
         <sonar.projectKey>MireilleBF_FromMLWFConfigurationToBPMN</sonar.projectKey>
         <sonar.organization>mireillebf-github</sonar.organization>

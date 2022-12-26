@@ -16,7 +16,7 @@ import java.util.Collection;
 @NoArgsConstructor
 @Document("Constraints")
 @PersistentIndex(fields = { "version" })
-public class ArangoConstraintOperand implements GraphConstraintOperand<ArangoStandardKnowledgeTask, ArangoTaskVersion, ArangoConstraintOperand> {
+public class ArangoConstraintOperand implements GraphConstraintOperand<ArangoTaskVersion> {
 
     // TODO: support description
 
@@ -43,9 +43,5 @@ public class ArangoConstraintOperand implements GraphConstraintOperand<ArangoSta
         this.version = version;
         operands = new ArrayList<>();
         this.task = task;
-    }
-
-    public Collection<ArangoConstraintOperand> getOperands() {
-        return operands;
     }
 }

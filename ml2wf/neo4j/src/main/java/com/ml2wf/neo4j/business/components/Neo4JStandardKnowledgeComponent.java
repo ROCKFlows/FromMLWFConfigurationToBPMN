@@ -39,13 +39,16 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
                 .orElseGet(() -> new Neo4JTaskVersion(0, 0, 0, "unversioned"));
         var newVersion = versionsRepository.save(new Neo4JTaskVersion(lastVersion.getMajor() + 1, 0, 0, versionName));
         // converting and saving tasks
-        var neo4JStandardKnowledgeTasks = tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
+        // TODO: fix this unsafe cast
+        var neo4JStandardKnowledgeTasks = (List<Neo4JStandardKnowledgeTask>) tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
         neo4JStandardKnowledgeTasks.forEach(t -> t.setVersion(newVersion));
-        var iterableUpdatedNeo4JTasks = ImmutableList.copyOf(standardKnowledgeTasksRepository.saveAll(neo4JStandardKnowledgeTasks));
+        var iterableUpdatedNeo4JTasks = ImmutableList.copyOf(
+                (List<Neo4JStandardKnowledgeTask>) standardKnowledgeTasksRepository.saveAll(neo4JStandardKnowledgeTasks));
         var rootTask = new Neo4JStandardKnowledgeTask(ROOT_NODE_NAME, true, true, newVersion, "reserved tree root. internal use only. not exported.", Collections.singletonList(iterableUpdatedNeo4JTasks.get(0)));
         standardKnowledgeTasksRepository.save(rootTask); // saving reserved tree root
         // converting and saving constraints
-        var neo4jConstraintOperands = constraintsConverter.fromStandardKnowledgeTree(
+        // TODO: fix this unsafe cast
+        var neo4jConstraintOperands = (List<Neo4JConstraintOperand>) constraintsConverter.fromStandardKnowledgeTree(
                 standardKnowledgeTree, ImmutableList.copyOf(iterableUpdatedNeo4JTasks)
         );
         neo4jConstraintOperands.forEach(t -> t.setVersion(newVersion));

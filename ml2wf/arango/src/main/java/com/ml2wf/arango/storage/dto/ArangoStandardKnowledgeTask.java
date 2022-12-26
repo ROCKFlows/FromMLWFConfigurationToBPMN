@@ -11,7 +11,7 @@ import java.util.Collection;
 @Data
 @Document("StandardKnowledgeTask")
 @PersistentIndex(fields = { "name", "version" })
-public class ArangoStandardKnowledgeTask implements GraphStandardKnowledgeTask<ArangoStandardKnowledgeTask, ArangoTaskVersion> {
+public class ArangoStandardKnowledgeTask implements GraphStandardKnowledgeTask<ArangoTaskVersion> {
 
     @Id
     private String id;

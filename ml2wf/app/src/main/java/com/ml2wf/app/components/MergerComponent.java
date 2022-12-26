@@ -1,7 +1,6 @@
 package com.ml2wf.app.components;
 
 import com.ml2wf.contract.business.IStandardWorkflowComponent;
-import com.ml2wf.contract.business.AbstractStandardWorkflowComponent;
 import com.ml2wf.core.workflow.converter.BPMNWorkflowConverter;
 import com.ml2wf.core.workflow.custom.bpmn.BPMNWorkflow;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ public class MergerComponent {
     private final IStandardWorkflowComponent standardWorkflowComponent;
     private final BPMNWorkflowConverter bpmnWorkflowConverter; // TODO: make autowirable
 
-    public MergerComponent(@Autowired AbstractStandardWorkflowComponent standardWorkflowComponent) {
+    public MergerComponent(@Autowired IStandardWorkflowComponent standardWorkflowComponent) {
         this.standardWorkflowComponent = standardWorkflowComponent;
         bpmnWorkflowConverter = new BPMNWorkflowConverter();
     }

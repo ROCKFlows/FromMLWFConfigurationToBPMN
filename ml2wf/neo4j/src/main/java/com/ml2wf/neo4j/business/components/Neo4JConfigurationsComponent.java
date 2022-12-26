@@ -35,7 +35,7 @@ public class Neo4JConfigurationsComponent
                     var correspondingTask = standardKnowledgeComponent.getTaskWithName(c.getName(), version.getName())
                             .orElseThrow(() -> new RuntimeException(String.format("No task found for name %s and version %s.", c.getName(), version.getName())));
                     var convertedTask = standardKnowledgeConverter.fromStandardKnowledgeTask(correspondingTask).get(0);
-                    return new Neo4JConfigurationFeature(c.getAutomatic().getLowercaseName(), c.getManual().getLowercaseName(), convertedTask, version);
+                    return new Neo4JConfigurationFeature(c.getAutomatic().getLowercaseName(), c.getManual().getLowercaseName(), (Neo4JStandardKnowledgeTask) convertedTask, version);
                 })
                 .collect(Collectors.toList());
         var storedConfigFeatures = configurationFeaturesRepository.saveAll(convertedConfigurationFeatures);

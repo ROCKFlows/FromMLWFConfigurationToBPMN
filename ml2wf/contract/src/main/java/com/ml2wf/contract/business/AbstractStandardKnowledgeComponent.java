@@ -16,24 +16,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public abstract class AbstractStandardKnowledgeComponent<T extends GraphStandardKnowledgeTask<T, V>,
-        C extends GraphConstraintOperand<T, V, C>, V extends GraphTaskVersion> implements IStandardKnowledgeComponent {
+public abstract class AbstractStandardKnowledgeComponent<T extends GraphStandardKnowledgeTask<V>,
+        C extends GraphConstraintOperand<V>, V extends GraphTaskVersion> implements IStandardKnowledgeComponent {
 
     protected static final String ROOT_NODE_NAME = "__ROOT";
     protected static final String ROOT_CONSTRAINT_NODE_NAME = "__ROOT_CONSTRAINT";
 
     protected final StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTasksRepository;
-    protected final ConstraintsRepository<C, T, V, ?> constraintsRepository;
+    protected final ConstraintsRepository<C, V, ?> constraintsRepository;
     protected final VersionsRepository<V, String> versionsRepository;
-    protected final IGraphConstraintsConverter<T, C, V> constraintsConverter;
-    protected final IGraphStandardKnowledgeConverter<T, V> tasksConverter;
+    protected final IGraphConstraintsConverter<T, V> constraintsConverter;
+    protected final IGraphStandardKnowledgeConverter<V> tasksConverter;
 
     protected AbstractStandardKnowledgeComponent(
             StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTasksRepository,
-            ConstraintsRepository<C, T, V, ?> constraintsRepository,
+            ConstraintsRepository<C, V, ?> constraintsRepository,
             VersionsRepository<V, String> versionsRepository,
-            IGraphConstraintsConverter<T, C, V> constraintsConverter,
-            IGraphStandardKnowledgeConverter<T, V> tasksConverter
+            IGraphConstraintsConverter<T, V> constraintsConverter,
+            IGraphStandardKnowledgeConverter<V> tasksConverter
     ) {
         // TODO: find a way to autowire these elements in abstract rather than in concretes
         this.standardKnowledgeTasksRepository = standardKnowledgeTasksRepository;

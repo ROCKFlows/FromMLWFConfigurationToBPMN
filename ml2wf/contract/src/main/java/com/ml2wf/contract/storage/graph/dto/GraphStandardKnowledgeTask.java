@@ -2,7 +2,7 @@ package com.ml2wf.contract.storage.graph.dto;
 
 import java.util.Collection;
 
-public interface GraphStandardKnowledgeTask<T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion> {
+public interface GraphStandardKnowledgeTask<V extends GraphTaskVersion> {
 
     String getName();
 
@@ -12,7 +12,9 @@ public interface GraphStandardKnowledgeTask<T extends GraphStandardKnowledgeTask
 
     V getVersion();
 
+    void setVersion(V version);
+
     String getDescription();
 
-    Collection<T> getChildren();
+    Collection<? extends GraphStandardKnowledgeTask<V>> getChildren();
 }

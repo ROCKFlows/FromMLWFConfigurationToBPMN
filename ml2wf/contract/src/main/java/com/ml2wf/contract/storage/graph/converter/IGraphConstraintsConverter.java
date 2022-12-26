@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public interface IGraphConstraintsConverter<T extends GraphStandardKnowledgeTask<T, V>,
-        C extends GraphConstraintOperand<T, V, C>, V extends GraphTaskVersion> {
+public interface IGraphConstraintsConverter<T extends GraphStandardKnowledgeTask<V>, V extends GraphTaskVersion> {
 
     private static AbstractOperand callUsingReflection(Class<? extends AbstractOperand> clazz,
                                                        Class<?>[] parametersTypes, Object... parameters) {
@@ -27,7 +26,7 @@ public interface IGraphConstraintsConverter<T extends GraphStandardKnowledgeTask
         }
     }
 
-    private AbstractOperand toAbstractOperand(C graphConstraintOperand) {
+    private AbstractOperand toAbstractOperand(GraphConstraintOperand<V> graphConstraintOperand) {
         // TODO: use AbstractOperandFactory
         if (graphConstraintOperand.getType().equals("var")) { // TODO: improve (should not rely only on var)
             return callUsingReflection(
@@ -46,17 +45,17 @@ public interface IGraphConstraintsConverter<T extends GraphStandardKnowledgeTask
         );
     }
 
-    default ConstraintTree toConstraintTree(C graphConstraintOperand) {
+    default ConstraintTree toConstraintTree(GraphConstraintOperand<V> graphConstraintOperand) {
         return new ConstraintTree((AbstractOperator) toAbstractOperand(graphConstraintOperand));
     }
 
-    C fromAbstractOperand(AbstractOperand abstractOperand, List<T> graphStandardKnowledgeTasks); // TODO: factorize using factory
+    GraphConstraintOperand<V> fromAbstractOperand(AbstractOperand abstractOperand, List<T> graphStandardKnowledgeTasks); // TODO: factorize using factory
 
-    default C fromConstraintTree(ConstraintTree constraintTree, List<T> graphStandardKnowledgeTasks) {
+    default GraphConstraintOperand<V> fromConstraintTree(ConstraintTree constraintTree, List<T> graphStandardKnowledgeTasks) {
         return fromAbstractOperand(constraintTree.getOperator(), graphStandardKnowledgeTasks);
     }
 
-    default List<C> fromStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree,
+    default List<? extends GraphConstraintOperand<V>> fromStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree,
                                               List<T> graphStandardKnowledgeTasks) {
         return standardKnowledgeTree.getConstraints().stream()
                 .map(c -> fromConstraintTree(c, graphStandardKnowledgeTasks))
