@@ -1,5 +1,6 @@
 package com.ml2wf.contract.business;
 
+import com.ml2wf.contract.exception.VersionNotFoundException;
 import com.ml2wf.contract.storage.graph.converter.IGraphConstraintsConverter;
 import com.ml2wf.contract.storage.graph.converter.IGraphStandardKnowledgeConverter;
 import com.ml2wf.contract.storage.graph.dto.GraphConstraintOperand;
@@ -47,7 +48,7 @@ public abstract class AbstractStandardKnowledgeComponent<T extends GraphStandard
     public StandardKnowledgeTree getStandardKnowledgeTree(String versionName) {
         var optArangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersion_Name(ROOT_NODE_NAME, versionName);
         var arangoStandardKnowledgeTask = optArangoStandardKnowledgeTask.orElseThrow(
-                () -> new RuntimeException("No task found for version " + versionName));
+                () -> new VersionNotFoundException(versionName));
         // __ROOT node is for internal use only and should not be exported
         var firstArangoTreeTask = new ArrayList<>(arangoStandardKnowledgeTask.getChildren()).get(0);
         var rootConstraint = constraintsRepository.findAllByTypeEqualsAndVersion_Name(ROOT_CONSTRAINT_NODE_NAME, firstArangoTreeTask.getVersion().getName());

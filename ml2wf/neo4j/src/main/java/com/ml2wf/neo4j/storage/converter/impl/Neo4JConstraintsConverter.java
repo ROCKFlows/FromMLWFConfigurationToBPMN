@@ -1,5 +1,6 @@
 package com.ml2wf.neo4j.storage.converter.impl;
 
+import com.ml2wf.contract.exception.VariableTaskNotFoundException;
 import com.ml2wf.core.constraints.operands.AbstractOperand;
 import com.ml2wf.core.constraints.operands.impl.VariableOperand;
 import com.ml2wf.core.constraints.operators.AbstractOperator;
@@ -26,8 +27,7 @@ public class Neo4JConstraintsConverter implements INeo4JConstraintsConverter {
                     standardKnowledgeTasks.stream()
                             .filter(a -> a.getName().equals(((VariableOperand) abstractOperand).getValue()))
                             .findAny()
-                            .orElseThrow() // TODO: throw custom exception in case no task in the tree but present in the constraints
-
+                            .orElseThrow(() -> new VariableTaskNotFoundException((VariableOperand) abstractOperand))
             );
         }
         return new Neo4JConstraintOperand(
