@@ -12,7 +12,7 @@ sleep 10
 echo "Done."
 
 echo "Importing feature model into arangodb..."
-curl -X POST "http://localhost:8080/fm/" -H  "accept: application/json" -H  "Content-Type: application/xml" -d '@BPMN-Models/light_model_sample.xml'
+curl -X POST "http://localhost:8080/ml2wf/api/v1/fm?versionName=demopoc" -H  "accept: application/json" -H  "Content-Type: application/xml" -d '@BPMN-Models/light_model_sample.xml'
 echo -e "\nDone."
 
 echo "To visualize the imported feature model:"

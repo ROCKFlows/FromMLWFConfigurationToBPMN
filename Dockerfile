@@ -2,9 +2,7 @@ FROM maven:3.8.6-jdk-11 as builder
 
 WORKDIR /ml2wf-build
 
-COPY ./ml2wf/pom.xml .
-
-COPY ./ml2wf/src/ ./src/
+COPY ./ml2wf/ .
 
 RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests # tmp disable tests
 
@@ -14,7 +12,7 @@ FROM openjdk:11 as runner
 
 WORKDIR /ml2wf-runner
 
-COPY --from=builder /ml2wf-build/target/ml2wf.jar .
+COPY --from=builder /ml2wf-build/app/target/ml2wf.jar .
 
 COPY wait-for-it.sh /ml2wf-runner/wait-for-it.sh
 
