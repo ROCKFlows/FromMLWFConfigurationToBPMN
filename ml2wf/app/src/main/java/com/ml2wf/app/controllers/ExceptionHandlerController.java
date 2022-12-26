@@ -1,6 +1,7 @@
 package com.ml2wf.app.controllers;
 
 import com.ml2wf.app.exception.ApiException;
+import com.ml2wf.contract.exception.DuplicatedVersionNameException;
 import com.ml2wf.contract.exception.VariableTaskNotFoundException;
 import com.ml2wf.contract.exception.VersionNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ public class ExceptionHandlerController {
 
     private static final String VARIABLE_TASK_NOT_FOUND_MESSAGE_PATTERN = "Unknown reference to task %s in constraints.";
     private static final String VERSION_NOT_FOUND_MESSAGE_PATTERN = "Version %s not found.";
+    private static final String DUPLICATED_VERSION_NAME_MESSAGE_PATTERN = "Version with name %s already exists.";
 
     @ExceptionHandler(value = {VariableTaskNotFoundException.class})
     public ResponseEntity<ApiException> variableTaskNotFoundExceptionHandler(VariableTaskNotFoundException exception) {
@@ -34,6 +36,17 @@ public class ExceptionHandlerController {
                 .body(ApiException.builder()
                         .status(HttpStatus.BAD_REQUEST)
                         .message(String.format(VERSION_NOT_FOUND_MESSAGE_PATTERN, exception.getVersionName()))
+                        .build()
+                );
+    }
+
+    @ExceptionHandler(value = {DuplicatedVersionNameException.class})
+    public ResponseEntity<ApiException> duplicatedVersionNameExceptionHandler(DuplicatedVersionNameException exception) {
+        // TODO: use aspect for logging
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiException.builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message(String.format(DUPLICATED_VERSION_NAME_MESSAGE_PATTERN, exception.getVersionName()))
                         .build()
                 );
     }
