@@ -20,20 +20,23 @@ public class Neo4JTasksConverter implements INeo4JStandardKnowledgeConverter {
         List<Neo4JStandardKnowledgeTask> newTasks = new ArrayList<>();
         var newChildrenTasks = standardKnowledgeTask.getTasks().stream()
                 .map(this::fromStandardKnowledgeTask)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(t -> t.get(0), t -> t.subList(1, t.size())));
         var newNeo4JTask = new Neo4JStandardKnowledgeTask(
                 standardKnowledgeTask.getName(),
                 standardKnowledgeTask.isAbstract(),
                 !standardKnowledgeTask.isOptional(),
                 new Neo4JTaskVersion(0, 0, 0, "unversioned"), // TODO: take source task version in consideration
                 standardKnowledgeTask.getDocumentation(),
-                newChildrenTasks);
+                newChildrenTasks.keySet());
         if (standardKnowledgeTask.getTasks().isEmpty()) {
             return Collections.singletonList(newNeo4JTask);
         }
         newTasks.add(newNeo4JTask);
-        newTasks.addAll(newChildrenTasks);
+        newTasks.addAll(newChildrenTasks.keySet());
+        newTasks.addAll(newChildrenTasks.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList()));
         return newTasks;
     }
 }

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @Profile("neo4j")
 @Component
@@ -66,7 +65,6 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
         // converting and saving tasks
         // TODO: fix this unsafe cast
         var neo4JStandardKnowledgeTasks = (List<Neo4JStandardKnowledgeTask>) tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
-        neo4JStandardKnowledgeTasks.forEach(t -> t.setVersion(newVersion));
         recursiveApplyToTasks(t -> t.setVersion(newVersion), neo4JStandardKnowledgeTasks);
         var iterableUpdatedNeo4JTasks = ImmutableList.copyOf(
                 (List<Neo4JStandardKnowledgeTask>) standardKnowledgeTasksRepository.saveAll(neo4JStandardKnowledgeTasks));
