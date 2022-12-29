@@ -35,7 +35,6 @@
         <version.jackson.woodstox>6.4.0</version.jackson.woodstox>
         <version.arangodb>3.7.0</version.arangodb>
         <version.neo4j>6.2.0</version.neo4j>
-        <version.picocli>4.6.3</version.picocli>
         <version.log4j>2.19.0</version.log4j>
         <version.commons-io>2.11.0</version.commons-io>
         <version.guava>31.1-jre</version.guava>
@@ -153,12 +152,6 @@
             <artifactId>junit-jupiter-params</artifactId>
             <version>${version.junit}</version>
             <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
-        <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli</artifactId>
-            <version>${version.picocli}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
         <dependency>
