@@ -36,7 +36,7 @@
         <version.arangodb>3.7.0</version.arangodb>
         <version.neo4j>6.2.0</version.neo4j>
         <version.picocli>4.6.3</version.picocli>
-        <version.log4j>2.17.2</version.log4j>
+        <version.log4j>2.19.0</version.log4j>
         <version.commons-io>2.11.0</version.commons-io>
         <version.guava>31.1-jre</version.guava>
         <version.jansi>2.4.0</version.jansi>
