@@ -14,5 +14,5 @@ public interface GraphStandardKnowledgeTask<V extends GraphTaskVersion> extends 
 
     String getDescription();
 
-    Collection<? extends GraphStandardKnowledgeTask<V>> getChildren();
+    Collection<GraphStandardKnowledgeTask<V>> getChildren();
 }

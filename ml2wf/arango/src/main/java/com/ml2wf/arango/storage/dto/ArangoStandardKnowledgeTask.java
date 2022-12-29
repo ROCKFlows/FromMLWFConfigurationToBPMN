@@ -23,7 +23,7 @@ public class ArangoStandardKnowledgeTask implements GraphStandardKnowledgeTask<A
     private ArangoTaskVersion version;
     private String description;
     @Relations(edges = ArangoStandardKnowledgeTaskLink.class, direction = Relations.Direction.OUTBOUND, lazy = true)
-    private Collection<ArangoStandardKnowledgeTask> children;
+    private Collection<GraphStandardKnowledgeTask<ArangoTaskVersion>> children;
 
     public ArangoStandardKnowledgeTask(String name, boolean isAbstract, boolean isMandatory, ArangoTaskVersion version,
                                        String description) {

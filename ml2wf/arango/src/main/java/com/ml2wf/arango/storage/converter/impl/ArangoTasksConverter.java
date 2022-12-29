@@ -3,6 +3,7 @@ package com.ml2wf.arango.storage.converter.impl;
 import com.ml2wf.arango.storage.converter.IArangoStandardKnowledgeConverter;
 import com.ml2wf.arango.storage.dto.ArangoStandardKnowledgeTask;
 import com.ml2wf.arango.storage.dto.ArangoTaskVersion;
+import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.core.tree.StandardKnowledgeTask;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class ArangoTasksConverter implements IArangoStandardKnowledgeConverter {
 
     @Override
-    public List<ArangoStandardKnowledgeTask> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask) {
+    public List<GraphStandardKnowledgeTask<ArangoTaskVersion>> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask) {
         var newArangoTask = new ArangoStandardKnowledgeTask(
                 standardKnowledgeTask.getName(),
                 standardKnowledgeTask.isAbstract(),

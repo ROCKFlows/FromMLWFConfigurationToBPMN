@@ -2,8 +2,8 @@ package com.ml2wf.arango.storage.converter.impl;
 
 import com.ml2wf.arango.storage.converter.IArangoConstraintsConverter;
 import com.ml2wf.arango.storage.dto.ArangoConstraintOperand;
-import com.ml2wf.arango.storage.dto.ArangoStandardKnowledgeTask;
 import com.ml2wf.arango.storage.dto.ArangoTaskVersion;
+import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.core.constraints.operands.AbstractOperand;
 import com.ml2wf.core.constraints.operands.impl.VariableOperand;
 import com.ml2wf.core.constraints.operators.AbstractOperator;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class ArangoConstraintsConverter implements IArangoConstraintsConverter {
 
     public ArangoConstraintOperand fromAbstractOperand(AbstractOperand abstractOperand,
-                                                       List<ArangoStandardKnowledgeTask> arangoStandardKnowledgeTasks) {
+                                                       List<GraphStandardKnowledgeTask<ArangoTaskVersion>> arangoStandardKnowledgeTasks) {
         // TODO: improve to avoid instanceof
         if (abstractOperand instanceof VariableOperand) {
             return new ArangoConstraintOperand(

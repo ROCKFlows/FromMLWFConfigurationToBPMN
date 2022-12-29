@@ -19,7 +19,7 @@ import java.util.stream.StreamSupport;
 @Profile("arango")
 @Component
 public class ArangoConfigurationsComponent
-        extends AbstractConfigurationsComponent<ArangoConfiguration, ArangoStandardKnowledgeTask, ArangoTaskVersion, ArangoConfigurationFeature, ArangoConstraintOperand> {
+        extends AbstractConfigurationsComponent<ArangoConfiguration, ArangoTaskVersion, ArangoConfigurationFeature> {
 
     private final ArangoConfigurationToFeaturesLinksRepository configurationToFeaturesRepository;
     private final ArangoConfigurationFeaturesToTaskLinksRepository configurationFeaturesToTaskLinksRepository;

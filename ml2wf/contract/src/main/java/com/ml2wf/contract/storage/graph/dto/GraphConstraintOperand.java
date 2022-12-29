@@ -8,7 +8,7 @@ public interface GraphConstraintOperand<V extends GraphTaskVersion> extends Vers
 
     String getType();
 
-    Collection<? extends GraphConstraintOperand<V>> getOperands();
+    Collection<GraphConstraintOperand<V>> getOperands();
 
     GraphStandardKnowledgeTask<V> getTask();
 }

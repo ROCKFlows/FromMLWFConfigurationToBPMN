@@ -1,7 +1,9 @@
 package com.ml2wf.neo4j.storage.dto;
 
+import com.ml2wf.contract.storage.graph.dto.AbstractGraphKnowledgeTask;
 import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -11,27 +13,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Node("Task")
-public class Neo4JStandardKnowledgeTask implements GraphStandardKnowledgeTask<Neo4JTaskVersion> {
+public class Neo4JStandardKnowledgeTask extends AbstractGraphKnowledgeTask<Neo4JTaskVersion> {
 
     @Id @GeneratedValue
     private Long id;
-    private String name;
-    private boolean isAbstract;
-    private boolean isMandatory;
     @Relationship(type = "IS_VERSIONED_BY", direction = Relationship.Direction.OUTGOING)
     private Neo4JTaskVersion version;
-    private String description;
     @Relationship(type = "IS_PARENT_OF", direction = Relationship.Direction.OUTGOING)
-    private Collection<Neo4JStandardKnowledgeTask> children;
+    private Collection<GraphStandardKnowledgeTask<Neo4JTaskVersion>> children;
 
     public Neo4JStandardKnowledgeTask(String name, boolean isAbstract, boolean isMandatory, Neo4JTaskVersion version,
-                                      String description, Collection<Neo4JStandardKnowledgeTask> children) {
-        this.name = name;
-        this.isAbstract = isAbstract;
-        this.isMandatory = isMandatory;
+                                      String description, Collection<GraphStandardKnowledgeTask<Neo4JTaskVersion>> children) {
+        super(name, isAbstract, isMandatory, description);
         this.version = version;
-        this.description = description;
         this.children = new ArrayList<>(children);
     }
 }

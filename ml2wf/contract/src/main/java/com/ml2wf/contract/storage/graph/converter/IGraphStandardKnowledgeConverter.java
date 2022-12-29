@@ -45,12 +45,12 @@ public interface IGraphStandardKnowledgeConverter<V extends GraphTaskVersion> {
         );
     }
 
-    default List<? extends GraphStandardKnowledgeTask<V>> fromStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree) {
+    default List<GraphStandardKnowledgeTask<V>> fromStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree) {
         if (standardKnowledgeTree.getTasks().isEmpty()) {
             throw new IllegalStateException("Can't convert an empty knowledge tree model.");
         }
         return fromStandardKnowledgeTask(standardKnowledgeTree.getTasks().get(0)); // TODO: currently, we only support one root task
     }
 
-    List<? extends GraphStandardKnowledgeTask<V>> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask);
+    List<GraphStandardKnowledgeTask<V>> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask);
 }

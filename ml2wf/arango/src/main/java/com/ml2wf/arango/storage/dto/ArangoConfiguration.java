@@ -5,6 +5,7 @@ import com.arangodb.springframework.annotation.Document;
 import com.arangodb.springframework.annotation.PersistentIndex;
 import com.arangodb.springframework.annotation.Relations;
 import com.ml2wf.contract.storage.graph.dto.GraphConfiguration;
+import com.ml2wf.contract.storage.graph.dto.GraphConfigurationFeature;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -22,9 +23,10 @@ public class ArangoConfiguration implements GraphConfiguration<ArangoTaskVersion
     private String name;
     private ArangoTaskVersion version;
     @Relations(edges = ArangoConfigurationToFeatureLink.class, direction = Relations.Direction.OUTBOUND)
-    private List<ArangoConfigurationFeature> features;
+    private List<GraphConfigurationFeature<ArangoTaskVersion>> features;
 
-    public ArangoConfiguration(String name, ArangoTaskVersion version, List<ArangoConfigurationFeature> features) {
+    public ArangoConfiguration(String name, ArangoTaskVersion version,
+                               List<GraphConfigurationFeature<ArangoTaskVersion>> features) {
         this.name = name;
         this.version = version;
         this.features = new ArrayList<>(features);

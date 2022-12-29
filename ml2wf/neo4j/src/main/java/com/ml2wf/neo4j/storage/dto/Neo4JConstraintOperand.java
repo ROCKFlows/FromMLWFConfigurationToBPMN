@@ -1,6 +1,7 @@
 package com.ml2wf.neo4j.storage.dto;
 
 import com.ml2wf.contract.storage.graph.dto.GraphConstraintOperand;
+import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.neo4j.core.schema.Id;
@@ -24,18 +25,18 @@ public class Neo4JConstraintOperand implements GraphConstraintOperand<Neo4JTaskV
     @Relationship(type = "IS_VERSIONED_BY", direction = Relationship.Direction.OUTGOING)
     private Neo4JTaskVersion version; // we should remove it as we can access it from the constrained task
     @Relationship(type = "IS_PARENT_OF", direction = Relationship.Direction.OUTGOING)
-    private Collection<Neo4JConstraintOperand> operands;
+    private Collection<GraphConstraintOperand<Neo4JTaskVersion>> operands;
     @Relationship(type = "CONSTRAINS", direction = Relationship.Direction.OUTGOING)
-    private Neo4JStandardKnowledgeTask task;
+    private GraphStandardKnowledgeTask<Neo4JTaskVersion> task;
 
-    public Neo4JConstraintOperand(String type, Neo4JTaskVersion version, Collection<Neo4JConstraintOperand> operands) {
+    public Neo4JConstraintOperand(String type, Neo4JTaskVersion version, Collection<GraphConstraintOperand<Neo4JTaskVersion>> operands) {
         this.type = type;
         this.version = version;
         this.operands = new ArrayList<>(operands);
         task = null;
     }
 
-    public Neo4JConstraintOperand(String type, Neo4JTaskVersion version, Neo4JStandardKnowledgeTask task) {
+    public Neo4JConstraintOperand(String type, Neo4JTaskVersion version, GraphStandardKnowledgeTask<Neo4JTaskVersion> task) {
         this.type = type;
         this.version = version;
         operands = new ArrayList<>();

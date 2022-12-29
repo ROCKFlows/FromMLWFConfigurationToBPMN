@@ -6,6 +6,6 @@ import com.ml2wf.neo4j.storage.dto.Neo4JTaskVersion;
 import org.springframework.stereotype.Component;
 
 @Component
-public interface INeo4JConstraintsConverter extends IGraphConstraintsConverter<Neo4JStandardKnowledgeTask, Neo4JTaskVersion> {
+public interface INeo4JConstraintsConverter extends IGraphConstraintsConverter<Neo4JTaskVersion> {
 
 }

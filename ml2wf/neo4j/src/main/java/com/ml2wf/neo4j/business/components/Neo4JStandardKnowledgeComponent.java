@@ -3,7 +3,8 @@ package com.ml2wf.neo4j.business.components;
 import com.google.common.collect.ImmutableList;
 import com.ml2wf.contract.business.AbstractStandardKnowledgeComponent;
 import com.ml2wf.contract.exception.DuplicatedVersionNameException;
-import com.ml2wf.contract.storage.graph.Versioned;
+import com.ml2wf.contract.storage.graph.dto.GraphConstraintOperand;
+import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.core.tree.StandardKnowledgeTree;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JConstraintsConverter;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JTasksConverter;
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
 
 @Profile("neo4j")
 @Component
-public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeComponent<Neo4JStandardKnowledgeTask, Neo4JConstraintOperand, Neo4JTaskVersion> {
+public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeComponent<Neo4JTaskVersion> {
 
     private static final String ROOT_NODE_NAME = "__ROOT";
     private static final String ROOT_CONSTRAINT_NODE_NAME = "__ROOT_CONSTRAINT";
@@ -35,8 +36,9 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
         super(standardKnowledgeTasksRepository, constraintsRepository, versionsRepository, constraintsConverter, tasksConverter);
     }
 
-    private void recursiveApplyToTasks(Consumer<Neo4JStandardKnowledgeTask> callable,
-                                       Iterable<Neo4JStandardKnowledgeTask> tasks) {
+    private void recursiveApplyToTasks(Consumer<GraphStandardKnowledgeTask<Neo4JTaskVersion>> callable,
+                                       // TODO: fix wildcard
+                                       Iterable<? extends GraphStandardKnowledgeTask<Neo4JTaskVersion>> tasks) {
         // TODO: factorize with recursiveApplyToOperands
         tasks.forEach((t) -> {
             callable.accept(t);
@@ -44,8 +46,9 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
         });
     }
 
-    private void recursiveApplyToOperands(Consumer<Neo4JConstraintOperand> callable,
-                                          Iterable<Neo4JConstraintOperand> operands) {
+    private void recursiveApplyToOperands(Consumer<GraphConstraintOperand<Neo4JTaskVersion>> callable,
+                                          // TODO: fix wildcard
+                                          Iterable<? extends GraphConstraintOperand<Neo4JTaskVersion>> operands) {
         // TODO: factorize with recursiveApplyToOperands
         operands.forEach((o) -> {
             callable.accept(o);
@@ -64,15 +67,15 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
         var newVersion = versionsRepository.save(new Neo4JTaskVersion(lastVersion.getMajor() + 1, 0, 0, versionName));
         // converting and saving tasks
         // TODO: fix this unsafe cast
-        var neo4JStandardKnowledgeTasks = (List<Neo4JStandardKnowledgeTask>) tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
+        var neo4JStandardKnowledgeTasks = tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
         recursiveApplyToTasks(t -> t.setVersion(newVersion), neo4JStandardKnowledgeTasks);
         var iterableUpdatedNeo4JTasks = ImmutableList.copyOf(
-                (List<Neo4JStandardKnowledgeTask>) standardKnowledgeTasksRepository.saveAll(neo4JStandardKnowledgeTasks));
+                standardKnowledgeTasksRepository.saveAll(neo4JStandardKnowledgeTasks));
         var rootTask = new Neo4JStandardKnowledgeTask(ROOT_NODE_NAME, true, true, newVersion, "reserved tree root. internal use only. not exported.", Collections.singletonList(iterableUpdatedNeo4JTasks.get(0)));
         standardKnowledgeTasksRepository.save(rootTask); // saving reserved tree root
         // converting and saving constraints
         // TODO: fix this unsafe cast
-        var neo4jConstraintOperands = (List<Neo4JConstraintOperand>) constraintsConverter.fromStandardKnowledgeTree(
+        var neo4jConstraintOperands = constraintsConverter.fromStandardKnowledgeTree(
                 standardKnowledgeTree, ImmutableList.copyOf(iterableUpdatedNeo4JTasks)
         );
         recursiveApplyToOperands(t -> t.setVersion(newVersion), neo4jConstraintOperands);

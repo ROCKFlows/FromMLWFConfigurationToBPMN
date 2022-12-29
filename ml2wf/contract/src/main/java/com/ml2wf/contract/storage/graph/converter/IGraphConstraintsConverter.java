@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public interface IGraphConstraintsConverter<T extends GraphStandardKnowledgeTask<V>, V extends GraphTaskVersion> {
+public interface IGraphConstraintsConverter<V extends GraphTaskVersion> {
 
     private static AbstractOperand callUsingReflection(Class<? extends AbstractOperand> clazz,
                                                        Class<?>[] parametersTypes, Object... parameters) {
@@ -49,14 +49,14 @@ public interface IGraphConstraintsConverter<T extends GraphStandardKnowledgeTask
         return new ConstraintTree((AbstractOperator) toAbstractOperand(graphConstraintOperand));
     }
 
-    GraphConstraintOperand<V> fromAbstractOperand(AbstractOperand abstractOperand, List<T> graphStandardKnowledgeTasks); // TODO: factorize using factory
+    GraphConstraintOperand<V> fromAbstractOperand(AbstractOperand abstractOperand, List<GraphStandardKnowledgeTask<V>> graphStandardKnowledgeTasks); // TODO: factorize using factory
 
-    default GraphConstraintOperand<V> fromConstraintTree(ConstraintTree constraintTree, List<T> graphStandardKnowledgeTasks) {
+    default GraphConstraintOperand<V> fromConstraintTree(ConstraintTree constraintTree, List<GraphStandardKnowledgeTask<V>> graphStandardKnowledgeTasks) {
         return fromAbstractOperand(constraintTree.getOperator(), graphStandardKnowledgeTasks);
     }
 
-    default List<? extends GraphConstraintOperand<V>> fromStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree,
-                                              List<T> graphStandardKnowledgeTasks) {
+    default List<GraphConstraintOperand<V>> fromStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree,
+                                              List<GraphStandardKnowledgeTask<V>> graphStandardKnowledgeTasks) {
         return standardKnowledgeTree.getConstraints().stream()
                 .map(c -> fromConstraintTree(c, graphStandardKnowledgeTasks))
                 .collect(Collectors.toList());

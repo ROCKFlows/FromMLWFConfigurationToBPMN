@@ -9,8 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface StandardKnowledgeTasksRepository<T extends GraphStandardKnowledgeTask<V>, V
-        extends GraphTaskVersion, ID> extends PagingAndSortingRepository<T, ID>, QueryByExampleExecutor<T> {
+public interface StandardKnowledgeTasksRepository<V extends GraphTaskVersion, ID>
+        extends PagingAndSortingRepository<GraphStandardKnowledgeTask<V>, ID>,
+        QueryByExampleExecutor<GraphStandardKnowledgeTask<V>> {
 
-    Optional<T> findOneByNameAndVersion_Name(String name, String versionName);
+    Optional<GraphStandardKnowledgeTask<V>> findOneByNameAndVersion_Name(String name, String versionName);
 }

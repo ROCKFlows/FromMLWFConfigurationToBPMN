@@ -3,6 +3,8 @@ package com.ml2wf.arango.storage.dto;
 import com.arangodb.springframework.annotation.Edge;
 import com.arangodb.springframework.annotation.From;
 import com.arangodb.springframework.annotation.To;
+import com.ml2wf.contract.storage.graph.dto.GraphConfiguration;
+import com.ml2wf.contract.storage.graph.dto.GraphConfigurationFeature;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -13,11 +15,12 @@ public class ArangoConfigurationToFeatureLink {
     @Id
     private String id;
     @From
-    private ArangoConfiguration configuration;
+    private GraphConfiguration<ArangoTaskVersion> configuration;
     @To
-    private ArangoConfigurationFeature feature;
+    private GraphConfigurationFeature<ArangoTaskVersion> feature;
 
-    public ArangoConfigurationToFeatureLink(ArangoConfiguration configuration, ArangoConfigurationFeature feature) {
+    public ArangoConfigurationToFeatureLink(GraphConfiguration<ArangoTaskVersion> configuration,
+                                            GraphConfigurationFeature<ArangoTaskVersion> feature) {
         this.configuration = configuration;
         this.feature = feature;
     }

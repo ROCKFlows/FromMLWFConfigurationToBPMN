@@ -6,6 +6,8 @@ import com.ml2wf.arango.storage.repository.*;
 import com.ml2wf.arango.storage.converter.IArangoStandardKnowledgeConverter;
 import com.ml2wf.arango.storage.converter.impl.ArangoConstraintsConverter;
 import com.ml2wf.contract.business.AbstractStandardKnowledgeComponent;
+import com.ml2wf.contract.storage.graph.dto.GraphConstraintOperand;
+import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.core.tree.StandardKnowledgeTask;
 import com.ml2wf.core.tree.StandardKnowledgeTree;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,7 @@ import java.util.stream.StreamSupport;
 
 @Profile("arango")
 @Component
-public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeComponent<ArangoStandardKnowledgeTask,
-        ArangoConstraintOperand, ArangoTaskVersion> {
+public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeComponent<ArangoTaskVersion> {
 
     private final ArangoStandardKnowledgeTasksLinksRepository standardKnowledgeTasksLinkRepository;
     private final ArangoConstraintsLinksRepository constraintsLinksRepository;
@@ -52,11 +53,11 @@ public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeC
 
     private void saveLinks(
             StandardKnowledgeTree knowledgeTree,
-            Iterable<ArangoStandardKnowledgeTask> arangoStandardKnowledgeTasks
+            Iterable<GraphStandardKnowledgeTask<ArangoTaskVersion>> arangoStandardKnowledgeTasks
     ) {
         // TODO: move to dedicated component
-        Map<String, ArangoStandardKnowledgeTask> map = StreamSupport.stream(arangoStandardKnowledgeTasks.spliterator(), false)
-                .collect(Collectors.toMap(ArangoStandardKnowledgeTask::getName, t -> t));
+        Map<String, GraphStandardKnowledgeTask<ArangoTaskVersion>> map = StreamSupport.stream(arangoStandardKnowledgeTasks.spliterator(), false)
+                .collect(Collectors.toMap(GraphStandardKnowledgeTask<ArangoTaskVersion>::getName, t -> t));
         map.forEach((k, v) -> {
             var knowledgeTask = containsTaskWithName(knowledgeTree.getTasks().get(0), k).orElseThrow();
             knowledgeTask.getTasks().forEach(c -> standardKnowledgeTasksLinkRepository.save(new ArangoStandardKnowledgeTaskLink(v, map.get(c.getName()))));
@@ -64,14 +65,14 @@ public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeC
     }
 
     private void saveRootLink(StandardKnowledgeTree standardKnowledgeTree,
-                              Iterable<ArangoStandardKnowledgeTask> arangoStandardKnowledgeTasks,
+                              Iterable<GraphStandardKnowledgeTask<ArangoTaskVersion>> arangoStandardKnowledgeTasks,
                               ArangoStandardKnowledgeTask root) {
-        Map<String, ArangoStandardKnowledgeTask> map = StreamSupport.stream(arangoStandardKnowledgeTasks.spliterator(), false)
-                .collect(Collectors.toMap(ArangoStandardKnowledgeTask::getName, t -> t));
+        Map<String, GraphStandardKnowledgeTask<ArangoTaskVersion>> map = StreamSupport.stream(arangoStandardKnowledgeTasks.spliterator(), false)
+                .collect(Collectors.toMap(GraphStandardKnowledgeTask<ArangoTaskVersion>::getName, t -> t));
         standardKnowledgeTasksLinkRepository.save(new ArangoStandardKnowledgeTaskLink(root, map.get(standardKnowledgeTree.getTasks().get(0).getName())));
     }
 
-    private Collection<ArangoConstraintOperand> saveConstraints(Collection<ArangoConstraintOperand> operands) {
+    private Collection<GraphConstraintOperand<ArangoTaskVersion>> saveConstraints(Collection<GraphConstraintOperand<ArangoTaskVersion>> operands) {
         var updatedParentsOperands = ImmutableList.copyOf(constraintsRepository.saveAll(operands));
         for (var parentOperand : updatedParentsOperands) {
             for (var childOperand : saveConstraints(parentOperand.getOperands())) {
@@ -84,7 +85,8 @@ public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeC
         return updatedParentsOperands;
     }
 
-    private void saveConstraintRootLinks(Iterable<ArangoConstraintOperand> operands, ArangoConstraintOperand root) {
+    private void saveConstraintRootLinks(Iterable<GraphConstraintOperand<ArangoTaskVersion>> operands,
+                                         GraphConstraintOperand<ArangoTaskVersion> root) {
         operands.forEach(o -> constraintsLinksRepository.save(new ArangoConstraintLink(root, o)));
     }
 
@@ -93,7 +95,7 @@ public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeC
         var lastVersion = versionsRepository.getLastVersion().orElseGet(() -> new ArangoTaskVersion(0, 0, 0, "unversioned"));
         // converting and saving tasks
         // TODO: fix this unsafe cast
-        var arangoStandardKnowledgeTasks = (List<ArangoStandardKnowledgeTask>) tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
+        var arangoStandardKnowledgeTasks = tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
         arangoStandardKnowledgeTasks.forEach(t -> {
             t.getVersion().setMajor(lastVersion.getMajor() + 1);
             t.getVersion().setName(versionName);
@@ -109,7 +111,7 @@ public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeC
         var rootConstraint = new ArangoConstraintOperand(ROOT_CONSTRAINT_NODE_NAME, new ArangoTaskVersion(lastVersion.getMajor() + 1, 0, 0, versionName), Collections.emptyList());
         constraintsRepository.save(rootConstraint); // saving reserved constraint tree root
         // TODO: fix this unsafe cast
-        var arangoConstraintOperands = (List<ArangoConstraintOperand>) constraintsConverter.fromStandardKnowledgeTree(
+        var arangoConstraintOperands = constraintsConverter.fromStandardKnowledgeTree(
                 standardKnowledgeTree, ImmutableList.copyOf(iterableUpdatedArangoTasks)
         );
         arangoConstraintOperands.forEach(t -> {
