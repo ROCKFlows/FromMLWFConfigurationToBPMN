@@ -27,7 +27,7 @@ public class Neo4JConfigurationsComponent
         super(configurationRepository, configurationFeaturesRepository, standardKnowledgeComponent, versionsComponent, tasksConverter);
     }
 
-    public boolean importConfiguration(String name, Configuration configuration) throws Throwable {
+    public boolean importConfiguration(String name, Configuration configuration) {
         // TODO: move common part in parent
         var version = versionsComponent.getLastVersion().orElseThrow(
                 () -> new RuntimeException("No version found. Please import some tasks before saving a configuration."));

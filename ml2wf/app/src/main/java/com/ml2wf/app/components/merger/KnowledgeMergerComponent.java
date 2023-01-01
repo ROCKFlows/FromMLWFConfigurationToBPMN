@@ -26,8 +26,7 @@ public class KnowledgeMergerComponent<T extends GraphStandardKnowledgeTask<T, V>
     void mergeWorkflowWithTree(String version, StandardWorkflow workflow) {
         workflow.getTasks().forEach((t) -> {
             var optReferredTask = standardKnowledgeTasksRepository.findOneByNameAndVersion_Name(
-                    version,
-                    String.format("TODO: reference of %s", t.getName())
+                    version, String.format("TODO: reference of %s", t.getName())
             );
             var referredTask = optReferredTask.orElseThrow(); // TODO: manage this case
             // TODO: convert using dedicated core util class

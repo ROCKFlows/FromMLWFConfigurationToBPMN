@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component;
 @Component
 public interface IConfigurationComponent {
 
-    boolean importConfiguration(String name, Configuration configuration) throws Throwable;
+    boolean importConfiguration(String name, Configuration configuration);
 }
