@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 public class ArangoStandardWorkflowComponent extends AbstractStandardWorkflowComponent<ArangoStandardKnowledgeTask,
         ArangoTaskVersion, ArangoConstraintOperand> {
 
-    public ArangoStandardWorkflowComponent(@Autowired ArangoStandardKnowledgeComponent standardKnowledgeComponent,
+    public ArangoStandardWorkflowComponent(@Autowired ArangoStandardKnowledgeMergerComponent standardKnowledgeMergerComponent,
                                            @Autowired ArangoConstraintsRepository constraintsRepository,
                                            @Autowired ArangoConstraintsConverter constraintsConverter) {
-        super(standardKnowledgeComponent, constraintsRepository, constraintsConverter);
+        super(standardKnowledgeMergerComponent, constraintsRepository, constraintsConverter);
     }
 }

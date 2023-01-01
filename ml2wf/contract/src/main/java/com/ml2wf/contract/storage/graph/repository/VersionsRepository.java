@@ -12,4 +12,6 @@ public interface VersionsRepository<V extends GraphTaskVersion, ID>
         extends PagingAndSortingRepository<V, ID>, QueryByExampleExecutor<V> {
 
     Optional<V> getLastVersion();
+
+    Optional<V> findOneByName(String versionName);
 }

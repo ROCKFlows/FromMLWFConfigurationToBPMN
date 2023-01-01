@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 public class Neo4JStandardWorkflowComponent extends AbstractStandardWorkflowComponent<Neo4JStandardKnowledgeTask,
         Neo4JTaskVersion, Neo4JConstraintOperand> {
 
-    public Neo4JStandardWorkflowComponent(@Autowired Neo4JStandardKnowledgeComponent standardKnowledgeComponent,
+    public Neo4JStandardWorkflowComponent(@Autowired Neo4JStandardKnowledgeMergerComponent standardKnowledgeMergerComponent,
                                           @Autowired Neo4JConstraintsRepository constraintsRepository,
                                           @Autowired Neo4JConstraintsConverter constraintsConverter) {
-        super(standardKnowledgeComponent, constraintsRepository, constraintsConverter);
+        super(standardKnowledgeMergerComponent, constraintsRepository, constraintsConverter);
     }
 }

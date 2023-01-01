@@ -12,11 +12,12 @@ public class FeatureModelComponent {
     // TODO: intercept this method return and convert automatically standard knowledge tree to feature model (Aspect4J ?)
 
     private final IStandardKnowledgeComponent standardKnowledgeComponent;
-    private final FeatureModelConverter featureModelConverter; // TODO: make autowirable
+    private final FeatureModelConverter featureModelConverter;
 
-    public FeatureModelComponent(@Autowired IStandardKnowledgeComponent standardKnowledgeComponent) {
+    public FeatureModelComponent(@Autowired IStandardKnowledgeComponent standardKnowledgeComponent,
+                                 @Autowired FeatureModelConverter featureModelConverter) {
         this.standardKnowledgeComponent = standardKnowledgeComponent;
-        featureModelConverter = new FeatureModelConverter();
+        this.featureModelConverter = featureModelConverter;
     }
 
     public FeatureModel getFeatureModel(String versionName) {
