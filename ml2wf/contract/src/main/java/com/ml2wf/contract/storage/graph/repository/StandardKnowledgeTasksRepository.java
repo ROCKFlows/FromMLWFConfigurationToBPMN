@@ -1,7 +1,7 @@
 package com.ml2wf.contract.storage.graph.repository;
 
-import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
 import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
+import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.QueryByExampleExecutor;
 import org.springframework.stereotype.Repository;
@@ -9,9 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface StandardKnowledgeTasksRepository<V extends GraphTaskVersion, ID>
-        extends PagingAndSortingRepository<GraphStandardKnowledgeTask<V>, ID>,
-        QueryByExampleExecutor<GraphStandardKnowledgeTask<V>> {
+public interface StandardKnowledgeTasksRepository<T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion, ID>
+        extends PagingAndSortingRepository<T, ID>, QueryByExampleExecutor<T> {
 
-    Optional<GraphStandardKnowledgeTask<V>> findOneByNameAndVersion_Name(String name, String versionName);
+    Optional<T> findOneByNameAndVersion_Name(String name, String versionName);
 }

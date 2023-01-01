@@ -4,7 +4,8 @@ import com.ml2wf.contract.storage.graph.Versioned;
 
 import java.util.Collection;
 
-public interface GraphStandardKnowledgeTask<V extends GraphTaskVersion> extends Versioned<V> {
+public interface GraphStandardKnowledgeTask<T extends GraphStandardKnowledgeTask<T, V>,
+        V extends GraphTaskVersion> extends Versioned<V> {
 
     String getName();
 
@@ -14,5 +15,5 @@ public interface GraphStandardKnowledgeTask<V extends GraphTaskVersion> extends 
 
     String getDescription();
 
-    Collection<GraphStandardKnowledgeTask<V>> getChildren();
+    Collection<T> getChildren();
 }

@@ -1,7 +1,6 @@
 package com.ml2wf.neo4j.storage.converter.impl;
 
 import com.ml2wf.contract.exception.VariableTaskNotFoundException;
-import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.core.constraints.operands.AbstractOperand;
 import com.ml2wf.core.constraints.operands.impl.VariableOperand;
 import com.ml2wf.core.constraints.operators.AbstractOperator;
@@ -19,7 +18,7 @@ public class Neo4JConstraintsConverter implements INeo4JConstraintsConverter {
 
     @Override
     public Neo4JConstraintOperand fromAbstractOperand(AbstractOperand abstractOperand,
-                                                      List<GraphStandardKnowledgeTask<Neo4JTaskVersion>> standardKnowledgeTasks) {
+                                                      List<Neo4JStandardKnowledgeTask> standardKnowledgeTasks) {
         // TODO: improve to avoid instanceof
         if (abstractOperand instanceof VariableOperand) {
             return new Neo4JConstraintOperand(

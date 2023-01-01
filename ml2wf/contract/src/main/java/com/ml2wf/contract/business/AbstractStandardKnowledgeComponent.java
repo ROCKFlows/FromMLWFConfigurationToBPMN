@@ -3,6 +3,8 @@ package com.ml2wf.contract.business;
 import com.ml2wf.contract.exception.VersionNotFoundException;
 import com.ml2wf.contract.storage.graph.converter.IGraphConstraintsConverter;
 import com.ml2wf.contract.storage.graph.converter.IGraphStandardKnowledgeConverter;
+import com.ml2wf.contract.storage.graph.dto.GraphConstraintOperand;
+import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
 import com.ml2wf.contract.storage.graph.repository.ConstraintsRepository;
 import com.ml2wf.contract.storage.graph.repository.StandardKnowledgeTasksRepository;
@@ -15,23 +17,25 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public abstract class AbstractStandardKnowledgeComponent<V extends GraphTaskVersion> implements IStandardKnowledgeComponent {
+public abstract class AbstractStandardKnowledgeComponent<T extends GraphStandardKnowledgeTask<T, V>,
+        O extends GraphConstraintOperand<O, T, V>, V extends GraphTaskVersion>
+        implements IStandardKnowledgeComponent {
 
     protected static final String ROOT_NODE_NAME = "__ROOT";
     protected static final String ROOT_CONSTRAINT_NODE_NAME = "__ROOT_CONSTRAINT";
 
-    protected final StandardKnowledgeTasksRepository<V, ?> standardKnowledgeTasksRepository;
-    protected final ConstraintsRepository<V, ?> constraintsRepository;
+    protected final StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTasksRepository;
+    protected final ConstraintsRepository<O, T, V, ?> constraintsRepository;
     protected final VersionsRepository<V, String> versionsRepository;
-    protected final IGraphConstraintsConverter<V> constraintsConverter;
-    protected final IGraphStandardKnowledgeConverter<V> tasksConverter;
+    protected final IGraphConstraintsConverter<O, T, V> constraintsConverter;
+    protected final IGraphStandardKnowledgeConverter<T, V> tasksConverter;
 
     protected AbstractStandardKnowledgeComponent(
-            StandardKnowledgeTasksRepository<V, ?> standardKnowledgeTasksRepository,
-            ConstraintsRepository<V, ?> constraintsRepository,
+            StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTasksRepository,
+            ConstraintsRepository<O, T, V, ?> constraintsRepository,
             VersionsRepository<V, String> versionsRepository,
-            IGraphConstraintsConverter<V> constraintsConverter,
-            IGraphStandardKnowledgeConverter<V> tasksConverter
+            IGraphConstraintsConverter<O, T, V> constraintsConverter,
+            IGraphStandardKnowledgeConverter<T, V> tasksConverter
     ) {
         // TODO: find a way to autowire these elements in abstract rather than in concretes
         this.standardKnowledgeTasksRepository = standardKnowledgeTasksRepository;

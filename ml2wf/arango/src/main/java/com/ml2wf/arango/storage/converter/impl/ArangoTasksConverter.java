@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class ArangoTasksConverter implements IArangoStandardKnowledgeConverter {
 
     @Override
-    public List<GraphStandardKnowledgeTask<ArangoTaskVersion>> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask) {
+    public List<ArangoStandardKnowledgeTask> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask) {
         var newArangoTask = new ArangoStandardKnowledgeTask(
                 standardKnowledgeTask.getName(),
                 standardKnowledgeTask.isAbstract(),

@@ -12,16 +12,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public interface IGraphStandardKnowledgeConverter<V extends GraphTaskVersion> {
+public interface IGraphStandardKnowledgeConverter<T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion> {
 
-    default StandardKnowledgeTree toStandardKnowledgeTree(GraphStandardKnowledgeTask<V> standardKnowledgeTask) {
+    default StandardKnowledgeTree toStandardKnowledgeTree(T standardKnowledgeTask) {
         return new StandardKnowledgeTree(
                 Collections.singletonList(toStandardKnowledgeTask(standardKnowledgeTask)),
                 Collections.emptyList()
         );
     }
 
-    default StandardKnowledgeTree toStandardKnowledgeTree(GraphStandardKnowledgeTask<V> standardKnowledgeTask, List<ConstraintTree> constraintTrees) {
+    default StandardKnowledgeTree toStandardKnowledgeTree(T standardKnowledgeTask, List<ConstraintTree> constraintTrees) {
         return new StandardKnowledgeTree(
                 Collections.singletonList(toStandardKnowledgeTask(standardKnowledgeTask)),
                 constraintTrees
@@ -32,7 +32,7 @@ public interface IGraphStandardKnowledgeConverter<V extends GraphTaskVersion> {
         return String.format("v%d.%d.%d <%s>", version.getMajor(), version.getMinor(), version.getPatch(), version.getName());
     }
 
-    default StandardKnowledgeTask toStandardKnowledgeTask(GraphStandardKnowledgeTask<V> standardKnowledgeTask) {
+    default StandardKnowledgeTask toStandardKnowledgeTask(T standardKnowledgeTask) {
         return new StandardKnowledgeTask(
                 standardKnowledgeTask.getName(),
                 standardKnowledgeTask.getDescription(),
@@ -45,12 +45,12 @@ public interface IGraphStandardKnowledgeConverter<V extends GraphTaskVersion> {
         );
     }
 
-    default List<GraphStandardKnowledgeTask<V>> fromStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree) {
+    default List<T> fromStandardKnowledgeTree(StandardKnowledgeTree standardKnowledgeTree) {
         if (standardKnowledgeTree.getTasks().isEmpty()) {
             throw new IllegalStateException("Can't convert an empty knowledge tree model.");
         }
         return fromStandardKnowledgeTask(standardKnowledgeTree.getTasks().get(0)); // TODO: currently, we only support one root task
     }
 
-    List<GraphStandardKnowledgeTask<V>> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask);
+    List<T> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask);
 }

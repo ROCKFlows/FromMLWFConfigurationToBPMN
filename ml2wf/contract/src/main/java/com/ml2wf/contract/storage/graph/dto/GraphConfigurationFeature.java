@@ -1,12 +1,12 @@
 package com.ml2wf.contract.storage.graph.dto;
 
-public interface GraphConfigurationFeature<V extends GraphTaskVersion> {
+public interface GraphConfigurationFeature<T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion> {
 
     String getAutomatic();
 
     String getManual();
 
-    GraphStandardKnowledgeTask<V> getTask();
+    T getTask();
 
     V getVersion();
 }

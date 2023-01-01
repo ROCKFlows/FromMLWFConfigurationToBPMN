@@ -1,6 +1,5 @@
 package com.ml2wf.neo4j.storage.converter.impl;
 
-import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.core.tree.StandardKnowledgeTask;
 import com.ml2wf.neo4j.storage.dto.Neo4JStandardKnowledgeTask;
 import com.ml2wf.neo4j.storage.dto.Neo4JTaskVersion;
@@ -17,8 +16,8 @@ import java.util.stream.Collectors;
 public class Neo4JTasksConverter implements INeo4JStandardKnowledgeConverter {
 
     @Override
-    public List<GraphStandardKnowledgeTask<Neo4JTaskVersion>> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask) {
-        List<GraphStandardKnowledgeTask<Neo4JTaskVersion>> newTasks = new ArrayList<>();
+    public List<Neo4JStandardKnowledgeTask> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask) {
+        List<Neo4JStandardKnowledgeTask> newTasks = new ArrayList<>();
         var newChildrenTasks = standardKnowledgeTask.getTasks().stream()
                 .map(this::fromStandardKnowledgeTask)
                 .collect(Collectors.toMap(t -> t.get(0), t -> t.subList(1, t.size())));

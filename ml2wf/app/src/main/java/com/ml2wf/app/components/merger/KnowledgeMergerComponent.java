@@ -1,6 +1,7 @@
 package com.ml2wf.app.components.merger;
 
 import com.ml2wf.contract.storage.graph.converter.IGraphStandardKnowledgeConverter;
+import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
 import com.ml2wf.contract.storage.graph.repository.StandardKnowledgeTasksRepository;
 import com.ml2wf.core.tree.StandardKnowledgeTask;
@@ -9,13 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 
-public class KnowledgeMergerComponent<V extends GraphTaskVersion> {
+public class KnowledgeMergerComponent<T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion> {
 
-    private final StandardKnowledgeTasksRepository<V, ?> standardKnowledgeTasksRepository;
-    private final IGraphStandardKnowledgeConverter<V> graphStandardKnowledgeConverter;
+    private final StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTasksRepository;
+    private final IGraphStandardKnowledgeConverter<T, V> graphStandardKnowledgeConverter;
 
-    public KnowledgeMergerComponent(@Autowired StandardKnowledgeTasksRepository<V, ?> standardKnowledgeTasksRepository,
-                                    @Autowired IGraphStandardKnowledgeConverter<V> graphStandardKnowledgeConverter) {
+    public KnowledgeMergerComponent(@Autowired StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTasksRepository,
+                                    @Autowired IGraphStandardKnowledgeConverter<T, V> graphStandardKnowledgeConverter) {
         this.standardKnowledgeTasksRepository = standardKnowledgeTasksRepository;
         this.graphStandardKnowledgeConverter = graphStandardKnowledgeConverter;
     }

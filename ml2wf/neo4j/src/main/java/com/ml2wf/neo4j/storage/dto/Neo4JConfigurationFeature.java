@@ -9,7 +9,7 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 
 @Data
 @Node("ConfigurationFeature")
-public class Neo4JConfigurationFeature implements GraphConfigurationFeature<Neo4JTaskVersion> {
+public class Neo4JConfigurationFeature implements GraphConfigurationFeature<Neo4JStandardKnowledgeTask, Neo4JTaskVersion> {
 
     @Id @GeneratedValue
     private Long id;

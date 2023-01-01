@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArangoConfigurationFeaturesRepository extends ArangoRepository<ArangoConfigurationFeature, Long>,
-        ConfigurationFeaturesRepository<ArangoConfigurationFeature, ArangoTaskVersion, Long> {
+        ConfigurationFeaturesRepository<ArangoConfigurationFeature, ArangoStandardKnowledgeTask, ArangoTaskVersion, Long> {
 
 }

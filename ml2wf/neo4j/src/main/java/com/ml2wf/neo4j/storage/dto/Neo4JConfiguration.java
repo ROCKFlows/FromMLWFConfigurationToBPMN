@@ -11,7 +11,8 @@ import java.util.List;
 
 @Data
 @Node("Configuration")
-public class Neo4JConfiguration implements GraphConfiguration<Neo4JTaskVersion> {
+public class Neo4JConfiguration implements GraphConfiguration<Neo4JConfigurationFeature, Neo4JStandardKnowledgeTask,
+        Neo4JTaskVersion> {
 
     @Id
     private String name;

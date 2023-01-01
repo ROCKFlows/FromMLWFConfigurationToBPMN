@@ -3,8 +3,6 @@ package com.ml2wf.neo4j.business.components;
 import com.google.common.collect.ImmutableList;
 import com.ml2wf.contract.business.AbstractStandardKnowledgeComponent;
 import com.ml2wf.contract.exception.DuplicatedVersionNameException;
-import com.ml2wf.contract.storage.graph.dto.GraphConstraintOperand;
-import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.core.tree.StandardKnowledgeTree;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JConstraintsConverter;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JTasksConverter;
@@ -23,7 +21,8 @@ import java.util.function.Consumer;
 
 @Profile("neo4j")
 @Component
-public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeComponent<Neo4JTaskVersion> {
+public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeComponent<Neo4JStandardKnowledgeTask,
+        Neo4JConstraintOperand, Neo4JTaskVersion> {
 
     private static final String ROOT_NODE_NAME = "__ROOT";
     private static final String ROOT_CONSTRAINT_NODE_NAME = "__ROOT_CONSTRAINT";
@@ -36,9 +35,9 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
         super(standardKnowledgeTasksRepository, constraintsRepository, versionsRepository, constraintsConverter, tasksConverter);
     }
 
-    private void recursiveApplyToTasks(Consumer<GraphStandardKnowledgeTask<Neo4JTaskVersion>> callable,
+    private void recursiveApplyToTasks(Consumer<Neo4JStandardKnowledgeTask> callable,
                                        // TODO: fix wildcard
-                                       Iterable<? extends GraphStandardKnowledgeTask<Neo4JTaskVersion>> tasks) {
+                                       Iterable<Neo4JStandardKnowledgeTask> tasks) {
         // TODO: factorize with recursiveApplyToOperands
         tasks.forEach((t) -> {
             callable.accept(t);
@@ -46,9 +45,9 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
         });
     }
 
-    private void recursiveApplyToOperands(Consumer<GraphConstraintOperand<Neo4JTaskVersion>> callable,
+    private void recursiveApplyToOperands(Consumer<Neo4JConstraintOperand> callable,
                                           // TODO: fix wildcard
-                                          Iterable<? extends GraphConstraintOperand<Neo4JTaskVersion>> operands) {
+                                          Iterable<Neo4JConstraintOperand> operands) {
         // TODO: factorize with recursiveApplyToOperands
         operands.forEach((o) -> {
             callable.accept(o);

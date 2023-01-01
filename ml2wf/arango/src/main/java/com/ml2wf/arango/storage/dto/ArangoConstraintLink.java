@@ -3,7 +3,6 @@ package com.ml2wf.arango.storage.dto;
 import com.arangodb.springframework.annotation.Edge;
 import com.arangodb.springframework.annotation.From;
 import com.arangodb.springframework.annotation.To;
-import com.ml2wf.contract.storage.graph.dto.GraphConstraintOperand;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -14,12 +13,11 @@ public class ArangoConstraintLink {
     @Id
     private String id;
     @From
-    private GraphConstraintOperand<ArangoTaskVersion> parent;
+    private ArangoConstraintOperand parent;
     @To
-    private GraphConstraintOperand<ArangoTaskVersion> child;
+    private ArangoConstraintOperand child;
 
-    public ArangoConstraintLink(GraphConstraintOperand<ArangoTaskVersion> parent,
-                                GraphConstraintOperand<ArangoTaskVersion> child) {
+    public ArangoConstraintLink(ArangoConstraintOperand parent, ArangoConstraintOperand child) {
         this.parent = parent;
         this.child = child;
     }

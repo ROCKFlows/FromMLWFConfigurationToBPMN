@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 @Profile("neo4j")
 @Component
 public class Neo4JConfigurationsComponent
-        extends AbstractConfigurationsComponent<Neo4JConfiguration, Neo4JTaskVersion, Neo4JConfigurationFeature> {
+        extends AbstractConfigurationsComponent<Neo4JConfiguration, Neo4JTaskVersion, Neo4JStandardKnowledgeTask,
+        Neo4JConstraintOperand, Neo4JConfigurationFeature> {
 
     public Neo4JConfigurationsComponent(@Autowired Neo4JConfigurationRepository configurationRepository,
                                         @Autowired Neo4JConfigurationFeaturesRepository configurationFeaturesRepository,

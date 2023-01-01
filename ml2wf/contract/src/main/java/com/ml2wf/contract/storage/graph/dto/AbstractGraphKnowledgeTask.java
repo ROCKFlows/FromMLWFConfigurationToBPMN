@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractGraphKnowledgeTask<T extends GraphTaskVersion> implements GraphStandardKnowledgeTask<T> {
+public abstract class AbstractGraphKnowledgeTask<T extends GraphStandardKnowledgeTask<T, V>,
+        V extends GraphTaskVersion> implements GraphStandardKnowledgeTask<T, V> {
 
     protected String name;
     protected boolean isAbstract;

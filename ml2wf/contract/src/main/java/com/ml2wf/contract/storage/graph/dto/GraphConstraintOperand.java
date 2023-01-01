@@ -4,11 +4,12 @@ import com.ml2wf.contract.storage.graph.Versioned;
 
 import java.util.Collection;
 
-public interface GraphConstraintOperand<V extends GraphTaskVersion> extends Versioned<V> {
+public interface GraphConstraintOperand<O extends GraphConstraintOperand<O, T, V>,
+        T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion> extends Versioned<V> {
 
     String getType();
 
-    Collection<GraphConstraintOperand<V>> getOperands();
+    Collection<O> getOperands();
 
-    GraphStandardKnowledgeTask<V> getTask();
+    T getTask();
 }

@@ -11,7 +11,7 @@ import java.util.Collection;
 @Data
 @Document("StandardKnowledgeTask")
 @PersistentIndex(fields = { "name", "version" })
-public class ArangoStandardKnowledgeTask implements GraphStandardKnowledgeTask<ArangoTaskVersion> {
+public class ArangoStandardKnowledgeTask implements GraphStandardKnowledgeTask<ArangoStandardKnowledgeTask, ArangoTaskVersion> {
 
     @Id
     private String id;
@@ -23,7 +23,7 @@ public class ArangoStandardKnowledgeTask implements GraphStandardKnowledgeTask<A
     private ArangoTaskVersion version;
     private String description;
     @Relations(edges = ArangoStandardKnowledgeTaskLink.class, direction = Relations.Direction.OUTBOUND, lazy = true)
-    private Collection<GraphStandardKnowledgeTask<ArangoTaskVersion>> children;
+    private Collection<ArangoStandardKnowledgeTask> children;
 
     public ArangoStandardKnowledgeTask(String name, boolean isAbstract, boolean isMandatory, ArangoTaskVersion version,
                                        String description) {

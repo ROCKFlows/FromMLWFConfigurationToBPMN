@@ -8,23 +8,25 @@ import org.springframework.stereotype.Component;
 
 @Component
 public abstract class AbstractConfigurationsComponent<
-        C extends GraphConfiguration<V>,
+        C extends GraphConfiguration<F, T, V>,
         V extends GraphTaskVersion,
-        F extends GraphConfigurationFeature<V>
+        T extends GraphStandardKnowledgeTask<T, V>,
+        O extends GraphConstraintOperand<O, T, V>,
+        F extends GraphConfigurationFeature<T, V>
         >
         implements IConfigurationComponent {
 
-    protected final ConfigurationRepository<C, V, String> configurationRepository;
-    protected final ConfigurationFeaturesRepository<F, V, Long> configurationFeaturesRepository;
-    protected final AbstractStandardKnowledgeComponent<V> standardKnowledgeComponent;
+    protected final ConfigurationRepository<C, F, T, V, String> configurationRepository;
+    protected final ConfigurationFeaturesRepository<F, T, V, Long> configurationFeaturesRepository;
+    protected final AbstractStandardKnowledgeComponent<T, O, V> standardKnowledgeComponent;
     protected final IVersionsComponent<V> versionsComponent;
-    protected final IGraphStandardKnowledgeConverter<V> standardKnowledgeConverter;
+    protected final IGraphStandardKnowledgeConverter<T, V> standardKnowledgeConverter;
 
-    protected AbstractConfigurationsComponent(ConfigurationRepository<C, V, String> configurationRepository,
-                                              ConfigurationFeaturesRepository<F, V, Long> configurationFeaturesRepository,
-                                              AbstractStandardKnowledgeComponent<V> standardKnowledgeComponent,
+    protected AbstractConfigurationsComponent(ConfigurationRepository<C, F, T, V, String> configurationRepository,
+                                              ConfigurationFeaturesRepository<F, T, V, Long> configurationFeaturesRepository,
+                                              AbstractStandardKnowledgeComponent<T, O, V> standardKnowledgeComponent,
                                               IVersionsComponent<V> versionsComponent,
-                                              IGraphStandardKnowledgeConverter<V> standardKnowledgeConverter) {
+                                              IGraphStandardKnowledgeConverter<T, V> standardKnowledgeConverter) {
         this.configurationRepository = configurationRepository;
         this.configurationFeaturesRepository = configurationFeaturesRepository;
         this.standardKnowledgeComponent = standardKnowledgeComponent;

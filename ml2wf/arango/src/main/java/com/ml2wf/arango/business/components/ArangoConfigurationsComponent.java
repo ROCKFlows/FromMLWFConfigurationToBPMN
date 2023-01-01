@@ -19,7 +19,8 @@ import java.util.stream.StreamSupport;
 @Profile("arango")
 @Component
 public class ArangoConfigurationsComponent
-        extends AbstractConfigurationsComponent<ArangoConfiguration, ArangoTaskVersion, ArangoConfigurationFeature> {
+        extends AbstractConfigurationsComponent<ArangoConfiguration, ArangoTaskVersion, ArangoStandardKnowledgeTask,
+        ArangoConstraintOperand, ArangoConfigurationFeature> {
 
     private final ArangoConfigurationToFeaturesLinksRepository configurationToFeaturesRepository;
     private final ArangoConfigurationFeaturesToTaskLinksRepository configurationFeaturesToTaskLinksRepository;
@@ -45,7 +46,7 @@ public class ArangoConfigurationsComponent
                     var correspondingTask = standardKnowledgeComponent.getTaskWithName(c.getName(), version.getName())
                             .orElseThrow(() -> new RuntimeException(String.format("No task found for name %s and version %s.", c.getName(), version.getName()))); // TODO: use custom exception and intercept in app
                     var convertedTask = standardKnowledgeConverter.fromStandardKnowledgeTask(correspondingTask).get(0);
-            return new ArangoConfigurationFeature(c.getAutomatic().getLowercaseName(), c.getManual().getLowercaseName(), (ArangoStandardKnowledgeTask) convertedTask, version);
+            return new ArangoConfigurationFeature(c.getAutomatic().getLowercaseName(), c.getManual().getLowercaseName(), convertedTask, version);
             })
                 .collect(Collectors.toList());
         var storedConfigFeatures = configurationFeaturesRepository.saveAll(convertedConfigurationFeatures);
