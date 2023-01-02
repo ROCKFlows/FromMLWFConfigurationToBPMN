@@ -1,29 +1,27 @@
-import { useState } from 'react'
-import './App.css'
+import * as React from 'react';
+import {Stack, Typography} from "@mui/material";
+import {TreeItem, TreeView} from "@mui/lab";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+      <Stack>
+          <Typography>ml2wf</Typography>
+          <TreeView
+              aria-label="knowledge-tree"
+              defaultCollapseIcon={<ExpandMoreIcon />}
+              defaultExpandIcon={<ChevronRightIcon />}
+          >
+              <TreeItem nodeId="1" label="nodeA">
+                  <TreeItem nodeId="2" label="nodeA-1" />
+              </TreeItem>
+              <TreeItem nodeId="5" label="nodeB">
+                  <TreeItem nodeId="10" label="nodeB-1" />
+              </TreeItem>
+          </TreeView>
+      </Stack>
   )
 }
 
