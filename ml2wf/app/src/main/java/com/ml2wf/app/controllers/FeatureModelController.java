@@ -23,12 +23,12 @@ public class FeatureModelController {
         this.featureModelComponent = featureModelComponent;
     }
 
-    @GetMapping(value = {""})
+    @GetMapping(value = {""}, produces = {MediaType.APPLICATION_XML_VALUE})
     FeatureModel getFeatureModel(@RequestParam String versionName) {
         return featureModelComponent.getFeatureModel(versionName);
     }
 
-    @GetMapping(value = {"/{name}"})
+    @GetMapping(value = {"/{name}"}, produces = {MediaType.APPLICATION_XML_VALUE})
     FeatureModel getFeatureModelTask(@PathVariable String name, @RequestParam String versionName) {
         return featureModelComponent.getFeatureModelTaskWithName(name, versionName);
     }
