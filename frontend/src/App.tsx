@@ -56,7 +56,7 @@ function App() {
         sx={{height: '90vh', padding: '1em'}}
       >
         <Grid item xs={12}>
-          <Paper sx={{height: '89vh', padding: '1em'}}>
+          <Paper sx={{height: '89vh', padding: '1em', overflow: 'auto'}}>
             <KnowledgeTreeSection
               knowledgeTree={knowledgeTree?.FeatureModel?.structure}
               onVersionSelected={(v: string) => setVersion(v)}
@@ -71,14 +71,14 @@ function App() {
             sx={{height: '90vh'}}
           >
             <Grid item xs={6}>
-              <Paper sx={{height: '44vh', padding: '1em'}}>
+              <Paper sx={{height: '44vh', padding: '1em', overflow: 'auto'}}>
                 <ConstraintsSection
                   constraints={knowledgeTree?.FeatureModel?.constraints}
                 />
               </Paper>
             </Grid>
             <Grid item xs={6}>
-              <Paper sx={{height: '44vh', padding: '1em'}}>
+              <Paper sx={{height: '44vh', padding: '1em', overflow: 'auto'}}>
                 <WorkflowSection version={version} onImported={getTree} />
               </Paper>
             </Grid>

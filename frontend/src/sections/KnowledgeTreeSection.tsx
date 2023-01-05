@@ -15,6 +15,23 @@ export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
 
   const [tmpVersion, setTmpVersion] = useState<string>('');
 
+  const getNodesIds = (node: any): string[] => {
+    if (!node.children) {
+      return [node.name];
+    }
+    if (!node.name) {
+      return Array.isArray(node.children)
+        ? node.children.map(getNodesIds).flatMap((c: string[]) => c)
+        : getNodesIds(node.children);
+    }
+    return [
+      node.name,
+      ...(Array.isArray(node.children)
+        ? node.children.map(getNodesIds).flatMap((c: string[]) => c)
+        : getNodesIds(node.children)),
+    ];
+  };
+
   const getNodes = (node: any): ReactElement => {
     if (!node.children) {
       return <TreeItem nodeId={node.name} label={node.name} />;
@@ -49,13 +66,16 @@ export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
           Confirm
         </Button>
       </Stack>
-      <TreeView
-        aria-label="knowledge-tree"
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
-      >
-        {knowledgeTree && getNodes(knowledgeTree.children)}
-      </TreeView>
+      {knowledgeTree && (
+        <TreeView
+          aria-label="knowledge-tree"
+          defaultCollapseIcon={<ExpandMoreIcon />}
+          defaultExpandIcon={<ChevronRightIcon />}
+          defaultExpanded={getNodesIds(knowledgeTree.children)}
+        >
+          {getNodes(knowledgeTree.children)}
+        </TreeView>
+      )}
     </Stack>
   );
 }
