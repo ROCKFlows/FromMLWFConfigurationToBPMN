@@ -1,12 +1,26 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
-import {Alert, AlertColor, Grid, Paper, Snackbar, Stack} from '@mui/material';
+import {Suspense, useEffect, useState} from 'react';
+import {
+  Alert,
+  AlertColor,
+  Box,
+  CircularProgress,
+  Grid,
+  Paper,
+  Snackbar,
+  Stack,
+} from '@mui/material';
 import axios from 'axios';
 import {XMLParser} from 'fast-xml-parser';
 import TopToolbar from './TopToolbar';
-import KnowledgeTreeSection from './sections/KnowledgeTreeSection';
-import WorkflowSection from './sections/WorkflowSection';
-import ConstraintsSection from './sections/ConstraintsSection';
+
+const KnowledgeTreeSection = React.lazy(() =>
+  import('./sections/KnowledgeTreeSection'),
+);
+const WorkflowSection = React.lazy(() => import('./sections/WorkflowSection'));
+const ConstraintsSection = React.lazy(() =>
+  import('./sections/ConstraintsSection'),
+);
 
 function App() {
   const [version, setVersion] = useState<string>('');
@@ -63,10 +77,18 @@ function App() {
       >
         <Grid item xs={12}>
           <Paper sx={{height: '89vh', padding: '1em', overflow: 'auto'}}>
-            <KnowledgeTreeSection
-              knowledgeTree={knowledgeTree?.extendedFeatureModel?.struct}
-              onSelectedVersion={(v: string) => setVersion(v)}
-            />
+            <Suspense
+              fallback={
+                <Box sx={{display: 'flex'}}>
+                  <CircularProgress />
+                </Box>
+              }
+            >
+              <KnowledgeTreeSection
+                knowledgeTree={knowledgeTree?.extendedFeatureModel?.struct}
+                onSelectedVersion={(v: string) => setVersion(v)}
+              />
+            </Suspense>
           </Paper>
         </Grid>
         <Grid item>
@@ -78,14 +100,32 @@ function App() {
           >
             <Grid item xs={6}>
               <Paper sx={{height: '44vh', padding: '1em', overflow: 'auto'}}>
-                <ConstraintsSection
-                  constraints={knowledgeTree?.extendedFeatureModel?.constraints}
-                />
+                <Suspense
+                  fallback={
+                    <Box sx={{display: 'flex'}}>
+                      <CircularProgress />
+                    </Box>
+                  }
+                >
+                  <ConstraintsSection
+                    constraints={
+                      knowledgeTree?.extendedFeatureModel?.constraints
+                    }
+                  />
+                </Suspense>
               </Paper>
             </Grid>
             <Grid item xs={6}>
               <Paper sx={{height: '44vh', padding: '1em', overflow: 'auto'}}>
-                <WorkflowSection version={version} onImported={getTree} />
+                <Suspense
+                  fallback={
+                    <Box sx={{display: 'flex'}}>
+                      <CircularProgress />
+                    </Box>
+                  }
+                >
+                  <WorkflowSection version={version} onImported={getTree} />
+                </Suspense>
               </Paper>
             </Grid>
           </Grid>
