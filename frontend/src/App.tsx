@@ -11,7 +11,7 @@ import ConstraintsSection from './sections/ConstraintsSection';
 function App() {
   const [version, setVersion] = useState<string>('');
   const [knowledgeTree, setKnowledgeTree] = useState<
-    {FeatureModel: {constraints: any; structure: any}} | undefined
+    {extendedFeatureModel: {constraints: any; struct: any}} | undefined
   >(undefined);
   const [isSnackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState<
@@ -25,7 +25,13 @@ function App() {
     axios
       .get(`http://localhost:8080/ml2wf/api/v1/fm?versionName=${version}`)
       .then((r) => {
-        setKnowledgeTree(new XMLParser().parse(r.data));
+        setKnowledgeTree(
+          new XMLParser({
+            ignoreAttributes: false,
+            attributeNamePrefix: '@_',
+            allowBooleanAttributes: true,
+          }).parse(r.data),
+        );
         setSnackbarSeverity('success');
         setSnackbarMessage('Knowledge tree successfully retrieved.');
       })
@@ -58,7 +64,7 @@ function App() {
         <Grid item xs={12}>
           <Paper sx={{height: '89vh', padding: '1em', overflow: 'auto'}}>
             <KnowledgeTreeSection
-              knowledgeTree={knowledgeTree?.FeatureModel?.structure}
+              knowledgeTree={knowledgeTree?.extendedFeatureModel?.struct}
               onVersionSelected={(v: string) => setVersion(v)}
             />
           </Paper>
@@ -73,7 +79,7 @@ function App() {
             <Grid item xs={6}>
               <Paper sx={{height: '44vh', padding: '1em', overflow: 'auto'}}>
                 <ConstraintsSection
-                  constraints={knowledgeTree?.FeatureModel?.constraints}
+                  constraints={knowledgeTree?.extendedFeatureModel?.constraints}
                 />
               </Paper>
             </Grid>

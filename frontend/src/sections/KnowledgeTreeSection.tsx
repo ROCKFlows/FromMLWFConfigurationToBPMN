@@ -16,36 +16,40 @@ export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
   const [tmpVersion, setTmpVersion] = useState<string>('');
 
   const getNodesIds = (node: any): string[] => {
-    if (!node.children) {
-      return [node.name];
+    let result = [node['@_name']];
+    if (node.and) {
+      result = [
+        ...result,
+        ...(Array.isArray(node.and)
+          ? node.and.flatMap((n) => getNodesIds(n))
+          : getNodesIds(node.and)),
+      ];
     }
-    if (!node.name) {
-      return Array.isArray(node.children)
-        ? node.children.map(getNodesIds).flatMap((c: string[]) => c)
-        : getNodesIds(node.children);
+    if (node.feature) {
+      result = [
+        ...result,
+        ...(Array.isArray(node.feature)
+          ? node.feature.flatMap((n) => getNodesIds(n))
+          : getNodesIds(node.feature)),
+      ];
     }
-    return [
-      node.name,
-      ...(Array.isArray(node.children)
-        ? node.children.map(getNodesIds).flatMap((c: string[]) => c)
-        : getNodesIds(node.children)),
-    ];
+    return result;
   };
 
   const getNodes = (node: any): ReactElement => {
-    if (!node.children) {
-      return <TreeItem nodeId={node.name} label={node.name} />;
-    }
-    if (!node.name) {
-      return Array.isArray(node.children)
-        ? node.children.map(getNodes)
-        : getNodes(node.children);
+    if (!node.and && !node.feature) {
+      return <TreeItem nodeId={node['@_name']} label={node['@_name']} />;
     }
     return (
-      <TreeItem nodeId={node.name} label={node.name}>
-        {Array.isArray(node.children)
-          ? node.children.map(getNodes)
-          : getNodes(node.children)}
+      <TreeItem nodeId={node['@_name']} label={node['@_name']}>
+        {node.and &&
+          (Array.isArray(node.and)
+            ? node.and.map((n) => getNodes(n))
+            : getNodes(node.and))}
+        {node.feature &&
+          (Array.isArray(node.feature)
+            ? node.feature.map((n) => getNodes(n))
+            : getNodes(node.feature))}
       </TreeItem>
     );
   };
@@ -71,9 +75,9 @@ export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
           aria-label="knowledge-tree"
           defaultCollapseIcon={<ExpandMoreIcon />}
           defaultExpandIcon={<ChevronRightIcon />}
-          defaultExpanded={getNodesIds(knowledgeTree.children)}
+          defaultExpanded={getNodesIds(knowledgeTree.and)}
         >
-          {getNodes(knowledgeTree.children)}
+          {getNodes(knowledgeTree.and)}
         </TreeView>
       )}
     </Stack>

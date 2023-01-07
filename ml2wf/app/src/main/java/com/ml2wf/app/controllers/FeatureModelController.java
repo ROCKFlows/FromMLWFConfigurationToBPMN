@@ -23,7 +23,7 @@ public class FeatureModelController {
         this.featureModelComponent = featureModelComponent;
     }
 
-    @GetMapping(value = {""}, produces = {MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(value = {""})
     FeatureModel getFeatureModel(@RequestParam String versionName) {
         return featureModelComponent.getFeatureModel(versionName);
     }
