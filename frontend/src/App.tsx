@@ -65,7 +65,7 @@ function App() {
           <Paper sx={{height: '89vh', padding: '1em', overflow: 'auto'}}>
             <KnowledgeTreeSection
               knowledgeTree={knowledgeTree?.extendedFeatureModel?.struct}
-              onVersionSelected={(v: string) => setVersion(v)}
+              onSelectedVersion={(v: string) => setVersion(v)}
             />
           </Paper>
         </Grid>

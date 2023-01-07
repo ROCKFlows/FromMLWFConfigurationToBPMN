@@ -19,13 +19,13 @@ public abstract class AbstractConfigurationsComponent<
     protected final ConfigurationRepository<C, F, T, V, String> configurationRepository;
     protected final ConfigurationFeaturesRepository<F, T, V, Long> configurationFeaturesRepository;
     protected final AbstractStandardKnowledgeComponent<T, O, V> standardKnowledgeComponent;
-    protected final IVersionsComponent<V> versionsComponent;
+    protected final IVersionsComponent versionsComponent;
     protected final IGraphStandardKnowledgeConverter<T, V> standardKnowledgeConverter;
 
     protected AbstractConfigurationsComponent(ConfigurationRepository<C, F, T, V, String> configurationRepository,
                                               ConfigurationFeaturesRepository<F, T, V, Long> configurationFeaturesRepository,
                                               AbstractStandardKnowledgeComponent<T, O, V> standardKnowledgeComponent,
-                                              IVersionsComponent<V> versionsComponent,
+                                              IVersionsComponent versionsComponent,
                                               IGraphStandardKnowledgeConverter<T, V> standardKnowledgeConverter) {
         this.configurationRepository = configurationRepository;
         this.configurationFeaturesRepository = configurationFeaturesRepository;

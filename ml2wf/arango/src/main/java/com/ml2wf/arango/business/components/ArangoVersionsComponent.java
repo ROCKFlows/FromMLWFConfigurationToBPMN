@@ -1,5 +1,6 @@
 package com.ml2wf.arango.business.components;
 
+import com.ml2wf.arango.storage.converter.impl.ArangoVersionConverter;
 import com.ml2wf.arango.storage.dto.ArangoTaskVersion;
 import com.ml2wf.arango.storage.repository.ArangoVersionsRepository;
 import com.ml2wf.contract.business.AbstractVersionsComponent;
@@ -11,7 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ArangoVersionsComponent extends AbstractVersionsComponent<ArangoTaskVersion> {
 
-    public ArangoVersionsComponent(@Autowired ArangoVersionsRepository versionsRepository) {
-        super(versionsRepository);
+    public ArangoVersionsComponent(@Autowired ArangoVersionsRepository versionsRepository,
+                                   @Autowired ArangoVersionConverter versionConverter) {
+        super(versionsRepository, versionConverter);
     }
 }

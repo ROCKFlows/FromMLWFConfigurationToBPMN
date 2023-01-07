@@ -1,12 +1,14 @@
 package com.ml2wf.contract.business;
 
-import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
+import com.ml2wf.core.tree.StandardKnowledgeVersion;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.List;
 
 @Component
-public interface IVersionsComponent<V extends GraphTaskVersion> {
+public interface IVersionsComponent {
 
-    Optional<V> getLastVersion();
+    StandardKnowledgeVersion getLastVersion();
+
+    List<StandardKnowledgeVersion> getVersions();
 }

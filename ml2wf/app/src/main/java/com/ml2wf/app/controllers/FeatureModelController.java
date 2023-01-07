@@ -1,7 +1,9 @@
 package com.ml2wf.app.controllers;
 
 import com.ml2wf.app.components.FeatureModelComponent;
+import com.ml2wf.contract.business.IVersionsComponent;
 import com.ml2wf.contract.mapper.IObjectMapperFactory;
+import com.ml2wf.core.tree.StandardKnowledgeVersion;
 import com.ml2wf.core.tree.custom.featuremodel.FeatureModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,18 +11,33 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/fm")
 public class FeatureModelController {
 
     private final IObjectMapperFactory objectMapperFactory;
     private final FeatureModelComponent featureModelComponent;
+    private final IVersionsComponent versionsComponent;
 
     @Autowired
     public FeatureModelController(@Autowired IObjectMapperFactory objectMapperFactory,
-                                  @Autowired FeatureModelComponent featureModelComponent) {
+                                  @Autowired FeatureModelComponent featureModelComponent,
+                                  @Autowired IVersionsComponent versionsComponent) {
         this.objectMapperFactory = objectMapperFactory;
         this.featureModelComponent = featureModelComponent;
+        this.versionsComponent = versionsComponent;
+    }
+
+    @GetMapping(value = {"/versions/all"})
+    List<StandardKnowledgeVersion> getVersions() {
+        return versionsComponent.getVersions();
+    }
+
+    @GetMapping(value = {"/versions/last"})
+    StandardKnowledgeVersion getLastVersion() {
+        return versionsComponent.getLastVersion();
     }
 
     @GetMapping(value = {""})

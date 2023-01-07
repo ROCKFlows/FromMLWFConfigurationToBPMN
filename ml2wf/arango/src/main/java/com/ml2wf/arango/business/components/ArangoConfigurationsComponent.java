@@ -1,6 +1,7 @@
 package com.ml2wf.arango.business.components;
 
 import com.google.common.collect.ImmutableList;
+import com.ml2wf.arango.storage.converter.impl.ArangoVersionConverter;
 import com.ml2wf.arango.storage.dto.*;
 import com.ml2wf.arango.storage.repository.ArangoConfigurationFeaturesRepository;
 import com.ml2wf.arango.storage.repository.ArangoConfigurationFeaturesToTaskLinksRepository;
@@ -24,6 +25,7 @@ public class ArangoConfigurationsComponent
 
     private final ArangoConfigurationToFeaturesLinksRepository configurationToFeaturesRepository;
     private final ArangoConfigurationFeaturesToTaskLinksRepository configurationFeaturesToTaskLinksRepository;
+    private final ArangoVersionConverter versionConverter;
 
     public ArangoConfigurationsComponent(@Autowired ArangoConfigurationRepository configurationRepository,
                                          @Autowired ArangoConfigurationFeaturesRepository configurationFeaturesRepository,
@@ -31,16 +33,18 @@ public class ArangoConfigurationsComponent
                                          @Autowired ArangoConfigurationFeaturesToTaskLinksRepository configurationFeaturesToTaskLinksRepository,
                                          @Autowired ArangoStandardKnowledgeComponent standardKnowledgeComponent,
                                          @Autowired ArangoVersionsComponent versionsComponent,
-                                         @Autowired ArangoTasksConverter tasksConverter) {
+                                         @Autowired ArangoTasksConverter tasksConverter,
+                                         @Autowired ArangoVersionConverter versionConverter) {
         super(configurationRepository, configurationFeaturesRepository, standardKnowledgeComponent, versionsComponent, tasksConverter);
         this.configurationToFeaturesRepository = configurationToFeaturesRepository;
         this.configurationFeaturesToTaskLinksRepository = configurationFeaturesToTaskLinksRepository;
+        this.versionConverter = versionConverter;
     }
 
     public boolean importConfiguration(String name, Configuration configuration) {
         // TODO: move common part in parent
-        var version = versionsComponent.getLastVersion().orElseThrow(
-                () -> new RuntimeException("No version found. Please import some tasks before saving a configuration.")); // TODO: use custom exception and intercept in app
+        var standardVersion = versionsComponent.getLastVersion();
+        var version = versionConverter.fromStandardKnowledgeVersion(standardVersion);
         var convertedConfigurationFeatures = configuration.getFeatures().stream()
                 .map(c -> {
                     var correspondingTask = standardKnowledgeComponent.getTaskWithName(c.getName(), version.getName())

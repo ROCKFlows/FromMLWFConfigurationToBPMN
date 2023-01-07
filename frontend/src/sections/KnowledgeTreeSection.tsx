@@ -1,19 +1,19 @@
 import * as React from 'react';
-import {ReactElement, useState} from 'react';
-import {Button, Stack, TextField} from '@mui/material';
+import {ReactElement} from 'react';
+import {Stack} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {TreeItem, TreeView} from '@mui/lab';
 
+const VersionsSelect = React.lazy(() => import('./VersionsSelect'));
+
 type KnowledgeTreeSectionProps = {
   knowledgeTree: any | undefined;
-  onVersionSelected: (version: string) => void;
+  onSelectedVersion: (version: string) => void;
 };
 
 export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
-  const {knowledgeTree, onVersionSelected} = props;
-
-  const [tmpVersion, setTmpVersion] = useState<string>('');
+  const {knowledgeTree, onSelectedVersion} = props;
 
   const getNodesIds = (node: any): string[] => {
     let result = [node['@_name']];
@@ -57,18 +57,7 @@ export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
   return (
     <Stack spacing={1} height="100%">
       <Stack direction="row" padding={1}>
-        <TextField
-          label="Version"
-          variant="outlined"
-          value={tmpVersion}
-          onChange={(e) => setTmpVersion(e.target.value)}
-        />
-        <Button
-          variant="outlined"
-          onClick={() => onVersionSelected(tmpVersion)}
-        >
-          Confirm
-        </Button>
+        <VersionsSelect onSelectedVersion={onSelectedVersion} />
       </Stack>
       {knowledgeTree && (
         <TreeView
