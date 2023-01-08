@@ -24,8 +24,8 @@
     <description>From Machine Learning configuration to workflows</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>19</maven.compiler.source>
+        <maven.compiler.target>19</maven.compiler.target>
         <version.junit>5.9.0</version.junit>
         <version.jar.plugin>3.2.0</version.jar.plugin>
         <version.assembly.plugin>3.3.0</version.assembly.plugin>
