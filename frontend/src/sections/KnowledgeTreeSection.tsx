@@ -16,7 +16,7 @@ export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
   const {knowledgeTree, onSelectedVersion} = props;
 
   const getNodesIds = (node: any): string[] => {
-    let result = [node['@_name']];
+    let result = [node[':@']['@_name']];
     if (node.and) {
       result = [
         ...result,
@@ -25,31 +25,21 @@ export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
           : getNodesIds(node.and)),
       ];
     }
-    if (node.feature) {
-      result = [
-        ...result,
-        ...(Array.isArray(node.feature)
-          ? node.feature.flatMap((n) => getNodesIds(n))
-          : getNodesIds(node.feature)),
-      ];
-    }
     return result;
   };
 
   const getNodes = (node: any): ReactElement => {
     if (!node.and && !node.feature) {
-      return <TreeItem nodeId={node['@_name']} label={node['@_name']} />;
+      return (
+        <TreeItem nodeId={node[':@']['@_name']} label={node[':@']['@_name']} />
+      );
     }
     return (
-      <TreeItem nodeId={node['@_name']} label={node['@_name']}>
+      <TreeItem nodeId={node[':@']['@_name']} label={node[':@']['@_name']}>
         {node.and &&
           (Array.isArray(node.and)
             ? node.and.map((n) => getNodes(n))
             : getNodes(node.and))}
-        {node.feature &&
-          (Array.isArray(node.feature)
-            ? node.feature.map((n) => getNodes(n))
-            : getNodes(node.feature))}
       </TreeItem>
     );
   };
@@ -64,9 +54,9 @@ export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
           aria-label="knowledge-tree"
           defaultCollapseIcon={<ExpandMoreIcon />}
           defaultExpandIcon={<ChevronRightIcon />}
-          defaultExpanded={getNodesIds(knowledgeTree.and)}
+          defaultExpanded={getNodesIds(knowledgeTree)}
         >
-          {getNodes(knowledgeTree.and)}
+          {getNodes(knowledgeTree)}
         </TreeView>
       )}
     </Stack>

@@ -44,6 +44,7 @@ function App() {
             ignoreAttributes: false,
             attributeNamePrefix: '@_',
             allowBooleanAttributes: true,
+            preserveOrder: true,
           }).parse(r.data),
         );
         setSnackbarSeverity('success');
@@ -85,7 +86,11 @@ function App() {
               }
             >
               <KnowledgeTreeSection
-                knowledgeTree={knowledgeTree?.extendedFeatureModel?.struct}
+                knowledgeTree={
+                  knowledgeTree
+                    ? knowledgeTree[0].extendedFeatureModel[0].struct[0]
+                    : undefined
+                }
                 onSelectedVersion={(v: string) => setVersion(v)}
               />
             </Suspense>
@@ -109,7 +114,9 @@ function App() {
                 >
                   <ConstraintsSection
                     constraints={
-                      knowledgeTree?.extendedFeatureModel?.constraints
+                      knowledgeTree
+                        ? knowledgeTree[0].extendedFeatureModel[1].constraints
+                        : undefined
                     }
                   />
                 </Suspense>
