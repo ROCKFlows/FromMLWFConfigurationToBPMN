@@ -18,7 +18,8 @@ public class Neo4JStandardKnowledgeMergerComponent extends AbstractStandardKnowl
 
     Neo4JStandardKnowledgeMergerComponent(@Autowired Neo4JStandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
                                           @Autowired Neo4JVersionsRepository versionsRepository,
-                                          @Autowired Neo4JTasksConverter neo4JTasksConverter) {
-        super(standardKnowledgeTasksRepository, versionsRepository, neo4JTasksConverter);
+                                          @Autowired Neo4JTasksConverter tasksConverter,
+                                          @Autowired Neo4JStandardKnowledgeComponent standardKnowledgeComponent) {
+        super(standardKnowledgeTasksRepository, versionsRepository, tasksConverter, standardKnowledgeComponent);
     }
 }

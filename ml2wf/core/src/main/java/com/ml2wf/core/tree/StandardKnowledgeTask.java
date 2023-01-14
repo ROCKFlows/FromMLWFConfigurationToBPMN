@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @Data
@@ -17,11 +18,7 @@ public class StandardKnowledgeTask implements ITree, INamedElement {
     private String documentation;
     private boolean isAbstract;
     private boolean isOptional;
+    @Nullable
     private String version;
     private List<StandardKnowledgeTask> tasks;
-
-    @Override
-    public String getName() {
-        return name;
-    }
 }

@@ -14,7 +14,8 @@ public class Neo4JVersionConverter implements INeo4JVersionConverter {
                 standardKnowledgeVersion.getMajor(),
                 standardKnowledgeVersion.getMinor(),
                 standardKnowledgeVersion.getPatch(),
-                standardKnowledgeVersion.getName()
+                standardKnowledgeVersion.getName(),
+                null
         );
     }
 }

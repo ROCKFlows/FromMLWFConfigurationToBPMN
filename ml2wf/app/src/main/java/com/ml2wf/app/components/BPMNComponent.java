@@ -19,9 +19,9 @@ public class BPMNComponent {
         bpmnWorkflowConverter = new BPMNWorkflowConverter();
     }
 
-    public boolean importWorkflow(String versionName, BPMNWorkflow bpmnWorkflow) {
+    public boolean importWorkflow(String newVersionName, BPMNWorkflow bpmnWorkflow) {
         var standardWorkflow = bpmnWorkflowConverter.toStandardWorkflow(bpmnWorkflow);
-        return standardWorkflowComponent.importStandardWorkflow(versionName, standardWorkflow);
+        return standardWorkflowComponent.importStandardWorkflow(newVersionName, standardWorkflow);
     }
 
     public boolean isBPMNWorkflowConsistent(String versionName, BPMNWorkflow bpmnWorkflow) {

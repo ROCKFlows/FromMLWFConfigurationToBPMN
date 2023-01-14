@@ -47,20 +47,27 @@ public abstract class AbstractStandardKnowledgeComponent<T extends GraphStandard
 
     @Override
     public StandardKnowledgeTree getStandardKnowledgeTree(String versionName) {
-        var optArangoStandardKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersion_Name(ROOT_NODE_NAME, versionName);
-        var arangoStandardKnowledgeTask = optArangoStandardKnowledgeTask.orElseThrow(
+        System.out.println("standardKnowledgeTasksRepository.findOneByNameAndVersionName(ROOT_NODE_NAME, versionName) = " + standardKnowledgeTasksRepository.findOneByNameAndVersionName(ROOT_NODE_NAME, versionName));
+        var optGraphKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersionName(ROOT_NODE_NAME, versionName);
+        System.out.println("optGraphKnowledgeTask = " + optGraphKnowledgeTask);
+        var graphKnowledgeTask = optGraphKnowledgeTask.orElseThrow(
                 () -> new VersionNotFoundException(versionName));
+        System.out.println("graphKnowledgeTask = " + graphKnowledgeTask);
+        System.out.println("graphKnowledgeTask = " + graphKnowledgeTask.getName());
+        System.out.println("graphKnowledgeTask = " + graphKnowledgeTask.getVersion());
+        System.out.println("graphKnowledgeTask = " + graphKnowledgeTask.getChildren());
         // __ROOT node is for internal use only and should not be exported
-        var firstArangoTreeTask = new ArrayList<>(arangoStandardKnowledgeTask.getChildren()).get(0);
-        var rootConstraint = constraintsRepository.findAllByTypeEqualsAndVersion_Name(ROOT_CONSTRAINT_NODE_NAME, firstArangoTreeTask.getVersion().getName());
-        return tasksConverter.toStandardKnowledgeTree(firstArangoTreeTask, rootConstraint.get(0).getOperands().stream()
+        var firstGraphTreeTask = new ArrayList<>(graphKnowledgeTask.getChildren()).get(0);
+        var rootConstraint = constraintsRepository.findAllByTypeAndVersionName(ROOT_CONSTRAINT_NODE_NAME, versionName);
+        return tasksConverter.toStandardKnowledgeTree(firstGraphTreeTask, rootConstraint.get(0).getOperands().stream()
                 .map(constraintsConverter::toConstraintTree)
                 .collect(Collectors.toList()));
     }
 
     @Override
     public Optional<StandardKnowledgeTask> getTaskWithName(String taskName, String versionName) {
-        return standardKnowledgeTasksRepository.findOneByNameAndVersion_Name(taskName, versionName).map(tasksConverter::toStandardKnowledgeTask);
+        return standardKnowledgeTasksRepository.findOneByNameAndVersionName(taskName, versionName)
+                .map(tasksConverter::toStandardKnowledgeTask);
     }
 
     @Override

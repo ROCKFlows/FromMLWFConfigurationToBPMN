@@ -18,7 +18,8 @@ public class ArangoStandardKnowledgeMergerComponent extends AbstractStandardKnow
 
     ArangoStandardKnowledgeMergerComponent(@Autowired ArangoStandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
                                            @Autowired ArangoVersionsRepository versionsRepository,
-                                           @Autowired ArangoTasksConverter arangoTasksConverter) {
-        super(standardKnowledgeTasksRepository, versionsRepository, arangoTasksConverter);
+                                           @Autowired ArangoTasksConverter tasksConverter,
+                                           @Autowired ArangoStandardKnowledgeComponent standardKnowledgeComponent) {
+        super(standardKnowledgeTasksRepository, versionsRepository, tasksConverter, standardKnowledgeComponent);
     }
 }

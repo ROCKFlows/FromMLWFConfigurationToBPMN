@@ -25,15 +25,17 @@ public abstract class AbstractStandardWorkflowComponent<T extends GraphStandardK
     }
 
     @Override
-    public boolean importStandardWorkflow(String versionName, StandardWorkflow standardWorkflow) {
-        standardKnowledgeMergerComponent.mergeWorkflowWithTree(versionName, standardWorkflow);
+    public boolean importStandardWorkflow(String newVersionName, StandardWorkflow standardWorkflow) {
+        standardKnowledgeMergerComponent.mergeWorkflowWithTree(newVersionName, standardWorkflow);
         return true;
     }
 
     @Override
     public boolean isStandardWorkflowConsistent(String versionName, StandardWorkflow standardWorkflow) {
-        var operands = constraintsRepository.findAllByTypeEqualsAndVersion_Name(
+        System.out.println("constraintsRepository.findAllByTypeEqualsAndVersion_Name(ROOT_CONSTRAINT_NODE_NAME, versionName) = " + constraintsRepository.findAllByTypeAndVersionName(ROOT_CONSTRAINT_NODE_NAME, versionName).get(0).getOperands());
+        var operands = constraintsRepository.findAllByTypeAndVersionName(
                 ROOT_CONSTRAINT_NODE_NAME, versionName).get(0).getOperands();
+        System.out.println("operands = " + operands);
         return operands.stream()
                 .map(constraintsConverter::toConstraintTree)
                 .allMatch(c -> c.isWorkflowConsistent(standardWorkflow));

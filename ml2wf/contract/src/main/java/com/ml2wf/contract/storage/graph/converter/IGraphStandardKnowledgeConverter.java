@@ -28,17 +28,13 @@ public interface IGraphStandardKnowledgeConverter<T extends GraphStandardKnowled
         );
     }
 
-    private String formatVersion(V version) {
-        return String.format("v%d.%d.%d <%s>", version.getMajor(), version.getMinor(), version.getPatch(), version.getName());
-    }
-
     default StandardKnowledgeTask toStandardKnowledgeTask(T standardKnowledgeTask) {
         return new StandardKnowledgeTask(
                 standardKnowledgeTask.getName(),
                 standardKnowledgeTask.getDescription(),
                 standardKnowledgeTask.isAbstract(),
                 !standardKnowledgeTask.isMandatory(),
-                formatVersion(standardKnowledgeTask.getVersion()),
+                null, // TODO: take source task version in consideration
                 standardKnowledgeTask.getChildren().stream()
                         .map(this::toStandardKnowledgeTask)
                         .collect(Collectors.toList())

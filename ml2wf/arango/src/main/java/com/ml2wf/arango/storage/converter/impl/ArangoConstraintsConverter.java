@@ -3,7 +3,6 @@ package com.ml2wf.arango.storage.converter.impl;
 import com.ml2wf.arango.storage.converter.IArangoConstraintsConverter;
 import com.ml2wf.arango.storage.dto.ArangoConstraintOperand;
 import com.ml2wf.arango.storage.dto.ArangoStandardKnowledgeTask;
-import com.ml2wf.arango.storage.dto.ArangoTaskVersion;
 import com.ml2wf.core.constraints.operands.AbstractOperand;
 import com.ml2wf.core.constraints.operands.impl.VariableOperand;
 import com.ml2wf.core.constraints.operators.AbstractOperator;
@@ -21,7 +20,7 @@ public class ArangoConstraintsConverter implements IArangoConstraintsConverter {
         if (abstractOperand instanceof VariableOperand) {
             return new ArangoConstraintOperand(
                     AbstractOperand.Operands.getShortNameForClass(abstractOperand.getClass()),
-                    new ArangoTaskVersion(0, 0, 0, "unversioned"),
+                    null,
                     arangoStandardKnowledgeTasks.stream()
                             .filter(a -> a.getName().equals(((VariableOperand) abstractOperand).getValue()))
                             .findAny()
@@ -31,7 +30,7 @@ public class ArangoConstraintsConverter implements IArangoConstraintsConverter {
         }
         return new ArangoConstraintOperand(
                 AbstractOperator.Operators.getShortNameForClass(((AbstractOperator) abstractOperand).getClass()),
-                new ArangoTaskVersion(0, 0, 0, "unversioned"),
+                null,
                 ((AbstractOperator) abstractOperand).getOperands().stream()
                         .map(o -> fromAbstractOperand(o, arangoStandardKnowledgeTasks))
                         .collect(Collectors.toList())

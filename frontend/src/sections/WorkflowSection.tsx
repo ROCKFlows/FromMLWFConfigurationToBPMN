@@ -2,9 +2,9 @@ import * as React from 'react';
 import {
   Alert,
   AlertColor,
-  Paper,
   Snackbar,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material';
 import Dropzone from 'react-dropzone';
@@ -26,6 +26,7 @@ export default function WorkflowSection(props: WorkflowSectionProps) {
   const [snackbarMessage, setSnackbarMessage] = useState<string | undefined>(
     undefined,
   );
+  const [newVersionName, setNewVersionName] = useState<string>('');
 
   const importWorkflow = (worflowFile: File) => {
     const reader = new FileReader();
@@ -57,7 +58,14 @@ export default function WorkflowSection(props: WorkflowSectionProps) {
 
   return (
     <Stack spacing={2} height="100%">
-      <Typography>Workflow</Typography>
+      <Typography>Add workflow</Typography>
+      <TextField
+        id="new-version-name-textfield"
+        label="New version"
+        variant="standard"
+        value={newVersionName}
+        onChange={(e) => setNewVersionName(e.target.value)}
+      />
       <Dropzone
         multiple={false}
         disabled={!version}

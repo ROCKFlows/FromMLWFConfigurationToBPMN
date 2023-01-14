@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface StandardKnowledgeTasksRepository<T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion, ID>
         extends PagingAndSortingRepository<T, ID>, QueryByExampleExecutor<T> {
 
-    Optional<T> findOneByNameAndVersion_Name(String name, String versionName);
+    Optional<T> findOneByNameAndVersionName(String taskName, String versionName);
 }

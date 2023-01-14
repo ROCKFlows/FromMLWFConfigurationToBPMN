@@ -2,7 +2,6 @@ package com.ml2wf.arango.storage.converter.impl;
 
 import com.ml2wf.arango.storage.converter.IArangoStandardKnowledgeConverter;
 import com.ml2wf.arango.storage.dto.ArangoStandardKnowledgeTask;
-import com.ml2wf.arango.storage.dto.ArangoTaskVersion;
 import com.ml2wf.core.tree.StandardKnowledgeTask;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +19,7 @@ public class ArangoTasksConverter implements IArangoStandardKnowledgeConverter {
                 standardKnowledgeTask.getName(),
                 standardKnowledgeTask.isAbstract(),
                 !standardKnowledgeTask.isOptional(),
-                new ArangoTaskVersion(0, 0, 0, "unversioned"), // TODO: take source task version in consideration
+                null, // TODO: take source task version in consideration
                 standardKnowledgeTask.getDocumentation());
         if (standardKnowledgeTask.getTasks().isEmpty()) {
             return Collections.singletonList(newArangoTask);

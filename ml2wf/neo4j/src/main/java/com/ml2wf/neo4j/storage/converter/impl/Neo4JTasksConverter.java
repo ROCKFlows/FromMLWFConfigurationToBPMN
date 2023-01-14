@@ -2,7 +2,6 @@ package com.ml2wf.neo4j.storage.converter.impl;
 
 import com.ml2wf.core.tree.StandardKnowledgeTask;
 import com.ml2wf.neo4j.storage.dto.Neo4JStandardKnowledgeTask;
-import com.ml2wf.neo4j.storage.dto.Neo4JTaskVersion;
 import com.ml2wf.neo4j.storage.converter.INeo4JStandardKnowledgeConverter;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +24,7 @@ public class Neo4JTasksConverter implements INeo4JStandardKnowledgeConverter {
                 standardKnowledgeTask.getName(),
                 standardKnowledgeTask.isAbstract(),
                 !standardKnowledgeTask.isOptional(),
-                new Neo4JTaskVersion(0, 0, 0, "unversioned"), // TODO: take source task version in consideration
+                null, // TODO: take source task version in consideration
                 standardKnowledgeTask.getDocumentation(),
                 newChildrenTasks.keySet());
         if (standardKnowledgeTask.getTasks().isEmpty()) {

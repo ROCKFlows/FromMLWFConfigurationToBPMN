@@ -23,7 +23,7 @@ public class Neo4JConstraintsConverter implements INeo4JConstraintsConverter {
         if (abstractOperand instanceof VariableOperand) {
             return new Neo4JConstraintOperand(
                     AbstractOperand.Operands.getShortNameForClass(abstractOperand.getClass()),
-                    new Neo4JTaskVersion(0, 0, 0, "unversioned"),
+                    null,
                     standardKnowledgeTasks.stream()
                             .filter(a -> a.getName().equals(((VariableOperand) abstractOperand).getValue()))
                             .findAny()
@@ -32,7 +32,7 @@ public class Neo4JConstraintsConverter implements INeo4JConstraintsConverter {
         }
         return new Neo4JConstraintOperand(
                 AbstractOperator.Operators.getShortNameForClass(((AbstractOperator) abstractOperand).getClass()),
-                new Neo4JTaskVersion(0, 0, 0, "unversioned"),
+                null,
                 ((AbstractOperator) abstractOperand).getOperands().stream()
                         .map(o -> fromAbstractOperand(o, standardKnowledgeTasks))
                         .collect(Collectors.toList())

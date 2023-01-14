@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -26,13 +27,14 @@ public class ArangoConstraintOperand implements GraphConstraintOperand<ArangoCon
     @ArangoId
     private String arangoId;
     private String type;
+    @Nullable
     private ArangoTaskVersion version;
     @Relations(edges = ArangoConstraintLink.class, direction = Relations.Direction.OUTBOUND, lazy = true)
     private Collection<ArangoConstraintOperand> operands;
     @Relations(edges = ArangoConstraintToTaskLink.class, direction = Relations.Direction.OUTBOUND)
     private ArangoStandardKnowledgeTask task;
 
-    public ArangoConstraintOperand(String type, ArangoTaskVersion version,
+    public ArangoConstraintOperand(String type, @Nullable ArangoTaskVersion version,
                                    Collection<ArangoConstraintOperand> operands) {
         this.type = type;
         this.version = version;
@@ -40,7 +42,7 @@ public class ArangoConstraintOperand implements GraphConstraintOperand<ArangoCon
         task = null;
     }
 
-    public ArangoConstraintOperand(String type, ArangoTaskVersion version, ArangoStandardKnowledgeTask task) {
+    public ArangoConstraintOperand(String type, @Nullable ArangoTaskVersion version, ArangoStandardKnowledgeTask task) {
         this.type = type;
         this.version = version;
         operands = new ArrayList<>();

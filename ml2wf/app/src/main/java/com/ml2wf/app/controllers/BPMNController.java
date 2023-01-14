@@ -25,12 +25,13 @@ public class BPMNController {
 
     @PostMapping(value = {"", "/"},
             consumes = {MediaType.APPLICATION_XML_VALUE})
-    ResponseEntity<String> importBPMNWorkflow(@RequestParam String versionName, @RequestBody String bpmnWorkflowString)
+    ResponseEntity<String> importBPMNWorkflow(@RequestParam String newVersionName,
+                                              @RequestBody String bpmnWorkflowString)
             throws Exception {
         // TODO: use jackson to automatically convert requestbody to featureModel
         BPMNWorkflow bpmnWorkflow = objectMapperFactory.createNewObjectMapper()
                 .readValue(bpmnWorkflowString, BPMNWorkflow.class);
-        bpmnComponent.importWorkflow(versionName, bpmnWorkflow); // TODO: check result
+        bpmnComponent.importWorkflow(newVersionName, bpmnWorkflow); // TODO: check result
         return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
     }
 

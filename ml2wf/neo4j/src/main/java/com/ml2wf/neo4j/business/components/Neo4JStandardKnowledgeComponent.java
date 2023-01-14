@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 @Profile("neo4j")
 @Component
@@ -35,39 +34,19 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
         super(standardKnowledgeTasksRepository, constraintsRepository, versionsRepository, constraintsConverter, tasksConverter);
     }
 
-    private void recursiveApplyToTasks(Consumer<Neo4JStandardKnowledgeTask> callable,
-                                       // TODO: fix wildcard
-                                       Iterable<Neo4JStandardKnowledgeTask> tasks) {
-        // TODO: factorize with recursiveApplyToOperands
-        tasks.forEach((t) -> {
-            callable.accept(t);
-            recursiveApplyToTasks(callable, t.getChildren());
-        });
-    }
-
-    private void recursiveApplyToOperands(Consumer<Neo4JConstraintOperand> callable,
-                                          // TODO: fix wildcard
-                                          Iterable<Neo4JConstraintOperand> operands) {
-        // TODO: factorize with recursiveApplyToOperands
-        operands.forEach((o) -> {
-            callable.accept(o);
-            recursiveApplyToOperands(callable, o.getOperands());
-        });
-    }
-
     public boolean importStandardKnowledgeTree(String versionName, StandardKnowledgeTree standardKnowledgeTree) {
         // TODO: split into dedicated components (one for tasks, one for constraints...)
         // saving new version
-        var lastVersion = versionsRepository.getLastVersion()
-                .orElseGet(() -> new Neo4JTaskVersion(0, 0, 0, "unversioned"));
+        var optLastVersion = versionsRepository.getLastVersion();
+        var lastVersion = optLastVersion
+                .orElseGet(() -> new Neo4JTaskVersion(0, 0, 0, "unversioned", null));
         if (lastVersion.getName().equals(versionName)) {
             throw new DuplicatedVersionNameException(versionName);
         }
-        var newVersion = versionsRepository.save(new Neo4JTaskVersion(lastVersion.getMajor() + 1, 0, 0, versionName));
+        var newVersion = versionsRepository.save(new Neo4JTaskVersion(lastVersion.getMajor() + 1, 0, 0, versionName, optLastVersion.orElse(null)));
         // converting and saving tasks
         // TODO: fix this unsafe cast
         var neo4JStandardKnowledgeTasks = tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
-        recursiveApplyToTasks(t -> t.setVersion(newVersion), neo4JStandardKnowledgeTasks);
         var iterableUpdatedNeo4JTasks = ImmutableList.copyOf(
                 standardKnowledgeTasksRepository.saveAll(neo4JStandardKnowledgeTasks));
         var rootTask = new Neo4JStandardKnowledgeTask(ROOT_NODE_NAME, true, true, newVersion, "reserved tree root. internal use only. not exported.", Collections.singletonList(iterableUpdatedNeo4JTasks.get(0)));
@@ -77,7 +56,6 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
         var neo4jConstraintOperands = constraintsConverter.fromStandardKnowledgeTree(
                 standardKnowledgeTree, ImmutableList.copyOf(iterableUpdatedNeo4JTasks)
         );
-        recursiveApplyToOperands(t -> t.setVersion(newVersion), neo4jConstraintOperands);
         var iterableUpdatedNeo4JOperands = constraintsRepository.saveAll(neo4jConstraintOperands);
         var rootConstraint = new Neo4JConstraintOperand(ROOT_CONSTRAINT_NODE_NAME, newVersion, ImmutableList.copyOf(iterableUpdatedNeo4JOperands));
         constraintsRepository.save(rootConstraint); // saving reserved constraint tree root

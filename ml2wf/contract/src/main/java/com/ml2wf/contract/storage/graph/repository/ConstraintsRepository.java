@@ -14,5 +14,5 @@ public interface ConstraintsRepository<O extends GraphConstraintOperand<O, T, V>
         T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion, ID>
         extends PagingAndSortingRepository<O, ID>, QueryByExampleExecutor<O> {
 
-    List<O> findAllByTypeEqualsAndVersion_Name(String name, String versionName);
+    List<O> findAllByTypeAndVersionName(String constraintType, String versionName);
 }

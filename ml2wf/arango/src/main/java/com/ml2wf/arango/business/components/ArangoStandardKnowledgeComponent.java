@@ -91,7 +91,8 @@ public class ArangoStandardKnowledgeComponent extends AbstractStandardKnowledgeC
 
     public boolean importStandardKnowledgeTree(String versionName, StandardKnowledgeTree standardKnowledgeTree) {
         // TODO: split into dedicated components (one for tasks, one for constraints...)
-        var lastVersion = versionsRepository.getLastVersion().orElseGet(() -> new ArangoTaskVersion(0, 0, 0, "unversioned"));
+        var lastVersion = versionsRepository.getLastVersion()
+                .orElseGet(() -> new ArangoTaskVersion(0, 0, 0, "unversioned"));
         // converting and saving tasks
         // TODO: fix this unsafe cast
         var arangoStandardKnowledgeTasks = tasksConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
