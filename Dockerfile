@@ -1,4 +1,4 @@
-FROM maven:3.8.7-eclipse-temurin-19 as builder
+FROM maven:3.8.7-eclipse-temurin-17 as builder
 
 WORKDIR /ml2wf-build
 
@@ -8,7 +8,7 @@ RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests # tmp disa
 
 # RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:19 as runner
+FROM eclipse-temurin:17 as runner
 
 WORKDIR /ml2wf-runner
 

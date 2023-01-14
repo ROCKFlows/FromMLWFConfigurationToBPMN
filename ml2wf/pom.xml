@@ -24,8 +24,8 @@
     <description>From Machine Learning configuration to workflows</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <version.junit>5.9.0</version.junit>
         <version.jar.plugin>3.2.0</version.jar.plugin>
         <version.assembly.plugin>3.3.0</version.assembly.plugin>
@@ -75,6 +75,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
