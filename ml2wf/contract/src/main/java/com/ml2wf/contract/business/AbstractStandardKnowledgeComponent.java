@@ -47,15 +47,9 @@ public abstract class AbstractStandardKnowledgeComponent<T extends GraphStandard
 
     @Override
     public StandardKnowledgeTree getStandardKnowledgeTree(String versionName) {
-        System.out.println("standardKnowledgeTasksRepository.findOneByNameAndVersionName(ROOT_NODE_NAME, versionName) = " + standardKnowledgeTasksRepository.findOneByNameAndVersionName(ROOT_NODE_NAME, versionName));
         var optGraphKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersionName(ROOT_NODE_NAME, versionName);
-        System.out.println("optGraphKnowledgeTask = " + optGraphKnowledgeTask);
         var graphKnowledgeTask = optGraphKnowledgeTask.orElseThrow(
                 () -> new VersionNotFoundException(versionName));
-        System.out.println("graphKnowledgeTask = " + graphKnowledgeTask);
-        System.out.println("graphKnowledgeTask = " + graphKnowledgeTask.getName());
-        System.out.println("graphKnowledgeTask = " + graphKnowledgeTask.getVersion());
-        System.out.println("graphKnowledgeTask = " + graphKnowledgeTask.getChildren());
         // __ROOT node is for internal use only and should not be exported
         var firstGraphTreeTask = new ArrayList<>(graphKnowledgeTask.getChildren()).get(0);
         var rootConstraint = constraintsRepository.findAllByTypeAndVersionName(ROOT_CONSTRAINT_NODE_NAME, versionName);

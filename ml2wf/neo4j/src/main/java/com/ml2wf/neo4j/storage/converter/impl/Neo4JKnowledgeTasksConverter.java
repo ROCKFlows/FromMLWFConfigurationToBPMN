@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class Neo4JTasksConverter implements INeo4JStandardKnowledgeConverter {
+public class Neo4JKnowledgeTasksConverter implements INeo4JStandardKnowledgeConverter {
 
     @Override
     public List<Neo4JStandardKnowledgeTask> fromStandardKnowledgeTask(StandardKnowledgeTask standardKnowledgeTask) {

@@ -5,7 +5,7 @@ import com.ml2wf.contract.business.AbstractStandardKnowledgeComponent;
 import com.ml2wf.contract.exception.DuplicatedVersionNameException;
 import com.ml2wf.core.tree.StandardKnowledgeTree;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JConstraintsConverter;
-import com.ml2wf.neo4j.storage.converter.impl.Neo4JTasksConverter;
+import com.ml2wf.neo4j.storage.converter.impl.Neo4JKnowledgeTasksConverter;
 import com.ml2wf.neo4j.storage.dto.Neo4JConstraintOperand;
 import com.ml2wf.neo4j.storage.dto.Neo4JStandardKnowledgeTask;
 import com.ml2wf.neo4j.storage.dto.Neo4JTaskVersion;
@@ -30,7 +30,7 @@ public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeCo
                                     @Autowired Neo4JConstraintsRepository constraintsRepository,
                                     @Autowired Neo4JVersionsRepository versionsRepository,
                                     @Autowired Neo4JConstraintsConverter constraintsConverter,
-                                    @Autowired Neo4JTasksConverter tasksConverter) {
+                                    @Autowired Neo4JKnowledgeTasksConverter tasksConverter) {
         super(standardKnowledgeTasksRepository, constraintsRepository, versionsRepository, constraintsConverter, tasksConverter);
     }
 

@@ -1,7 +1,7 @@
 package com.ml2wf.neo4j.business.components;
 
 import com.ml2wf.contract.business.AbstractStandardKnowledgeMergerComponent;
-import com.ml2wf.neo4j.storage.converter.impl.Neo4JTasksConverter;
+import com.ml2wf.neo4j.storage.converter.impl.Neo4JKnowledgeTasksConverter;
 import com.ml2wf.neo4j.storage.dto.Neo4JStandardKnowledgeTask;
 import com.ml2wf.neo4j.storage.dto.Neo4JTaskVersion;
 import com.ml2wf.neo4j.storage.repository.Neo4JStandardKnowledgeTasksRepository;
@@ -18,7 +18,7 @@ public class Neo4JStandardKnowledgeMergerComponent extends AbstractStandardKnowl
 
     Neo4JStandardKnowledgeMergerComponent(@Autowired Neo4JStandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
                                           @Autowired Neo4JVersionsRepository versionsRepository,
-                                          @Autowired Neo4JTasksConverter tasksConverter,
+                                          @Autowired Neo4JKnowledgeTasksConverter tasksConverter,
                                           @Autowired Neo4JStandardKnowledgeComponent standardKnowledgeComponent) {
         super(standardKnowledgeTasksRepository, versionsRepository, tasksConverter, standardKnowledgeComponent);
     }

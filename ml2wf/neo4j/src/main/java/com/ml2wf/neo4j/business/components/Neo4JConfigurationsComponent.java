@@ -3,7 +3,7 @@ package com.ml2wf.neo4j.business.components;
 import com.google.common.collect.ImmutableList;
 import com.ml2wf.contract.business.AbstractConfigurationsComponent;
 import com.ml2wf.core.configurations.Configuration;
-import com.ml2wf.neo4j.storage.converter.impl.Neo4JTasksConverter;
+import com.ml2wf.neo4j.storage.converter.impl.Neo4JKnowledgeTasksConverter;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JVersionConverter;
 import com.ml2wf.neo4j.storage.dto.*;
 import com.ml2wf.neo4j.storage.repository.Neo4JConfigurationFeaturesRepository;
@@ -26,7 +26,7 @@ public class Neo4JConfigurationsComponent
                                         @Autowired Neo4JConfigurationFeaturesRepository configurationFeaturesRepository,
                                         @Autowired Neo4JStandardKnowledgeComponent standardKnowledgeComponent,
                                         @Autowired Neo4JVersionsComponent versionsComponent,
-                                        @Autowired Neo4JTasksConverter tasksConverter,
+                                        @Autowired Neo4JKnowledgeTasksConverter tasksConverter,
                                         @Autowired Neo4JVersionConverter versionConverter) {
         super(configurationRepository, configurationFeaturesRepository, standardKnowledgeComponent, versionsComponent, tasksConverter);
         this.versionConverter = versionConverter;

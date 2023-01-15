@@ -15,9 +15,4 @@ public class StandardWorkflowTask implements INamedElement {
     private String description;
     private boolean isAbstract;
     private boolean isOptional;
-
-    @Override
-    public String getName() {
-        return name;
-    }
 }
