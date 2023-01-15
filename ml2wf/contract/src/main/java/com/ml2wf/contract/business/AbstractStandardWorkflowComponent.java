@@ -1,5 +1,6 @@
 package com.ml2wf.contract.business;
 
+import com.ml2wf.contract.exception.VersionNotFoundException;
 import com.ml2wf.contract.storage.graph.converter.IGraphConstraintsConverter;
 import com.ml2wf.contract.storage.graph.converter.IGraphStandardWorkflowConverter;
 import com.ml2wf.contract.storage.graph.dto.GraphConstraintOperand;
@@ -52,6 +53,14 @@ public abstract class AbstractStandardWorkflowComponent<W extends GraphStandardW
         );
         convertedNode.setVersion(graphVersion);
         return standardWorkflowTasksRepository.save(convertedNode);
+    }
+
+    @Override
+    public StandardWorkflow getStandardWorkflow(String versionName) {
+        var rootGraphWorkflow = standardWorkflowTasksRepository.findOneByNameAndVersionName(
+                ROOT_WORKFLOW_NODE_NAME, versionName
+        ).orElseThrow(() -> new VersionNotFoundException(versionName));
+        return graphStandardWorkflowConverter.toStandardWorkflow(rootGraphWorkflow.getNextTask());
     }
 
     @Override

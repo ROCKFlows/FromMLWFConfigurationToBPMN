@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 @Component
 public interface IStandardWorkflowComponent {
 
+    StandardWorkflow getStandardWorkflow(String versionName);
+
     boolean importStandardWorkflow(String newVersionName, StandardWorkflow standardWorkflow);
 
     boolean isStandardWorkflowConsistent(String versionName, StandardWorkflow standardWorkflow);

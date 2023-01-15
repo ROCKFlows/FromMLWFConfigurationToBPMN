@@ -23,6 +23,11 @@ public class BPMNController {
         this.bpmnComponent = bpmnComponent;
     }
 
+    @GetMapping(value = {""})
+    BPMNWorkflow getFeatureModel(@RequestParam String versionName) {
+        return bpmnComponent.getBPMNWorkflow(versionName);
+    }
+
     @PostMapping(value = {"", "/"},
             consumes = {MediaType.APPLICATION_XML_VALUE})
     ResponseEntity<String> importBPMNWorkflow(@RequestParam String newVersionName,

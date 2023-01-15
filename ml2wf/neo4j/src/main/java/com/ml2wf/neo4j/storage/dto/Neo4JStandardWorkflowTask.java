@@ -24,9 +24,9 @@ public class Neo4JStandardWorkflowTask extends AbstractGraphWorkflowTask<Neo4JSt
     @Nullable
     private Neo4JStandardWorkflowTask nextTask;
 
-    public Neo4JStandardWorkflowTask(String name, boolean isAbstract, boolean isMandatory, @Nullable Neo4JTaskVersion version,
+    public Neo4JStandardWorkflowTask(String name, boolean isAbstract, boolean isOptional, @Nullable Neo4JTaskVersion version,
                                      String description, @Nullable Neo4JStandardWorkflowTask nextTask) {
-        super(name, isAbstract, isMandatory, description);
+        super(name, isAbstract, isOptional, description);
         this.version = version;
         this.nextTask = nextTask;
     }
