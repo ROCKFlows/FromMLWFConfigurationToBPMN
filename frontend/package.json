@@ -20,11 +20,14 @@
     "@mui/lab": "^5.0.0-alpha.114",
     "@mui/material": "^5.11.3",
     "@mui/system": "^5.11.2",
+    "@reduxjs/toolkit": "^1.9.1",
+    "@types/react-redux": "^7.1.25",
     "axios": "^1.2.2",
     "fast-xml-parser": "^4.0.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
+    "react-redux": "^8.0.5",
     "reactflow": "^11.4.2"
   },
   "devDependencies": {

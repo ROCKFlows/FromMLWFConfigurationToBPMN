@@ -2,7 +2,9 @@ import {createTheme, CssBaseline, ThemeProvider} from '@mui/material';
 import {blue, pink, purple} from '@mui/material/colors';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import {Provider} from 'react-redux';
 import App from './App';
+import store from './store/store';
 
 const theme = createTheme({
   // see https://www.welcomedeveloper.com/react-mui-theme
@@ -25,7 +27,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </ThemeProvider>
   </React.StrictMode>,
 );

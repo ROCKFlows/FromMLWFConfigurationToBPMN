@@ -10,16 +10,16 @@ import {
 import Dropzone from 'react-dropzone';
 import {useState} from 'react';
 import axios from 'axios';
+import {useAppSelector} from '../store/hooks';
 
 type WorkflowImportSectionProps = {
-  version: string;
   onImported: () => void;
 };
 
 export default function WorkflowImportSection(
   props: WorkflowImportSectionProps,
 ) {
-  const {version, onImported} = props;
+  const {onImported} = props;
 
   const [isSnackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState<
@@ -30,6 +30,8 @@ export default function WorkflowImportSection(
   );
   const [newVersionName, setNewVersionName] = useState<string>('');
 
+  const {currentVersion} = useAppSelector((state) => state.version);
+
   const importWorkflow = (worflowFile: File) => {
     const reader = new FileReader();
     reader.onerror = () => {
@@ -39,7 +41,7 @@ export default function WorkflowImportSection(
     reader.onload = () => {
       axios
         .post(
-          `http://localhost:8080/ml2wf/api/v1/bpmn?versionName=${version}`,
+          `http://localhost:8080/ml2wf/api/v1/bpmn?versionName=${currentVersion}`,
           reader.result,
           {
             headers: {
@@ -70,7 +72,7 @@ export default function WorkflowImportSection(
       />
       <Dropzone
         multiple={false}
-        disabled={!version}
+        disabled={!currentVersion}
         onDrop={(acceptedFiles) => importWorkflow(acceptedFiles[0])}
       >
         {({getRootProps, getInputProps}) => (

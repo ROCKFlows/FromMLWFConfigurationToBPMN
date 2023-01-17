@@ -1,32 +1,42 @@
 import * as React from 'react';
-import {FormControl, InputLabel, MenuItem, Select} from '@mui/material';
-import axios from 'axios';
-import {useEffect, useState} from 'react';
-import {XMLParser} from 'fast-xml-parser';
+import {
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from '@mui/material';
+import {useEffect} from 'react';
+import {useAppDispatch} from '../store/hooks';
+import {changeVersion} from '../store/reducers/VersionSlice';
+import {useGetVersionsQuery} from '../store/api/knowledgeApi';
 
-const xmlParser = new XMLParser({
-  isArray: (name, jpath) => jpath === 'List.item',
-});
+export default function VersionsSelect() {
+  const {
+    data: versions,
+    isSuccess,
+    isError,
+    error,
+    isFetching,
+  } = useGetVersionsQuery();
 
-type VersionsSelectProps = {
-  onSelectedVersion: (version: string) => void;
-};
-
-export default function VersionsSelect(props: VersionsSelectProps) {
-  const {onSelectedVersion} = props;
-
-  const [versions, setVersions] = useState<string[]>([]);
-
-  const getVersions = async () =>
-    axios
-      .get(`http://localhost:8080/ml2wf/api/v1/fm/versions/all`)
-      .then((r) => {
-        setVersions(xmlParser.parse(r.data).List.item.map((v) => v.name));
-      });
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    getVersions();
-  }, []);
+    if (isError && error) {
+      console.error(
+        `Failed to retrieve versions. Error is ${error.status}: ${error.error}`,
+      );
+    }
+  }, [isError, error]);
+
+  if (isError) {
+    // TODO: snackbar
+  }
+
+  if (isFetching) {
+    return <CircularProgress />;
+  }
 
   return (
     <FormControl fullWidth>
@@ -35,13 +45,14 @@ export default function VersionsSelect(props: VersionsSelectProps) {
         labelId="versions-select-label"
         id="versions-select"
         label="Version"
-        onChange={(e) => onSelectedVersion(e.target.value)}
+        onChange={(e) => dispatch(changeVersion(e.target.value))}
       >
-        {versions.map((v) => (
-          <MenuItem value={v} key={v}>
-            {v}
-          </MenuItem>
-        ))}
+        {isSuccess &&
+          versions.map((v) => (
+            <MenuItem value={v.name} key={v.name}>
+              {v.name} ({v.major}.{v.minor}.{v.patch})
+            </MenuItem>
+          ))}
       </Select>
     </FormControl>
   );

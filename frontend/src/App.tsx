@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {Suspense, useEffect, useState} from 'react';
+import {Suspense} from 'react';
 import {
   Alert,
-  AlertColor,
   Box,
   CircularProgress,
   Grid,
@@ -10,9 +9,9 @@ import {
   Snackbar,
   Stack,
 } from '@mui/material';
-import axios from 'axios';
-import {XMLParser} from 'fast-xml-parser';
 import TopToolbar from './TopToolbar';
+import {useAppDispatch, useAppSelector} from './store/hooks';
+import {hideSnackbar} from './store/reducers/SnackbarSlice';
 
 const KnowledgeTreeSection = React.lazy(() =>
   import('./sections/KnowledgeTreeSection'),
@@ -23,48 +22,9 @@ const ConstraintsSection = React.lazy(() =>
 );
 
 function App() {
-  const [version, setVersion] = useState<string>('');
-  const [knowledgeTree, setKnowledgeTree] = useState<
-    {extendedFeatureModel: {constraints: any; struct: any}} | undefined
-  >(undefined);
-  const [isSnackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    AlertColor | undefined
-  >(undefined);
-  const [snackbarMessage, setSnackbarMessage] = useState<string | undefined>(
-    undefined,
-  );
+  const snackbar = useAppSelector((state) => state.snackbar);
 
-  const getTree = () => {
-    axios
-      .get(`http://localhost:8080/ml2wf/api/v1/fm?versionName=${version}`)
-      .then((r) => {
-        setKnowledgeTree(
-          new XMLParser({
-            ignoreAttributes: false,
-            attributeNamePrefix: '@_',
-            allowBooleanAttributes: true,
-            preserveOrder: true,
-          }).parse(r.data),
-        );
-        setSnackbarSeverity('success');
-        setSnackbarMessage('Knowledge tree successfully retrieved.');
-      })
-      .catch(() => {
-        setSnackbarSeverity('error');
-        setSnackbarMessage('Failed to retrieve knowledge tree.');
-      })
-      .finally(() => {
-        setSnackbarOpen(true);
-      });
-  };
-
-  useEffect(() => {
-    if (!version) {
-      return;
-    }
-    getTree();
-  }, [version]);
+  const dispatch = useAppDispatch();
 
   return (
     <Stack>
@@ -85,14 +45,7 @@ function App() {
                 </Box>
               }
             >
-              <KnowledgeTreeSection
-                knowledgeTree={
-                  knowledgeTree
-                    ? knowledgeTree[0].extendedFeatureModel[0].struct[0]
-                    : undefined
-                }
-                onSelectedVersion={(v: string) => setVersion(v)}
-              />
+              <KnowledgeTreeSection />
             </Suspense>
           </Paper>
         </Grid>
@@ -112,13 +65,7 @@ function App() {
                     </Box>
                   }
                 >
-                  <ConstraintsSection
-                    constraints={
-                      knowledgeTree
-                        ? knowledgeTree[0].extendedFeatureModel[1].constraints
-                        : undefined
-                    }
-                  />
+                  <ConstraintsSection />
                 </Suspense>
               </Paper>
             </Grid>
@@ -131,7 +78,7 @@ function App() {
                     </Box>
                   }
                 >
-                  <WorkflowSection version={version} onImported={getTree} />
+                  <WorkflowSection />
                 </Suspense>
               </Paper>
             </Grid>
@@ -139,16 +86,16 @@ function App() {
         </Grid>
       </Grid>
       <Snackbar
-        open={isSnackbarOpen}
+        open={snackbar.show}
         autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
+        onClose={() => dispatch(hideSnackbar())}
       >
         <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarSeverity}
+          onClose={() => dispatch(hideSnackbar())}
+          severity={snackbar.severity}
           sx={{width: '100%'}}
         >
-          {snackbarMessage}
+          {snackbar.message}
         </Alert>
       </Snackbar>
     </Stack>

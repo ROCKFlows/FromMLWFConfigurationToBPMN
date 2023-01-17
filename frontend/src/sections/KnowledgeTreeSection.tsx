@@ -1,19 +1,48 @@
 import * as React from 'react';
-import {ReactElement} from 'react';
-import {Stack} from '@mui/material';
+import {ReactElement, useEffect} from 'react';
+import {CircularProgress, Stack} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {TreeItem, TreeView} from '@mui/lab';
+import {useAppDispatch, useAppSelector} from '../store/hooks';
+import {useGetKnowledgeTreeQuery} from '../store/api/knowledgeApi';
+import {showSnackbar} from '../store/reducers/SnackbarSlice';
 
 const VersionsSelect = React.lazy(() => import('./VersionsSelect'));
 
-type KnowledgeTreeSectionProps = {
-  knowledgeTree: any | undefined;
-  onSelectedVersion: (version: string) => void;
-};
+export default function KnowledgeTreeSection() {
+  const {currentVersion} = useAppSelector((state) => state.version);
+  const {
+    data: knowledgeTree,
+    isSuccess,
+    isError,
+    error,
+    isFetching,
+  } = useGetKnowledgeTreeQuery(currentVersion, {skip: currentVersion === ''});
 
-export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
-  const {knowledgeTree, onSelectedVersion} = props;
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!(isSuccess || isError)) {
+      return;
+    }
+    dispatch(
+      showSnackbar({
+        severity: isError ? 'error' : 'success',
+        message: isError
+          ? `Failed to retrieve knowledge tree for version ${currentVersion}.`
+          : `Knowledge tree successfully retrieved for version ${currentVersion}.`,
+      }),
+    );
+  }, [isSuccess, isError]);
+
+  useEffect(() => {
+    if (isError && error) {
+      console.error(
+        `Failed to retrieve knowledge tree for version ${currentVersion}. Error is ${error.status}: ${error.error}`,
+      );
+    }
+  }, [isError, error]);
 
   const getNodesIds = (node: any): string[] => {
     let result = [node[':@']['@_name']];
@@ -47,16 +76,19 @@ export default function KnowledgeTreeSection(props: KnowledgeTreeSectionProps) {
   return (
     <Stack spacing={1} height="100%">
       <Stack direction="row" padding={1}>
-        <VersionsSelect onSelectedVersion={onSelectedVersion} />
+        <VersionsSelect />
       </Stack>
-      {knowledgeTree && (
+      {isFetching && <CircularProgress />}
+      {isSuccess && knowledgeTree?.extendedFeatureModel[0].struct[0] && (
         <TreeView
           aria-label="knowledge-tree"
           defaultCollapseIcon={<ExpandMoreIcon />}
           defaultExpandIcon={<ChevronRightIcon />}
-          defaultExpanded={getNodesIds(knowledgeTree)}
+          defaultExpanded={getNodesIds(
+            knowledgeTree.extendedFeatureModel[0].struct[0],
+          )}
         >
-          {getNodes(knowledgeTree)}
+          {getNodes(knowledgeTree.extendedFeatureModel[0].struct[0])}
         </TreeView>
       )}
     </Stack>

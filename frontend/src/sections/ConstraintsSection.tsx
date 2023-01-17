@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {Box, Stack, Typography} from '@mui/material';
-
-type ConstraintsSectionProps = {
-  constraints: any[] | undefined;
-};
+import {Box, CircularProgress, Stack, Typography} from '@mui/material';
+import {useEffect} from 'react';
+import {useAppDispatch, useAppSelector} from '../store/hooks';
+import {useGetKnowledgeTreeQuery} from '../store/api/knowledgeApi';
+import {showSnackbar} from '../store/reducers/SnackbarSlice';
 
 const getOperatorRepresentation = (o) => {
   if (o.imp) return <span style={{color: 'red'}}>implies</span>;
@@ -21,8 +21,36 @@ const getConstraintOperator = (c) => {
   if (c.not) return c.not;
 };
 
-export default function ConstraintsSection(props: ConstraintsSectionProps) {
-  const {constraints} = props;
+export default function ConstraintsSection() {
+  const {currentVersion} = useAppSelector((state) => state.version);
+  const {
+    data: knowledgeTree,
+    isSuccess,
+    isError,
+    error,
+    isFetching,
+  } = useGetKnowledgeTreeQuery(currentVersion, {skip: currentVersion === ''});
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!isError) {
+      return;
+    }
+    dispatch(
+      showSnackbar({
+        severity: 'error',
+        message: `Failed to retrieve constraints for version ${currentVersion}.`,
+      }),
+    );
+  }, [isError]);
+
+  useEffect(() => {
+    if (isError && error) {
+      console.error(
+        `Failed to retrieve knowledge tree for version ${currentVersion}. Error is ${error.status}: ${error.error}`,
+      );
+    }
+  }, [isError, error]);
 
   const getConstraint = (c, isRoot: boolean) => {
     const operatorRepresentation = getOperatorRepresentation(c);
@@ -51,11 +79,13 @@ export default function ConstraintsSection(props: ConstraintsSectionProps) {
   return (
     <Stack spacing={1} height="100%">
       <Typography>Constraints</Typography>
-      {constraints?.map((r) => (
-        <Box>
-          <Typography>{getConstraint(r.rule[0], true)}</Typography>
-        </Box>
-      ))}
+      {isFetching && <CircularProgress />}
+      {isSuccess &&
+        knowledgeTree?.extendedFeatureModel[1].constraints?.map((r) => (
+          <Box>
+            <Typography>{getConstraint(r.rule[0], true)}</Typography>
+          </Box>
+        ))}
     </Stack>
   );
 }
