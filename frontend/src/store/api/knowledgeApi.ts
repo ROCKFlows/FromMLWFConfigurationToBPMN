@@ -1,5 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {XMLParser} from 'fast-xml-parser';
+import parseWorkflowXMLToObject from '../../xml/parser';
 
 export type Version = {
   name: string;
@@ -40,7 +41,7 @@ type WorkflowEdge = {
   target: string;
 };
 
-type Workflow = {
+export type Workflow = {
   nodes: WorkflowTask[];
   edges: WorkflowEdge[];
 };
@@ -89,44 +90,28 @@ export const knowledgeApi = createApi({
         url: `bpmn?versionName=${version}`,
         responseHandler: (response) => response.text(),
       }),
-      transformResponse: (
-        response: any, // TODO: any
-      ) => {
-        const tasks = new XMLParser({
-          ignoreAttributes: false,
-          attributeNamePrefix: '@_',
-          allowBooleanAttributes: true,
-          preserveOrder: true,
-        })
-          .parse(response)[0]
-          ['bpmn2:definitions'][0]['bpmn2:process'].filter(
-            (t) => t['bpmn2:task'],
-          );
-        // TODO: move conversion to dedicated util
-        return {
-          nodes: tasks.map((t, i) => ({
-            id: t[':@']['@_id'],
-            position: {x: i * 200, y: 0},
-            data: {label: t[':@']['@_name']},
-            sourcePosition: 'right',
-            targetPosition: 'left',
-          })),
-          edges: tasks.slice(0, -1).map((n, i) => ({
-            id: `e${i}`,
-            source: tasks[i][':@']['@_id'],
-            target: tasks[i + 1][':@']['@_id'],
-          })),
-        };
-      },
+      transformResponse: (response: string) =>
+        parseWorkflowXMLToObject(response),
       providesTags: ['Versioned'],
+    }),
+    postNewWorkflow: builder.mutation<
+      File,
+      Partial<{newVersion: string; workflowFile: File}>
+    >({
+      // note: an optional `queryFn` may be used in place of `query`
+      query: ({newVersion, workflowFile}) => ({
+        url: `bpmn?versionName=${newVersion}`,
+        method: 'POST',
+        body: workflowFile,
+      }),
+      invalidatesTags: ['Versioned'],
     }),
   }),
 });
 
-// Export hooks for usage in functional components, which are
-// auto-generated based on the defined endpoints
 export const {
   useGetVersionsQuery,
   useGetKnowledgeTreeQuery,
   useGetWorkflowQuery,
+  usePostNewWorkflowMutation,
 } = knowledgeApi;
