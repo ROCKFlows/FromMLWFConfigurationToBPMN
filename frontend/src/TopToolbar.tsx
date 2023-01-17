@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
   Box,
-  Button,
   IconButton,
   Menu,
   MenuItem,
@@ -10,9 +9,11 @@ import {
 } from '@mui/material';
 import AdbIcon from '@mui/icons-material/Adb';
 import MenuIcon from '@mui/icons-material/Menu';
+import {Link} from 'react-router-dom';
+import type {RoutePage} from './routes';
 
 type TopToolbarProps = {
-  pages: string[];
+  pages: RoutePage[];
 };
 
 export default function TopToolbar(props: TopToolbarProps) {
@@ -77,8 +78,10 @@ export default function TopToolbar(props: TopToolbarProps) {
           }}
         >
           {pages.map((page) => (
-            <MenuItem key={page} onClick={handleCloseNavMenu}>
-              <Typography textAlign="center">{page}</Typography>
+            <MenuItem key={page.name} onClick={handleCloseNavMenu}>
+              <Link to={page.url} style={{padding: 5}}>
+                {page.name}
+              </Link>
             </MenuItem>
           ))}
         </Menu>
@@ -104,13 +107,11 @@ export default function TopToolbar(props: TopToolbarProps) {
       </Typography>
       <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
         {pages.map((page) => (
-          <Button
-            key={page}
-            onClick={handleCloseNavMenu}
-            sx={{my: 2, display: 'block'}}
-          >
-            {page}
-          </Button>
+          <MenuItem key={page.name} onClick={handleCloseNavMenu}>
+            <Link to={page.url} style={{padding: 5}}>
+              {page.name}
+            </Link>
+          </MenuItem>
         ))}
       </Box>
     </Toolbar>
