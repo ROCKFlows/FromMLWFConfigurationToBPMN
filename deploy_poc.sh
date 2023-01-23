@@ -15,6 +15,9 @@ echo "Importing feature model into neo4j..."
 curl -X POST "http://localhost:8080/ml2wf/api/v1/fm?versionName=demo" -H  "accept: application/json" -H  "Content-Type: application/xml" -d '@model.xml'
 echo -e "\nDone."
 
-echo "To visualize the imported feature model:"
+echo "To access the UI:"
+echo "   - go to http://localhost:4173/"
+echo ""
+echo "To visualize the imported feature model in Neo4J:"
 echo "   - go to http://localhost:7474/browser/"
 echo "   - username=neo4j password=ml2wf_password"

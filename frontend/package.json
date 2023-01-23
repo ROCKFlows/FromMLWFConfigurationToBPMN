@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "dev": "vite --host",
+    "build": "vite build",
+    "build:tsc": "tsc && vite build",
+    "preview": "vite preview --host",
     "eslint": "eslint -c .eslintrc.cjs src/**/*",
     "eslint:fix": "eslint -c .eslintrc.cjs --fix src/**/*",
     "prettier": "prettier --check --ignore-unknown src",
@@ -54,6 +55,18 @@
     "prettier": "^2.8.1",
     "typescript": "*",
     "vite": "^4.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "husky": {
     "pre-commit": "lint-staged"

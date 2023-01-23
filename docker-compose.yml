@@ -14,6 +14,14 @@ services:
     depends_on:
       - arango
       - neo4j
+  frontend:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "4173:4173"
+    depends_on:
+      - app
   arango:
     image: arangodb:3.9.0
     ports:
