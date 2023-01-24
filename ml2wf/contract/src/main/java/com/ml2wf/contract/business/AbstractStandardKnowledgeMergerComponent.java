@@ -1,6 +1,7 @@
 package com.ml2wf.contract.business;
 
 import com.ml2wf.contract.exception.NoVersionFoundException;
+import com.ml2wf.contract.exception.VersionNotFoundException;
 import com.ml2wf.contract.storage.graph.converter.IGraphStandardKnowledgeConverter;
 import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
@@ -9,6 +10,7 @@ import com.ml2wf.contract.storage.graph.repository.VersionsRepository;
 import com.ml2wf.core.tree.StandardKnowledgeTask;
 import com.ml2wf.core.workflow.StandardWorkflow;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 import static com.ml2wf.core.util.XMLManager.getReferredTask;
@@ -16,6 +18,7 @@ import static com.ml2wf.core.util.XMLManager.getReferredTask;
 public class AbstractStandardKnowledgeMergerComponent<T extends GraphStandardKnowledgeTask<T, V>,
         V extends GraphTaskVersion> implements IStandardKnowledgeMergerComponent {
 
+    private static final String ROOT_NODE_NAME = "__ROOT";
     public static final String UNMANAGED_NODE_NAME = "__UNMANAGED";
     public static final String UNMANAGED_NODE_DESCRIPTION = "Parent of tasks with unknown referred parents.";
     private final StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTasksRepository;
@@ -34,6 +37,12 @@ public class AbstractStandardKnowledgeMergerComponent<T extends GraphStandardKno
     }
 
     private T createUnmanagedNode(V graphVersion) {
+        var optGraphKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersionName(
+                ROOT_NODE_NAME, graphVersion.getName()
+        );
+        var graphKnowledgeTask = optGraphKnowledgeTask.orElseThrow(
+                () -> new VersionNotFoundException(graphVersion.getName()));
+        var firstGraphTreeTask = new ArrayList<>(graphKnowledgeTask.getChildren()).get(0);
         var convertedNode = graphStandardKnowledgeConverter.fromStandardKnowledgeTask(
                 new StandardKnowledgeTask(
                         UNMANAGED_NODE_NAME,
@@ -44,8 +53,10 @@ public class AbstractStandardKnowledgeMergerComponent<T extends GraphStandardKno
                         Collections.emptyList()
                 )
         ).get(0);
-        convertedNode.setVersion(graphVersion);
-        return standardKnowledgeTasksRepository.save(convertedNode);
+        var savedUnmanagedRootNode = standardKnowledgeTasksRepository.save(convertedNode);
+        firstGraphTreeTask.getChildren().add(savedUnmanagedRootNode);
+        standardKnowledgeTasksRepository.save(firstGraphTreeTask);
+        return savedUnmanagedRootNode;
     }
 
     // TODO: move version ?

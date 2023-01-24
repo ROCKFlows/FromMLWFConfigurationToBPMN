@@ -1,9 +1,10 @@
 import * as React from 'react';
 import {ReactElement, useEffect} from 'react';
-import {CircularProgress, Stack} from '@mui/material';
+import {CircularProgress, Stack, Tooltip, Typography} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {TreeItem, TreeView} from '@mui/lab';
+import InfoIcon from '@mui/icons-material/Info';
 import {useAppDispatch, useAppSelector} from '../store/hooks';
 import {useGetKnowledgeTreeQuery} from '../store/api/knowledgeApi';
 import {showSnackbar} from '../store/reducers/SnackbarSlice';
@@ -42,9 +43,15 @@ export default function KnowledgeTreeSection() {
         `Failed to retrieve knowledge tree for version ${currentVersion}. Error is ${error.status}: ${error.error}`,
       );
     }
+    if (isError) {
+      // TODO: snackbar
+    }
   }, [isError, error]);
 
   const getNodesIds = (node: any): string[] => {
+    if (node.description) {
+      return [];
+    }
     let result = [node[':@']['@_name']];
     if (node.and) {
       result = [
@@ -58,16 +65,35 @@ export default function KnowledgeTreeSection() {
   };
 
   const getNodes = (node: any): ReactElement => {
+    const description = Array.isArray(node.and)
+      ? node.and
+          .filter((n) => n.description && n.description[0]['#text'])
+          .map((n) => n.description[0]['#text'])[0]
+      : undefined;
     if (!node.and && !node.feature) {
       return (
         <TreeItem nodeId={node[':@']['@_name']} label={node[':@']['@_name']} />
       );
     }
     return (
-      <TreeItem nodeId={node[':@']['@_name']} label={node[':@']['@_name']}>
+      <TreeItem
+        nodeId={node[':@']['@_name']}
+        label={
+          description ? (
+            <Stack spacing={1} direction="row">
+              <Typography>{node[':@']['@_name']}</Typography>
+              <Tooltip title={description}>
+                <InfoIcon />
+              </Tooltip>
+            </Stack>
+          ) : (
+            <Typography>{node[':@']['@_name']}</Typography>
+          )
+        }
+      >
         {node.and &&
           (Array.isArray(node.and)
-            ? node.and.map((n) => getNodes(n))
+            ? node.and.filter((n) => !n.description).map((n) => getNodes(n))
             : getNodes(node.and))}
       </TreeItem>
     );
