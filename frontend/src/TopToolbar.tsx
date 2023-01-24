@@ -29,7 +29,7 @@ export default function TopToolbar(props: TopToolbarProps) {
   };
 
   return (
-    <Toolbar disableGutters sx={{height: '5vh'}}>
+    <Toolbar disableGutters sx={{height: '5vh', paddingLeft: '1vw'}}>
       <AdbIcon sx={{display: {xs: 'none', md: 'flex'}, mr: 1}} />
       <Typography
         variant="h6"

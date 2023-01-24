@@ -1,5 +1,5 @@
 import React, {Suspense} from 'react';
-import {Route, Routes} from 'react-router';
+import {Navigate, Route, Routes} from 'react-router';
 import {CircularProgress} from '@mui/material';
 
 const HomePage = React.lazy(() => import('../pages/HomePage'));
@@ -16,7 +16,7 @@ export type RoutePage = {
 export const pages: RoutePage[] = [
   {
     name: 'Home',
-    url: '/',
+    url: '/knowledge',
   },
   {
     name: 'Import Workflow',
@@ -27,7 +27,12 @@ export const pages: RoutePage[] = [
 export const routes = (
   <Suspense fallback={<CircularProgress />}>
     <Routes>
-      <Route path="/" element={<HomePage />} key="versionRoute" />
+      <Route path="/" element={<Navigate to="/knowledge" replace />} />
+      <Route
+        path="/knowledge/:version?"
+        element={<HomePage />}
+        key="versionRoute"
+      />
       <Route
         path="/workflow/new"
         element={<WorkflowImportPage />}

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
   Box,
-  Button,
+  CircularProgress,
   Fab,
   Paper,
   Stack,
@@ -22,6 +22,7 @@ import ReactFlow, {
 
 import 'reactflow/dist/style.css';
 
+import {useNavigate} from 'react-router-dom';
 import {useAppDispatch} from '../store/hooks';
 import {usePostNewWorkflowMutation, Workflow} from '../store/api/knowledgeApi';
 import {showSnackbar} from '../store/reducers/SnackbarSlice';
@@ -47,6 +48,8 @@ export default function WorkflowImportPage() {
   const [newWorkflow, setNewWorkflow] = useState<Workflow | undefined>(
     undefined,
   );
+
+  const navigate = useNavigate();
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -92,10 +95,33 @@ export default function WorkflowImportPage() {
     [isFocused, isDragAccept, isDragReject],
   );
 
-  const [addWorkflow, {isLoading, isSuccess, isError}] =
+  const [addWorkflow, {isLoading, isSuccess, isError, error}] =
     usePostNewWorkflowMutation();
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!(isSuccess || isError)) {
+      return;
+    }
+    if (isError) {
+      console.error(
+        `Failed to post new workflow with version ${newVersionName}. Error is \n${error?.data}`,
+        error,
+      );
+    }
+    dispatch(
+      showSnackbar({
+        severity: isError ? 'error' : 'success',
+        message: isError
+          ? `Failed to post new workflow with version ${newVersionName}.`
+          : `Workflow successfully imported with version ${newVersionName}.`,
+      }),
+    );
+    if (isSuccess) {
+      navigate(`/knowledge/${newVersionName}`);
+    }
+  }, [isSuccess, isError]);
 
   useEffect(() => {
     if (acceptedFiles.length === 0) {
@@ -176,8 +202,11 @@ export default function WorkflowImportPage() {
           aria-label="add"
           variant="extended"
           sx={{position: 'absolute', bottom: '5vh'}}
-          disabled={newWorkflowFile === undefined}
+          disabled={
+            !newVersionName || newWorkflowFile === undefined || isLoading
+          }
         >
+          {isLoading && <CircularProgress />}
           <FileUploadIcon />
           Import
         </Fab>

@@ -1,6 +1,11 @@
 import * as React from 'react';
 import {Box, CircularProgress, Grid, Paper} from '@mui/material';
-import {Suspense} from 'react';
+import {Suspense, useEffect} from 'react';
+import {useParams} from 'react-router';
+import {useNavigate} from 'react-router-dom';
+import {useGetVersionsQuery} from '../store/api/knowledgeApi';
+import {changeVersion} from '../store/reducers/VersionSlice';
+import {useAppDispatch} from '../store/hooks';
 
 const KnowledgeTreeSection = React.lazy(() =>
   import('../sections/KnowledgeTreeSection'),
@@ -11,6 +16,54 @@ const ConstraintsSection = React.lazy(() =>
 );
 
 export default function HomePage() {
+  const {data: versions, isError, error, isFetching} = useGetVersionsQuery();
+
+  const dispatch = useAppDispatch();
+
+  const {version: urlVersion} = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isError && error) {
+      console.error(
+        `Failed to retrieve versions. Error is ${error.status}: ${error.error}`,
+      );
+    }
+    if (isError) {
+      // TODO: snackbar
+    }
+  }, [isError, error]);
+
+  useEffect(() => {
+    if (isFetching) {
+      return;
+    }
+    if (!urlVersion) {
+      if (versions === undefined || versions.length === 0) {
+        navigate('/workflow/new');
+      } else {
+        navigate(
+          `/knowledge/${
+            versions?.reduce((vA, vB) =>
+              vA.major * 100 + vA.minor * 10 + vA.patch >
+              vB.major * 100 + vB.minor * 10 + vB.patch
+                ? vA
+                : vB,
+            ).name
+          }`,
+        );
+      }
+    } else if (!versions?.find((v) => v.name === urlVersion)) {
+      navigate('/404');
+    } else {
+      dispatch(changeVersion(urlVersion));
+    }
+  }, [isFetching, urlVersion]);
+
+  if (isFetching) {
+    return <CircularProgress />;
+  }
+
   return (
     <Grid
       container

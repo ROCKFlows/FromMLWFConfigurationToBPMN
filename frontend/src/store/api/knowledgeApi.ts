@@ -100,9 +100,14 @@ export const knowledgeApi = createApi({
     >({
       // note: an optional `queryFn` may be used in place of `query`
       query: ({newVersion, workflowFile}) => ({
-        url: `bpmn?versionName=${newVersion}`,
+        url: `bpmn/?newVersionName=${newVersion}`,
         method: 'POST',
         body: workflowFile,
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/xml',
+        },
+        responseHandler: (response) => response.text(),
       }),
       invalidatesTags: ['Versioned'],
     }),
