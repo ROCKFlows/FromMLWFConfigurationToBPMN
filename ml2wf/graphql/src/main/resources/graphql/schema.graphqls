@@ -1,6 +1,5 @@
 type Query {
     configurationById(id: ID): Configuration
-    featureByName(name: ID): Feature
 }
 
 type Configuration {

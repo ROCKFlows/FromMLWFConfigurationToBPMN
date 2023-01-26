@@ -2,7 +2,9 @@ package com.ml2wf.neo4j.business.components;
 
 import com.google.common.collect.ImmutableList;
 import com.ml2wf.contract.business.AbstractConfigurationsComponent;
+import com.ml2wf.contract.exception.NoVersionFoundException;
 import com.ml2wf.core.configurations.Configuration;
+import com.ml2wf.neo4j.storage.converter.impl.Neo4JConfigurationConverter;
 import com.ml2wf.neo4j.storage.dto.*;
 import com.ml2wf.neo4j.storage.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +21,16 @@ public class Neo4JConfigurationsComponent
 
     public Neo4JConfigurationsComponent(@Autowired Neo4JConfigurationRepository configurationRepository,
                                         @Autowired Neo4JConfigurationFeaturesRepository configurationFeaturesRepository,
+                                        @Autowired Neo4JConfigurationConverter configurationConverter,
                                         @Autowired Neo4JStandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
                                         @Autowired Neo4JVersionsRepository versionsRepository) {
-        super(configurationRepository, configurationFeaturesRepository, standardKnowledgeTasksRepository, versionsRepository);
+        super(configurationRepository, configurationFeaturesRepository, configurationConverter,
+                standardKnowledgeTasksRepository, versionsRepository);
     }
 
     @Override
     public boolean importConfiguration(String name, Configuration configuration) {
-        var graphVersion = versionsRepository.getLastVersion().orElseThrow();
+        var graphVersion = versionsRepository.getLastVersion().orElseThrow(NoVersionFoundException::new);
         var convertedConfigurationFeatures = configuration.getFeatures().stream()
                 .map(c -> {
                     var correspondingGraphTask = standardKnowledgeTaskRepository.findOneByNameAndVersionName(c.getName(), graphVersion.getName())

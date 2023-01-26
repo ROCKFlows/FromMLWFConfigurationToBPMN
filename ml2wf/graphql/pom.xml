@@ -22,11 +22,11 @@
             <artifactId>contract</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.graphql-java/graphql-spring-boot-starter -->
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-graphql -->
         <dependency>
-            <groupId>com.graphql-java</groupId>
-            <artifactId>graphql-spring-boot-starter</artifactId>
-            <version>5.0.2</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
+            <version>3.0.2</version>
         </dependency>
     </dependencies>
 

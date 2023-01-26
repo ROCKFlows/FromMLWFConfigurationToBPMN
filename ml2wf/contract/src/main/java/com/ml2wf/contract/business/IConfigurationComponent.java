@@ -7,4 +7,6 @@ import org.springframework.stereotype.Component;
 public interface IConfigurationComponent {
 
     boolean importConfiguration(String name, Configuration configuration);
+
+    Configuration getConfiguration(String configurationName);
 }
