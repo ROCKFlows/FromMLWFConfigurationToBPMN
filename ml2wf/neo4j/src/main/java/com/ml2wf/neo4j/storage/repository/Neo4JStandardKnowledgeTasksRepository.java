@@ -16,7 +16,7 @@ public interface Neo4JStandardKnowledgeTasksRepository extends Neo4jRepository<N
     // TODO: fix hardcoded __ROOT task name
     @Override
     @Query("""
-            MATCH (r:Task {name: $taskName})<-[:IS_PARENT_OF*0..]-(:Task {name: '__ROOT'})-[:IS_VERSIONED_BY*]->({name: $versionName}), f = (c:Task)<-[:IS_PARENT_OF*]-(r)
+            MATCH (r:Task {name: $taskName})<-[:IS_PARENT_OF*0..]-(:Task {name: '__ROOT'})-[:IS_VERSIONED_BY*]->({name: $versionName}), f = (c:Task)<-[:IS_PARENT_OF*0..]-(r)
             RETURN r, collect(nodes(f)), collect(relationships(f))
             """)
     Optional<Neo4JStandardKnowledgeTask> findOneByNameAndVersionName(String taskName, String versionName);

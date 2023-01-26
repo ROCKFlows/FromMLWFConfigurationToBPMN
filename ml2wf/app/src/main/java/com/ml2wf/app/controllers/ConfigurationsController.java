@@ -22,13 +22,14 @@ public class ConfigurationsController {
         this.configurationsComponent = configurationsComponent;
     }
 
-    @PostMapping(value = {"/{name}"}, consumes = {MediaType.APPLICATION_XML_VALUE})
-    ResponseEntity<String> importBPMNWorkflow(@PathVariable String name, @RequestBody String configurationString)
+    @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE})
+    ResponseEntity<String> importBPMNWorkflow(@RequestParam String configurationName,
+                                              @RequestBody String configurationString)
             throws Throwable {
         // TODO: use jackson to automatically convert requestbody to configuration
         Configuration configuration = objectMapperFactory.createNewObjectMapper()
                 .readValue(configurationString, Configuration.class);
-        configurationsComponent.importConfiguration(name, configuration); // TODO: check result
+        configurationsComponent.importConfiguration(configurationName, configuration); // TODO: check result
         return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
     }
 }

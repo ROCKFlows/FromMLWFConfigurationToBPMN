@@ -6,8 +6,8 @@
         <module>core</module>
         <module>contract</module>
         <module>xml</module>
-        <module>arango</module>
         <module>neo4j</module>
+        <module>graphql</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

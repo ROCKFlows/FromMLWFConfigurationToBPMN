@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>arango</artifactId>
+    <artifactId>graphql</artifactId>
 
     <dependencies>
         <dependency>
@@ -21,6 +21,12 @@
             <groupId>com.ml2wf</groupId>
             <artifactId>contract</artifactId>
             <version>1.0.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.graphql-java/graphql-spring-boot-starter -->
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-spring-boot-starter</artifactId>
+            <version>5.0.2</version>
         </dependency>
     </dependencies>
 

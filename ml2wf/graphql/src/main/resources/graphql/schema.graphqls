@@ -1,0 +1,21 @@
+type Query {
+    configurationById(id: ID): Configuration
+    featureByName(name: ID): Feature
+}
+
+type Configuration {
+    id: ID
+    features: [Feature]
+}
+
+enum FeatureSelectionStatus {
+    selected,
+    unselected,
+    undefined,
+}
+
+type Feature {
+    name: ID
+    automatic: FeatureSelectionStatus
+    manual: FeatureSelectionStatus
+}

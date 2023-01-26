@@ -17,7 +17,7 @@ public interface Neo4JConstraintsRepository extends Neo4jRepository<Neo4JConstra
     // TODO: fix hardcoded __ROOT_CONSTRAINT task name
     @Override
     @Query("""
-            MATCH (r:Constraint {type: $constraintType})<-[:IS_PARENT_OF*0..]-(:Constraint {type: '__ROOT_CONSTRAINT'})-[:IS_VERSIONED_BY*]->({name: $versionName}), f = (:Task)<-[:CONSTRAINS]-(c:Constraint)<-[:IS_PARENT_OF*]-(r)
+            MATCH (r:Constraint {type: $constraintType})<-[:IS_PARENT_OF*0..]-(:Constraint {type: '__ROOT_CONSTRAINT'})-[:IS_VERSIONED_BY*]->({name: $versionName}), f = (:Task)<-[:CONSTRAINS]-(c:Constraint)<-[:IS_PARENT_OF*0..]-(r)
             RETURN r, collect(nodes(f)), collect(relationships(f))
             """)
     List<Neo4JConstraintOperand> findAllByTypeAndVersionName(String constraintType, String versionName);

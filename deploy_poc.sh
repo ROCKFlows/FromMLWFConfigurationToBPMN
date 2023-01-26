@@ -13,7 +13,9 @@ echo "Done."
 
 echo "Importing feature model into neo4j..."
 curl -X POST "http://localhost:8080/ml2wf/api/v1/fm?versionName=demo" -H  "accept: application/json" -H  "Content-Type: application/xml" -d '@model.xml'
-echo -e "\nDone."
+echo -e "
+
+
 
 echo "To access the UI:"
 echo "   - go to http://localhost:4173/"
