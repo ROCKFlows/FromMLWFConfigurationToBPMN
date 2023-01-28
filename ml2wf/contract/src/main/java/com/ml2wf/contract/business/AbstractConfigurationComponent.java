@@ -7,11 +7,11 @@ import com.ml2wf.contract.storage.graph.repository.ConfigurationFeaturesReposito
 import com.ml2wf.contract.storage.graph.repository.ConfigurationRepository;
 import com.ml2wf.contract.storage.graph.repository.StandardKnowledgeTasksRepository;
 import com.ml2wf.contract.storage.graph.repository.VersionsRepository;
-import com.ml2wf.core.configurations.Configuration;
+import com.ml2wf.core.configurations.NamedConfiguration;
 import org.springframework.stereotype.Component;
 
 @Component
-public abstract class AbstractConfigurationsComponent<
+public abstract class AbstractConfigurationComponent<
         C extends GraphConfiguration<F, T, V>,
         V extends GraphTaskVersion,
         T extends GraphStandardKnowledgeTask<T, V>,
@@ -25,11 +25,11 @@ public abstract class AbstractConfigurationsComponent<
     protected final StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTaskRepository;
     protected final VersionsRepository<V, ?> versionsRepository;
 
-    protected AbstractConfigurationsComponent(ConfigurationRepository<C, F, T, V, String> configurationRepository,
-                                              ConfigurationFeaturesRepository<F, T, V, Long> configurationFeaturesRepository,
-                                              IGraphConfigurationConverter<C, F, T, V> configurationConverter,
-                                              StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTaskRepository,
-                                              VersionsRepository<V, ?> versionsRepository) {
+    protected AbstractConfigurationComponent(ConfigurationRepository<C, F, T, V, String> configurationRepository,
+                                             ConfigurationFeaturesRepository<F, T, V, Long> configurationFeaturesRepository,
+                                             IGraphConfigurationConverter<C, F, T, V> configurationConverter,
+                                             StandardKnowledgeTasksRepository<T, V, ?> standardKnowledgeTaskRepository,
+                                             VersionsRepository<V, ?> versionsRepository) {
         this.configurationRepository = configurationRepository;
         this.configurationFeaturesRepository = configurationFeaturesRepository;
         this.configurationConverter = configurationConverter;
@@ -38,8 +38,8 @@ public abstract class AbstractConfigurationsComponent<
     }
 
     @Override
-    public Configuration getConfiguration(String configurationName) {
-        return configurationRepository.findOneByNameAndVersionName(configurationName)
+    public NamedConfiguration getConfiguration(String configurationName) {
+        return configurationRepository.findOneByName(configurationName)
                 .map(configurationConverter::toStandardConfiguration)
                 .orElseThrow(() -> new ConfigurationNotFoundException(configurationName));
     }

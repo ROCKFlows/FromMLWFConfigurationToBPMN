@@ -1,9 +1,9 @@
 package com.ml2wf.neo4j.business.components;
 
 import com.google.common.collect.ImmutableList;
-import com.ml2wf.contract.business.AbstractConfigurationsComponent;
+import com.ml2wf.contract.business.AbstractConfigurationComponent;
 import com.ml2wf.contract.exception.NoVersionFoundException;
-import com.ml2wf.core.configurations.Configuration;
+import com.ml2wf.core.configurations.NamedConfiguration;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JConfigurationConverter;
 import com.ml2wf.neo4j.storage.dto.*;
 import com.ml2wf.neo4j.storage.repository.*;
@@ -15,21 +15,21 @@ import java.util.stream.Collectors;
 
 @Profile("neo4j")
 @Component
-public class Neo4JConfigurationsComponent
-        extends AbstractConfigurationsComponent<Neo4JConfiguration, Neo4JTaskVersion, Neo4JStandardKnowledgeTask,
-        Neo4JConfigurationFeature> {
+public class Neo4JConfigurationComponent
+        extends AbstractConfigurationComponent<Neo4JConfiguration, Neo4JTaskVersion, Neo4JStandardKnowledgeTask,
+                Neo4JConfigurationFeature> {
 
-    public Neo4JConfigurationsComponent(@Autowired Neo4JConfigurationRepository configurationRepository,
-                                        @Autowired Neo4JConfigurationFeaturesRepository configurationFeaturesRepository,
-                                        @Autowired Neo4JConfigurationConverter configurationConverter,
-                                        @Autowired Neo4JStandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
-                                        @Autowired Neo4JVersionsRepository versionsRepository) {
+    public Neo4JConfigurationComponent(@Autowired Neo4JConfigurationRepository configurationRepository,
+                                       @Autowired Neo4JConfigurationFeaturesRepository configurationFeaturesRepository,
+                                       @Autowired Neo4JConfigurationConverter configurationConverter,
+                                       @Autowired Neo4JStandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
+                                       @Autowired Neo4JVersionsRepository versionsRepository) {
         super(configurationRepository, configurationFeaturesRepository, configurationConverter,
                 standardKnowledgeTasksRepository, versionsRepository);
     }
 
     @Override
-    public boolean importConfiguration(String name, Configuration configuration) {
+    public boolean importConfiguration(NamedConfiguration configuration) {
         var graphVersion = versionsRepository.getLastVersion().orElseThrow(NoVersionFoundException::new);
         var convertedConfigurationFeatures = configuration.getFeatures().stream()
                 .map(c -> {
@@ -39,7 +39,8 @@ public class Neo4JConfigurationsComponent
                 })
                 .collect(Collectors.toList());
         var storedConfigFeatures = configurationFeaturesRepository.saveAll(convertedConfigurationFeatures);
-        configurationRepository.save(new Neo4JConfiguration(name, graphVersion, ImmutableList.copyOf(storedConfigFeatures)));
+        // TODO: use configuration converter
+        configurationRepository.save(new Neo4JConfiguration(configuration.getName(), graphVersion, ImmutableList.copyOf(storedConfigFeatures)));
         return true;
     }
 }

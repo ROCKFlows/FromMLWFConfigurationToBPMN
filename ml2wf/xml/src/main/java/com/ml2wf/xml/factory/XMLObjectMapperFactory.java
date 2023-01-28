@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.ml2wf.contract.mapper.IObjectMapperFactory;
-import com.ml2wf.core.configurations.Configuration;
+import com.ml2wf.core.configurations.RawConfiguration;
 import com.ml2wf.core.configurations.ConfigurationFeature;
 import com.ml2wf.core.constraints.operands.impl.VariableOperand;
 import com.ml2wf.core.constraints.operators.AbstractOperator;
@@ -93,7 +93,7 @@ public class XMLObjectMapperFactory implements IObjectMapperFactory {
                 .addMixIn(AbstractOperator.class, AbstractOperatorMixin.class)
                 .addMixIn(VariableOperand.class, VariableOperandMixin.class)
                 // Configurations related mixins
-                .addMixIn(Configuration.class, ConfigurationMixin.class)
+                .addMixIn(RawConfiguration.class, ConfigurationMixin.class)
                 .addMixIn(ConfigurationFeature.class, ConfigurationFeatureMixin.class)
                 .addMixIn(ConfigurationFeature.Status.class, ConfigurationFeatureStatusMixin.class);
     }

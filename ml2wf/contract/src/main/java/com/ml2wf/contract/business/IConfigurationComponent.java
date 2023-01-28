@@ -1,12 +1,12 @@
 package com.ml2wf.contract.business;
 
-import com.ml2wf.core.configurations.Configuration;
+import com.ml2wf.core.configurations.NamedConfiguration;
 import org.springframework.stereotype.Component;
 
 @Component
 public interface IConfigurationComponent {
 
-    boolean importConfiguration(String name, Configuration configuration);
+    boolean importConfiguration(NamedConfiguration configuration);
 
-    Configuration getConfiguration(String configurationName);
+    NamedConfiguration getConfiguration(String configurationName);
 }

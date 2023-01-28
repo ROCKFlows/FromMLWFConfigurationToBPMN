@@ -15,5 +15,5 @@ public interface ConfigurationRepository<C extends GraphConfiguration<F, T, V>,
         F extends GraphConfigurationFeature<T, V>, T extends GraphStandardKnowledgeTask<T, V>,
         V extends GraphTaskVersion, ID> extends PagingAndSortingRepository<C, ID>, QueryByExampleExecutor<C> {
 
-    Optional<C> findOneByNameAndVersionName(String configurationName);
+    Optional<C> findOneByName(String configurationName);
 }

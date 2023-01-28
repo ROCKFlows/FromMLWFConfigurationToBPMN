@@ -1,7 +1,7 @@
 package com.ml2wf.graphql.controllers;
 
 import com.ml2wf.contract.business.IConfigurationComponent;
-import com.ml2wf.core.configurations.Configuration;
+import com.ml2wf.core.configurations.NamedConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -17,7 +17,7 @@ public class ConfigurationController {
     }
 
     @QueryMapping
-    public Configuration configurationById(@Argument String id) {
-        return configurationComponent.getConfiguration(id);
+    public NamedConfiguration configuration(@Argument String name) {
+        return configurationComponent.getConfiguration(name);
     }
 }

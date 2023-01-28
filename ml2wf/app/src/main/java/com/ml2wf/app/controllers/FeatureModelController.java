@@ -2,7 +2,6 @@ package com.ml2wf.app.controllers;
 
 import com.ml2wf.app.components.FeatureModelComponent;
 import com.ml2wf.contract.business.IVersionsComponent;
-import com.ml2wf.contract.mapper.IObjectMapperFactory;
 import com.ml2wf.core.tree.StandardKnowledgeVersion;
 import com.ml2wf.core.tree.custom.featuremodel.FeatureModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,30 +16,27 @@ import java.util.List;
 @RequestMapping("/fm")
 public class FeatureModelController {
 
-    private final IObjectMapperFactory objectMapperFactory;
     private final FeatureModelComponent featureModelComponent;
     private final IVersionsComponent versionsComponent;
 
     @Autowired
-    public FeatureModelController(@Autowired IObjectMapperFactory objectMapperFactory,
-                                  @Autowired FeatureModelComponent featureModelComponent,
+    public FeatureModelController(@Autowired FeatureModelComponent featureModelComponent,
                                   @Autowired IVersionsComponent versionsComponent) {
-        this.objectMapperFactory = objectMapperFactory;
         this.featureModelComponent = featureModelComponent;
         this.versionsComponent = versionsComponent;
     }
 
-    @GetMapping(value = {"/versions/all"})
+    @GetMapping(value = {"/versions/all"}, produces = {MediaType.APPLICATION_XML_VALUE})
     List<StandardKnowledgeVersion> getVersions() {
         return versionsComponent.getVersions();
     }
 
-    @GetMapping(value = {"/versions/last"})
+    @GetMapping(value = {"/versions/last"}, produces = {MediaType.APPLICATION_XML_VALUE})
     StandardKnowledgeVersion getLastVersion() {
         return versionsComponent.getLastVersion();
     }
 
-    @GetMapping(value = {""})
+    @GetMapping(value = {""}, produces = {MediaType.APPLICATION_XML_VALUE})
     FeatureModel getFeatureModel(@RequestParam String versionName) {
         return featureModelComponent.getFeatureModel(versionName);
     }
@@ -50,12 +46,10 @@ public class FeatureModelController {
         return featureModelComponent.getFeatureModelTaskWithName(name, versionName);
     }
 
-    @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE})
-    ResponseEntity<String> importFeatureModel(@RequestParam String versionName, @RequestBody String featureModelString)
-            throws Exception {
-        // TODO: use jackson to automatically convert requestbody to featureModel
-        FeatureModel featureModel = objectMapperFactory.createNewObjectMapper()
-                .readValue(featureModelString, FeatureModel.class);
+    @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    ResponseEntity<String> importFeatureModel(@RequestParam String versionName,
+                                              @RequestBody FeatureModel featureModel) {
         featureModelComponent.importFeatureModel(versionName, featureModel); // TODO: check result
         return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
     }
