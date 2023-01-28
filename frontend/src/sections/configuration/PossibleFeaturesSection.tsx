@@ -4,6 +4,7 @@ import {
   Grid,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   Stack,
   Typography,
@@ -54,13 +55,11 @@ export default function PossibleFeaturesSection() {
     return <CircularProgress />;
   }
 
-  const unselectedFeatures = currentConfiguration.features
+  const selectedFeatures = currentConfiguration.features
     .filter(
       (f) =>
-        f.manual === FeatureSelectionStatus.UNSELECTED ||
-        f.automatic === FeatureSelectionStatus.UNSELECTED ||
-        f.manual === FeatureSelectionStatus.UNDEFINED ||
-        f.automatic === FeatureSelectionStatus.UNDEFINED,
+        f.manual === FeatureSelectionStatus.SELECTED ||
+        f.automatic === FeatureSelectionStatus.SELECTED,
     )
     .map((f) => f.name);
 
@@ -77,18 +76,20 @@ export default function PossibleFeaturesSection() {
                 (c) =>
                   !c.features.find(
                     (f) =>
-                      (f.manual === FeatureSelectionStatus.SELECTED ||
-                        f.automatic === FeatureSelectionStatus.SELECTED) &&
-                      unselectedFeatures.includes(f.name),
+                      (f.manual === FeatureSelectionStatus.UNSELECTED ||
+                        f.automatic === FeatureSelectionStatus.UNSELECTED) &&
+                      selectedFeatures.includes(f.name),
                   ),
               )
               .map((c) => (
                 <ListItem key={`list-item-possible-${c.name}`}>
-                  <ListItemText
-                    key={`list-item-possible-${c.name}`}
-                    id={`list-item-possible-${c.name}`}
-                    primary={c.name}
-                  />
+                  <ListItemButton>
+                    <ListItemText
+                      key={`list-item-possible-${c.name}`}
+                      id={`list-item-possible-${c.name}`}
+                      primary={c.name}
+                    />
+                  </ListItemButton>
                 </ListItem>
               ))}
           </List>
@@ -102,18 +103,20 @@ export default function PossibleFeaturesSection() {
               .filter((c) =>
                 c.features.find(
                   (f) =>
-                    (f.manual === FeatureSelectionStatus.SELECTED ||
-                      f.automatic === FeatureSelectionStatus.SELECTED) &&
-                    unselectedFeatures.includes(f.name),
+                    (f.manual === FeatureSelectionStatus.UNSELECTED ||
+                      f.automatic === FeatureSelectionStatus.UNSELECTED) &&
+                    selectedFeatures.includes(f.name),
                 ),
               )
               .map((c) => (
-                <ListItem key={`list-item-possible-${c.name}`}>
-                  <ListItemText
-                    key={`list-item-possible-${c.name}`}
-                    id={`list-item-possible-${c.name}`}
-                    primary={c.name}
-                  />
+                <ListItem key={`list-item-impossible-${c.name}`}>
+                  <ListItemButton>
+                    <ListItemText
+                      key={`list-item-impossible-${c.name}`}
+                      id={`list-item-impossible-${c.name}`}
+                      primary={c.name}
+                    />
+                  </ListItemButton>
                 </ListItem>
               ))}
           </List>

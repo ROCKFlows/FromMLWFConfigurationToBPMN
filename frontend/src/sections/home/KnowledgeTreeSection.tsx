@@ -69,11 +69,16 @@ export default function KnowledgeTreeSection() {
       : undefined;
     if (!node.and && !node.feature) {
       return (
-        <TreeItem nodeId={node[':@']['@_name']} label={node[':@']['@_name']} />
+        <TreeItem
+          key={`tree-item-knowledge-${node[':@']['@_name']}`}
+          nodeId={node[':@']['@_name']}
+          label={node[':@']['@_name']}
+        />
       );
     }
     return (
       <TreeItem
+        key={`tree-item-knowledge-${node[':@']['@_name']}`}
         nodeId={node[':@']['@_name']}
         label={
           description ? (

@@ -3,9 +3,9 @@ import {gql} from 'graphql-request';
 import {graphqlRequestBaseQuery} from '@rtk-query/graphql-request-base-query';
 
 export enum FeatureSelectionStatus {
-  SELECTED,
-  UNSELECTED,
-  UNDEFINED,
+  SELECTED = 'SELECTED',
+  UNSELECTED = 'UNSELECTED',
+  UNDEFINED = 'UNDEFINED',
 }
 
 export type ConfigurationFeature = {
