@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {Box, CircularProgress, Stack, Typography} from '@mui/material';
 import {useEffect} from 'react';
-import {useAppDispatch, useAppSelector} from '../store/hooks';
-import {useGetKnowledgeTreeQuery} from '../store/api/knowledgeApi';
-import {showSnackbar} from '../store/reducers/SnackbarSlice';
+import {useAppDispatch, useAppSelector} from '../../store/hooks';
+import {useGetKnowledgeTreeQuery} from '../../store/api/knowledgeApi';
+import {showSnackbar} from '../../store/reducers/SnackbarSlice';
 
 const getOperatorRepresentation = (o) => {
   if (o.imp) return <span style={{color: 'red'}}>implies</span>;

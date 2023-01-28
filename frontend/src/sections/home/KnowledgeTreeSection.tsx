@@ -5,9 +5,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {TreeItem, TreeView} from '@mui/lab';
 import InfoIcon from '@mui/icons-material/Info';
-import {useAppDispatch, useAppSelector} from '../store/hooks';
-import {useGetKnowledgeTreeQuery} from '../store/api/knowledgeApi';
-import {showSnackbar} from '../store/reducers/SnackbarSlice';
+import {useAppDispatch, useAppSelector} from '../../store/hooks';
+import {useGetKnowledgeTreeQuery} from '../../store/api/knowledgeApi';
+import {showSnackbar} from '../../store/reducers/SnackbarSlice';
 
 const VersionsSelect = React.lazy(() => import('./VersionsSelect'));
 

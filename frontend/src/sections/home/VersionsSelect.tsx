@@ -8,8 +8,8 @@ import {
 } from '@mui/material';
 import {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useAppSelector} from '../store/hooks';
-import {useGetVersionsQuery} from '../store/api/knowledgeApi';
+import {useAppSelector} from '../../store/hooks';
+import {useGetVersionsQuery} from '../../store/api/knowledgeApi';
 
 export default function VersionsSelect() {
   const {currentVersion} = useAppSelector((state) => state.version);

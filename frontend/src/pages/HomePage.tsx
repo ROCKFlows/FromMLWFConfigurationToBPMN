@@ -8,11 +8,13 @@ import {changeVersion} from '../store/reducers/VersionSlice';
 import {useAppDispatch} from '../store/hooks';
 
 const KnowledgeTreeSection = React.lazy(() =>
-  import('../sections/KnowledgeTreeSection'),
+  import('../sections/home/KnowledgeTreeSection'),
 );
-const WorkflowSection = React.lazy(() => import('../sections/WorkflowSection'));
+const WorkflowSection = React.lazy(() =>
+  import('../sections/home/WorkflowSection'),
+);
 const ConstraintsSection = React.lazy(() =>
-  import('../sections/ConstraintsSection'),
+  import('../sections/home/ConstraintsSection'),
 );
 
 export default function HomePage() {

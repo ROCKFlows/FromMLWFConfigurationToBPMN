@@ -10,9 +10,9 @@ import ReactFlow, {
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
-import {useAppDispatch, useAppSelector} from '../store/hooks';
-import {useGetWorkflowQuery} from '../store/api/knowledgeApi';
-import {showSnackbar} from '../store/reducers/SnackbarSlice';
+import {useAppDispatch, useAppSelector} from '../../store/hooks';
+import {useGetWorkflowQuery} from '../../store/api/knowledgeApi';
+import {showSnackbar} from '../../store/reducers/SnackbarSlice';
 
 const initialNodes = [
   {
