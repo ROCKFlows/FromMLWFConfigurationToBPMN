@@ -19,24 +19,13 @@ export type Configuration = {
   features: ConfigurationFeature[];
 };
 
-type Pagination = {
-  page: number;
-  per_page: number;
-  total: number;
-  total_pages: number;
+export type GetConfigurationResponse = {
+  configuration: Configuration;
 };
 
-export type GetConfigurationResponse = {
-  data: {
-    configuration: Configuration;
-  };
-} & Pagination;
-
 export type GetAllConfigurationsResponse = {
-  data: {
-    configurations: Configuration[];
-  };
-} & Pagination;
+  configurations: Configuration[];
+};
 
 export const configurationApi = createApi({
   reducerPath: 'configurationApi',
@@ -64,7 +53,7 @@ export const configurationApi = createApi({
         },
       }),
     }),
-    getAllConfigurations: builder.query<GetAllConfigurationsResponse, {}>({
+    getAllConfigurations: builder.query<GetAllConfigurationsResponse, void>({
       query: () => ({
         document: gql`
           query GetConfigurations {

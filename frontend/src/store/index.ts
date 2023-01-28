@@ -14,7 +14,10 @@ const store = configureStore({
     [configurationApi.reducerPath]: configurationApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(knowledgeApi.middleware),
+    getDefaultMiddleware().concat(
+      knowledgeApi.middleware,
+      configurationApi.middleware,
+    ),
   // TODO: devTools: process.env.NODE_ENV === 'development',
 });
 
