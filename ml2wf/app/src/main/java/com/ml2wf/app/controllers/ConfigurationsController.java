@@ -27,4 +27,9 @@ public class ConfigurationsController {
         configurationsComponent.importConfiguration(namedConfiguration); // TODO: check result
         return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
     }
+
+    @GetMapping(value = {"", "/"}, produces = {MediaType.APPLICATION_XML_VALUE})
+    RawConfiguration importConfiguration(@RequestParam String configurationName) {
+        return new RawConfiguration(configurationsComponent.getConfiguration(configurationName).getFeatures());
+    }
 }

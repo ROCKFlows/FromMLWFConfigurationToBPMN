@@ -8,9 +8,9 @@ type Configuration {
 }
 
 enum FeatureSelectionStatus {
-    selected,
-    unselected,
-    undefined,
+    SELECTED,
+    UNSELECTED,
+    UNDEFINED,
 }
 
 type Feature {

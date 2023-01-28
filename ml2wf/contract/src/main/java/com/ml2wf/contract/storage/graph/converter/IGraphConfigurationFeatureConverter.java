@@ -6,6 +6,8 @@ import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
 import com.ml2wf.core.configurations.ConfigurationFeature;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
+
 
 @Component
 public interface IGraphConfigurationFeatureConverter<F extends GraphConfigurationFeature<T, V>,
@@ -13,8 +15,8 @@ public interface IGraphConfigurationFeatureConverter<F extends GraphConfiguratio
 
     default ConfigurationFeature toStandardConfigurationFeature(F graphConfigurationFeature) {
         return new ConfigurationFeature(
-                ConfigurationFeature.Status.valueOf(graphConfigurationFeature.getAutomatic()),
-                ConfigurationFeature.Status.valueOf(graphConfigurationFeature.getManual()),
+                ConfigurationFeature.Status.valueOf(graphConfigurationFeature.getAutomatic().toUpperCase(Locale.ROOT)),
+                ConfigurationFeature.Status.valueOf(graphConfigurationFeature.getManual().toUpperCase(Locale.ROOT)),
                 graphConfigurationFeature.getTask().getName()
         );
     }
