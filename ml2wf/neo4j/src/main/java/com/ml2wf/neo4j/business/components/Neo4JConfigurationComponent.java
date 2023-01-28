@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Profile("neo4j")
 @Component
@@ -42,5 +44,12 @@ public class Neo4JConfigurationComponent
         // TODO: use configuration converter
         configurationRepository.save(new Neo4JConfiguration(configuration.getName(), graphVersion, ImmutableList.copyOf(storedConfigFeatures)));
         return true;
+    }
+
+    @Override
+    public List<NamedConfiguration> getAllConfigurations() {
+        return StreamSupport.stream(configurationRepository.findAll().spliterator(), false)
+                .map(configurationConverter::toStandardConfiguration)
+                .collect(Collectors.toList());
     }
 }

@@ -9,7 +9,7 @@ const VariabilitySection = React.lazy(() =>
   import('../sections/configuration/VariabilitySection'),
 );
 const CommonalitySection = React.lazy(() =>
-    import('../sections/configuration/CommonalitySection'),
+  import('../sections/configuration/CommonalitySection'),
 );
 const PossibleFeaturesSection = React.lazy(() =>
   import('../sections/configuration/PossibleFeaturesSection'),
@@ -26,8 +26,8 @@ export default function ConfigurationPage() {
     >
       <Grid item xs={5}>
         <Grid container direction="column" rowSpacing={1} sx={{height: '90vh'}}>
-          <Grid item xs={7}>
-            <Paper sx={{height: '100%', padding: '1em', overflow: 'auto'}}>
+          <Grid item xs={7} overflow="auto">
+            <Paper sx={{height: '100%', padding: '1em'}}>
               <Suspense
                 fallback={
                   <Box sx={{display: 'flex'}}>
@@ -39,7 +39,7 @@ export default function ConfigurationPage() {
               </Suspense>
             </Paper>
           </Grid>
-          <Grid item xs={5}>
+          <Grid item xs={5} overflow="auto">
             <Paper sx={{height: '100%', padding: '1em', overflow: 'auto'}}>
               <Suspense
                 fallback={
@@ -56,7 +56,7 @@ export default function ConfigurationPage() {
       </Grid>
       <Grid item xs={7}>
         <Grid container direction="column" rowSpacing={1} sx={{height: '90vh'}}>
-          <Grid item xs={6}>
+          <Grid item xs={6} overflow="auto">
             <Paper sx={{height: '100%', padding: '1em', overflow: 'auto'}}>
               <Suspense
                 fallback={
@@ -69,7 +69,7 @@ export default function ConfigurationPage() {
               </Suspense>
             </Paper>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={6} overflow="auto">
             <Paper sx={{height: '100%', padding: '1em', overflow: 'auto'}}>
               <Suspense
                 fallback={

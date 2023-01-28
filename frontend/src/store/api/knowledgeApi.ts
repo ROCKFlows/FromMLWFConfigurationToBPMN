@@ -21,10 +21,12 @@ type VersionResponse = {
 };
 
 type KnowledgeTree = {
-  extendedFeatureModel: {
-    constraints: any;
-    struct: any;
-  };
+  extendedFeatureModel: [
+    {
+      constraints: any;
+      struct: any;
+    },
+  ];
 };
 
 type WorkflowTask = {

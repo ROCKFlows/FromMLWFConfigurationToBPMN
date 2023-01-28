@@ -15,7 +15,7 @@ export const versionSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    changeVersion: (state, action) => {
+    changeVersion: (state: VersionSliceState, action) => {
       // TODO/ check if exists in api versions
       state.currentVersion = action.payload;
     },

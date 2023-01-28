@@ -1,13 +1,17 @@
 import {configureStore} from '@reduxjs/toolkit';
 import versionSlice from './reducers/VersionSlice';
 import snackbarSlice from './reducers/SnackbarSlice';
+import configurationSlice from './reducers/ConfigurationSlice';
 import {knowledgeApi} from './api/knowledgeApi';
+import {configurationApi} from './api/configurationApi';
 
 const store = configureStore({
   reducer: {
     version: versionSlice,
     snackbar: snackbarSlice,
+    configuration: configurationSlice,
     [knowledgeApi.reducerPath]: knowledgeApi.reducer,
+    [configurationApi.reducerPath]: configurationApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(knowledgeApi.middleware),

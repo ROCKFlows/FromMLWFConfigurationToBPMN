@@ -21,7 +21,7 @@ export const snackbarSlice = createSlice({
   initialState,
   reducers: {
     showSnackbar: (
-      state,
+      state: SnackbarSliceState,
       action: PayloadAction<{severity: AlertColor; message: string}>,
     ) => {
       const {severity, message} = action.payload;
@@ -29,7 +29,7 @@ export const snackbarSlice = createSlice({
       state.message = message;
       state.show = true;
     },
-    hideSnackbar: (state) => {
+    hideSnackbar: (state: SnackbarSliceState) => {
       state.severity = undefined;
       state.message = undefined;
       state.show = false;

@@ -43,9 +43,6 @@ export default function KnowledgeTreeSection() {
         `Failed to retrieve knowledge tree for version ${currentVersion}. Error is ${error.status}: ${error.error}`,
       );
     }
-    if (isError) {
-      // TODO: snackbar
-    }
   }, [isError, error]);
 
   const getNodesIds = (node: any): string[] => {
