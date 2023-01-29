@@ -1,8 +1,10 @@
 package com.ml2wf.neo4j.business.components;
 
 import com.google.common.collect.ImmutableList;
-import com.ml2wf.contract.business.AbstractStandardKnowledgeComponent;
+import com.ml2wf.contract.business.IStandardKnowledgeComponent;
 import com.ml2wf.contract.exception.DuplicatedVersionNameException;
+import com.ml2wf.contract.exception.VersionNotFoundException;
+import com.ml2wf.core.tree.StandardKnowledgeTask;
 import com.ml2wf.core.tree.StandardKnowledgeTree;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JConstraintsConverter;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JKnowledgeTasksConverter;
@@ -17,21 +19,60 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Profile("neo4j")
 @Component
-public class Neo4JStandardKnowledgeComponent extends AbstractStandardKnowledgeComponent<Neo4JStandardKnowledgeTask,
-        Neo4JConstraintOperand, Neo4JTaskVersion> {
+public class Neo4JStandardKnowledgeComponent implements IStandardKnowledgeComponent {
 
     private static final String ROOT_NODE_NAME = "__ROOT";
     private static final String ROOT_CONSTRAINT_NODE_NAME = "__ROOT_CONSTRAINT";
+    private final Neo4JStandardKnowledgeTasksRepository standardKnowledgeTasksRepository;
+    private final Neo4JConstraintsRepository constraintsRepository;
+    private final Neo4JVersionsRepository versionsRepository;
+    private final Neo4JConstraintsConverter constraintsConverter;
+    private final Neo4JKnowledgeTasksConverter tasksConverter;
 
     Neo4JStandardKnowledgeComponent(@Autowired Neo4JStandardKnowledgeTasksRepository standardKnowledgeTasksRepository,
                                     @Autowired Neo4JConstraintsRepository constraintsRepository,
                                     @Autowired Neo4JVersionsRepository versionsRepository,
                                     @Autowired Neo4JConstraintsConverter constraintsConverter,
                                     @Autowired Neo4JKnowledgeTasksConverter tasksConverter) {
-        super(standardKnowledgeTasksRepository, constraintsRepository, versionsRepository, constraintsConverter, tasksConverter);
+        this.standardKnowledgeTasksRepository = standardKnowledgeTasksRepository;
+        this.constraintsRepository = constraintsRepository;
+        this.versionsRepository = versionsRepository;
+        this.constraintsConverter = constraintsConverter;
+        this.tasksConverter = tasksConverter;
+    }
+
+    @Override
+    public StandardKnowledgeTree getStandardKnowledgeTree(String versionName) {
+        var optGraphKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersionName(ROOT_NODE_NAME, versionName);
+        var graphKnowledgeTask = optGraphKnowledgeTask.orElseThrow(
+                () -> new VersionNotFoundException(versionName));
+        // __ROOT node is for internal use only and should not be exported
+        var firstGraphTreeTask = new ArrayList<>(graphKnowledgeTask.getChildren()).get(0);
+        var rootConstraint = constraintsRepository.findAllByTypeAndVersionName(ROOT_CONSTRAINT_NODE_NAME, versionName);
+        return tasksConverter.toStandardKnowledgeTree(firstGraphTreeTask, rootConstraint.get(0).getOperands().stream()
+                .map(constraintsConverter::toConstraintTree)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public Optional<StandardKnowledgeTask> getTaskWithName(String taskName, String versionName) {
+        return standardKnowledgeTasksRepository.findOneByNameAndVersionName(taskName, versionName)
+                .map(tasksConverter::toStandardKnowledgeTask);
+    }
+
+    @Override
+    public StandardKnowledgeTree getStandardKnowledgeTaskWithName(String taskName, String versionName) {
+        // TODO: use a dedicated converter (KnowledgeTask to KnowledgeTree)
+        return new StandardKnowledgeTree(
+                Collections.singletonList(getTaskWithName(taskName, versionName).orElseThrow(
+                        () -> new RuntimeException(String.format("No task found for name %s and version %s.", taskName, versionName))
+                )),
+                Collections.emptyList()
+        );
     }
 
     public boolean importStandardKnowledgeTree(String versionName, StandardKnowledgeTree standardKnowledgeTree) {
