@@ -1,59 +1,107 @@
 import * as React from 'react';
-import {Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
-import {DataGrid, GridColDef, GridValueGetterParams} from '@mui/x-data-grid';
-
-const columns: GridColDef[] = [
-  {field: 'id', headerName: 'ID', width: 70},
-  {field: 'firstName', headerName: 'First name', width: 130},
-  {field: 'lastName', headerName: 'Last name', width: 130},
-  {
-    field: 'age',
-    headerName: 'Age',
-    type: 'number',
-    width: 90,
-  },
-  {
-    field: 'fullName',
-    headerName: 'Full name',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 160,
-    valueGetter: (params: GridValueGetterParams) =>
-      `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-  },
-];
-
-const rows = [
-  {id: 1, lastName: 'Snow', firstName: 'Jon', age: 35},
-  {id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42},
-  {id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45},
-  {id: 4, lastName: 'Stark', firstName: 'Arya', age: 16},
-  {id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null},
-  {id: 6, lastName: 'Melisandre', firstName: null, age: 150},
-  {id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44},
-  {id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36},
-  {id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65},
-];
+import {useEffect} from 'react';
+import {
+  CircularProgress,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
+import {
+  FeatureSelectionStatus,
+  useGetAllConfigurationsQuery,
+} from '../../store/api/configurationApi';
+import {useAppDispatch} from '../../store/hooks';
+import {showSnackbar} from '../../store/reducers/SnackbarSlice';
 
 export default function CommonalitySection() {
+  const {
+    data: configurations,
+    isSuccess,
+    isError,
+    error,
+    isFetching,
+  } = useGetAllConfigurationsQuery();
+
+  const dispatch = useAppDispatch();
+
+  const theme = useTheme();
+
+  useEffect(() => {
+    if (!(isSuccess || isError)) {
+      return;
+    }
+    dispatch(
+      showSnackbar({
+        severity: isError ? 'error' : 'success',
+        message: isError
+          ? `Failed to retrieve configurations.`
+          : `Configurations list successfully retrieved.`,
+      }),
+    );
+  }, [isSuccess, isError]);
+
+  useEffect(() => {
+    if (isError && error) {
+      console.error(
+        `Failed to retrieve configurations. Error is ${error.status}: ${error.error}`,
+      );
+    }
+  }, [isError, error]);
+
+  if (isFetching) {
+    return <CircularProgress />;
+  }
+
+  const commonality = configurations?.configurations[0].features.filter(
+    (f) =>
+      f.manual !== FeatureSelectionStatus.UNDEFINED &&
+      !configurations.configurations.find((c) =>
+        c.features.find(
+          (cf) =>
+            f.name === cf.name &&
+            (f.manual !== cf.manual || f.automatic !== cf.automatic),
+        ),
+      ),
+  );
+
   return (
     <Stack spacing={1} height="100%" style={{overflowY: 'auto'}}>
+      <Typography textAlign="center">
+        <b>Commonality</b>
+      </Typography>
       <TableContainer>
         <Table aria-label="commonality table">
-          <TableHead>
+          <TableHead
+            style={{
+              position: 'sticky',
+              top: 0,
+              backgroundColor: theme.palette.background.paper,
+            }}
+          >
             <TableRow>
               <TableCell align="center">Feature Name</TableCell>
               <TableCell align="center">Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {['A', 'B', 'C', 'D'].map((f) => (
-                <TableRow
-                    key={`row-feature-${f}`}
+            {commonality?.map((f) => (
+              <TableRow key={`row-feature-${f.name}`}>
+                <TableCell key={`cell-feature-name-${f.name}`} align="center">
+                  {f.name}
+                </TableCell>
+                <TableCell
+                  key={`cell-feature-manual-${f.manual}`}
+                  align="center"
                 >
-                  <TableCell align="center">Feature {f}</TableCell>
-                  <TableCell align="center">Selected</TableCell>
-                </TableRow>
+                  {f.manual}
+                </TableCell>
+              </TableRow>
             ))}
           </TableBody>
         </Table>

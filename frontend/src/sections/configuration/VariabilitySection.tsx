@@ -1,50 +1,109 @@
 import * as React from 'react';
-import {Stack} from '@mui/material';
-import {DataGrid, GridColDef, GridValueGetterParams} from '@mui/x-data-grid';
-
-const columns: GridColDef[] = [
-  {field: 'id', headerName: 'ID', width: 70},
-  {field: 'firstName', headerName: 'First name', width: 130},
-  {field: 'lastName', headerName: 'Last name', width: 130},
-  {
-    field: 'age',
-    headerName: 'Age',
-    type: 'number',
-    width: 90,
-  },
-  {
-    field: 'fullName',
-    headerName: 'Full name',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 160,
-    valueGetter: (params: GridValueGetterParams) =>
-      `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-  },
-];
-
-const rows = [
-  {id: 1, lastName: 'Snow', firstName: 'Jon', age: 35},
-  {id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42},
-  {id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45},
-  {id: 4, lastName: 'Stark', firstName: 'Arya', age: 16},
-  {id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null},
-  {id: 6, lastName: 'Melisandre', firstName: null, age: 150},
-  {id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44},
-  {id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36},
-  {id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65},
-];
+import {useEffect} from 'react';
+import {CircularProgress, Stack} from '@mui/material';
+import {DataGrid, GridColDef} from '@mui/x-data-grid';
+import {
+  FeatureSelectionStatus,
+  useGetAllConfigurationsQuery,
+} from '../../store/api/configurationApi';
+import {showSnackbar} from '../../store/reducers/SnackbarSlice';
+import {useAppDispatch} from '../../store/hooks';
 
 export default function VariabilitySection() {
+  const {
+    data: configurations,
+    isSuccess,
+    isError,
+    error,
+    isFetching,
+  } = useGetAllConfigurationsQuery();
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!(isSuccess || isError)) {
+      return;
+    }
+    dispatch(
+      showSnackbar({
+        severity: isError ? 'error' : 'success',
+        message: isError
+          ? `Failed to retrieve configurations.`
+          : `Configurations list successfully retrieved.`,
+      }),
+    );
+  }, [isSuccess, isError]);
+
+  useEffect(() => {
+    if (isError && error) {
+      console.error(
+        `Failed to retrieve configurations. Error is ${error.status}: ${error.error}`,
+      );
+    }
+  }, [isError, error]);
+
+  if (isFetching) {
+    return <CircularProgress />;
+  }
+
+  const nbFeatures = configurations?.configurations[0].features.length;
+
+  const columns: GridColDef[] = [
+    {field: 'id', headerName: 'Feature', width: 200},
+    {
+      field: 'selected',
+      headerName: 'Selected',
+      valueFormatter: (p) => `${p.value}/${nbFeatures}`,
+    },
+    {
+      field: 'unselected',
+      headerName: 'Unselected',
+      valueFormatter: (p) => `${p.value}/${nbFeatures}`,
+    },
+    {
+      field: 'undefined',
+      headerName: 'Undefined',
+      valueFormatter: (p) => `${p.value}/${nbFeatures}`,
+    },
+  ];
+
+  const variability = configurations?.configurations[0].features.map((f) =>
+    configurations?.configurations.reduce(
+      (r, c) => {
+        const result = c.features.find((cf) => cf.name === f.name);
+        if (
+          result?.manual === FeatureSelectionStatus.SELECTED ||
+          result?.automatic === FeatureSelectionStatus.SELECTED
+        ) {
+          r.selected += 1;
+        }
+        if (
+          result?.manual === FeatureSelectionStatus.UNSELECTED ||
+          result?.automatic === FeatureSelectionStatus.UNSELECTED
+        ) {
+          r.unselected += 1;
+        }
+        if (
+          result?.manual === FeatureSelectionStatus.UNDEFINED &&
+          result?.automatic === FeatureSelectionStatus.UNDEFINED
+        ) {
+          r.undefined += 1;
+        }
+        return r;
+      },
+      {id: f.name, selected: 0, unselected: 0, undefined: 0},
+    ),
+  );
+
   return (
     <Stack spacing={1} height="100%">
       <DataGrid
         density="compact"
-        rows={rows}
+        rows={variability}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
-        checkboxSelection
+        disableSelectionOnClick
       />
     </Stack>
   );

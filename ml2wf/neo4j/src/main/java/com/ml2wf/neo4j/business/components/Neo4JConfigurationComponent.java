@@ -32,6 +32,7 @@ public class Neo4JConfigurationComponent
 
     @Override
     public boolean importConfiguration(NamedConfiguration configuration) {
+        // TODO: check if configuration already exists with name
         var graphVersion = versionsRepository.getLastVersion().orElseThrow(NoVersionFoundException::new);
         var convertedConfigurationFeatures = configuration.getFeatures().stream()
                 .map(c -> {

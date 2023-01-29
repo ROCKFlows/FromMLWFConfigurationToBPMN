@@ -4,11 +4,13 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  SvgIcon,
   Toolbar,
   Typography,
 } from '@mui/material';
 import AdbIcon from '@mui/icons-material/Adb';
 import MenuIcon from '@mui/icons-material/Menu';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import {Link} from 'react-router-dom';
 import type {RoutePage} from './routes';
 
@@ -113,6 +115,38 @@ export default function TopToolbar(props: TopToolbarProps) {
             </Link>
           </MenuItem>
         ))}
+      </Box>
+      <Box paddingRight={3}>
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="menu-appbar"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <a href="http://localhost:7474/browser/" target="_blank">
+            <img
+              src="/neo4j-icon-white.svg"
+              alt="neo4j icon"
+              width="40"
+              height="40"
+            />
+          </a>
+        </IconButton>
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="menu-appbar"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <a
+            href="https://github.com/ROCKFlows/FromMLWFConfigurationToBPMN"
+            target="_blank"
+          >
+            <GitHubIcon />
+          </a>
+        </IconButton>
       </Box>
     </Toolbar>
   );
