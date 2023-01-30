@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Configuration, ConfigurationFeature} from "../api/configurationApi";
+import {Configuration, ConfigurationFeature} from '../api/configurationApi';
 
 // Define a type for the slice state
 interface ConfigurationSliceState {
@@ -16,23 +16,38 @@ export const configurationSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    setConfigurationName: (state: ConfigurationSliceState, action: PayloadAction<{name: string}>) => {
+    setConfigurationName: (
+      state: ConfigurationSliceState,
+      action: PayloadAction<{name: string}>,
+    ) => {
       state.currentConfiguration.name = action.payload.name;
     },
-    setConfigurationFeatures: (state: ConfigurationSliceState, action: PayloadAction<{features: ConfigurationFeature[]}>) => {
+    setConfigurationFeatures: (
+      state: ConfigurationSliceState,
+      action: PayloadAction<{features: ConfigurationFeature[]}>,
+    ) => {
       state.currentConfiguration.features = [...action.payload.features];
     },
-    updateConfigurationFeature: (state: ConfigurationSliceState, action: PayloadAction<ConfigurationFeature>) => {
+    updateConfigurationFeature: (
+      state: ConfigurationSliceState,
+      action: PayloadAction<ConfigurationFeature>,
+    ) => {
       const {name, manual, automatic} = action.payload;
-      const feature = state.currentConfiguration.features.find((f) => f.name === name);
+      const feature = state.currentConfiguration.features.find(
+        (f) => f.name === name,
+      );
       if (feature) {
         feature.manual = manual;
         feature.automatic = automatic;
       }
-    }
+    },
   },
 });
 
-export const {setConfigurationName, setConfigurationFeatures, updateConfigurationFeature} = configurationSlice.actions;
+export const {
+  setConfigurationName,
+  setConfigurationFeatures,
+  updateConfigurationFeature,
+} = configurationSlice.actions;
 
 export default configurationSlice.reducer;

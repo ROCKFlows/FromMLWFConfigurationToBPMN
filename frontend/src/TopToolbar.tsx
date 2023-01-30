@@ -124,7 +124,7 @@ export default function TopToolbar(props: TopToolbarProps) {
           aria-haspopup="true"
           color="inherit"
         >
-          <a href="http://localhost:7474/browser/" target="_blank">
+          <a href="http://localhost:7474/browser/" target="_blank" rel="noreferrer">
             <img
               src="/neo4j-icon-white.svg"
               alt="neo4j icon"
@@ -142,7 +142,7 @@ export default function TopToolbar(props: TopToolbarProps) {
         >
           <a
             href="https://github.com/ROCKFlows/FromMLWFConfigurationToBPMN"
-            target="_blank"
+            target="_blank" rel="noreferrer"
           >
             <GitHubIcon />
           </a>

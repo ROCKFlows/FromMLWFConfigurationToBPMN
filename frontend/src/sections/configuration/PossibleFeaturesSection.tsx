@@ -9,12 +9,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import {useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../store/hooks';
 import {
   FeatureSelectionStatus,
   useGetAllConfigurationsQuery,
 } from '../../store/api/configurationApi';
-import {useEffect} from 'react';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
 
 export default function PossibleFeaturesSection() {
