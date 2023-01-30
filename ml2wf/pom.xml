@@ -37,10 +37,10 @@
         <version.neo4j>6.3.6</version.neo4j>
         <version.commons-io>2.11.0</version.commons-io>
         <version.guava>31.1-jre</version.guava>
-        <version.jansi>2.4.0</version.jansi>
         <version.lombok>1.18.24</version.lombok>
         <version.vavr>0.10.4</version.vavr>
         <version.springdoc>1.6.14</version.springdoc>
+        <version.spock>2.3-groovy-4.0</version.spock>
         <dependency.directory>dependency/</dependency.directory>
         <sonar.projectKey>MireilleBF_FromMLWFConfigurationToBPMN</sonar.projectKey>
         <sonar.organization>mireillebf-github</sonar.organization>
@@ -82,6 +82,18 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>2.1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compileTests</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -155,6 +167,20 @@
             <artifactId>woodstox-core</artifactId>
             <version>${version.jackson.woodstox}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.spockframework/spock-core -->
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <version>${version.spock}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.spockframework/spock-spring -->
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-spring</artifactId>
+            <version>${version.spock}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -187,12 +213,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${version.guava}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.fusesource.jansi/jansi -->
-        <dependency>
-            <groupId>org.fusesource.jansi</groupId>
-            <artifactId>jansi</artifactId>
-            <version>${version.jansi}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
