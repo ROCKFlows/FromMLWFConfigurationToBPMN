@@ -1,6 +1,10 @@
 type Query {
+    # configuration queries
     configuration(name: ID!): Configuration
     configurations: [Configuration]
+    # version queries
+    versions: [Version]!
+    lastVersion: Version!
 }
 
 type Configuration {
@@ -18,4 +22,11 @@ type Feature {
     name: ID!
     automatic: FeatureSelectionStatus
     manual: FeatureSelectionStatus
+}
+
+type Version {
+    name: ID!
+    major: Int
+    minor: Int
+    patch: Int
 }
