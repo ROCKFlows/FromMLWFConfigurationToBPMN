@@ -10,11 +10,11 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 
 @Controller
-public class ConfigurationController {
+public class ConfigurationGraphQLController {
 
     private final IConfigurationComponent configurationComponent;
 
-    ConfigurationController(@Autowired IConfigurationComponent configurationComponent) {
+    ConfigurationGraphQLController(@Autowired IConfigurationComponent configurationComponent) {
         this.configurationComponent = configurationComponent;
     }
 

@@ -3,6 +3,7 @@ package com.ml2wf.app.components;
 import com.ml2wf.contract.business.IStandardKnowledgeComponent;
 import com.ml2wf.core.tree.converter.FeatureModelConverter;
 import com.ml2wf.core.tree.custom.featuremodel.FeatureModel;
+import com.ml2wf.core.tree.custom.featuremodel.FeatureModelTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +26,9 @@ public class FeatureModelComponent {
         return featureModelConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
     }
 
-    public FeatureModel getFeatureModelTaskWithName(String taskName, String versionName) {
-        var standardKnowledgeTree = standardKnowledgeComponent.getStandardKnowledgeTaskWithName(taskName, versionName);
-        return featureModelConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
+    public FeatureModelTask getFeatureModelTaskWithName(String taskName, String versionName) {
+        var standardKnowledgeTask = standardKnowledgeComponent.getStandardKnowledgeTaskWithName(taskName, versionName);
+        return featureModelConverter.fromStandardKnowledgeTask(standardKnowledgeTask);
     }
 
 

@@ -5,6 +5,8 @@ type Query {
     # version queries
     versions: [Version]!
     lastVersion: Version!
+    # workflow queries
+    workflow(versionName: String): Workflow!
 }
 
 type Configuration {
@@ -20,13 +22,24 @@ enum FeatureSelectionStatus {
 
 type Feature {
     name: ID!
-    automatic: FeatureSelectionStatus
-    manual: FeatureSelectionStatus
+    automatic: FeatureSelectionStatus!
+    manual: FeatureSelectionStatus!
 }
 
 type Version {
     name: ID!
-    major: Int
-    minor: Int
-    patch: Int
+    major: Int!
+    minor: Int!
+    patch: Int!
+}
+
+type WorkflowTask {
+    name: String!
+    description: String
+    isAbstract: Boolean!
+    isOptional: Boolean!
+}
+
+type Workflow {
+    tasks: [WorkflowTask!]!
 }

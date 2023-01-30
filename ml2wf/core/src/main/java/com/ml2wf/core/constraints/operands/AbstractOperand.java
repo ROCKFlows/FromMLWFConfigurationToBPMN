@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
-public interface  AbstractOperand extends ConsistencyChecker {
+public interface AbstractOperand extends ConsistencyChecker {
 
     @RequiredArgsConstructor
     @Getter

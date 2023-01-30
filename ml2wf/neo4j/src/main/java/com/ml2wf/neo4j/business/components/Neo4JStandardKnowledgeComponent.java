@@ -3,6 +3,7 @@ package com.ml2wf.neo4j.business.components;
 import com.google.common.collect.ImmutableList;
 import com.ml2wf.contract.business.IStandardKnowledgeComponent;
 import com.ml2wf.contract.exception.DuplicatedVersionNameException;
+import com.ml2wf.contract.exception.KnowledgeTaskNotFoundException;
 import com.ml2wf.contract.exception.VersionNotFoundException;
 import com.ml2wf.core.tree.StandardKnowledgeTask;
 import com.ml2wf.core.tree.StandardKnowledgeTree;
@@ -65,14 +66,9 @@ public class Neo4JStandardKnowledgeComponent implements IStandardKnowledgeCompon
     }
 
     @Override
-    public StandardKnowledgeTree getStandardKnowledgeTaskWithName(String taskName, String versionName) {
-        // TODO: use a dedicated converter (KnowledgeTask to KnowledgeTree)
-        return new StandardKnowledgeTree(
-                Collections.singletonList(getTaskWithName(taskName, versionName).orElseThrow(
-                        () -> new RuntimeException(String.format("No task found for name %s and version %s.", taskName, versionName))
-                )),
-                Collections.emptyList()
-        );
+    public StandardKnowledgeTask getStandardKnowledgeTaskWithName(String taskName, String versionName) {
+        return getTaskWithName(taskName, versionName)
+                .orElseThrow(() -> new KnowledgeTaskNotFoundException(taskName, versionName));
     }
 
     public boolean importStandardKnowledgeTree(String versionName, StandardKnowledgeTree standardKnowledgeTree) {

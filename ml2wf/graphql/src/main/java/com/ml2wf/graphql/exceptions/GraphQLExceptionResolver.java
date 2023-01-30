@@ -2,6 +2,7 @@ package com.ml2wf.graphql.exceptions;
 
 import com.ml2wf.contract.exception.ConfigurationNotFoundException;
 import com.ml2wf.contract.exception.NoVersionFoundException;
+import com.ml2wf.contract.exception.VersionNotFoundException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
@@ -17,6 +18,7 @@ public class GraphQLExceptionResolver extends DataFetcherExceptionResolverAdapte
     private static final String CONFIGURATION_NOT_FOUND_MESSAGE_PATTERN = "Configuration with name %s not found.";
     private static final String UNEXPECTED_ERROR = "Unexpected error while fetching data.";
     private static final String NO_VERSION_FOUND_MESSAGE_PATTERN = "No version found.";
+    private static final String VERSION_NOT_FOUND_MESSAGE_PATTERN = "Version %s not found.";
 
     @Override
     protected GraphQLError resolveToSingleError(@NonNull Throwable ex, @NonNull DataFetchingEnvironment env) {
@@ -34,6 +36,15 @@ public class GraphQLExceptionResolver extends DataFetcherExceptionResolverAdapte
             return GraphqlErrorBuilder.newError()
                     .errorType(ErrorType.BAD_REQUEST)
                     .message(NO_VERSION_FOUND_MESSAGE_PATTERN)
+                    .path(env.getExecutionStepInfo().getPath())
+                    .location(env.getField().getSourceLocation())
+                    .build();
+        }
+
+        if (ex instanceof VersionNotFoundException vnfe) {
+            return GraphqlErrorBuilder.newError()
+                    .errorType(ErrorType.BAD_REQUEST)
+                    .message(String.format(VERSION_NOT_FOUND_MESSAGE_PATTERN, vnfe.getVersionName()))
                     .path(env.getExecutionStepInfo().getPath())
                     .location(env.getField().getSourceLocation())
                     .build();

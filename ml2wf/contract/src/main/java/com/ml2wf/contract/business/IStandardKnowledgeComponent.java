@@ -13,7 +13,7 @@ public interface IStandardKnowledgeComponent {
 
     Optional<StandardKnowledgeTask> getTaskWithName(String taskName, String versionName);
 
-    StandardKnowledgeTree getStandardKnowledgeTaskWithName(String taskName, String versionName);
+    StandardKnowledgeTask getStandardKnowledgeTaskWithName(String taskName, String versionName);
 
     boolean importStandardKnowledgeTree(String versionName, StandardKnowledgeTree standardKnowledgeTree);
 }

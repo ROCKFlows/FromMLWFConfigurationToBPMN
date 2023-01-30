@@ -4,6 +4,7 @@ import com.ml2wf.app.components.FeatureModelComponent;
 import com.ml2wf.contract.business.IVersionsComponent;
 import com.ml2wf.core.tree.StandardKnowledgeVersion;
 import com.ml2wf.core.tree.custom.featuremodel.FeatureModel;
+import com.ml2wf.core.tree.custom.featuremodel.FeatureModelTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,7 +43,7 @@ public class FeatureModelController {
     }
 
     @GetMapping(value = {"/{name}"}, produces = {MediaType.APPLICATION_XML_VALUE})
-    FeatureModel getFeatureModelTask(@PathVariable String name, @RequestParam String versionName) {
+    FeatureModelTask getFeatureModelTask(@PathVariable String name, @RequestParam String versionName) {
         return featureModelComponent.getFeatureModelTaskWithName(name, versionName);
     }
 

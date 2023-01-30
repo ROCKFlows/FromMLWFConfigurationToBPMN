@@ -12,11 +12,23 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class ExceptionHandlerController {
 
+    private static final String KNOWLEDGE_TASK_NOT_FOUND_MESSAGE_PATTERN = "Unknown reference to task %s in knowledge tree for version %s.";
     private static final String VARIABLE_TASK_NOT_FOUND_MESSAGE_PATTERN = "Unknown reference to task %s in constraints.";
     private static final String VERSION_NOT_FOUND_MESSAGE_PATTERN = "Version %s not found.";
     private static final String CONFIGURATION_NOT_FOUND_MESSAGE_PATTERN = "Configuration with name %s not found.";
     private static final String NO_VERSION_FOUND_MESSAGE_PATTERN = "No version found.";
     private static final String DUPLICATED_VERSION_NAME_MESSAGE_PATTERN = "Version with name %s already exists.";
+
+    @ExceptionHandler(value = {KnowledgeTaskNotFoundException.class})
+    public ResponseEntity<ApiException> knowledgeTaskNotFoundExceptionHandler(KnowledgeTaskNotFoundException exception) {
+        // TODO: use aspect for logging
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiException.builder()
+                        .status(HttpStatus.NOT_FOUND)
+                        .message(String.format(KNOWLEDGE_TASK_NOT_FOUND_MESSAGE_PATTERN, exception.getTaskName(), exception.getVersionName()))
+                        .build()
+                );
+    }
 
     @ExceptionHandler(value = {VariableTaskNotFoundException.class})
     public ResponseEntity<ApiException> variableTaskNotFoundExceptionHandler(VariableTaskNotFoundException exception) {

@@ -1,10 +1,7 @@
 package com.ml2wf.core.tree.custom.featuremodel;
 
 import com.ml2wf.core.tree.custom.CustomKnowledgeTree;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -12,15 +9,12 @@ import java.util.Set;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString(callSuper = true)
 public class FeatureModel extends CustomKnowledgeTree {
 
     private FeatureModelStructure structure;
     @Getter @NonNull private final Set<FeatureModelRule> constraints = new LinkedHashSet<>();
-
-    private FeatureModel() {
-        // used by Jackson for deserialization
-    }
 
     public FeatureModel(@NonNull FeatureModelStructure structure, Collection<FeatureModelRule> constraints) {
         this(structure);

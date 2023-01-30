@@ -9,11 +9,11 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 
 @Controller
-public class VersionController {
+public class VersionGraphQLController {
 
     private final IVersionsComponent versionsComponent;
 
-    VersionController(@Autowired IVersionsComponent versionsComponent) {
+    VersionGraphQLController(@Autowired IVersionsComponent versionsComponent) {
         this.versionsComponent = versionsComponent;
     }
 

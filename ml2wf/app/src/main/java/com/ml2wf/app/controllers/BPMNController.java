@@ -23,16 +23,14 @@ public class BPMNController {
         return bpmnComponent.getBPMNWorkflow(versionName);
     }
 
-    @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE},
-            produces = {MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE})
     ResponseEntity<String> importBPMNWorkflow(@RequestParam String newVersionName,
                                               @RequestBody BPMNWorkflow bpmnWorkflow) {
         bpmnComponent.importWorkflow(newVersionName, bpmnWorkflow); // TODO: check result
         return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
     }
 
-    @PostMapping(value = {"/consistency"}, consumes = {MediaType.APPLICATION_XML_VALUE},
-            produces = {MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = {"/consistency"}, consumes = {MediaType.APPLICATION_XML_VALUE})
     ResponseEntity<String> isBPMNWorkflowConsistent(@RequestParam String versionName,
                                                     @RequestBody BPMNWorkflow bpmnWorkflow) {
         return new ResponseEntity<>(String.valueOf(bpmnComponent.isBPMNWorkflowConsistent(versionName, bpmnWorkflow)),
