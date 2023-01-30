@@ -7,10 +7,9 @@ import com.ml2wf.core.tree.custom.featuremodel.FeatureModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/fm")
@@ -27,30 +26,30 @@ public class FeatureModelController {
     }
 
     @GetMapping(value = {"/versions/all"}, produces = {MediaType.APPLICATION_XML_VALUE})
-    List<StandardKnowledgeVersion> getVersions() {
+    Flux<StandardKnowledgeVersion> getVersions() {
         return versionsComponent.getVersions();
     }
 
     @GetMapping(value = {"/versions/last"}, produces = {MediaType.APPLICATION_XML_VALUE})
-    StandardKnowledgeVersion getLastVersion() {
+    Mono<StandardKnowledgeVersion> getLastVersion() {
         return versionsComponent.getLastVersion();
     }
 
     @GetMapping(value = {""}, produces = {MediaType.APPLICATION_XML_VALUE})
-    FeatureModel getFeatureModel(@RequestParam String versionName) {
+    Mono<FeatureModel> getFeatureModel(@RequestParam String versionName) {
         return featureModelComponent.getFeatureModel(versionName);
     }
 
     @GetMapping(value = {"/{name}"}, produces = {MediaType.APPLICATION_XML_VALUE})
-    FeatureModel getFeatureModelTask(@PathVariable String name, @RequestParam String versionName) {
+    Mono<FeatureModel> getFeatureModelTask(@PathVariable String name, @RequestParam String versionName) {
         return featureModelComponent.getFeatureModelTaskWithName(name, versionName);
     }
 
     @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity<String> importFeatureModel(@RequestParam String versionName,
-                                              @RequestBody FeatureModel featureModel) {
-        featureModelComponent.importFeatureModel(versionName, featureModel); // TODO: check result
-        return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    Mono<String> importFeatureModel(@RequestParam String versionName, @RequestBody FeatureModel featureModel) {
+        return featureModelComponent.importFeatureModel(versionName, featureModel)
+                .thenReturn("OK"); // TODO: check result
     }
 }

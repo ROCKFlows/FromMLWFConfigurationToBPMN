@@ -2,9 +2,10 @@ package com.ml2wf.contract.business;
 
 import com.ml2wf.core.workflow.StandardWorkflow;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Component
 public interface IStandardKnowledgeMergerComponent {
 
-    void mergeWorkflowWithTree(String version, StandardWorkflow workflow);
+    Mono<Void> mergeWorkflowWithTree(String version, StandardWorkflow workflow);
 }

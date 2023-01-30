@@ -2,15 +2,15 @@ package com.ml2wf.contract.business;
 
 import com.ml2wf.core.configurations.NamedConfiguration;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Component
 public interface IConfigurationComponent {
 
-    boolean importConfiguration(NamedConfiguration configuration);
+    Mono<Boolean> importConfiguration(NamedConfiguration configuration);
 
-    NamedConfiguration getConfiguration(String configurationName);
+    Mono<NamedConfiguration> getConfiguration(String configurationName);
 
-    List<NamedConfiguration> getAllConfigurations();
+    Flux<NamedConfiguration> getAllConfigurations();
 }

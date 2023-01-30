@@ -6,6 +6,7 @@ import com.ml2wf.core.workflow.StandardWorkflow;
 import com.ml2wf.core.workflow.StandardWorkflowTask;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JConstraintsConverter;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JWorkflowTasksConverter;
+import com.ml2wf.neo4j.storage.dto.Neo4JConstraintOperand;
 import com.ml2wf.neo4j.storage.dto.Neo4JTaskVersion;
 import com.ml2wf.neo4j.storage.dto.Neo4JStandardWorkflowTask;
 import com.ml2wf.neo4j.storage.repository.Neo4JConstraintsRepository;
@@ -14,6 +15,9 @@ import com.ml2wf.neo4j.storage.repository.Neo4JVersionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 @Profile("neo4j")
 @Component
@@ -43,45 +47,46 @@ public class Neo4JStandardWorkflowComponent implements IStandardWorkflowComponen
         this.constraintsConverter = constraintsConverter;
     }
 
-    private Neo4JStandardWorkflowTask createUnmanagedNode(Neo4JTaskVersion graphVersion) {
-        var convertedNode = workflowTasksConverter.fromStandardWorkflowTask(
-                new StandardWorkflowTask(
-                        ROOT_WORKFLOW_NODE_NAME,
-                        UNMANAGED_NODE_DESCRIPTION,
-                        true,
-                        true
-                )
-        );
-        convertedNode.setVersion(graphVersion);
-        return standardWorkflowTasksRepository.save(convertedNode);
+    private Mono<Neo4JStandardWorkflowTask> createUnmanagedNode(Mono<Neo4JTaskVersion> graphVersion) {
+        return graphVersion.map((v) -> {
+            var convertedNode = workflowTasksConverter.fromStandardWorkflowTask(
+                    new StandardWorkflowTask(
+                            ROOT_WORKFLOW_NODE_NAME,
+                            UNMANAGED_NODE_DESCRIPTION,
+                            true,
+                            true
+                    )
+            );
+            convertedNode.setVersion(v);
+            return convertedNode;
+        }).flatMap(standardWorkflowTasksRepository::save);
     }
 
     @Override
-    public StandardWorkflow getStandardWorkflow(String versionName) {
-        var rootGraphWorkflow = standardWorkflowTasksRepository.findOneByNameAndVersionName(
-                ROOT_WORKFLOW_NODE_NAME, versionName
-        ).orElseThrow(() -> new VersionNotFoundException(versionName));
-        return workflowTasksConverter.toStandardWorkflow(rootGraphWorkflow.getNextTask());
+    public Mono<StandardWorkflow> getStandardWorkflow(String versionName) {
+        return standardWorkflowTasksRepository.findOneByNameAndVersionName(ROOT_WORKFLOW_NODE_NAME, versionName)
+                .switchIfEmpty(Mono.error(() -> new VersionNotFoundException(versionName)))
+                .map((r) -> workflowTasksConverter.toStandardWorkflow(r.getNextTask()));
     }
 
     @Override
-    public boolean importStandardWorkflow(String newVersionName, StandardWorkflow standardWorkflow) {
+    public Mono<Boolean> importStandardWorkflow(String newVersionName, StandardWorkflow standardWorkflow) {
         standardKnowledgeMergerComponent.mergeWorkflowWithTree(newVersionName, standardWorkflow);
-        var workflowRootTask = standardWorkflowTasksRepository.findOneByNameAndVersionName(
-                ROOT_WORKFLOW_NODE_NAME, newVersionName
-        ).orElseGet(() -> createUnmanagedNode(versionsRepository.findOneByName(newVersionName).orElseThrow())); // TODO: throw
-        Neo4JStandardWorkflowTask graphWorkflowTask = workflowTasksConverter.fromStandardWorkflow(standardWorkflow);
-        workflowRootTask.setNextTask(graphWorkflowTask);
-        standardWorkflowTasksRepository.save(workflowRootTask);
-        return true;
+        return standardWorkflowTasksRepository.findOneByNameAndVersionName(ROOT_WORKFLOW_NODE_NAME, newVersionName)
+                .switchIfEmpty(Mono.defer(() -> createUnmanagedNode(versionsRepository.findOneByName(newVersionName))))
+                .map((t) -> {
+                    t.setNextTask(workflowTasksConverter.fromStandardWorkflow(standardWorkflow));
+                    return t;
+                }).flatMap(standardWorkflowTasksRepository::save)
+                .map(Objects::nonNull);
     }
 
     @Override
-    public boolean isStandardWorkflowConsistent(String versionName, StandardWorkflow standardWorkflow) {
-        var operands = constraintsRepository.findAllByTypeAndVersionName(
-                ROOT_CONSTRAINT_NODE_NAME, versionName).get(0).getOperands();
-        return operands.stream()
-                .map(constraintsConverter::toConstraintTree)
-                .allMatch(c -> c.isWorkflowConsistent(standardWorkflow));
+    public Mono<Boolean> isStandardWorkflowConsistent(String versionName, StandardWorkflow standardWorkflow) {
+        return constraintsRepository.findAllByTypeAndVersionName(ROOT_CONSTRAINT_NODE_NAME, versionName)
+                .next()
+                .map(Neo4JConstraintOperand::getOperands)
+                .map((c) -> c.stream().map(constraintsConverter::toConstraintTree)
+                        .allMatch(e -> e.isWorkflowConsistent(standardWorkflow)));
     }
 }

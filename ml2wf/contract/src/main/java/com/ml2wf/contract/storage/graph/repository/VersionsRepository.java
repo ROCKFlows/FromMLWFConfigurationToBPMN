@@ -1,17 +1,16 @@
 package com.ml2wf.contract.storage.graph.repository;
 
 import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.QueryByExampleExecutor;
+import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
+import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 @Repository
 public interface VersionsRepository<V extends GraphTaskVersion, ID>
-        extends PagingAndSortingRepository<V, ID>, QueryByExampleExecutor<V> {
+        extends ReactiveSortingRepository<V, ID>, ReactiveQueryByExampleExecutor<V> {
 
-    Optional<V> getLastVersion();
+    Mono<V> getLastVersion();
 
-    Optional<V> findOneByName(String versionName);
+    Mono<V> findOneByName(String versionName);
 }

@@ -3,16 +3,15 @@ package com.ml2wf.contract.storage.graph.repository;
 import com.ml2wf.contract.storage.graph.dto.GraphConstraintOperand;
 import com.ml2wf.contract.storage.graph.dto.GraphStandardKnowledgeTask;
 import com.ml2wf.contract.storage.graph.dto.GraphTaskVersion;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.QueryByExampleExecutor;
+import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
+import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
 
 @Repository
 public interface ConstraintsRepository<O extends GraphConstraintOperand<O, T, V>,
         T extends GraphStandardKnowledgeTask<T, V>, V extends GraphTaskVersion, ID>
-        extends PagingAndSortingRepository<O, ID>, QueryByExampleExecutor<O> {
+        extends ReactiveSortingRepository<O, ID>, ReactiveQueryByExampleExecutor<O> {
 
-    List<O> findAllByTypeAndVersionName(String constraintType, String versionName);
+    Flux<O> findAllByTypeAndVersionName(String constraintType, String versionName);
 }

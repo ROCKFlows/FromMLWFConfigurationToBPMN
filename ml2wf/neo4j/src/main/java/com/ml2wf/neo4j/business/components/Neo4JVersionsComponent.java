@@ -8,9 +8,8 @@ import com.ml2wf.neo4j.storage.repository.Neo4JVersionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Profile("neo4j")
 @Component
@@ -26,18 +25,16 @@ public class Neo4JVersionsComponent implements IVersionsComponent {
     }
 
     @Override
-    public StandardKnowledgeVersion getLastVersion() {
-        return versionConverter.toStandardKnowledgeVersion(
-                versionsRepository.getLastVersion()
-                        .orElseThrow(NoVersionFoundException::new)
-        );
+    public Mono<StandardKnowledgeVersion> getLastVersion() {
+        return versionsRepository.getLastVersion()
+                .switchIfEmpty(Mono.error(NoVersionFoundException::new))
+                .map(versionConverter::toStandardKnowledgeVersion);
     }
 
     @Override
-    public List<StandardKnowledgeVersion> getVersions() {
-        return versionsRepository.findAll().stream()
-                .map(versionConverter::toStandardKnowledgeVersion)
-                .collect(Collectors.toList());
+    public Flux<StandardKnowledgeVersion> getVersions() {
+        return versionsRepository.findAll()
+                .map(versionConverter::toStandardKnowledgeVersion);
     }
 }
 

@@ -5,6 +5,7 @@ import com.ml2wf.core.tree.converter.FeatureModelConverter;
 import com.ml2wf.core.tree.custom.featuremodel.FeatureModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Component
 public class FeatureModelComponent {
@@ -20,18 +21,18 @@ public class FeatureModelComponent {
         this.featureModelConverter = featureModelConverter;
     }
 
-    public FeatureModel getFeatureModel(String versionName) {
-        var standardKnowledgeTree = standardKnowledgeComponent.getStandardKnowledgeTree(versionName);
-        return featureModelConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
+    public Mono<FeatureModel> getFeatureModel(String versionName) {
+        return standardKnowledgeComponent.getStandardKnowledgeTree(versionName)
+                .map(featureModelConverter::fromStandardKnowledgeTree);
     }
 
-    public FeatureModel getFeatureModelTaskWithName(String taskName, String versionName) {
-        var standardKnowledgeTree = standardKnowledgeComponent.getStandardKnowledgeTaskWithName(taskName, versionName);
-        return featureModelConverter.fromStandardKnowledgeTree(standardKnowledgeTree);
+    public Mono<FeatureModel> getFeatureModelTaskWithName(String taskName, String versionName) {
+        return standardKnowledgeComponent.getStandardKnowledgeTaskWithName(taskName, versionName)
+                .map(featureModelConverter::fromStandardKnowledgeTree);
     }
 
 
-    public boolean importFeatureModel(String versionName, FeatureModel featureModel) {
+    public Mono<Boolean> importFeatureModel(String versionName, FeatureModel featureModel) {
         var standardKnowledgeTree = featureModelConverter.toStandardKnowledgeTree(featureModel);
         return standardKnowledgeComponent.importStandardKnowledgeTree(versionName, standardKnowledgeTree);
     }

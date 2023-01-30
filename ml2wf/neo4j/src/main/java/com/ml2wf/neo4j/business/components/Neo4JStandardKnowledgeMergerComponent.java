@@ -13,9 +13,12 @@ import com.ml2wf.neo4j.storage.repository.Neo4JVersionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.NoSuchElementException;
 
 import static com.ml2wf.core.util.XMLManager.getReferredTask;
 
@@ -41,54 +44,58 @@ public class Neo4JStandardKnowledgeMergerComponent implements IStandardKnowledge
         this.standardKnowledgeComponent = standardKnowledgeComponent;
     }
 
-    private Neo4JStandardKnowledgeTask createUnmanagedNode(Neo4JTaskVersion graphVersion) {
-        var optGraphKnowledgeTask = standardKnowledgeTasksRepository.findOneByNameAndVersionName(
-                ROOT_NODE_NAME, graphVersion.getName()
-        );
-        var graphKnowledgeTask = optGraphKnowledgeTask.orElseThrow(
-                () -> new VersionNotFoundException(graphVersion.getName()));
-        var firstGraphTreeTask = new ArrayList<>(graphKnowledgeTask.getChildren()).get(0);
-        var convertedNode = tasksConverter.fromStandardKnowledgeTask(
-                new StandardKnowledgeTask(
-                        UNMANAGED_NODE_NAME,
-                        UNMANAGED_NODE_DESCRIPTION,
-                        true,
-                        true,
-                        graphVersion.getName(),
-                        Collections.emptyList()
-                )
-        ).get(0);
-        var savedUnmanagedRootNode = standardKnowledgeTasksRepository.save(convertedNode);
-        firstGraphTreeTask.getChildren().add(savedUnmanagedRootNode);
-        standardKnowledgeTasksRepository.save(firstGraphTreeTask);
-        return savedUnmanagedRootNode;
+    private Mono<Neo4JStandardKnowledgeTask> createUnmanagedNode(Neo4JTaskVersion graphVersion) {
+        return standardKnowledgeTasksRepository.findOneByNameAndVersionName(ROOT_NODE_NAME, graphVersion.getName())
+                .switchIfEmpty(Mono.error(() -> new VersionNotFoundException(graphVersion.getName())))
+                .map((t) -> new ArrayList<>(t.getChildren()).get(0))
+                .flatMap((t) ->
+                        standardKnowledgeTasksRepository.save(
+                                tasksConverter.fromStandardKnowledgeTask(
+                                        new StandardKnowledgeTask(
+                                                UNMANAGED_NODE_NAME,
+                                                UNMANAGED_NODE_DESCRIPTION,
+                                                true,
+                                                true,
+                                                graphVersion.getName(),
+                                                Collections.emptyList()
+                                        )
+                                ).get(0)
+                        ).map((f) -> {
+                            t.getChildren().add(f);
+                            // TODO: fix value never used as a publisher
+                            standardKnowledgeTasksRepository.save(t);
+                            return f;
+                        })
+                );
     }
 
     // TODO: move version ?
     // TODO: return new version ?
     @Override
-    public void mergeWorkflowWithTree(String newVersionName, StandardWorkflow workflow) {
-        var graphVersion = versionsRepository.getLastVersion()
-                .orElseThrow(NoVersionFoundException::new);
-        var originalTree = standardKnowledgeComponent.getStandardKnowledgeTree(graphVersion.getName());
-        standardKnowledgeComponent.importStandardKnowledgeTree(newVersionName, originalTree);
-        var newGraphVersion = versionsRepository.getLastVersion()
-                .orElseThrow(NoVersionFoundException::new); // TODO: manage this case
-        var optUnmanagedNode = standardKnowledgeTasksRepository.findOneByNameAndVersionName(
-                UNMANAGED_NODE_NAME, newGraphVersion.getName()
-        );
-        var unmanagedNode = optUnmanagedNode.orElseGet(() -> createUnmanagedNode(newGraphVersion));
-        workflow.getTasks().forEach((t) -> {
-            var optReferredName = getReferredTask(t.getDescription());
-            var parentTask = optReferredName.map((n) -> standardKnowledgeTasksRepository.findOneByNameAndVersionName(n, graphVersion.getName())
-                    .orElseThrow()  // TODO: manage this case
-            ).orElse(unmanagedNode);  // TODO: log this case
-            // TODO: convert using dedicated core util class
-            var convertedReferredTask = tasksConverter.fromStandardKnowledgeTask(
-                    new StandardKnowledgeTask(t.getName(), t.getDescription(), t.isAbstract(), t.isOptional(), null, Collections.emptyList())
-            ).get(0);
-            parentTask.getChildren().add(convertedReferredTask);
-            standardKnowledgeTasksRepository.save(parentTask);
-        });
+    public Mono<Void> mergeWorkflowWithTree(String newVersionName, StandardWorkflow workflow) {
+        return versionsRepository.getLastVersion()
+                .switchIfEmpty(Mono.error(NoVersionFoundException::new))
+                .map((v) -> standardKnowledgeComponent.getStandardKnowledgeTree(v.getName()))
+                .map((mt) -> mt.map((t) -> standardKnowledgeComponent.importStandardKnowledgeTree(newVersionName, t)))
+                .flatMap((b) -> versionsRepository.getLastVersion()
+                        .switchIfEmpty(Mono.error(NoVersionFoundException::new)))
+                .flatMap((v) -> standardKnowledgeTasksRepository.findOneByNameAndVersionName(UNMANAGED_NODE_NAME, v.getName())
+                        .switchIfEmpty(Mono.defer(() -> createUnmanagedNode(v)))
+                        .map((t) -> Flux.fromIterable(workflow.getTasks())
+                                .map((wt) -> getReferredTask(t.getDescription())
+                                        .map((n) -> standardKnowledgeTasksRepository.findOneByNameAndVersionName(n, v.getName())
+                                                .switchIfEmpty(Mono.error(NoSuchElementException::new)) // TODO: manage this case
+                                        )
+                                        .orElse(Mono.just(t))  // TODO: log this case
+                                        .map((pt) -> {
+                                            pt.getChildren().add(tasksConverter.fromStandardKnowledgeTask(
+                                                    new StandardKnowledgeTask(wt.getName(), wt.getDescription(), wt.isAbstract(), wt.isOptional(), null, Collections.emptyList())
+                                            ).get(0));
+                                            return pt;
+                                        })
+                                )
+                                .flatMap(standardKnowledgeTasksRepository::saveAll)
+                        )
+                ).thenEmpty(Mono.empty());
     }
 }

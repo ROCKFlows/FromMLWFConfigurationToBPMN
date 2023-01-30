@@ -5,8 +5,8 @@ import com.ml2wf.core.workflow.custom.bpmn.BPMNWorkflow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/bpmn")
@@ -19,23 +19,23 @@ public class BPMNController {
     }
 
     @GetMapping(value = {""}, produces = {MediaType.APPLICATION_XML_VALUE})
-    BPMNWorkflow getFeatureModel(@RequestParam String versionName) {
+    Mono<BPMNWorkflow> getFeatureModel(@RequestParam String versionName) {
         return bpmnComponent.getBPMNWorkflow(versionName);
     }
 
     @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_XML_VALUE})
-    ResponseEntity<String> importBPMNWorkflow(@RequestParam String newVersionName,
-                                              @RequestBody BPMNWorkflow bpmnWorkflow) {
-        bpmnComponent.importWorkflow(newVersionName, bpmnWorkflow); // TODO: check result
-        return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    Mono<String> importBPMNWorkflow(@RequestParam String newVersionName,
+                                    @RequestBody BPMNWorkflow bpmnWorkflow) {
+        return bpmnComponent.importWorkflow(newVersionName, bpmnWorkflow)
+                .map((t) -> "OK"); // TODO: check result
     }
 
-    @PostMapping(value = {"/consistency"}, consumes = {MediaType.APPLICATION_XML_VALUE},
-            produces = {MediaType.APPLICATION_XML_VALUE})
-    ResponseEntity<String> isBPMNWorkflowConsistent(@RequestParam String versionName,
+    @PostMapping(value = {"/consistency"}, consumes = {MediaType.APPLICATION_XML_VALUE})
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    Mono<Boolean> isBPMNWorkflowConsistent(@RequestParam String versionName,
                                                     @RequestBody BPMNWorkflow bpmnWorkflow) {
-        return new ResponseEntity<>(String.valueOf(bpmnComponent.isBPMNWorkflowConsistent(versionName, bpmnWorkflow)),
-                HttpStatus.ACCEPTED);
+        return bpmnComponent.isBPMNWorkflowConsistent(versionName, bpmnWorkflow);
     }
 }

@@ -8,16 +8,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 import java.util.Collections;
 
 @Configuration
 @EnableAspectJAutoProxy
-public class ApplicationContext implements WebMvcConfigurer {
+public class ApplicationContext implements WebFluxConfigurer {
 
     private final IObjectMapperFactory objectMapperFactory;
 
@@ -32,7 +33,6 @@ public class ApplicationContext implements WebMvcConfigurer {
 
     @Bean
     public HttpMessageConverters customConverters() {
-        objectMapperFactory.createNewObjectMapper();
         final AbstractJackson2HttpMessageConverter xmlConverter = new MappingJackson2HttpMessageConverter(
                 objectMapperFactory.createNewObjectMapper()
         );
@@ -42,5 +42,11 @@ public class ApplicationContext implements WebMvcConfigurer {
         );
         jsonConverter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));
         return new HttpMessageConverters(xmlConverter, jsonConverter);
+    }
+
+    @Override
+    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
+        configurer.customCodecs().register(objectMapperFactory.createNewObjectMapper());
+        configurer.customCodecs().register(objectMapperFactory.createNewObjectMapper());
     }
 }

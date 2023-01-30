@@ -5,6 +5,7 @@ import com.ml2wf.core.workflow.converter.BPMNWorkflowConverter;
 import com.ml2wf.core.workflow.custom.bpmn.BPMNWorkflow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Component
 public class BPMNComponent {
@@ -19,17 +20,17 @@ public class BPMNComponent {
         bpmnWorkflowConverter = new BPMNWorkflowConverter();
     }
 
-    public BPMNWorkflow getBPMNWorkflow(String versionName) {
-        var standardWorkflow = standardWorkflowComponent.getStandardWorkflow(versionName);
-        return bpmnWorkflowConverter.fromStandardWorkflow(standardWorkflow);
+    public Mono<BPMNWorkflow> getBPMNWorkflow(String versionName) {
+        return standardWorkflowComponent.getStandardWorkflow(versionName)
+                .map(bpmnWorkflowConverter::fromStandardWorkflow);
     }
 
-    public boolean importWorkflow(String newVersionName, BPMNWorkflow bpmnWorkflow) {
+    public Mono<Boolean> importWorkflow(String newVersionName, BPMNWorkflow bpmnWorkflow) {
         var standardWorkflow = bpmnWorkflowConverter.toStandardWorkflow(bpmnWorkflow);
         return standardWorkflowComponent.importStandardWorkflow(newVersionName, standardWorkflow);
     }
 
-    public boolean isBPMNWorkflowConsistent(String versionName, BPMNWorkflow bpmnWorkflow) {
+    public Mono<Boolean> isBPMNWorkflowConsistent(String versionName, BPMNWorkflow bpmnWorkflow) {
         var standardWorkflow = bpmnWorkflowConverter.toStandardWorkflow(bpmnWorkflow);
         return standardWorkflowComponent.isStandardWorkflowConsistent(versionName, standardWorkflow);
     }

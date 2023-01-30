@@ -6,8 +6,8 @@ import com.ml2wf.core.configurations.RawConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/configuration")
@@ -21,15 +21,17 @@ public class ConfigurationsController {
 
     @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity<String> importConfiguration(@RequestParam String configurationName,
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    Mono<String> importConfiguration(@RequestParam String configurationName,
                                               @RequestBody RawConfiguration configuration) {
         NamedConfiguration namedConfiguration = new NamedConfiguration(configurationName, configuration.getFeatures());
-        configurationsComponent.importConfiguration(namedConfiguration); // TODO: check result
-        return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
+        return configurationsComponent.importConfiguration(namedConfiguration)
+                .thenReturn("OK"); // TODO: check result
     }
 
     @GetMapping(value = {"", "/"}, produces = {MediaType.APPLICATION_XML_VALUE})
-    RawConfiguration importConfiguration(@RequestParam String configurationName) {
-        return new RawConfiguration(configurationsComponent.getConfiguration(configurationName).getFeatures());
+    Mono<RawConfiguration> importConfiguration(@RequestParam String configurationName) {
+        return configurationsComponent.getConfiguration(configurationName)
+                .map((c) -> new RawConfiguration(c.getFeatures()));
     }
 }

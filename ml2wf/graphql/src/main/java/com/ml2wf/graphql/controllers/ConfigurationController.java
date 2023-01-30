@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Controller
 public class ConfigurationController {
@@ -19,12 +19,12 @@ public class ConfigurationController {
     }
 
     @QueryMapping
-    public NamedConfiguration configuration(@Argument String name) {
+    public Mono<NamedConfiguration> configuration(@Argument String name) {
         return configurationComponent.getConfiguration(name);
     }
 
     @QueryMapping
-    public List<NamedConfiguration> configurations() {
+    public Flux<NamedConfiguration> configurations() {
         return configurationComponent.getAllConfigurations();
     }
 }
