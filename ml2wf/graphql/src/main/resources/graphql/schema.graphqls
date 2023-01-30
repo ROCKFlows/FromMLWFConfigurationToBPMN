@@ -6,7 +6,7 @@ type Query {
     versions: [Version]!
     lastVersion: Version!
     # workflow queries
-    workflow(versionName: String): Workflow!
+    workflow(versionName: String!): Workflow!
 }
 
 type Configuration {

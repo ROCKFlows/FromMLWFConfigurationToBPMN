@@ -19,11 +19,11 @@ export type Configuration = {
   features: ConfigurationFeature[];
 };
 
-export type GetConfigurationResponse = {
+type GetConfigurationResponse = {
   configuration: Configuration;
 };
 
-export type GetAllConfigurationsResponse = {
+type GetAllConfigurationsResponse = {
   configurations: Configuration[];
 };
 
@@ -38,7 +38,7 @@ export const configurationApi = createApi({
       query: ({name}) => ({
         document: gql`
           query GetConfiguration {
-            configuration(name: $name) {
+            configuration(name: "${name}") {
               name
               features {
                 name
@@ -48,9 +48,6 @@ export const configurationApi = createApi({
             }
           }
         `,
-        variables: {
-          name,
-        },
       }),
     }),
     getAllConfigurations: builder.query<GetAllConfigurationsResponse, void>({

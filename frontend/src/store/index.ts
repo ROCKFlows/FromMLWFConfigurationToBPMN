@@ -4,6 +4,7 @@ import snackbarSlice from './reducers/SnackbarSlice';
 import configurationSlice from './reducers/ConfigurationSlice';
 import {knowledgeApi} from './api/knowledgeApi';
 import {configurationApi} from './api/configurationApi';
+import {workflowApi} from './api/workflowApi';
 
 const store = configureStore({
   reducer: {
@@ -12,11 +13,13 @@ const store = configureStore({
     configuration: configurationSlice,
     [knowledgeApi.reducerPath]: knowledgeApi.reducer,
     [configurationApi.reducerPath]: configurationApi.reducer,
+    [workflowApi.reducerPath]: workflowApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       knowledgeApi.middleware,
       configurationApi.middleware,
+      workflowApi.middleware,
     ),
   // TODO: devTools: process.env.NODE_ENV === 'development',
 });

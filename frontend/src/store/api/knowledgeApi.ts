@@ -1,6 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {XMLParser} from 'fast-xml-parser';
-import parseWorkflowXMLToObject from '../../xml/parser';
 
 export type Version = {
   name: string;
@@ -86,16 +85,6 @@ export const knowledgeApi = createApi({
         }).parse(response)[0],
       providesTags: ['Versioned'],
     }),
-    getWorkflow: builder.query<Workflow, string>({
-      // TODO: any
-      query: (version) => ({
-        url: `bpmn?versionName=${version}`,
-        responseHandler: (response) => response.text(),
-      }),
-      transformResponse: (response: string) =>
-        parseWorkflowXMLToObject(response),
-      providesTags: ['Versioned'],
-    }),
     postNewWorkflow: builder.mutation<
       File,
       Partial<{newVersion: string; workflowFile: File}>
@@ -119,6 +108,5 @@ export const knowledgeApi = createApi({
 export const {
   useGetVersionsQuery,
   useGetKnowledgeTreeQuery,
-  useGetWorkflowQuery,
   usePostNewWorkflowMutation,
 } = knowledgeApi;
