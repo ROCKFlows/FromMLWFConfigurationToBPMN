@@ -3,9 +3,9 @@ import {Box, CircularProgress, Grid, Paper} from '@mui/material';
 import {Suspense, useEffect} from 'react';
 import {useParams} from 'react-router';
 import {useNavigate} from 'react-router-dom';
-import {useGetVersionsQuery} from '../store/api/knowledgeApi';
 import {changeVersion} from '../store/reducers/VersionSlice';
 import {useAppDispatch} from '../store/hooks';
+import {useGetVersionsQuery} from '../store/api/versionApi';
 
 const KnowledgeTreeSection = React.lazy(() =>
   import('../sections/home/KnowledgeTreeSection'),
@@ -41,12 +41,12 @@ export default function HomePage() {
       return;
     }
     if (!urlVersion) {
-      if (versions === undefined || versions.length === 0) {
+      if (versions === undefined || versions.versions.length === 0) {
         navigate('/workflow/new');
       } else {
         navigate(
           `/knowledge/${
-            versions?.reduce((vA, vB) =>
+            versions?.versions.reduce((vA, vB) =>
               vA.major * 100 + vA.minor * 10 + vA.patch >
               vB.major * 100 + vB.minor * 10 + vB.patch
                 ? vA
@@ -55,7 +55,7 @@ export default function HomePage() {
           }`,
         );
       }
-    } else if (!versions?.find((v) => v.name === urlVersion)) {
+    } else if (!versions?.versions.find((v) => v.name === urlVersion)) {
       navigate('/404');
     } else {
       dispatch(changeVersion(urlVersion));

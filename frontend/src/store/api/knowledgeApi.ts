@@ -1,24 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {XMLParser} from 'fast-xml-parser';
 
-export type Version = {
-  name: string;
-  major: number;
-  minor: number;
-  patch: number;
-};
-
-type VersionResponse = {
-  List: {
-    item: {
-      name: string;
-      major: number;
-      minor: number;
-      patch: number;
-    }[];
-  };
-};
-
 type KnowledgeTree = {
   extendedFeatureModel: [
     {
@@ -55,19 +37,6 @@ export const knowledgeApi = createApi({
   }),
   tagTypes: ['Versioned'],
   endpoints: (builder) => ({
-    getVersions: builder.query<Version[], void>({
-      query: () => ({
-        url: 'fm/versions/all',
-        responseHandler: (response) => response.text(),
-      }),
-      transformResponse: (response: VersionResponse) => {
-        const apiReturnedVersions = new XMLParser({
-          isArray: (name, jpath) => jpath === 'List.item',
-        }).parse(response).List;
-        return apiReturnedVersions ? apiReturnedVersions.item : [];
-      },
-      providesTags: ['Versioned'],
-    }),
     getKnowledgeTree: builder.query<KnowledgeTree, string>({
       // TODO: any
       query: (version) => ({
@@ -105,8 +74,5 @@ export const knowledgeApi = createApi({
   }),
 });
 
-export const {
-  useGetVersionsQuery,
-  useGetKnowledgeTreeQuery,
-  usePostNewWorkflowMutation,
-} = knowledgeApi;
+export const {useGetKnowledgeTreeQuery, usePostNewWorkflowMutation} =
+  knowledgeApi;

@@ -9,7 +9,7 @@ import {
 import {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAppSelector} from '../../store/hooks';
-import {useGetVersionsQuery} from '../../store/api/knowledgeApi';
+import {useGetVersionsQuery} from '../../store/api/versionApi';
 
 export default function VersionsSelect() {
   const {currentVersion} = useAppSelector((state) => state.version);
@@ -49,7 +49,7 @@ export default function VersionsSelect() {
         onChange={(e) => navigate(`/knowledge/${e.target.value}`)}
       >
         {isSuccess &&
-          versions
+          versions.versions
             ?.slice()
             ?.sort(
               (vA, vB) =>

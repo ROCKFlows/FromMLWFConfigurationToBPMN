@@ -5,6 +5,7 @@ import configurationSlice from './reducers/ConfigurationSlice';
 import {knowledgeApi} from './api/knowledgeApi';
 import {configurationApi} from './api/configurationApi';
 import {workflowApi} from './api/workflowApi';
+import {versionApi} from './api/versionApi';
 
 const store = configureStore({
   reducer: {
@@ -14,12 +15,14 @@ const store = configureStore({
     [knowledgeApi.reducerPath]: knowledgeApi.reducer,
     [configurationApi.reducerPath]: configurationApi.reducer,
     [workflowApi.reducerPath]: workflowApi.reducer,
+    [versionApi.reducerPath]: versionApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       knowledgeApi.middleware,
       configurationApi.middleware,
       workflowApi.middleware,
+      versionApi.middleware,
     ),
   // TODO: devTools: process.env.NODE_ENV === 'development',
 });
