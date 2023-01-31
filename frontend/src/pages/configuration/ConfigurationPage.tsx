@@ -3,16 +3,16 @@ import {Box, CircularProgress, Grid, Paper} from '@mui/material';
 import {Suspense} from 'react';
 
 const ConfigurationElementsSection = React.lazy(() =>
-  import('../sections/configuration/ConfigurationElementsSection'),
+  import('../../sections/configuration/ConfigurationElementsSection'),
 );
 const VariabilitySection = React.lazy(() =>
-  import('../sections/configuration/VariabilitySection'),
+  import('../../sections/configuration/VariabilitySection'),
 );
 const CommonalitySection = React.lazy(() =>
-  import('../sections/configuration/CommonalitySection'),
+  import('../../sections/configuration/CommonalitySection'),
 );
 const PossibleFeaturesSection = React.lazy(() =>
-  import('../sections/configuration/PossibleFeaturesSection'),
+  import('../../sections/configuration/PossibleFeaturesSection'),
 );
 
 export default function ConfigurationPage() {

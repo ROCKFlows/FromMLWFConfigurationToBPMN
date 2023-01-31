@@ -8,16 +8,16 @@ import {useAppDispatch} from '../store/hooks';
 import {useGetVersionsQuery} from '../store/api/versionApi';
 
 const KnowledgeTreeSection = React.lazy(() =>
-  import('../sections/home/KnowledgeTreeSection'),
+  import('../sections/knowledge/KnowledgeTreeSection'),
 );
 const WorkflowSection = React.lazy(() =>
-  import('../sections/home/WorkflowSection'),
+  import('../sections/knowledge/WorkflowSection'),
 );
 const ConstraintsSection = React.lazy(() =>
-  import('../sections/home/ConstraintsSection'),
+  import('../sections/knowledge/ConstraintsSection'),
 );
 
-export default function HomePage() {
+export default function KnowledgePage() {
   const {data: versions, isError, error, isFetching} = useGetVersionsQuery();
 
   const dispatch = useAppDispatch();

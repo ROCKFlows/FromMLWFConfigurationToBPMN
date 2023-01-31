@@ -2,16 +2,16 @@ import React, {Suspense} from 'react';
 import {Navigate, Route, Routes} from 'react-router';
 import {CircularProgress} from '@mui/material';
 
-const HomePage = React.lazy(() => import('../pages/HomePage'));
+const KnowledgePage = React.lazy(() => import('../pages/KnowledgePage'));
 const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage'));
 const WorkflowImportPage = React.lazy(() =>
-  import('../pages/WorkflowImportPage'),
+  import('../pages/workflow/WorkflowImportPage'),
 );
 const ConfigurationPage = React.lazy(() =>
-  import('../pages/ConfigurationPage'),
+  import('../pages/configuration/ConfigurationPage'),
 );
 const ConfigurationImportPage = React.lazy(() =>
-  import('../pages/ConfigurationImportPage'),
+  import('../pages/configuration/ConfigurationImportPage'),
 );
 
 export type RoutePage = {
@@ -21,7 +21,7 @@ export type RoutePage = {
 
 export const pages: RoutePage[] = [
   {
-    name: 'Home',
+    name: 'Knowledge',
     url: '/knowledge',
   },
   {
@@ -44,7 +44,7 @@ export const routes = (
       <Route path="/" element={<Navigate to="/knowledge" replace />} />
       <Route
         path="/knowledge/:version?"
-        element={<HomePage />}
+        element={<KnowledgePage />}
         key="versionRoute"
       />
       <Route
