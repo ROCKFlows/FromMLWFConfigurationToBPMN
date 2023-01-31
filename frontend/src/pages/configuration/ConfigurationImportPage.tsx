@@ -101,7 +101,7 @@ export default function ConfigurationImportPage() {
         severity: isError ? 'error' : 'success',
         message: isError
           ? `Failed to post new configuration with name ${newConfiguration.name}.`
-          : `ConfigurationComponent successfully imported with name ${newConfiguration.name}.`,
+          : `Configuration successfully imported with name ${newConfiguration.name}.`,
       }),
     );
     if (isSuccess) {
@@ -140,12 +140,12 @@ export default function ConfigurationImportPage() {
 
   return (
     <Stack spacing={2} height="100%" sx={{height: '92vh', padding: '1em'}}>
-      <Typography>Add ConfigurationComponent</Typography>
+      <Typography>Add Configuration</Typography>
       <Paper sx={{height: '20vh', padding: '1em', overflow: 'auto'}}>
         <Stack spacing={2}>
           <TextField
             id="new-version-name-textfield"
-            label="ConfigurationComponent name"
+            label="Configuration name"
             variant="outlined"
             value={newConfiguration.name}
             onChange={(e) =>

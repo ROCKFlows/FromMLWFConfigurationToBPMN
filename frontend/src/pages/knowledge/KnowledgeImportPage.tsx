@@ -11,25 +11,16 @@ import {
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import {useTheme} from '@mui/material/styles';
 import {useDropzone} from 'react-dropzone';
-import {useCallback, useEffect, useMemo, useState} from 'react';
-import ReactFlow, {
-  addEdge,
-  Background,
-  Controls,
-  useEdgesState,
-  useNodesState,
-} from 'reactflow';
-
-import 'reactflow/dist/style.css';
-
+import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAppDispatch} from '../../store/hooks';
-import {
-  usePostNewWorkflowMutation,
-  Workflow,
-} from '../../store/api/knowledgeApi';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
-import {parseWorkflowXMLToObject} from '../../xml/parser';
+import {parseKnowledgeTreeXMLToObject} from '../../xml/parser';
+import {
+  KnowledgeTree,
+  usePostKnowledgeTreeMutation,
+} from '../../store/api/knowledgeApi';
+import KnowledgeTreeComponent from '../../sections/knowledge/components/KnowledgeTreeComponent';
 
 const focusedStyle = {
   borderColor: '#2196f3',
@@ -43,24 +34,16 @@ const rejectStyle = {
   borderColor: '#ff1744',
 };
 
-export default function WorkflowImportPage() {
+export default function KnowledgeImportPage() {
   const [newVersionName, setNewVersionName] = useState<string>('');
-  const [newWorkflowFile, setNewWorkflowFile] = useState<File | undefined>(
-    undefined,
-  );
-  const [newWorkflow, setNewWorkflow] = useState<Workflow | undefined>(
-    undefined,
-  );
+  const [newKnowledgeTreeFile, setNewKnowledgeTreeFile] = useState<
+    File | undefined
+  >(undefined);
+  const [newKnowledgeTree, setNewKnowledgeTree] = useState<
+    KnowledgeTree | undefined
+  >(undefined);
 
   const navigate = useNavigate();
-
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
-  );
 
   const theme = useTheme();
 
@@ -98,8 +81,8 @@ export default function WorkflowImportPage() {
     [isFocused, isDragAccept, isDragReject],
   );
 
-  const [addWorkflow, {isLoading, isSuccess, isError, error}] =
-    usePostNewWorkflowMutation();
+  const [addKnowledgeTree, {isLoading, isSuccess, isError, error}] =
+    usePostKnowledgeTreeMutation();
 
   const dispatch = useAppDispatch();
 
@@ -109,7 +92,7 @@ export default function WorkflowImportPage() {
     }
     if (isError) {
       console.error(
-        `Failed to post new workflow with version ${newVersionName}. Error is \n${error?.data}`,
+        `Failed to post new knowledge tree with version ${newVersionName}. Error is \n${error?.data}`,
         error,
       );
     }
@@ -117,12 +100,12 @@ export default function WorkflowImportPage() {
       showSnackbar({
         severity: isError ? 'error' : 'success',
         message: isError
-          ? `Failed to post new workflow with version ${newVersionName}.`
-          : `Workflow successfully imported with version ${newVersionName}.`,
+          ? `Failed to post new knowledge tree with version ${newVersionName}.`
+          : `Knowledge tree successfully imported with version ${newVersionName}. You will be redirected soon...`,
       }),
     );
     if (isSuccess) {
-      navigate(`/knowledge/${newVersionName}`);
+      // TODO: navigate(`/knowledge/${newVersionName}`);
     }
   }, [isSuccess, isError]);
 
@@ -130,16 +113,11 @@ export default function WorkflowImportPage() {
     if (acceptedFiles.length === 0) {
       return;
     }
-    setNewWorkflowFile(acceptedFiles[0] as File);
+    setNewKnowledgeTreeFile(acceptedFiles[0] as File);
   }, [acceptedFiles]);
 
   useEffect(() => {
-    setNodes(newWorkflow?.nodes ?? []);
-    setEdges(newWorkflow?.edges ?? []);
-  }, [newWorkflow]);
-
-  useEffect(() => {
-    if (!newWorkflowFile) {
+    if (!newKnowledgeTreeFile) {
       return;
     }
     const reader = new FileReader();
@@ -147,24 +125,24 @@ export default function WorkflowImportPage() {
       dispatch(
         showSnackbar({
           severity: 'error',
-          message: `Failed to load the workflow file.`,
+          message: `Failed to load the configuration file.`,
         }),
       );
     };
     reader.onload = () => {
-      setNewWorkflow(parseWorkflowXMLToObject(reader.result));
+      setNewKnowledgeTree(parseKnowledgeTreeXMLToObject(reader.result));
     };
-    reader.readAsText(newWorkflowFile, 'utf8');
-  }, [newWorkflowFile]);
+    reader.readAsText(newKnowledgeTreeFile, 'utf8');
+  }, [newKnowledgeTreeFile]);
 
   return (
     <Stack spacing={2} height="100%" sx={{height: '92vh', padding: '1em'}}>
-      <Typography>Add workflow</Typography>
+      <Typography>Add Knowledge Tree</Typography>
       <Paper sx={{height: '20vh', padding: '1em', overflow: 'auto'}}>
         <Stack spacing={2}>
           <TextField
             id="new-version-name-textfield"
-            label="New version"
+            label="Knowledge Tree version"
             variant="outlined"
             value={newVersionName}
             onChange={(e) => setNewVersionName(e.target.value)}
@@ -172,40 +150,38 @@ export default function WorkflowImportPage() {
           <Box {...getRootProps()} sx={style}>
             <input {...getInputProps()} />
             <Typography>
-              Drag &apos;n&apos; drop a workflow file to import, or click to
-              select file
+              Drag &apos;n&apos; drop a configuration file to import, or click
+              to select file
             </Typography>
           </Box>
         </Stack>
       </Paper>
       <Paper sx={{height: '60vh', padding: '1em', overflow: 'auto'}}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          attributionPosition="bottom-right"
-        >
-          <Controls />
-          <Background />
-        </ReactFlow>
+        {newKnowledgeTree && (
+          <KnowledgeTreeComponent knowledgeTree={newKnowledgeTree} />
+        )}
       </Paper>
       <Box
         sx={{textAlign: 'center', zIndex: 100, cursor: 'pointer'}}
-        onClick={() =>
-          addWorkflow({
-            newVersion: newVersionName,
-            workflowFile: newWorkflowFile,
-          })
-        }
+        onClick={() => {
+          if (newKnowledgeTree?.extendedFeatureModel.length) {
+            addKnowledgeTree({
+              versionName: newVersionName,
+              knowledgeFile: newKnowledgeTreeFile,
+            });
+          }
+        }}
       >
         <Fab
           color="primary"
           aria-label="add"
           variant="extended"
           sx={{position: 'absolute', bottom: '5vh'}}
-          disabled={!newVersionName || !newWorkflowFile || isLoading}
+          disabled={
+            !newVersionName ||
+            !newKnowledgeTree?.extendedFeatureModel.length ||
+            isLoading
+          }
         >
           {isLoading && <CircularProgress />}
           <FileUploadIcon />

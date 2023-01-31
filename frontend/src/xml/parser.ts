@@ -1,6 +1,16 @@
 import {XMLParser} from 'fast-xml-parser';
 import {ConfigurationFeature} from '../store/api/configurationApi';
 
+export function parseKnowledgeTreeXMLToObject(xmlContent: string) {
+  const result = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: '@_',
+    allowBooleanAttributes: true,
+    preserveOrder: true,
+  }).parse(xmlContent);
+  return result[result.length === 1 ? 0 : 1]; // TODO: to improve
+}
+
 export function parseWorkflowXMLToObject(xmlContent: string) {
   const tasks = new XMLParser({
     ignoreAttributes: false,

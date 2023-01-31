@@ -2,7 +2,12 @@ import React, {Suspense} from 'react';
 import {Navigate, Route, Routes} from 'react-router';
 import {CircularProgress} from '@mui/material';
 
-const KnowledgePage = React.lazy(() => import('../pages/KnowledgePage'));
+const KnowledgePage = React.lazy(() =>
+  import('../pages/knowledge/KnowledgePage'),
+);
+const KnowledgeImportPage = React.lazy(() =>
+  import('../pages/knowledge/KnowledgeImportPage'),
+);
 const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage'));
 const WorkflowImportPage = React.lazy(() =>
   import('../pages/workflow/WorkflowImportPage'),
@@ -25,6 +30,10 @@ export const pages: RoutePage[] = [
     url: '/knowledge',
   },
   {
+    name: 'Import Knowledge',
+    url: '/knowledge/new',
+  },
+  {
     name: 'Import Workflow',
     url: '/workflow/new',
   },
@@ -45,6 +54,11 @@ export const routes = (
       <Route
         path="/knowledge/:version?"
         element={<KnowledgePage />}
+        key="versionRoute"
+      />
+      <Route
+        path="/knowledge/new"
+        element={<KnowledgeImportPage />}
         key="versionRoute"
       />
       <Route

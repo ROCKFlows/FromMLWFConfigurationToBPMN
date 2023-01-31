@@ -3,18 +3,18 @@ import {Box, CircularProgress, Grid, Paper} from '@mui/material';
 import {Suspense, useEffect} from 'react';
 import {useParams} from 'react-router';
 import {useNavigate} from 'react-router-dom';
-import {changeVersion} from '../store/reducers/VersionSlice';
-import {useAppDispatch} from '../store/hooks';
-import {useGetVersionsQuery} from '../store/api/versionApi';
+import {changeVersion} from '../../store/reducers/VersionSlice';
+import {useAppDispatch} from '../../store/hooks';
+import {useGetVersionsQuery} from '../../store/api/versionApi';
 
 const KnowledgeTreeSection = React.lazy(() =>
-  import('../sections/knowledge/KnowledgeTreeSection'),
+  import('../../sections/knowledge/KnowledgeTreeSection'),
 );
 const WorkflowSection = React.lazy(() =>
-  import('../sections/knowledge/WorkflowSection'),
+  import('../../sections/knowledge/WorkflowSection'),
 );
 const ConstraintsSection = React.lazy(() =>
-  import('../sections/knowledge/ConstraintsSection'),
+  import('../../sections/knowledge/ConstraintsSection'),
 );
 
 export default function KnowledgePage() {
@@ -42,7 +42,7 @@ export default function KnowledgePage() {
     }
     if (!urlVersion) {
       if (versions === undefined || versions.versions.length === 0) {
-        navigate('/workflow/new');
+        navigate('/knowledge/new');
       } else {
         navigate(
           `/knowledge/${

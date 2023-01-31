@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {XMLParser} from 'fast-xml-parser';
+import {parseKnowledgeTreeXMLToObject} from '../../xml/parser';
 
-type KnowledgeTree = {
+export type KnowledgeTree = {
   extendedFeatureModel: [
     {
       constraints: any;
@@ -45,14 +45,24 @@ export const knowledgeApi = createApi({
       }),
       transformResponse: (
         response: any, // TODO: any
-      ) =>
-        new XMLParser({
-          ignoreAttributes: false,
-          attributeNamePrefix: '@_',
-          allowBooleanAttributes: true,
-          preserveOrder: true,
-        }).parse(response)[0],
+      ) => parseKnowledgeTreeXMLToObject(response),
       providesTags: ['Versioned'],
+    }),
+    postKnowledgeTree: builder.mutation<
+      File,
+      Partial<{versionName: string; knowledgeFile: File}>
+    >({
+      query: ({versionName, knowledgeFile}) => ({
+        url: `fm/?versionName=${versionName}`,
+        method: 'POST',
+        body: knowledgeFile,
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/xml',
+        },
+        responseHandler: (response) => response.text(),
+      }),
+      invalidatesTags: ['Versioned'],
     }),
     postNewWorkflow: builder.mutation<
       File,
@@ -74,5 +84,8 @@ export const knowledgeApi = createApi({
   }),
 });
 
-export const {useGetKnowledgeTreeQuery, usePostNewWorkflowMutation} =
-  knowledgeApi;
+export const {
+  useGetKnowledgeTreeQuery,
+  usePostKnowledgeTreeMutation,
+  usePostNewWorkflowMutation,
+} = knowledgeApi;
