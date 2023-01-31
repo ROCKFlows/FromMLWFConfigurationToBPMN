@@ -1,14 +1,6 @@
 import * as React from 'react';
 import {useEffect} from 'react';
-import {
-  Checkbox,
-  CircularProgress,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Stack,
-} from '@mui/material';
+import {CircularProgress, Stack} from '@mui/material';
 import {useAppDispatch, useAppSelector} from '../../store/hooks';
 import {useGetKnowledgeTreeQuery} from '../../store/api/knowledgeApi';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
@@ -20,6 +12,7 @@ import {
   ConfigurationFeature,
   FeatureSelectionStatus,
 } from '../../store/api/configurationApi';
+import ConfigurationComponent from './components/ConfigurationComponent';
 
 export default function ConfigurationElementsSection() {
   const {currentVersion} = useAppSelector((state) => state.version);
@@ -92,37 +85,10 @@ export default function ConfigurationElementsSection() {
 
   return (
     <Stack spacing={1} height="100%">
-      <List dense>
-        {currentConfiguration.features.map((f) => (
-          <ListItem
-            key={`list-item-feature-${f.name}`}
-            secondaryAction={
-              <Checkbox
-                edge="end"
-                checked={f.manual === FeatureSelectionStatus.SELECTED}
-                onChange={(_, checked) => {
-                  dispatch(
-                    updateConfigurationFeature({
-                      ...f,
-                      manual: checked
-                        ? FeatureSelectionStatus.SELECTED
-                        : FeatureSelectionStatus.UNSELECTED,
-                    }),
-                  );
-                }}
-              />
-            }
-          >
-            <ListItemButton>
-              <ListItemText
-                id={`list-item-text-feature-${f.name}`}
-                key={`list-item-text-feature-${f.name}`}
-                primary={f.name}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <ConfigurationComponent
+        configuration={currentConfiguration}
+        onSelected={(f) => dispatch(updateConfigurationFeature(f))}
+      />
     </Stack>
   );
 }

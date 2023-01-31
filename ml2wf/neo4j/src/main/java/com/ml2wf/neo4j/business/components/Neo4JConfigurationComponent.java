@@ -3,6 +3,7 @@ package com.ml2wf.neo4j.business.components;
 import com.google.common.collect.ImmutableList;
 import com.ml2wf.contract.business.IConfigurationComponent;
 import com.ml2wf.contract.exception.ConfigurationNotFoundException;
+import com.ml2wf.contract.exception.KnowledgeTaskNotFoundException;
 import com.ml2wf.contract.exception.NoVersionFoundException;
 import com.ml2wf.core.configurations.NamedConfiguration;
 import com.ml2wf.neo4j.storage.converter.impl.Neo4JConfigurationConverter;
@@ -44,7 +45,7 @@ public class Neo4JConfigurationComponent implements IConfigurationComponent {
         var convertedConfigurationFeatures = configuration.getFeatures().stream()
                 .map(c -> {
                     var correspondingGraphTask = standardKnowledgeTasksRepository.findOneByNameAndVersionName(c.getName(), graphVersion.getName())
-                            .orElseThrow(() -> new RuntimeException(String.format("No task found for name %s and version %s.", c.getName(), graphVersion.getName())));
+                            .orElseThrow(() -> new KnowledgeTaskNotFoundException(c.getName(), graphVersion.getName()));
                     return new Neo4JConfigurationFeature(c.getAutomatic().getLowercaseName(), c.getManual().getLowercaseName(), correspondingGraphTask, graphVersion);
                 })
                 .collect(Collectors.toList());

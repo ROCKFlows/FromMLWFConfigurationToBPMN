@@ -1,12 +1,17 @@
 import React, {Suspense} from 'react';
 import {Navigate, Route, Routes} from 'react-router';
 import {CircularProgress} from '@mui/material';
-import ConfigurationPage from '../pages/ConfigurationPage';
 
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage'));
 const WorkflowImportPage = React.lazy(() =>
   import('../pages/WorkflowImportPage'),
+);
+const ConfigurationPage = React.lazy(() =>
+  import('../pages/ConfigurationPage'),
+);
+const ConfigurationImportPage = React.lazy(() =>
+  import('../pages/ConfigurationImportPage'),
 );
 
 export type RoutePage = {
@@ -26,6 +31,10 @@ export const pages: RoutePage[] = [
   {
     name: 'Configuration',
     url: '/configuration',
+  },
+  {
+    name: 'Import Configuration',
+    url: '/configuration/new',
   },
 ];
 
@@ -47,6 +56,11 @@ export const routes = (
         path="/configuration"
         element={<ConfigurationPage />}
         key="configurationRoute"
+      />
+      <Route
+        path="/configuration/new"
+        element={<ConfigurationImportPage />}
+        key="configurationImportRoute"
       />
       <Route path="*" element={<NotFoundPage />} key="notFoundRoute" />
     </Routes>

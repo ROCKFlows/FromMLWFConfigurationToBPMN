@@ -9,6 +9,11 @@ type Query {
     workflow(versionName: String!): Workflow!
 }
 
+type Mutation {
+    # configuration mutations
+    configuration(configuration: InputConfiguration!) : Configuration
+}
+
 type Configuration {
     name: ID!
     features: [Feature!]!
@@ -24,6 +29,17 @@ type Feature {
     name: ID!
     automatic: FeatureSelectionStatus!
     manual: FeatureSelectionStatus!
+}
+
+input InputFeature {
+    name: ID!
+    automatic: FeatureSelectionStatus!
+    manual: FeatureSelectionStatus!
+}
+
+input InputConfiguration {
+    name: ID!
+    features: [InputFeature!]!
 }
 
 type Version {

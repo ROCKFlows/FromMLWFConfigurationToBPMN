@@ -26,7 +26,7 @@ export default function VersionsSelect() {
   useEffect(() => {
     if (isError && error) {
       console.error(
-        `Failed to retrieve versions. Error is ${error.status}: ${error.error}`,
+        `Failed to retrieve versions. Error is ${error.status}: ${error.message}`,
       );
     }
     if (isError) {

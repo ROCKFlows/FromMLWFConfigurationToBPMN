@@ -1,6 +1,7 @@
 package com.ml2wf.graphql.exceptions;
 
 import com.ml2wf.contract.exception.ConfigurationNotFoundException;
+import com.ml2wf.contract.exception.KnowledgeTaskNotFoundException;
 import com.ml2wf.contract.exception.NoVersionFoundException;
 import com.ml2wf.contract.exception.VersionNotFoundException;
 import graphql.GraphQLError;
@@ -19,6 +20,7 @@ public class GraphQLExceptionResolver extends DataFetcherExceptionResolverAdapte
     private static final String UNEXPECTED_ERROR = "Unexpected error while fetching data.";
     private static final String NO_VERSION_FOUND_MESSAGE_PATTERN = "No version found.";
     private static final String VERSION_NOT_FOUND_MESSAGE_PATTERN = "Version %s not found.";
+    private static final String KNOWLEDGE_TASK_NOT_FOUND_MESSAGE_PATTERN = "Unknown reference to task %s in knowledge tree for version %s.";
 
     @Override
     protected GraphQLError resolveToSingleError(@NonNull Throwable ex, @NonNull DataFetchingEnvironment env) {
@@ -40,11 +42,19 @@ public class GraphQLExceptionResolver extends DataFetcherExceptionResolverAdapte
                     .location(env.getField().getSourceLocation())
                     .build();
         }
-
         if (ex instanceof VersionNotFoundException vnfe) {
             return GraphqlErrorBuilder.newError()
                     .errorType(ErrorType.BAD_REQUEST)
                     .message(String.format(VERSION_NOT_FOUND_MESSAGE_PATTERN, vnfe.getVersionName()))
+                    .path(env.getExecutionStepInfo().getPath())
+                    .location(env.getField().getSourceLocation())
+                    .build();
+        }
+        if (ex instanceof KnowledgeTaskNotFoundException ktnfe) {
+            return GraphqlErrorBuilder.newError()
+                    .errorType(ErrorType.BAD_REQUEST)
+                    .message(String.format(KNOWLEDGE_TASK_NOT_FOUND_MESSAGE_PATTERN, ktnfe.getTaskName(),
+                            ktnfe.getVersionName()))
                     .path(env.getExecutionStepInfo().getPath())
                     .location(env.getField().getSourceLocation())
                     .build();

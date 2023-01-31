@@ -27,6 +27,10 @@ type GetAllConfigurationsResponse = {
   configurations: Configuration[];
 };
 
+type PostConfigurationResponse = {
+  configuration: Configuration;
+};
+
 export const configurationApi = createApi({
   reducerPath: 'configurationApi',
   baseQuery: graphqlRequestBaseQuery({
@@ -66,8 +70,34 @@ export const configurationApi = createApi({
         `,
       }),
     }),
+    postConfiguration: builder.mutation<
+      PostConfigurationResponse,
+      {configuration: Configuration}
+    >({
+      query: ({configuration}) => ({
+        document: gql`
+          mutation AddConfiguration($configuration: InputConfiguration!) {
+            configuration(configuration: $configuration) {
+              name
+              features {
+                name
+                automatic
+                manual
+              }
+            }
+          }
+        `,
+        variables: {
+          configuration,
+        },
+      }),
+      invalidatesTags: ['Configuration'],
+    }),
   }),
 });
 
-export const {useGetConfigurationQuery, useGetAllConfigurationsQuery} =
-  configurationApi;
+export const {
+  useGetConfigurationQuery,
+  useGetAllConfigurationsQuery,
+  usePostConfigurationMutation,
+} = configurationApi;

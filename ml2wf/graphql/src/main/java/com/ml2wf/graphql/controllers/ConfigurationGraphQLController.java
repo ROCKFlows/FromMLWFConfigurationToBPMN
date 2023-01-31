@@ -4,6 +4,7 @@ import com.ml2wf.contract.business.IConfigurationComponent;
 import com.ml2wf.core.configurations.NamedConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -26,5 +27,11 @@ public class ConfigurationGraphQLController {
     @QueryMapping
     public List<NamedConfiguration> configurations() {
         return configurationComponent.getAllConfigurations();
+    }
+
+    @MutationMapping
+    public NamedConfiguration configuration(@Argument NamedConfiguration configuration) {
+        configurationComponent.importConfiguration(configuration); // TODO: check return
+        return configuration;
     }
 }
