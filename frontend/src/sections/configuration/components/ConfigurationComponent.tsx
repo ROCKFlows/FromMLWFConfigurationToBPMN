@@ -19,26 +19,30 @@ type ConfigurationProps = {
 
 export default function ConfigurationComponent(props: ConfigurationProps) {
   const {configuration, onSelected} = props;
+
   return (
     <List dense>
       {configuration.features.map((f) => (
         <ListItem
           key={`list-item-feature-${f.name}`}
           secondaryAction={
-            onSelected && (
-              <Checkbox
-                edge="end"
-                checked={f.manual === FeatureSelectionStatus.SELECTED}
-                onChange={(_, checked) => {
+            <Checkbox
+              edge="end"
+              checked={
+                f.manual === FeatureSelectionStatus.SELECTED ||
+                f.automatic === FeatureSelectionStatus.SELECTED
+              }
+              disabled={f.automatic === FeatureSelectionStatus.SELECTED}
+              onChange={(_, checked) => {
+                onSelected &&
                   onSelected({
                     ...f,
                     manual: checked
                       ? FeatureSelectionStatus.SELECTED
                       : FeatureSelectionStatus.UNSELECTED,
                   });
-                }}
-              />
-            )
+              }}
+            />
           }
         >
           <ListItemButton>

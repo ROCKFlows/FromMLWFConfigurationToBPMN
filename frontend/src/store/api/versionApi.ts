@@ -13,6 +13,10 @@ type GetVersionsResponse = {
   versions: Version[];
 };
 
+type GetLastVersion = {
+  lastVersion: Version;
+};
+
 export const versionApi = createApi({
   reducerPath: 'versionApi',
   baseQuery: graphqlRequestBaseQuery({
@@ -34,7 +38,21 @@ export const versionApi = createApi({
         `,
       }),
     }),
+    getLastVersion: builder.query<GetLastVersion, void>({
+      query: () => ({
+        document: gql`
+          query GetLastVersion {
+            lastVersion {
+              name
+              major
+              minor
+              patch
+            }
+          }
+        `,
+      }),
+    }),
   }),
 });
 
-export const {useGetVersionsQuery} = versionApi;
+export const {useGetVersionsQuery, useGetLastVersionQuery} = versionApi;
