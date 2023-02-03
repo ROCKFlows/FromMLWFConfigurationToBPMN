@@ -5,10 +5,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {TreeItem, TreeView} from '@mui/lab';
 import InfoIcon from '@mui/icons-material/Info';
-import {KnowledgeTree} from '../../../store/api/knowledgeApi';
+import {FeatureModel, FeatureModelTask} from '../../../store/types';
 
 type KnowledgeTreeComponentProps = {
-  knowledgeTree: KnowledgeTree;
+  knowledgeTree: FeatureModel;
 };
 
 export default function KnowledgeTreeComponent(
@@ -16,62 +16,39 @@ export default function KnowledgeTreeComponent(
 ) {
   const {knowledgeTree} = props;
 
-  const structure = knowledgeTree.extendedFeatureModel[0].struct
-    ? knowledgeTree.extendedFeatureModel[0].struct[0]
-    : knowledgeTree.extendedFeatureModel[1].struct[0]; // skipping properties
+  const structure = knowledgeTree.structure?.children;
 
-  const getNodesIds = (node: any): string[] => {
-    if (node.description) {
-      return [];
-    }
-    let result = [node[':@']['@_name']];
-    if (node.and) {
-      result = [
-        ...result,
-        ...(Array.isArray(node.and)
-          ? node.and.flatMap((n) => getNodesIds(n))
-          : getNodesIds(node.and)),
-      ];
-    }
-    return result;
-  };
+  const getNodesIds = (task: FeatureModelTask): string[] => [
+    task.name,
+    ...(task.children?.length ? task.children : []).flatMap((c) =>
+      getNodesIds(c),
+    ),
+  ];
 
-  const getNodes = (node: any): ReactElement => {
-    const description = Array.isArray(node.and)
-      ? node.and
-          .filter((n) => n.description && n.description[0]['#text'])
-          .map((n) => n.description[0]['#text'])[0]
+  const getNodes = (task: FeatureModelTask): ReactElement => {
+    const description = task.descriptions?.length
+      ? task.descriptions[0]?.content
       : undefined;
-    if (!node.and && !node.feature) {
-      return (
-        <TreeItem
-          key={`tree-item-knowledge-${node[':@']['@_name']}`}
-          nodeId={node[':@']['@_name']}
-          label={node[':@']['@_name']}
-        />
-      );
-    }
     return (
       <TreeItem
-        key={`tree-item-knowledge-${node[':@']['@_name']}`}
-        nodeId={node[':@']['@_name']}
+        key={`tree-item-knowledge-${task.name}`}
+        nodeId={task.name}
         label={
           description ? (
             <Stack spacing={1} direction="row">
-              <Typography>{node[':@']['@_name']}</Typography>
+              <Typography>{task.name}</Typography>
               <Tooltip title={description}>
                 <InfoIcon />
               </Tooltip>
             </Stack>
           ) : (
-            <Typography>{node[':@']['@_name']}</Typography>
+            <Typography>{task.name}</Typography>
           )
         }
       >
-        {node.and &&
-          (Array.isArray(node.and)
-            ? node.and.filter((n) => !n.description).map((n) => getNodes(n))
-            : getNodes(node.and))}
+        {task.children &&
+          task.children.length > 0 &&
+          task.children.map(getNodes)}
       </TreeItem>
     );
   };
@@ -82,9 +59,9 @@ export default function KnowledgeTreeComponent(
         aria-label="knowledge-tree"
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
-        defaultExpanded={getNodesIds(structure)}
+        defaultExpanded={structure && getNodesIds(structure[0])}
       >
-        {getNodes(structure)}
+        {structure && getNodes(structure[0])}
       </TreeView>
     </Stack>
   );

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class DisjunctionOperator extends AbstractOperator {
 
     public DisjunctionOperator(final List<AbstractOperand> operands) {
-        super(operands);
+        super(operands, "disj");
     }
 
     @Override

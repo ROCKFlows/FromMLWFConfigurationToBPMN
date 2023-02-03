@@ -18,13 +18,15 @@ import java.util.List;
 public abstract class AbstractOperator implements AbstractOperand {
 
     protected final List<AbstractOperand> operands;
+    protected final String operandName;
 
-    protected AbstractOperator(final List<AbstractOperand> operands) {
+    protected AbstractOperator(final List<AbstractOperand> operands, String operandName) {
         this.operands = Collections.unmodifiableList(operands);
+        this.operandName = operandName;
     }
 
     protected AbstractOperator() {
-        this(new ArrayList<>());
+        this(new ArrayList<>(), "abstractOperator");
     }
 
     @RequiredArgsConstructor

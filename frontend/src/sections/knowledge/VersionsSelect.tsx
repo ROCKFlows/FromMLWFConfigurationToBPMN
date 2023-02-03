@@ -9,7 +9,7 @@ import {
 import {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAppSelector} from '../../store/hooks';
-import {useGetVersionsQuery} from '../../store/api/versionApi';
+import {useGetVersionsQuery} from '../../store/api/graphql/versionGraphqlApi';
 
 export default function VersionsSelect() {
   const {currentVersion} = useAppSelector((state) => state.version);

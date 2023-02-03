@@ -1,23 +1,6 @@
-import {createApi} from '@reduxjs/toolkit/query/react';
 import {gql} from 'graphql-request';
-import {graphqlRequestBaseQuery} from '@rtk-query/graphql-request-base-query';
-
-export enum FeatureSelectionStatus {
-  SELECTED = 'SELECTED',
-  UNSELECTED = 'UNSELECTED',
-  UNDEFINED = 'UNDEFINED',
-}
-
-export type ConfigurationFeature = {
-  name: string;
-  automatic: FeatureSelectionStatus;
-  manual: FeatureSelectionStatus;
-};
-
-export type Configuration = {
-  name: string;
-  features: ConfigurationFeature[];
-};
+import baseGraphqlApi from './baseGraphqlApi';
+import type {Configuration} from '../../types';
 
 type GetConfigurationResponse = {
   configuration: Configuration;
@@ -31,12 +14,11 @@ type PostConfigurationResponse = {
   configuration: Configuration;
 };
 
-export const configurationApi = createApi({
-  reducerPath: 'configurationApi',
-  baseQuery: graphqlRequestBaseQuery({
-    url: 'http://localhost:8080/ml2wf/api/v1/graphql',
-  }),
-  tagTypes: ['Configuration'],
+const taggedBaseGraphqlApi = baseGraphqlApi.enhanceEndpoints({
+  addTagTypes: ['Configuration'],
+});
+
+const configurationGraphqlApi = taggedBaseGraphqlApi.injectEndpoints({
   endpoints: (builder) => ({
     getConfiguration: builder.query<GetConfigurationResponse, {name: string}>({
       query: ({name}) => ({
@@ -53,6 +35,7 @@ export const configurationApi = createApi({
           }
         `,
       }),
+      providesTags: ['Configuration'],
     }),
     getAllConfigurations: builder.query<GetAllConfigurationsResponse, void>({
       query: () => ({
@@ -69,6 +52,7 @@ export const configurationApi = createApi({
           }
         `,
       }),
+      providesTags: ['Configuration'],
     }),
     postConfiguration: builder.mutation<
       PostConfigurationResponse,
@@ -94,10 +78,13 @@ export const configurationApi = createApi({
       invalidatesTags: ['Configuration'],
     }),
   }),
+  overrideExisting: false,
 });
 
 export const {
   useGetConfigurationQuery,
   useGetAllConfigurationsQuery,
   usePostConfigurationMutation,
-} = configurationApi;
+} = configurationGraphqlApi;
+
+export default configurationGraphqlApi;

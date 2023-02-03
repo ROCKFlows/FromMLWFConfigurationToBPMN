@@ -11,11 +11,9 @@ import {
 } from '@mui/material';
 import {useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../store/hooks';
-import {
-  FeatureSelectionStatus,
-  useGetAllConfigurationsQuery,
-} from '../../store/api/configurationApi';
+import {useGetAllConfigurationsQuery} from '../../store/api/graphql/configurationGraphqlApi';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
+import {FeatureSelectionStatus} from '../../store/types';
 
 export default function PossibleFeaturesSection() {
   const {

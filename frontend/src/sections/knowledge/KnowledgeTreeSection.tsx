@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useEffect} from 'react';
 import {CircularProgress, Stack} from '@mui/material';
 import {useAppDispatch, useAppSelector} from '../../store/hooks';
-import {useGetKnowledgeTreeQuery} from '../../store/api/knowledgeApi';
+import {useGetFeatureModelQuery} from '../../store/api/rest/knowledgeRestApi';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
 import KnowledgeTreeComponent from './components/KnowledgeTreeComponent';
 
@@ -16,7 +16,10 @@ export default function KnowledgeTreeSection() {
     isError,
     error,
     isFetching,
-  } = useGetKnowledgeTreeQuery(currentVersion, {skip: currentVersion === ''});
+  } = useGetFeatureModelQuery(
+    {versionName: currentVersion},
+    {skip: currentVersion === ''},
+  );
 
   const dispatch = useAppDispatch();
 
@@ -48,7 +51,7 @@ export default function KnowledgeTreeSection() {
         <VersionsSelect />
       </Stack>
       {isFetching && <CircularProgress />}
-      {isSuccess && knowledgeTree?.extendedFeatureModel[0].struct[0] && (
+      {isSuccess && knowledgeTree.structure && (
         <KnowledgeTreeComponent knowledgeTree={knowledgeTree} />
       )}
     </Stack>

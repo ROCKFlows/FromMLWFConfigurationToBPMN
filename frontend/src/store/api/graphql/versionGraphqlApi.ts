@@ -1,13 +1,6 @@
-import {createApi} from '@reduxjs/toolkit/query/react';
 import {gql} from 'graphql-request';
-import {graphqlRequestBaseQuery} from '@rtk-query/graphql-request-base-query';
-
-export type Version = {
-  name: string;
-  major: number;
-  minor: number;
-  patch: number;
-};
+import baseGraphqlApi from './baseGraphqlApi';
+import type {Version} from '../../types';
 
 type GetVersionsResponse = {
   versions: Version[];
@@ -17,12 +10,11 @@ type GetLastVersion = {
   lastVersion: Version;
 };
 
-export const versionApi = createApi({
-  reducerPath: 'versionApi',
-  baseQuery: graphqlRequestBaseQuery({
-    url: 'http://localhost:8080/ml2wf/api/v1/graphql',
-  }),
-  tagTypes: ['Versioned'],
+const taggedBaseGraphqlApi = baseGraphqlApi.enhanceEndpoints({
+  addTagTypes: ['Version'],
+});
+
+const versionGraphqlApi = taggedBaseGraphqlApi.injectEndpoints({
   endpoints: (builder) => ({
     getVersions: builder.query<GetVersionsResponse, void>({
       query: () => ({
@@ -53,6 +45,9 @@ export const versionApi = createApi({
       }),
     }),
   }),
+  overrideExisting: false,
 });
 
-export const {useGetVersionsQuery, useGetLastVersionQuery} = versionApi;
+export const {useGetVersionsQuery, useGetLastVersionQuery} = versionGraphqlApi;
+
+export default versionGraphqlApi;

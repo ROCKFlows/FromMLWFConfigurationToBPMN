@@ -5,7 +5,7 @@ import {useParams} from 'react-router';
 import {useNavigate} from 'react-router-dom';
 import {changeVersion} from '../../store/reducers/VersionSlice';
 import {useAppDispatch} from '../../store/hooks';
-import {useGetVersionsQuery} from '../../store/api/versionApi';
+import {useGetVersionsQuery} from '../../store/api/graphql/versionGraphqlApi';
 
 const KnowledgeTreeSection = React.lazy(() =>
   import('../../sections/knowledge/KnowledgeTreeSection'),

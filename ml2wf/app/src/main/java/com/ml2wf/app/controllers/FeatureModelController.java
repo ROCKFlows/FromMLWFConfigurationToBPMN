@@ -27,27 +27,29 @@ public class FeatureModelController {
         this.versionsComponent = versionsComponent;
     }
 
-    @GetMapping(value = {"/versions/all"}, produces = {MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(value = {"/versions/all"},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     List<StandardKnowledgeVersion> getVersions() {
         return versionsComponent.getVersions();
     }
 
-    @GetMapping(value = {"/versions/last"}, produces = {MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(value = {"/versions/last"},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     StandardKnowledgeVersion getLastVersion() {
         return versionsComponent.getLastVersion();
     }
 
-    @GetMapping(value = {""}, produces = {MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(value = {""}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     FeatureModel getFeatureModel(@RequestParam String versionName) {
         return featureModelComponent.getFeatureModel(versionName);
     }
 
-    @GetMapping(value = {"/{name}"}, produces = {MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(value = {"/{name}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     FeatureModelTask getFeatureModelTask(@PathVariable String name, @RequestParam String versionName) {
         return featureModelComponent.getFeatureModelTaskWithName(name, versionName);
     }
 
-    @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE},
+    @PostMapping(value = {""}, consumes = {MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity<String> importFeatureModel(@RequestParam String versionName,
                                               @RequestBody FeatureModel featureModel) {

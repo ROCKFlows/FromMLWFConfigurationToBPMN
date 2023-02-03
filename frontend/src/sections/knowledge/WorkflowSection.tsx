@@ -12,7 +12,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import {useAppDispatch, useAppSelector} from '../../store/hooks';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
-import {useGetWorkflowQuery} from '../../store/api/workflowApi';
+import {useGetWorkflowQuery} from '../../store/api/graphql/workflowGraphqlApi';
 
 const initialNodes = [
   {
@@ -57,24 +57,26 @@ export default function WorkflowSection() {
   );
 
   useEffect(() => {
-    const newWorkflow = workflow?.workflow
+    const newTransformedWorkflow = workflow?.workflow?.processes?.length
       ? {
-          nodes: workflow.workflow.tasks.map((t, i) => ({
+          nodes: workflow.workflow.processes[0].tasks?.map((t, i) => ({
             id: t.name,
             position: {x: i * 200, y: 0},
             data: {label: t.name},
             sourcePosition: 'right',
             targetPosition: 'left',
           })),
-          edges: workflow.workflow.tasks.slice(0, -1).map((n, i) => ({
-            id: `e${i}`,
-            source: workflow.workflow.tasks[i].name,
-            target: workflow.workflow.tasks[i + 1].name,
-          })),
+          edges: workflow.workflow.processes[0].tasks
+            ?.slice(0, -1)
+            .map((t, i) => ({
+              id: `e${i}`,
+              source: workflow.processes[0].tasks[i].name,
+              target: workflow.processes[0].tasks[i + 1].name,
+            })),
         }
       : {nodes: initialNodes, edges: initialEdges};
-    setNodes(newWorkflow.nodes);
-    setEdges(newWorkflow.edges);
+    setNodes(newTransformedWorkflow.nodes);
+    setEdges(newTransformedWorkflow.edges);
   }, [workflow]);
 
   useEffect(() => {

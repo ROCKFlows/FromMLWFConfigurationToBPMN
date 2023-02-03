@@ -10,11 +10,11 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractUnaryOperator extends AbstractOperator {
 
-    protected AbstractUnaryOperator(final AbstractOperand operand) {
-        super(Collections.singletonList(operand));
+    protected AbstractUnaryOperator(final AbstractOperand operand, String operandName) {
+        super(Collections.singletonList(operand), operandName);
     }
 
-    protected AbstractUnaryOperator(final List<AbstractOperand> singleOperandList) {
-        super(Collections.singletonList(singleOperandList.get(0)));
+    protected AbstractUnaryOperator(final List<AbstractOperand> singleOperandList, String operandName) {
+        super(Collections.singletonList(singleOperandList.get(0)), operandName);
     }
 }

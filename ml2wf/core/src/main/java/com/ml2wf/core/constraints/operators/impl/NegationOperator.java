@@ -12,11 +12,11 @@ import java.util.List;
 public class NegationOperator extends AbstractUnaryOperator {
 
     public NegationOperator(final AbstractOperand operand) {
-        super(operand);
+        super(operand, "not");
     }
 
     public NegationOperator(final List<AbstractOperand> singleOperandList) {
-        super(singleOperandList);
+        super(singleOperandList, "not");
         // this constructor only accept a single valued list
     }
 

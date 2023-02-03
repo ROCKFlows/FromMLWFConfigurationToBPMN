@@ -6,11 +6,8 @@ import {
   ListItemButton,
   ListItemText,
 } from '@mui/material';
-import {
-  Configuration,
-  ConfigurationFeature,
-  FeatureSelectionStatus,
-} from '../../../store/api/configurationApi';
+import type {Configuration, ConfigurationFeature} from '../../../store/types';
+import {FeatureSelectionStatus} from '../../../store/types';
 
 type ConfigurationProps = {
   configuration: Configuration;
@@ -34,13 +31,14 @@ export default function ConfigurationComponent(props: ConfigurationProps) {
               }
               disabled={f.automatic === FeatureSelectionStatus.SELECTED}
               onChange={(_, checked) => {
-                onSelected &&
+                if (onSelected) {
                   onSelected({
                     ...f,
                     manual: checked
                       ? FeatureSelectionStatus.SELECTED
                       : FeatureSelectionStatus.UNSELECTED,
                   });
+                }
               }}
             />
           }

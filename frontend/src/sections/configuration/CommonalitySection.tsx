@@ -12,12 +12,10 @@ import {
   Typography,
 } from '@mui/material';
 import {useTheme} from '@mui/material/styles';
-import {
-  FeatureSelectionStatus,
-  useGetAllConfigurationsQuery,
-} from '../../store/api/configurationApi';
+import {useGetAllConfigurationsQuery} from '../../store/api/graphql/configurationGraphqlApi';
 import {useAppDispatch} from '../../store/hooks';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
+import {FeatureSelectionStatus} from '../../store/types';
 
 export default function CommonalitySection() {
   const {
@@ -58,10 +56,15 @@ export default function CommonalitySection() {
     return <CircularProgress />;
   }
 
-  const commonality = configurations?.configurations[0].features.filter(
+  const allConfigurations = configurations?.configurations.length
+    ? configurations.configurations
+    : [];
+  const allFeatures = allConfigurations[0]?.features ?? [];
+
+  const commonality = allFeatures.filter(
     (f) =>
       f.manual !== FeatureSelectionStatus.UNDEFINED &&
-      !configurations.configurations.find((c) =>
+      !allConfigurations.find((c) =>
         c.features.find(
           (cf) =>
             f.name === cf.name &&

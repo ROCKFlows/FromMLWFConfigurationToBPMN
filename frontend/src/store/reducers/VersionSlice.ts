@@ -10,7 +10,7 @@ const initialState: VersionSliceState = {
   currentVersion: '',
 };
 
-export const versionSlice = createSlice({
+const versionSlice = createSlice({
   name: 'version',
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,

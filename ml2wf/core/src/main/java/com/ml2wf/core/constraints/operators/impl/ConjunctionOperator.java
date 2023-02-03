@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class ConjunctionOperator extends AbstractOperator {
 
     public ConjunctionOperator(final List<AbstractOperand> operands) {
-        super(operands);
+        super(operands, "conj");
     }
 
     @Override

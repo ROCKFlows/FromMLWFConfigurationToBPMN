@@ -15,12 +15,9 @@ import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAppDispatch} from '../../store/hooks';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
-import {parseConfigurationXMLToObject} from '../../xml/parser';
-import {
-  Configuration,
-  usePostConfigurationMutation,
-} from '../../store/api/configurationApi';
+import {usePostConfigurationMutation} from '../../store/api/graphql/configurationGraphqlApi';
 import ConfigurationComponent from '../../sections/configuration/components/ConfigurationComponent';
+import {useGetConfigurationPreviewQuery} from '../../store/api/rest/configurationRestApi';
 
 const focusedStyle = {
   borderColor: '#2196f3',
@@ -35,13 +32,20 @@ const rejectStyle = {
 };
 
 export default function ConfigurationImportPage() {
+  const [newConfigurationName, setNewConfigurationName] = useState<string>('');
   const [newConfigurationFile, setNewConfigurationFile] = useState<
     File | undefined
   >(undefined);
-  const [newConfiguration, setNewConfiguration] = useState<Configuration>({
-    name: '',
-    features: [],
-  });
+  const {
+    data: newRawConfiguration,
+    isSuccess: isPreviewSuccess,
+    isError: isPreviewError,
+    error: previewError,
+    isFetching: isPreviewFetching,
+  } = useGetConfigurationPreviewQuery(
+    {body: newConfigurationFile},
+    {skip: !newConfigurationFile},
+  );
 
   const navigate = useNavigate();
 
@@ -92,7 +96,7 @@ export default function ConfigurationImportPage() {
     }
     if (isError) {
       console.error(
-        `Failed to post new configuration with name ${newConfiguration.name}. Error is \n${error?.message}`,
+        `Failed to post new configuration with name ${newConfigurationName}. Error is \n${error?.message}`,
         error,
       );
     }
@@ -100,8 +104,8 @@ export default function ConfigurationImportPage() {
       showSnackbar({
         severity: isError ? 'error' : 'success',
         message: isError
-          ? `Failed to post new configuration with name ${newConfiguration.name}.`
-          : `Configuration successfully imported with name ${newConfiguration.name}.`,
+          ? `Failed to post new configuration with name ${newConfigurationName}.`
+          : `Configuration successfully imported with name ${newConfigurationName}.`,
       }),
     );
     if (isSuccess) {
@@ -116,28 +120,6 @@ export default function ConfigurationImportPage() {
     setNewConfigurationFile(acceptedFiles[0] as File);
   }, [acceptedFiles]);
 
-  useEffect(() => {
-    if (!newConfigurationFile) {
-      return;
-    }
-    const reader = new FileReader();
-    reader.onerror = () => {
-      dispatch(
-        showSnackbar({
-          severity: 'error',
-          message: `Failed to load the configuration file.`,
-        }),
-      );
-    };
-    reader.onload = () => {
-      setNewConfiguration({
-        ...newConfiguration,
-        features: parseConfigurationXMLToObject(reader.result),
-      });
-    };
-    reader.readAsText(newConfigurationFile, 'utf8');
-  }, [newConfigurationFile]);
-
   return (
     <Stack spacing={2} height="100%" sx={{height: '92vh', padding: '1em'}}>
       <Typography>Add Configuration</Typography>
@@ -147,10 +129,8 @@ export default function ConfigurationImportPage() {
             id="new-version-name-textfield"
             label="Configuration name"
             variant="outlined"
-            value={newConfiguration.name}
-            onChange={(e) =>
-              setNewConfiguration({...newConfiguration, name: e.target.value})
-            }
+            value={newConfigurationName}
+            onChange={(e) => setNewConfigurationName(e.target.value)}
           />
           <Box {...getRootProps()} sx={style}>
             <input {...getInputProps()} />
@@ -162,15 +142,25 @@ export default function ConfigurationImportPage() {
         </Stack>
       </Paper>
       <Paper sx={{height: '60vh', padding: '1em', overflow: 'auto'}}>
-        {newConfiguration && (
-          <ConfigurationComponent configuration={newConfiguration} />
+        {newRawConfiguration && (
+          <ConfigurationComponent
+            configuration={{
+              name: newConfigurationName,
+              features: newRawConfiguration.features,
+            }}
+          />
         )}
       </Paper>
       <Box
         sx={{textAlign: 'center', zIndex: 100, cursor: 'pointer'}}
         onClick={() => {
-          if (newConfiguration.name) {
-            addConfiguration({configuration: newConfiguration});
+          if (newConfigurationName && newRawConfiguration) {
+            addConfiguration({
+              configuration: {
+                name: newConfigurationName,
+                features: newRawConfiguration.features,
+              },
+            });
           }
         }}
       >
@@ -179,7 +169,7 @@ export default function ConfigurationImportPage() {
           aria-label="add"
           variant="extended"
           sx={{position: 'absolute', bottom: '5vh'}}
-          disabled={!newConfiguration.name || isLoading}
+          disabled={!newConfigurationName || isLoading}
         >
           {isLoading && <CircularProgress />}
           <FileUploadIcon />

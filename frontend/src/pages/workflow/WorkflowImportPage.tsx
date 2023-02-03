@@ -25,11 +25,10 @@ import 'reactflow/dist/style.css';
 import {useNavigate} from 'react-router-dom';
 import {useAppDispatch} from '../../store/hooks';
 import {
-  usePostNewWorkflowMutation,
-  Workflow,
-} from '../../store/api/knowledgeApi';
+  useGetBpmnWorkflowPreviewQuery,
+  useImportBpmnWorkflowMutation,
+} from '../../store/api/rest/workflowRestApi';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
-import {parseWorkflowXMLToObject} from '../../xml/parser';
 
 const focusedStyle = {
   borderColor: '#2196f3',
@@ -48,8 +47,15 @@ export default function WorkflowImportPage() {
   const [newWorkflowFile, setNewWorkflowFile] = useState<File | undefined>(
     undefined,
   );
-  const [newWorkflow, setNewWorkflow] = useState<Workflow | undefined>(
-    undefined,
+  const {
+    data: newWorkflow,
+    isSuccess: isPreviewSuccess,
+    isError: isPreviewError,
+    error: previewError,
+    isFetching: isPreviewFetching,
+  } = useGetBpmnWorkflowPreviewQuery(
+    {body: newWorkflowFile},
+    {skip: !newWorkflowFile},
   );
 
   const navigate = useNavigate();
@@ -99,9 +105,29 @@ export default function WorkflowImportPage() {
   );
 
   const [addWorkflow, {isLoading, isSuccess, isError, error}] =
-    usePostNewWorkflowMutation();
+    useImportBpmnWorkflowMutation();
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!(isPreviewSuccess || isPreviewSuccess)) {
+      return;
+    }
+    if (isPreviewError) {
+      console.error(
+        `Failed to get workflow preview. Please check the provided workflow format. Error is \n${previewError?.data}`,
+        error,
+      );
+    }
+    dispatch(
+      showSnackbar({
+        severity: isError ? 'error' : 'success',
+        message: isError
+          ? `Failed to get workflow preview. Please check the provided workflow format.`
+          : `Workflow preview successfully retrieved.`,
+      }),
+    );
+  }, [isPreviewSuccess, isPreviewError]);
 
   useEffect(() => {
     if (!(isSuccess || isError)) {
@@ -134,28 +160,25 @@ export default function WorkflowImportPage() {
   }, [acceptedFiles]);
 
   useEffect(() => {
-    setNodes(newWorkflow?.nodes ?? []);
-    setEdges(newWorkflow?.edges ?? []);
+    const newTransformedWorkflow = newWorkflow?.processes?.length
+      ? {
+          nodes: newWorkflow.processes[0].tasks?.map((t, i) => ({
+            id: t.name,
+            position: {x: i * 200, y: 0},
+            data: {label: t.name},
+            sourcePosition: 'right',
+            targetPosition: 'left',
+          })),
+          edges: newWorkflow.processes[0].tasks?.slice(0, -1).map((t, i) => ({
+            id: `e${i}`,
+            source: newWorkflow.processes[0].tasks[i].name,
+            target: newWorkflow.processes[0].tasks[i + 1].name,
+          })),
+        }
+      : {nodes: [], edges: []};
+    setNodes(newTransformedWorkflow.nodes);
+    setEdges(newTransformedWorkflow.edges);
   }, [newWorkflow]);
-
-  useEffect(() => {
-    if (!newWorkflowFile) {
-      return;
-    }
-    const reader = new FileReader();
-    reader.onerror = () => {
-      dispatch(
-        showSnackbar({
-          severity: 'error',
-          message: `Failed to load the workflow file.`,
-        }),
-      );
-    };
-    reader.onload = () => {
-      setNewWorkflow(parseWorkflowXMLToObject(reader.result));
-    };
-    reader.readAsText(newWorkflowFile, 'utf8');
-  }, [newWorkflowFile]);
 
   return (
     <Stack spacing={2} height="100%" sx={{height: '92vh', padding: '1em'}}>
@@ -195,8 +218,8 @@ export default function WorkflowImportPage() {
         sx={{textAlign: 'center', zIndex: 100, cursor: 'pointer'}}
         onClick={() =>
           addWorkflow({
-            newVersion: newVersionName,
-            workflowFile: newWorkflowFile,
+            newVersionName,
+            body: newWorkflowFile,
           })
         }
       >

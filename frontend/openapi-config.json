@@ -1,0 +1,8 @@
+{
+  "schemaFile": "http://localhost:8080/ml2wf/api/v1/api-docs",
+  "apiFile": "./src/store/api/rest/baseRestApi.ts",
+  "apiImport": "baseRestApi",
+  "outputFile": "./src/store/api/rest/generatedRestApi.ts",
+  "exportName": "generatedRestApi",
+  "hooks": true
+}

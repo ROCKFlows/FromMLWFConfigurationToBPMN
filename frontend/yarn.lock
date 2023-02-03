@@ -3121,17 +3121,6 @@ eslint-plugin-react@latest:
   languageName: node
   linkType: hard
 
-"fast-xml-parser@npm:^4.0.12":
-  version: 4.0.15
-  resolution: "fast-xml-parser@npm:4.0.15"
-  dependencies:
-    strnum: ^1.0.5
-  bin:
-    fxparser: src/cli/cli.js
-  checksum: bf0f2cba65d6ef40bee95e8b05b48738c53260ac0f8e7e938861364dae8d242ee6fa7247079d0b8a53ddd67bfb2468ac04b64c418ac44ff5cccafb72a4a760aa
-  languageName: node
-  linkType: hard
-
 "fastq@npm:^1.6.0":
   version: 1.15.0
   resolution: "fastq@npm:1.15.0"
@@ -3253,7 +3242,6 @@ eslint-plugin-react@latest:
     eslint-plugin-n: ^15.0.0
     eslint-plugin-promise: ^6.0.0
     eslint-plugin-react: latest
-    fast-xml-parser: ^4.0.12
     graphql: ^16.6.0
     graphql-request: ^5.1.0
     husky: ^8.0.2
@@ -5500,13 +5488,6 @@ eslint-plugin-react@latest:
   version: 3.1.1
   resolution: "strip-json-comments@npm:3.1.1"
   checksum: 492f73e27268f9b1c122733f28ecb0e7e8d8a531a6662efbd08e22cccb3f9475e90a1b82cab06a392f6afae6d2de636f977e231296400d0ec5304ba70f166443
-  languageName: node
-  linkType: hard
-
-"strnum@npm:^1.0.5":
-  version: 1.0.5
-  resolution: "strnum@npm:1.0.5"
-  checksum: 651b2031db5da1bf4a77fdd2f116a8ac8055157c5420f5569f64879133825915ad461513e7202a16d7fec63c54fd822410d0962f8ca12385c4334891b9ae6dd2
   languageName: node
   linkType: hard
 

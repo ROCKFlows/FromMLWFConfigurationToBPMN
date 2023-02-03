@@ -12,14 +12,12 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import {useTheme} from '@mui/material/styles';
 import {useDropzone} from 'react-dropzone';
 import {useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {useAppDispatch} from '../../store/hooks';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
-import {parseKnowledgeTreeXMLToObject} from '../../xml/parser';
 import {
-  KnowledgeTree,
-  usePostKnowledgeTreeMutation,
-} from '../../store/api/knowledgeApi';
+  useGetFeatureModelPreviewQuery,
+  useImportFeatureModelMutation,
+} from '../../store/api/rest/knowledgeRestApi';
 import KnowledgeTreeComponent from '../../sections/knowledge/components/KnowledgeTreeComponent';
 
 const focusedStyle = {
@@ -39,11 +37,16 @@ export default function KnowledgeImportPage() {
   const [newKnowledgeTreeFile, setNewKnowledgeTreeFile] = useState<
     File | undefined
   >(undefined);
-  const [newKnowledgeTree, setNewKnowledgeTree] = useState<
-    KnowledgeTree | undefined
-  >(undefined);
-
-  const navigate = useNavigate();
+  const {
+    data: newKnowledgeTree,
+    isSuccess: isPreviewSuccess,
+    isError: isPreviewError,
+    error: previewError,
+    isFetching: isPreviewFetching,
+  } = useGetFeatureModelPreviewQuery(
+    {body: newKnowledgeTreeFile},
+    {skip: !newKnowledgeTreeFile},
+  );
 
   const theme = useTheme();
 
@@ -82,7 +85,7 @@ export default function KnowledgeImportPage() {
   );
 
   const [addKnowledgeTree, {isLoading, isSuccess, isError, error}] =
-    usePostKnowledgeTreeMutation();
+    useImportFeatureModelMutation();
 
   const dispatch = useAppDispatch();
 
@@ -116,25 +119,6 @@ export default function KnowledgeImportPage() {
     setNewKnowledgeTreeFile(acceptedFiles[0] as File);
   }, [acceptedFiles]);
 
-  useEffect(() => {
-    if (!newKnowledgeTreeFile) {
-      return;
-    }
-    const reader = new FileReader();
-    reader.onerror = () => {
-      dispatch(
-        showSnackbar({
-          severity: 'error',
-          message: `Failed to load the configuration file.`,
-        }),
-      );
-    };
-    reader.onload = () => {
-      setNewKnowledgeTree(parseKnowledgeTreeXMLToObject(reader.result));
-    };
-    reader.readAsText(newKnowledgeTreeFile, 'utf8');
-  }, [newKnowledgeTreeFile]);
-
   return (
     <Stack spacing={2} height="100%" sx={{height: '92vh', padding: '1em'}}>
       <Typography>Add Knowledge Tree</Typography>
@@ -164,10 +148,10 @@ export default function KnowledgeImportPage() {
       <Box
         sx={{textAlign: 'center', zIndex: 100, cursor: 'pointer'}}
         onClick={() => {
-          if (newKnowledgeTree?.extendedFeatureModel.length) {
+          if (newKnowledgeTree?.structure?.children?.length) {
             addKnowledgeTree({
               versionName: newVersionName,
-              knowledgeFile: newKnowledgeTreeFile,
+              body: newKnowledgeTreeFile,
             });
           }
         }}
@@ -179,7 +163,7 @@ export default function KnowledgeImportPage() {
           sx={{position: 'absolute', bottom: '5vh'}}
           disabled={
             !newVersionName ||
-            !newKnowledgeTree?.extendedFeatureModel.length ||
+            !newKnowledgeTree?.structure?.children?.length ||
             isLoading
           }
         >

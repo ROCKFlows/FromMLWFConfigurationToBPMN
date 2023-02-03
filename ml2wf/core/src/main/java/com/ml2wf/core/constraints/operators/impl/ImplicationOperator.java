@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class ImplicationOperator extends AbstractOperator {
 
     public ImplicationOperator(final List<AbstractOperand> operands) {
-        super(operands);
+        super(operands, "imp");
     }
 
     @Override

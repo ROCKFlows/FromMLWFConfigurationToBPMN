@@ -2,12 +2,10 @@ import * as React from 'react';
 import {useEffect} from 'react';
 import {CircularProgress, Stack} from '@mui/material';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
-import {
-  FeatureSelectionStatus,
-  useGetAllConfigurationsQuery,
-} from '../../store/api/configurationApi';
+import {useGetAllConfigurationsQuery} from '../../store/api/graphql/configurationGraphqlApi';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
 import {useAppDispatch} from '../../store/hooks';
+import {FeatureSelectionStatus} from '../../store/types';
 
 export default function VariabilitySection() {
   const {
@@ -46,7 +44,10 @@ export default function VariabilitySection() {
     return <CircularProgress />;
   }
 
-  const nbFeatures = configurations?.configurations[0].features.length;
+  const allFeatures = configurations?.configurations.length
+    ? configurations?.configurations[0].features
+    : [];
+  const nbFeatures = allFeatures.length;
 
   const columns: GridColDef[] = [
     {field: 'id', headerName: 'Feature', width: 200},
@@ -67,7 +68,7 @@ export default function VariabilitySection() {
     },
   ];
 
-  const variability = configurations?.configurations[0].features.map((f) =>
+  const variability = allFeatures.map((f) =>
     configurations?.configurations.reduce(
       (r, c) => {
         const result = c.features.find((cf) => cf.name === f.name);

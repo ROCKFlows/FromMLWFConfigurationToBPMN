@@ -19,7 +19,7 @@ public class ConfigurationsController {
         this.configurationsComponent = configurationsComponent;
     }
 
-    @PostMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_XML_VALUE},
+    @PostMapping(value = {""}, consumes = {MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity<String> importConfiguration(@RequestParam String configurationName,
                                               @RequestBody RawConfiguration configuration) {
@@ -28,8 +28,8 @@ public class ConfigurationsController {
         return new ResponseEntity<>("OK", HttpStatus.ACCEPTED);
     }
 
-    @GetMapping(value = {"", "/"}, produces = {MediaType.APPLICATION_XML_VALUE})
-    RawConfiguration importConfiguration(@RequestParam String configurationName) {
+    @GetMapping(value = {""}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    RawConfiguration getConfiguration(@RequestParam String configurationName) {
         return new RawConfiguration(configurationsComponent.getConfiguration(configurationName).getFeatures());
     }
 }

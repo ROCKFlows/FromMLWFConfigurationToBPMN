@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Configuration, ConfigurationFeature} from '../api/configurationApi';
+import {Configuration, ConfigurationFeature} from '../types';
 
 // Define a type for the slice state
 interface ConfigurationSliceState {
@@ -11,7 +11,7 @@ const initialState: ConfigurationSliceState = {
   currentConfiguration: {name: 'new empty configuration', features: []},
 };
 
-export const configurationSlice = createSlice({
+const configurationSlice = createSlice({
   name: 'configuration',
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,

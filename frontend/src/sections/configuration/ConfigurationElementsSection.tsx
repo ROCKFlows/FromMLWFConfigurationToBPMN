@@ -2,17 +2,15 @@ import * as React from 'react';
 import {useEffect} from 'react';
 import {CircularProgress, Stack} from '@mui/material';
 import {useAppDispatch, useAppSelector} from '../../store/hooks';
-import {useGetKnowledgeTreeQuery} from '../../store/api/knowledgeApi';
+import {useGetFeatureModelQuery} from '../../store/api/rest/knowledgeRestApi';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
 import {
   setConfigurationFeatures,
   updateConfigurationFeature,
 } from '../../store/reducers/ConfigurationSlice';
-import {
-  ConfigurationFeature,
-  FeatureSelectionStatus,
-} from '../../store/api/configurationApi';
+import type {ConfigurationFeature} from '../../store/types';
 import ConfigurationComponent from './components/ConfigurationComponent';
+import {FeatureModelTask, FeatureSelectionStatus} from '../../store/types';
 
 export default function ConfigurationElementsSection() {
   const {currentVersion} = useAppSelector((state) => state.version);
@@ -22,7 +20,10 @@ export default function ConfigurationElementsSection() {
     isError,
     error,
     isFetching,
-  } = useGetKnowledgeTreeQuery(currentVersion, {skip: currentVersion === ''});
+  } = useGetFeatureModelQuery(
+    {versionName: currentVersion},
+    {skip: currentVersion === ''},
+  );
   const {currentConfiguration} = useAppSelector((state) => state.configuration);
 
   const dispatch = useAppDispatch();
@@ -49,33 +50,25 @@ export default function ConfigurationElementsSection() {
     }
   }, [isError, error]);
 
-  const getNodesIds = (node: any): string[] => {
-    if (!node || node.description) {
-      return [];
-    }
-    let result = [node[':@']['@_name']];
-    if (node.and) {
-      result = [
-        ...result,
-        ...(Array.isArray(node.and)
-          ? node.and.flatMap((n) => getNodesIds(n))
-          : getNodesIds(node.and)),
-      ];
-    }
-    return result;
-  };
+  const getNodesIds = (task: FeatureModelTask): string[] => [
+    task.name,
+    ...(task.children?.length ? task.children : []).flatMap((c) =>
+      getNodesIds(c),
+    ),
+  ];
 
   useEffect(() => {
-    const features = getNodesIds(
-      knowledgeTree?.extendedFeatureModel[0].struct[0],
-    ).map(
-      (f) =>
-        ({
-          name: f,
-          automatic: FeatureSelectionStatus.UNDEFINED,
-          manual: FeatureSelectionStatus.UNSELECTED,
-        } as ConfigurationFeature),
-    );
+    const features =
+      knowledgeTree?.structure?.children && knowledgeTree.structure.children[0]
+        ? getNodesIds(knowledgeTree.structure.children[0]).map(
+            (f) =>
+              ({
+                name: f,
+                automatic: FeatureSelectionStatus.UNDEFINED,
+                manual: FeatureSelectionStatus.UNSELECTED,
+              } as ConfigurationFeature),
+          )
+        : [];
     dispatch(setConfigurationFeatures({features}));
   }, [currentVersion]);
 

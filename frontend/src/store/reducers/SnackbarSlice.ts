@@ -15,7 +15,7 @@ const initialState: SnackbarSliceState = {
   show: false,
 };
 
-export const snackbarSlice = createSlice({
+const snackbarSlice = createSlice({
   name: 'snackbar',
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
