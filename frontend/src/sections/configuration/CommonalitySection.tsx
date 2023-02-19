@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import {useTheme} from '@mui/material/styles';
 import {useGetAllConfigurationsQuery} from '../../store/api/graphql/configurationGraphqlApi';
-import {useAppDispatch} from '../../store/hooks';
+import {useAppDispatch, useAppSelector} from '../../store/hooks';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
 import {FeatureSelectionStatus} from '../../store/types';
 
@@ -25,6 +25,7 @@ export default function CommonalitySection() {
     error,
     isFetching,
   } = useGetAllConfigurationsQuery();
+  const {currentConfiguration} = useAppSelector((state) => state.configuration);
 
   const dispatch = useAppDispatch();
 
@@ -56,9 +57,10 @@ export default function CommonalitySection() {
     return <CircularProgress />;
   }
 
-  const allConfigurations = configurations?.configurations.length
-    ? configurations.configurations
-    : [];
+  const allConfigurations = [
+    currentConfiguration,
+    ...(configurations?.configurations ?? []),
+  ];
   const allFeatures = allConfigurations[0]?.features ?? [];
 
   const commonality = allFeatures.filter(

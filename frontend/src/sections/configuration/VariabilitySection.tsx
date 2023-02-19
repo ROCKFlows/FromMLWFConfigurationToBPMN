@@ -4,7 +4,7 @@ import {CircularProgress, Stack} from '@mui/material';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import {useGetAllConfigurationsQuery} from '../../store/api/graphql/configurationGraphqlApi';
 import {showSnackbar} from '../../store/reducers/SnackbarSlice';
-import {useAppDispatch} from '../../store/hooks';
+import {useAppDispatch, useAppSelector} from '../../store/hooks';
 import {FeatureSelectionStatus} from '../../store/types';
 
 export default function VariabilitySection() {
@@ -15,6 +15,7 @@ export default function VariabilitySection() {
     error,
     isFetching,
   } = useGetAllConfigurationsQuery();
+  const {currentConfiguration} = useAppSelector((state) => state.configuration);
 
   const dispatch = useAppDispatch();
 
@@ -44,9 +45,11 @@ export default function VariabilitySection() {
     return <CircularProgress />;
   }
 
-  const allFeatures = configurations?.configurations.length
-    ? configurations?.configurations[0].features
-    : [];
+  const allConfigurations = [
+    currentConfiguration,
+    ...(configurations?.configurations ?? []),
+  ];
+  const allFeatures = allConfigurations[0]?.features ?? [];
   const nbFeatures = allFeatures.length;
 
   const columns: GridColDef[] = [
@@ -69,7 +72,7 @@ export default function VariabilitySection() {
   ];
 
   const variability = allFeatures.map((f) =>
-    configurations?.configurations.reduce(
+    [...(configurations?.configurations ?? []), currentConfiguration].reduce(
       (r, c) => {
         const result = c.features.find((cf) => cf.name === f.name);
         if (
