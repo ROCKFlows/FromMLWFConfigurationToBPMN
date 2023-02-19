@@ -67,6 +67,7 @@ const knowledgeRestApi = taggedBaseRestApi.injectEndpoints({
           accept: 'application/json',
           'Content-Type': 'application/xml',
         },
+        responseHandler: (response) => response.text(),
       }),
       invalidatesTags: ['Knowledge', 'Version'],
     }),

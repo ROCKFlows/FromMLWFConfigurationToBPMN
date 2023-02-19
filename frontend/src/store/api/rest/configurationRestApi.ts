@@ -61,6 +61,7 @@ const configurationRestApi = taggedBaseRestApi.injectEndpoints({
           accept: 'application/json',
           'Content-Type': 'application/xml',
         },
+        responseHandler: (response) => response.text(),
       }),
       invalidatesTags: ['Configuration'],
     }),
